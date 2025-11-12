@@ -57,14 +57,14 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         public async Task<ApiPageRes<QrCodeDto>> ListAsync([FromQuery] QrCodeQueryDto dto)
         {
             var data = await _qrCodeService.GetPaginatedDataAsync(dto);
-            var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
-            var appIds = data.Select(s => s.AppId).Distinct().ToList();
-            var storeIds = data.Select(s => s.StoreId).Distinct().ToList();
-            var mchInfos = _mchInfoService.GetByMchNos(mchNos);
-            var mchApps = _mchAppService.GetByAppIds(appIds);
-            var mchStores = _mchStoreService.GetByStoreIdsAsNoTracking(storeIds);
+            var mchNos = data.Items.Select(s => s.MchNo).Distinct().ToList();
+            var appIds = data.Items.Select(s => s.AppId).Distinct().ToList();
+            var storeIds = data.Items.Select(s => s.StoreId).Distinct().ToList();
+            var mchInfos = await _mchInfoService.GetByMchNosAsNoTrackingAsync(mchNos);
+            var mchApps = await _mchAppService.GetByAppIdsAsNoTrackingAsync(appIds);
+            var mchStores = await _mchStoreService.GetByStoreIdsAsNoTrackingAsync(storeIds);
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            foreach (var item in data)
+            foreach (var item in data.Items)
             {
                 item.AddExt("mchName", mchInfos?.FirstOrDefault(s => s.MchNo == item.MchNo)?.MchName);
                 item.AddExt("appName", mchApps?.FirstOrDefault(s => s.AppId == item.AppId)?.AppName);

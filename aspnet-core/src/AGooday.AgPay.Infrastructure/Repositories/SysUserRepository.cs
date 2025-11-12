@@ -1,8 +1,9 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Domain.Queries.SysUsers;
 using AGooday.AgPay.Infrastructure.Context;
-using Microsoft.EntityFrameworkCore;
+using AGooday.AgPay.Infrastructure.Extensions;
 
 namespace AGooday.AgPay.Infrastructure.Repositories
 {
@@ -11,6 +12,26 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         public SysUserRepository(AgPayDbContext context)
             : base(context)
         {
+        }
+
+        public IQueryable<SysUserQueryResult> GetSysUsers(SysUserQuery request)
+        {
+            var query = from u in GetAllAsNoTracking()
+                        join ut in GetAllAsNoTracking<SysUserTeam>()
+                            on u.TeamId equals ut.TeamId into teamGroup
+                        from team in teamGroup.DefaultIfEmpty()
+                        select new SysUserQueryResult { SysUser = u, SysUserTeam = team };
+
+            query.WhereIfNotEmpty(request.SysType, w => w.SysUser.SysType == request.SysType)
+                .WhereIfNotEmpty(request.BelongInfoId, w => w.SysUser.BelongInfoId == request.BelongInfoId)
+                .WhereIfNotEmpty(request.Realname, w => w.SysUser.Realname.Contains(request.Realname))
+                .WhereIfNotNull(request.UserType, w => w.SysUser.UserType == request.UserType.Value)
+                .WhereIfNotNull(request.SysUserId, w => w.SysUser.SysUserId == request.SysUserId.Value)
+                .WhereIfNotNull(request.CurrentUserId, w => w.SysUser.SysUserId != request.CurrentUserId.Value);
+
+            query = query.OrderByDescending(o => o.SysUser.CreatedAt);
+
+            return query;
         }
 
         public Task<bool> IsExistLoginUsernameAsync(string loginUsername, string sysType)

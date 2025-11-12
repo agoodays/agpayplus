@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
                     {
                         var parentAgents = _agentInfoService.GetParents(agentInfo.Pid);
                         var agentNos = parentAgents.Select(o => o.AgentNo).ToList();
-                        var agentPayInterfaceConfigs = _payIfConfigService.GetByInfoIdAndIfCodes(CS.INFO_TYPE.AGENT, agentNos, ifCode);
+                        var agentPayInterfaceConfigs = await _payIfConfigService.GetByInfoIdAndIfCodesAsync(CS.INFO_TYPE.AGENT, agentNos, ifCode);
                         foreach (var item in agentPayInterfaceConfigs)
                         {
                             isSupportApplyments.Add(item.IsOpenApplyment);
@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.PayConfig
                         {
                             var mchParentAgents = _agentInfoService.GetParents(mchInfo.AgentNo);
                             var agentNos = mchParentAgents.Select(o => o.AgentNo).ToList();
-                            var agentPayInterfaceConfigs = _payIfConfigService.GetByInfoIdAndIfCodes(CS.INFO_TYPE.AGENT, agentNos, ifCode);
+                            var agentPayInterfaceConfigs = await _payIfConfigService.GetByInfoIdAndIfCodesAsync(CS.INFO_TYPE.AGENT, agentNos, ifCode);
                             foreach (var item in agentPayInterfaceConfigs)
                             {
                                 isSupportApplyments.Add(item.IsOpenApplyment);

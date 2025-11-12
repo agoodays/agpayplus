@@ -14,6 +14,6 @@ namespace AGooday.AgPay.Application.Interfaces
         Task<int> SaveUserRoleAsync(long userId, List<string> roleIds);
         IEnumerable<string> SelectRoleIdsByUserId(long userId);
         IEnumerable<long> SelectUserIdsByRoleId(string roleId);
-        Task<PaginatedList<SysUserRoleRelaDto>> GetPaginatedDataAsync(SysUserRoleRelaQueryDto dto);
+        Task<PaginatedResult<SysUserRoleRelaDto>> GetPaginatedDataAsync(SysUserRoleRelaQueryDto dto);
     }
 }

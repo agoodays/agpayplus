@@ -25,9 +25,9 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="ifCode">接口类型</param>
         /// <returns></returns>
         Task<PayInterfaceConfigDto> GetByInfoIdAndIfCodeAsync(string infoType, string infoId, string ifCode);
-        IEnumerable<PayInterfaceConfigDto> GetByInfoIdAndIfCodes(string infoType, List<string> infoIds, string ifCode);
-        IEnumerable<PayInterfaceConfigDto> GetByInfoId(string infoType, string infoId);
-        IEnumerable<PayInterfaceConfigDto> GetPayOauth2ConfigByStartsWithInfoId(string infoType, string infoId);
+        Task<List<PayInterfaceConfigDto>> GetByInfoIdAndIfCodesAsync(string infoType, List<string> infoIds, string ifCode);
+        Task<List<PayInterfaceConfigDto>> GetByInfoIdAsync(string infoType, string infoId);
+        Task<List<PayInterfaceConfigDto>> GetPayOauth2ConfigByStartsWithInfoIdAsync(string infoType, string infoId);
         /// <summary>
         /// 查询商户app使用已正确配置了通道信息
         /// </summary>

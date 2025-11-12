@@ -9,6 +9,6 @@ namespace AGooday.AgPay.Application.Interfaces
         Task<string> BatchIdDistinctCountAsync();
         Task<bool> BatchAddAsync(QrCodeAddDto dto);
         Task<bool> UnBindAsync(string recordId);
-        Task<PaginatedList<QrCodeDto>> GetPaginatedDataAsync(QrCodeQueryDto dto);
+        Task<PaginatedResult<QrCodeDto>> GetPaginatedDataAsync(QrCodeQueryDto dto);
     }
 }

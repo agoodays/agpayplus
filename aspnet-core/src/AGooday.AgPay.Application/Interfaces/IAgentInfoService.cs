@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Application.Interfaces
         Task ModifyAsync(AgentInfoModifyDto dto);
         Task<bool> UpdateByIdAsync(AgentInfoDto dto);
         IEnumerable<AgentInfoDto> GetParents(string agentNo);
-        Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(AgentInfoQueryDto dto);
-        Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(string agentNo, AgentInfoQueryDto dto);
+        Task<PaginatedResult<AgentInfoDto>> GetPaginatedDataAsync(AgentInfoQueryDto dto);
+        Task<PaginatedResult<AgentInfoDto>> GetPaginatedDataAsync(string agentNo, AgentInfoQueryDto dto);
     }
 }

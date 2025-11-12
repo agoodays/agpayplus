@@ -5,8 +5,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
@@ -57,17 +57,17 @@ namespace AGooday.AgPay.Application.Services
             var agents = await _agentInfoRepository.GetAllOrSubAgentsAsync(agentNo);
             var agentNos = agentNo == null ? null : agents.Select(s => s.AgentNo);
             var (payOrders, refundOrders) = SelectOrderCount(dto, agentNos: agentNos);
-            var allAmount = await payOrders.SumAsync(s => s.Amount);
-            var allCount = await payOrders.CountAsync();
+            var allAmount = await payOrders.SafeSumAsync(s => s.Amount);
+            var allCount = await payOrders.SafeCountAsync();
             // 成交金额: 支付成功的订单金额，包含部分退款及全额退款的订单
             var pay = payOrders.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
-            var payAmount = await pay.SumAsync(s => s.Amount);
-            var payCount = await pay.CountAsync();
-            var fee = await pay.SumAsync(s => s.MchOrderFeeAmount);
+            var payAmount = await pay.SafeSumAsync(s => s.Amount);
+            var payCount = await pay.SafeCountAsync();
+            var fee = await pay.SafeSumAsync(s => s.MchOrderFeeAmount);
             var refund = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
-            var refundAmount = await refund.SumAsync(s => s.RefundAmount);
-            var refundCount = await refund.CountAsync();
-            var refundFeeAmount = await refund.SumAsync(s => s.RefundFeeAmount);
+            var refundAmount = await refund.SafeSumAsync(s => s.RefundAmount);
+            var refundCount = await refund.SafeCountAsync();
+            var refundFeeAmount = await refund.SafeSumAsync(s => s.RefundFeeAmount);
             JObject result = new JObject();
             result.Add("allAmount", Decimal.Round(allAmount / 100M, 2, MidpointRounding.AwayFromZero));
             result.Add("allCount", allCount);
@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public async Task<PaginatedList<StatisticResultDto>> StatisticsAsync(string agentNo, StatisticQueryDto dto)
+        public async Task<PaginatedResult<StatisticResultDto>> StatisticsAsync(string agentNo, StatisticQueryDto dto)
         {
             return dto.Method switch
             {
@@ -89,7 +89,7 @@ namespace AGooday.AgPay.Application.Services
                 StatisticCS.Method.MCH => await MchStatisticsAsync(agentNo, dto),
                 StatisticCS.Method.STORE => await StoreStatisticsAsync(dto),
                 StatisticCS.Method.WAY_CODE => await WayCodeStatisticsAsync(dto),
-                StatisticCS.Method.WAY_TYPE => WayTypeStatistics(dto),
+                StatisticCS.Method.WAY_TYPE => await WayTypeStatisticsAsync(dto),
                 StatisticCS.Method.AGENT => await AgentStatisticsAsync(agentNo, dto),
                 StatisticCS.Method.ISV => await IsvStatisticsAsync(dto),
                 StatisticCS.Method.CHANNEL => await ChannelStatisticsAsync(dto),
@@ -97,26 +97,22 @@ namespace AGooday.AgPay.Application.Services
             };
         }
 
-        private async Task<PaginatedList<StatisticResultDto>> TransactionStatisticsAsync(string agentNo, StatisticQueryDto dto)
+        private async Task<PaginatedResult<StatisticResultDto>> TransactionStatisticsAsync(string agentNo, StatisticQueryDto dto)
         {
             IEnumerable<AgentInfo> agents = await _agentInfoRepository.GetSubAgentsAsync(agentNo);
             var agentNos = agents?.Select(s => s.AgentNo);
             var (payOrders, refundOrders) = SelectOrderCount(dto, agentNos: agentNos);
 
-            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.CreatedAt.Value.ToString(dto.Format))
-                .Select(s =>
+            var payRecords = payOrders
+                .GroupBy(g => g.CreatedAt.Value.ToString(dto.Format))
+                .Select(s => new StatisticResultDto()
                 {
-                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
-
-                    return new StatisticResultDto()
-                    {
-                        GroupDate = s.Key,
-                        AllAmount = s.Sum(s => s.Amount),
-                        AllCount = s.Count(),
-                        PayAmount = pay.Sum(s => s.Amount),
-                        PayCount = pay.Count(),
-                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
-                    };
+                    GroupDate = s.Key,
+                    AllAmount = s.Sum(s => s.Amount),
+                    AllCount = s.Count(),
+                    PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
+                    PayCount = s.Count(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)),
+                    Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
                 });
 
             var refundRecords = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable()
@@ -146,112 +142,106 @@ namespace AGooday.AgPay.Application.Services
                 })
                 .OrderByDescending(o => o.GroupDate);
 
-            var result = PaginatedList<StatisticResultDto>.Create(records, dto.PageNumber, dto.PageSize);
-            return result;
+            return await records.ToPaginatedResultAsync(dto.PageNumber, dto.PageSize);
         }
 
-        private async Task<PaginatedList<StatisticResultDto>> MchStatisticsAsync(string agentNo, StatisticQueryDto dto)
+        private async Task<PaginatedResult<StatisticResultDto>> MchStatisticsAsync(string agentNo, StatisticQueryDto dto)
         {
             var agents = await _agentInfoRepository.GetAllOrSubAgentsAsync(agentNo);
             var agentNos = agentNo == null ? null : agents.Select(s => s.AgentNo);
 
             var mchs = _mchInfoRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.MchName) || w.MchName.Contains(dto.MchName) || w.MchShortName.Contains(dto.MchName))
-                && (agentNos == null || agentNos.Contains(w.AgentNo))
-                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                ).OrderByDescending(o => o.CreatedAt);
-            var mchInfos = await PaginatedList<MchInfo>.CreateAsync<MchInfoDto>(mchs, _mapper, dto.PageNumber, dto.PageSize);
-            var mchNos = mchInfos.Select(s => s.MchNo);
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.AgentNo, w => w.AgentNo.Equals(dto.AgentNo))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotEmpty(dto.MchName, w => w.MchName.Contains(dto.MchName) || w.MchShortName.Contains(dto.MchName))
+                .WhereIfNotNull(agentNos, w => agentNos.Contains(w.AgentNo))
+                .OrderByDescending(o => o.CreatedAt);
+            var mchInfos = await mchs.ToPaginatedResultAsync<MchInfo, MchInfoDto>(_mapper, dto.PageNumber, dto.PageSize);
+            var mchNos = mchInfos.Items.Select(s => s.MchNo);
             var (payOrders, refundOrders) = SelectOrderCount(dto, agentNos: agentNos, mchNos: mchNos);
 
-            var payRecords = payOrders.GroupBy(g => g.MchNo).AsEnumerable()
-                .Select(s =>
+            var payRecords = await payOrders
+                .GroupBy(g => g.MchNo)
+                .Select(s => new StatisticResultDto()
                 {
-                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    MchNo = s.Key,
+                    AllAmount = s.Sum(s => s.Amount),
+                    AllCount = s.Count(),
+                    PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
+                    PayCount = s.Count(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)),
+                    Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        MchNo = s.Key,
-                        AllAmount = s.Sum(s => s.Amount),
-                        AllCount = s.Count(),
-                        PayAmount = pay.Sum(s => s.Amount),
-                        PayCount = pay.Count(),
-                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
-                    };
-                });
-
-            var refundRecords = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).GroupBy(g => g.MchNo)
+            var refundRecords = await refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .GroupBy(g => g.MchNo)
                 .Select(s => new StatisticResultDto()
                 {
                     MchNo = s.Key,
                     RefundAmount = s.Sum(s => s.RefundAmount),
                     RefundCount = s.Count(),
                     RefundFee = s.Sum(s => s.RefundFeeAmount),
-                });
+                }).ToListAsync();
 
-            var records = mchInfos.Select(s =>
-            {
-                var pay = payRecords?.Where(w => s.MchNo.Equals(w.MchNo))?.FirstOrDefault();
-                var refund = refundRecords?.Where(w => s.MchNo.Equals(w.MchNo))?.FirstOrDefault();
-
-                return new StatisticResultDto()
-                {
-                    MchNo = s.MchNo,
-                    MchName = s.MchName,
-                    AllAmount = pay?.AllAmount ?? 0,
-                    AllCount = pay?.AllCount ?? 0,
-                    PayAmount = pay?.PayAmount ?? 0,
-                    PayCount = pay?.PayCount ?? 0,
-                    Round = Math.Round((pay?.AllCount ?? 0) > 0 ? (decimal)pay?.PayCount / (pay?.AllCount ?? 0) : 0M, 2, MidpointRounding.AwayFromZero),
-                    Fee = pay?.Fee ?? 0,
-                    RefundAmount = refund?.RefundAmount ?? 0,
-                    RefundCount = refund?.RefundCount ?? 0,
-                    RefundFee = refund?.RefundFee ?? 0
-                };
-            });
-            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), mchInfos.TotalCount, dto.PageNumber, dto.PageSize);
-            return result;
-        }
-
-        private async Task<PaginatedList<StatisticResultDto>> StoreStatisticsAsync(StatisticQueryDto dto)
-        {
-            var stores = _mchStoreRepository.GetAllAsNoTracking()
-                .Where(w => (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
-                && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Contains(dto.StoreName))
-                && (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Contains(dto.MchNo))
-                ).OrderByDescending(o => o.CreatedAt);
-            var mchStores = await PaginatedList<MchStore>.CreateAsync<MchStoreDto>(stores, _mapper, dto.PageNumber, dto.PageSize);
-            var storeIds = mchStores.Select(s => s.StoreId);
-            var (payOrders, refundOrders) = SelectOrderCount(dto, storeIds: storeIds);
-
-            var payRecords = payOrders.GroupBy(g => g.StoreId).AsEnumerable()
+            var records = mchInfos.Items
                 .Select(s =>
                 {
-                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    var pay = payRecords?.Where(w => s.MchNo.Equals(w.MchNo))?.FirstOrDefault();
+                    var refund = refundRecords?.Where(w => s.MchNo.Equals(w.MchNo))?.FirstOrDefault();
 
                     return new StatisticResultDto()
                     {
-                        StoreId = s.Key,
-                        AllAmount = s.Sum(s => s.Amount),
-                        AllCount = s.Count(),
-                        PayAmount = pay.Sum(s => s.Amount),
-                        PayCount = pay.Count(),
-                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
+                        MchNo = s.MchNo,
+                        MchName = s.MchName,
+                        AllAmount = pay?.AllAmount ?? 0,
+                        AllCount = pay?.AllCount ?? 0,
+                        PayAmount = pay?.PayAmount ?? 0,
+                        PayCount = pay?.PayCount ?? 0,
+                        Round = Math.Round((pay?.AllCount ?? 0) > 0 ? (decimal)pay?.PayCount / (pay?.AllCount ?? 0) : 0M, 2, MidpointRounding.AwayFromZero),
+                        Fee = pay?.Fee ?? 0,
+                        RefundAmount = refund?.RefundAmount ?? 0,
+                        RefundCount = refund?.RefundCount ?? 0,
+                        RefundFee = refund?.RefundFee ?? 0
                     };
                 });
+            var result = new PaginatedResult<StatisticResultDto>(records?.ToList(), mchInfos.TotalCount, dto.PageNumber, dto.PageSize);
+            return result;
+        }
 
-            var refundRecords = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).GroupBy(g => g.StoreId)
+        private async Task<PaginatedResult<StatisticResultDto>> StoreStatisticsAsync(StatisticQueryDto dto)
+        {
+            var stores = _mchStoreRepository.GetAllAsNoTracking()
+                .WhereIfNotNull(dto.StoreId, w => w.StoreId.Equals(dto.StoreId))
+                .WhereIfNotEmpty(dto.StoreName, w => w.StoreName.Contains(dto.StoreName))
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Contains(dto.MchNo))
+                .OrderByDescending(o => o.CreatedAt);
+            var mchStores = await stores.ToPaginatedResultAsync<MchStore, MchStoreDto>(_mapper, dto.PageNumber, dto.PageSize);
+            var storeIds = mchStores.Items.Select(s => s.StoreId);
+            var (payOrders, refundOrders) = SelectOrderCount(dto, storeIds: storeIds);
+
+            var payRecords = await payOrders
+                .GroupBy(g => g.StoreId)
+                .Select(s => new StatisticResultDto()
+                {
+                    StoreId = s.Key,
+                    AllAmount = s.Sum(s => s.Amount),
+                    AllCount = s.Count(),
+                    PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
+                    PayCount = s.Count(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)),
+                    Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
+                }).ToListAsync();
+
+            var refundRecords = await refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .GroupBy(g => g.StoreId)
                 .Select(s => new StatisticResultDto()
                 {
                     StoreId = s.Key,
                     RefundAmount = s.Sum(s => s.RefundAmount),
                     RefundCount = s.Count(),
                     RefundFee = s.Sum(s => s.RefundFeeAmount),
-                });
+                }).ToListAsync();
 
-            var records = mchStores
+            var records = mchStores.Items
                 .Select(s =>
                 {
                     var pay = payRecords?.Where(w => s.StoreId.Equals(w.StoreId))?.FirstOrDefault();
@@ -272,51 +262,43 @@ namespace AGooday.AgPay.Application.Services
                         RefundFee = refund?.RefundFee ?? 0
                     };
                 });
-            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), mchStores.TotalCount, dto.PageNumber, dto.PageSize);
+            var result = new PaginatedResult<StatisticResultDto>(records?.ToList(), mchStores.TotalCount, dto.PageNumber, dto.PageSize);
             return result;
         }
 
-        private async Task<PaginatedList<StatisticResultDto>> WayCodeStatisticsAsync(StatisticQueryDto dto)
+        private async Task<PaginatedResult<StatisticResultDto>> WayCodeStatisticsAsync(StatisticQueryDto dto)
         {
             var ways = _payWayRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
-                //&& (string.IsNullOrWhiteSpace(dto.WayName) || w.WayName.Contains(dto.WayName))
-                ).OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            var payWays = await PaginatedList<PayWay>.CreateAsync<PayWayDto>(ways, _mapper, dto.PageNumber, dto.PageSize);
-            var wayCodes = payWays.Select(s => s.WayCode);
+                .WhereIfNotEmpty(dto.WayCode, w => w.WayCode.Equals(dto.WayCode))
+                .WhereIfNotEmpty(dto.WayName, w => w.WayName.Contains(dto.WayName))
+                .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
+            var payWays = await ways.ToPaginatedResultAsync<PayWay, PayWayDto>(_mapper, dto.PageNumber, dto.PageSize);
+            var wayCodes = payWays.Items.Select(s => s.WayCode);
             var (payOrders, refundOrders) = SelectOrderCount(dto, wayCodes: wayCodes);
 
-            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.WayCode)
-                .Select(s =>
+            var payRecords = await payOrders
+                .GroupBy(g => g.WayCode)
+                .Select(s => new StatisticResultDto()
                 {
-                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    WayCode = s.Key,
+                    AllAmount = s.Sum(s => s.Amount),
+                    AllCount = s.Count(),
+                    PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
+                    PayCount = s.Count(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)),
+                    Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        WayCode = s.Key,
-                        AllAmount = s.Sum(s => s.Amount),
-                        AllCount = s.Count(),
-                        PayAmount = pay.Sum(s => s.Amount),
-                        PayCount = pay.Count(),
-                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
-                    };
-                });
-
-            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.WayCode)
-                .Select(s =>
+            var refundRecords = await refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .GroupBy(g => g.WayCode)
+                .Select(s => new StatisticResultDto()
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
+                    WayCode = s.Key,
+                    RefundAmount = s.Sum(s => s.RefundAmount),
+                    RefundCount = s.Count(),
+                    RefundFee = s.Sum(s => s.RefundFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        WayCode = s.Key,
-                        RefundAmount = refund.Sum(s => s.RefundAmount),
-                        RefundCount = refund.Count(),
-                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
-                    };
-                });
-
-            var records = payWays
+            var records = payWays.Items
                 .Select(s =>
                 {
                     var pay = payRecords?.Where(w => s.WayCode.Equals(w.WayCode))?.FirstOrDefault();
@@ -337,38 +319,35 @@ namespace AGooday.AgPay.Application.Services
                         RefundFee = refund?.RefundFee ?? 0
                     };
                 });
-            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), payWays.TotalCount, dto.PageNumber, dto.PageSize);
+            var result = new PaginatedResult<StatisticResultDto>(records?.ToList(), payWays.TotalCount, dto.PageNumber, dto.PageSize);
             return result;
         }
 
-        private PaginatedList<StatisticResultDto> WayTypeStatistics(StatisticQueryDto dto)
+        private async Task<PaginatedResult<StatisticResultDto>> WayTypeStatisticsAsync(StatisticQueryDto dto)
         {
             var (payOrders, refundOrders) = SelectOrderCount(dto);
 
-            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.WayType)
-                .Select(s =>
+            var payRecords = await payOrders
+                .GroupBy(g => g.WayType)
+                .Select(s => new StatisticResultDto()
                 {
-                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    WayType = s.Key,
+                    AllAmount = s.Sum(s => s.Amount),
+                    AllCount = s.Count(),
+                    PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
+                    PayCount = s.Count(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)),
+                    Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        WayType = s.Key,
-                        AllAmount = s.Sum(s => s.Amount),
-                        AllCount = s.Count(),
-                        PayAmount = pay.Sum(s => s.Amount),
-                        PayCount = pay.Count(),
-                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
-                    };
-                });
-
-            var refundRecords = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).GroupBy(g => g.WayType)
+            var refundRecords = await refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .GroupBy(g => g.WayType)
                 .Select(s => new StatisticResultDto()
                 {
                     WayType = s.Key,
                     RefundAmount = s.Sum(s => s.RefundAmount),
                     RefundCount = s.Count(),
                     RefundFee = s.Sum(s => s.RefundFeeAmount),
-                });
+                }).ToListAsync();
 
             var records = Enum.GetValues(typeof(PayWayType)).Cast<PayWayType>()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.WayType) || w.ToString().Equals(dto.WayType)))
@@ -392,52 +371,44 @@ namespace AGooday.AgPay.Application.Services
                         RefundFee = refund?.RefundFee ?? 0
                     };
                 });
-            var result = PaginatedList<StatisticResultDto>.Create(records, dto.PageNumber, dto.PageSize);
+            var result = PaginatedResult<StatisticResultDto>.Create(records, dto.PageNumber, dto.PageSize);
             return result;
         }
 
-        private async Task<PaginatedList<StatisticResultDto>> AgentStatisticsAsync(string agentNo, StatisticQueryDto dto)
+        private async Task<PaginatedResult<StatisticResultDto>> AgentStatisticsAsync(string agentNo, StatisticQueryDto dto)
         {
             var agents = (await _agentInfoRepository.GetAllOrSubAgentsAsync(agentNo))
                 .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.IsvNo.Equals(dto.AgentNo))
                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.IsvName))
                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
                 ).OrderByDescending(o => o.CreatedAt);
-            var agentInfos = PaginatedList<AgentInfo>.Create(agents, dto.PageNumber, dto.PageSize);
-            var agentNos = agentNo == null ? null : agentInfos.Select(s => s.AgentNo);
+            var agentInfos = PaginatedResult<AgentInfo>.Create(agents, dto.PageNumber, dto.PageSize);
+            var agentNos = agentNo == null ? null : agentInfos.Items.Select(s => s.AgentNo);
             var (payOrders, refundOrders) = SelectOrderCount(dto, agentNos: agentNos);
 
-            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.AgentNo)
-                .Select(s =>
+            var payRecords = await payOrders
+                .GroupBy(g => g.AgentNo)
+                .Select(s => new StatisticResultDto()
                 {
-                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    AgentNo = s.Key,
+                    AllAmount = s.Sum(s => s.Amount),
+                    AllCount = s.Count(),
+                    PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
+                    PayCount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Count(),
+                    Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        AgentNo = s.Key,
-                        AllAmount = s.Sum(s => s.Amount),
-                        AllCount = s.Count(),
-                        PayAmount = pay.Sum(s => s.Amount),
-                        PayCount = pay.Count(),
-                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
-                    };
-                });
-
-            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.AgentNo)
-                .Select(s =>
+            var refundRecords = await refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .GroupBy(g => g.AgentNo)
+                .Select(s => new StatisticResultDto()
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
+                    AgentNo = s.Key,
+                    RefundAmount = s.Sum(s => s.RefundAmount),
+                    RefundCount = s.Count(),
+                    RefundFee = s.Sum(s => s.RefundFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        AgentNo = s.Key,
-                        RefundAmount = refund.Sum(s => s.RefundAmount),
-                        RefundCount = refund.Count(),
-                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
-                    };
-                });
-
-            var records = agentInfos
+            var records = agentInfos.Items
                 .Select(s =>
                 {
                     var pay = payRecords?.Where(w => s.AgentNo.Equals(w.AgentNo))?.FirstOrDefault();
@@ -458,52 +429,44 @@ namespace AGooday.AgPay.Application.Services
                         RefundFee = refund?.RefundFee ?? 0
                     };
                 });
-            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), agentInfos.TotalCount, dto.PageNumber, dto.PageSize);
-            // var result = PaginatedList<StatisticResultDto>.Create(records, dto.PageNumber, dto.PageSize);
+            var result = new PaginatedResult<StatisticResultDto>(records?.ToList(), agentInfos.TotalCount, dto.PageNumber, dto.PageSize);
+            // var result = query.ToPaginatedResultAsync<StatisticResultDto>.Create(records, dto.PageNumber, dto.PageSize);
             return result;
         }
 
-        private async Task<PaginatedList<StatisticResultDto>> IsvStatisticsAsync(StatisticQueryDto dto)
+        private async Task<PaginatedResult<StatisticResultDto>> IsvStatisticsAsync(StatisticQueryDto dto)
         {
             var isvs = _isvInfoRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
-                ).OrderByDescending(o => o.CreatedAt);
-            var isvInfos = await PaginatedList<IsvInfo>.CreateAsync<IsvInfoDto>(isvs, _mapper, dto.PageNumber, dto.PageSize);
-            var isvNos = isvInfos.Select(s => s.IsvNo);
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotEmpty(dto.IsvName, w => w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
+                .OrderByDescending(o => o.CreatedAt);
+            var isvInfos = await isvs.ToPaginatedResultAsync<IsvInfo, IsvInfoDto>(_mapper, dto.PageNumber, dto.PageSize);
+            var isvNos = isvInfos.Items.Select(s => s.IsvNo);
             var (payOrders, refundOrders) = SelectOrderCount(dto, isvNos: isvNos);
 
-            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.IsvNo)
-                .Select(s =>
+            var payRecords = await payOrders
+                .GroupBy(g => g.IsvNo)
+                .Select(s => new StatisticResultDto()
                 {
-                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    IsvNo = s.Key,
+                    AllAmount = s.Sum(s => s.Amount),
+                    AllCount = s.Count(),
+                    PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
+                    PayCount = s.Count(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)),
+                    Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        IsvNo = s.Key,
-                        AllAmount = s.Sum(s => s.Amount),
-                        AllCount = s.Count(),
-                        PayAmount = pay.Sum(s => s.Amount),
-                        PayCount = pay.Count(),
-                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
-                    };
-                });
-
-            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.IsvNo)
-                .Select(s =>
+            var refundRecords = await refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .GroupBy(g => g.IsvNo)
+                .Select(s => new StatisticResultDto()
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
+                    IsvNo = s.Key,
+                    RefundAmount = s.Sum(s => s.RefundAmount),
+                    RefundCount = s.Count(),
+                    RefundFee = s.Sum(s => s.RefundFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        IsvNo = s.Key,
-                        RefundAmount = refund.Sum(s => s.RefundAmount),
-                        RefundCount = refund.Count(),
-                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
-                    };
-                });
-
-            var records = isvInfos
+            var records = isvInfos.Items
                 .Select(s =>
                 {
                     var pay = payRecords?.Where(w => s.IsvNo.Equals(w.IsvNo))?.FirstOrDefault();
@@ -524,51 +487,43 @@ namespace AGooday.AgPay.Application.Services
                         RefundFee = refund?.RefundFee ?? 0
                     };
                 });
-            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), isvInfos.TotalCount, dto.PageNumber, dto.PageSize);
+            var result = new PaginatedResult<StatisticResultDto>(records?.ToList(), isvInfos.TotalCount, dto.PageNumber, dto.PageSize);
             return result;
         }
 
-        private async Task<PaginatedList<StatisticResultDto>> ChannelStatisticsAsync(StatisticQueryDto dto)
+        private async Task<PaginatedResult<StatisticResultDto>> ChannelStatisticsAsync(StatisticQueryDto dto)
         {
             var payIfDefines = _payInterfaceDefineRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode))
-                && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IfName.Equals(dto.IfName))
-                ).OrderByDescending(o => o.CreatedAt);
-            var payInterfaceDefines = await PaginatedList<PayInterfaceDefine>.CreateAsync<PayInterfaceDefineDto>(payIfDefines, _mapper, dto.PageNumber, dto.PageSize);
+                .WhereIfNotEmpty(dto.IfCode, w => w.IfCode.Equals(dto.IfCode))
+                .WhereIfNotEmpty(dto.IsvName, w => w.IfName.Equals(dto.IfName))
+                .OrderByDescending(o => o.CreatedAt);
+            var payInterfaceDefines = await payIfDefines.ToPaginatedResultAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper, dto.PageNumber, dto.PageSize);
 
             var (payOrders, refundOrders) = SelectOrderCount(dto);
 
-            var payRecords = payOrders.AsEnumerable().GroupBy(g => g.IfCode)
-                .Select(s =>
+            var payRecords = await payOrders
+                .GroupBy(g => g.IfCode)
+                .Select(s => new StatisticResultDto()
                 {
-                    var pay = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND));
+                    IfCode = s.Key,
+                    AllAmount = s.Sum(s => s.Amount),
+                    AllCount = s.Count(),
+                    PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
+                    PayCount = s.Count(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)),
+                    Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        IfCode = s.Key,
-                        AllAmount = s.Sum(s => s.Amount),
-                        AllCount = s.Count(),
-                        PayAmount = pay.Sum(s => s.Amount),
-                        PayCount = pay.Count(),
-                        Fee = pay.Sum(s => s.MchOrderFeeAmount),
-                    };
-                });
-
-            var refundRecords = refundOrders.AsEnumerable().GroupBy(g => g.IfCode)
-                .Select(s =>
+            var refundRecords = await refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .GroupBy(g => g.IfCode)
+                .Select(s => new StatisticResultDto()
                 {
-                    var refund = s.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
+                    IfCode = s.Key,
+                    RefundAmount = s.Sum(s => s.RefundAmount),
+                    RefundCount = s.Count(),
+                    RefundFee = s.Sum(s => s.RefundFeeAmount),
+                }).ToListAsync();
 
-                    return new StatisticResultDto()
-                    {
-                        IfCode = s.Key,
-                        RefundAmount = refund.Sum(s => s.RefundAmount),
-                        RefundCount = refund.Count(),
-                        RefundFee = refund.Sum(s => s.RefundFeeAmount),
-                    };
-                });
-
-            var records = payInterfaceDefines
+            var records = payInterfaceDefines.Items
                 .Select(s =>
                 {
                     var pay = payRecords?.Where(w => s.IfCode.Equals(w.IfCode))?.FirstOrDefault();
@@ -589,49 +544,49 @@ namespace AGooday.AgPay.Application.Services
                         RefundFee = refund?.RefundFee ?? 0
                     };
                 });
-            var result = new PaginatedList<StatisticResultDto>(records?.ToList(), payInterfaceDefines.TotalCount, dto.PageNumber, dto.PageSize);
+            var result = new PaginatedResult<StatisticResultDto>(records?.ToList(), payInterfaceDefines.TotalCount, dto.PageNumber, dto.PageSize);
             return result;
         }
 
         private (IQueryable<PayOrder> payOrders, IQueryable<RefundOrder> refundOrders) SelectOrderCount(StatisticQueryDto dto, IEnumerable<string> isvNos = null, IEnumerable<string> agentNos = null, IEnumerable<string> mchNos = null, IEnumerable<long?> storeIds = null, IEnumerable<string> wayCodes = null)
         {
             var payOrders = _payOrderRepository.GetAllAsNoTracking()
-                 .Where(w => ((mchNos == null || mchNos.Contains(w.MchNo))
-                 && string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                 && (string.IsNullOrWhiteSpace(dto.MchName) || w.MchName.Equals(dto.MchName))
-                 && (agentNos == null || agentNos.Contains(w.AgentNo))
-                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Equals(dto.AgentName))
-                 && (isvNos == null || isvNos.Contains(w.IsvNo))
-                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                 && (storeIds == null || storeIds.Contains(w.StoreId))
-                 && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Equals(dto.IsvName))
-                 && (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
-                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
-                 && (wayCodes == null || wayCodes.Contains(w.WayCode))
-                 && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
-                 && (string.IsNullOrWhiteSpace(dto.WayType) || w.WayType.Equals(dto.WayType))
-                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
+                .WhereIfNotNull(mchNos, w => mchNos.Contains(w.MchNo))
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.MchName, w => w.MchName.Equals(dto.MchName))
+                .WhereIfNotNull(agentNos, w => agentNos.Contains(w.AgentNo))
+                .WhereIfNotEmpty(dto.AgentNo, w => w.AgentNo.Equals(dto.AgentNo))
+                .WhereIfNotEmpty(dto.AgentName, w => w.AgentName.Equals(dto.AgentName))
+                .WhereIfNotNull(isvNos, w => isvNos.Contains(w.IsvNo))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotNull(storeIds, w => storeIds.Contains(w.StoreId))
+                .WhereIfNotEmpty(dto.IsvName, w => w.IsvName.Equals(dto.IsvName))
+                .WhereIfNotNull(dto.StoreId, w => w.StoreId.Equals(dto.StoreId))
+                .WhereIfNotEmpty(dto.StoreName, w => w.StoreName.Equals(dto.StoreName))
+                .WhereIfNotNull(wayCodes, w => wayCodes.Contains(w.WayCode))
+                .WhereIfNotEmpty(dto.WayCode, w => w.WayCode.Equals(dto.WayCode))
+                .WhereIfNotEmpty(dto.WayType, w => w.WayType.Equals(dto.WayType))
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd);
 
             var refundOrders = _refundOrderRepository.GetAllAsNoTracking()
-                 .Where(w => ((mchNos == null || mchNos.Contains(w.MchNo))
-                 && string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                 && (string.IsNullOrWhiteSpace(dto.MchName) || w.MchName.Equals(dto.MchName))
-                 && (agentNos == null || agentNos.Contains(w.AgentNo))
-                 && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                 && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Equals(dto.AgentName))
-                 && (isvNos == null || isvNos.Contains(w.IsvNo))
-                 && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                 && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Equals(dto.IsvName))
-                 && (storeIds == null || storeIds.Contains(w.StoreId))
-                 && (dto.StoreId.Equals(null) || w.StoreId.Equals(dto.StoreId))
-                 && (string.IsNullOrWhiteSpace(dto.StoreName) || w.StoreName.Equals(dto.StoreName))
-                 && (wayCodes == null || wayCodes.Contains(w.WayCode))
-                 && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
-                 && (string.IsNullOrWhiteSpace(dto.WayType) || w.WayType.Equals(dto.WayType))
-                 && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                 && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
+                .WhereIfNotNull(mchNos, w => mchNos.Contains(w.MchNo))
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.MchName, w => w.MchName.Equals(dto.MchName))
+                .WhereIfNotNull(agentNos, w => agentNos.Contains(w.AgentNo))
+                .WhereIfNotEmpty(dto.AgentNo, w => w.AgentNo.Equals(dto.AgentNo))
+                .WhereIfNotEmpty(dto.AgentName, w => w.AgentName.Equals(dto.AgentName))
+                .WhereIfNotNull(isvNos, w => isvNos.Contains(w.IsvNo))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotEmpty(dto.IsvName, w => w.IsvName.Equals(dto.IsvName))
+                .WhereIfNotNull(storeIds, w => storeIds.Contains(w.StoreId))
+                .WhereIfNotNull(dto.StoreId, w => w.StoreId.Equals(dto.StoreId))
+                .WhereIfNotEmpty(dto.StoreName, w => w.StoreName.Equals(dto.StoreName))
+                .WhereIfNotNull(wayCodes, w => wayCodes.Contains(w.WayCode))
+                .WhereIfNotEmpty(dto.WayCode, w => w.WayCode.Equals(dto.WayCode))
+                .WhereIfNotEmpty(dto.WayType, w => w.WayType.Equals(dto.WayType))
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd);
 
             return (payOrders, refundOrders);
         }

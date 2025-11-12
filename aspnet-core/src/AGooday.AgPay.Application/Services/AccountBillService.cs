@@ -6,6 +6,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -73,21 +74,20 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public Task<PaginatedList<AccountBillDto>> GetPaginatedDataAsync(AccountBillQueryDto dto)
+        public Task<PaginatedResult<AccountBillDto>> GetPaginatedDataAsync(AccountBillQueryDto dto)
         {
             var query = _agPayRepository.GetAllAsNoTracking()
-                .Where(w => (dto.Id.Equals(null) || w.Id.Equals(dto.Id))
-                && (string.IsNullOrWhiteSpace(dto.BillId) || w.BillId.Equals(dto.BillId))
-                && (string.IsNullOrWhiteSpace(dto.InfoId) || w.InfoId.Equals(dto.InfoId))
-                && (string.IsNullOrWhiteSpace(dto.InfoType) || w.InfoType.Equals(dto.InfoType))
-                && (dto.BizType.Equals(null) || w.BizType.Equals(dto.BizType))
-                && (dto.AccountType.Equals(null) || w.AccountType.Equals(dto.AccountType))
-                && (string.IsNullOrWhiteSpace(dto.RelaBizOrderId) || w.RelaBizOrderId.Equals(dto.RelaBizOrderId))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .WhereIfNotNull(dto.Id, w => w.Id.Equals(dto.Id))
+                .WhereIfNotEmpty(dto.BillId, w => w.BillId.Equals(dto.BillId))
+                .WhereIfNotEmpty(dto.InfoId, w => w.InfoId.Equals(dto.InfoId))
+                .WhereIfNotEmpty(dto.InfoType, w => w.InfoType.Equals(dto.InfoType))
+                .WhereIfNotNull(dto.BizType, w => w.BizType.Equals(dto.BizType))
+                .WhereIfNotNull(dto.AccountType, w => w.AccountType.Equals(dto.AccountType))
+                .WhereIfNotEmpty(dto.RelaBizOrderId, w => w.RelaBizOrderId.Equals(dto.RelaBizOrderId))
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd)
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<AccountBill>.CreateAsync<AccountBillDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<AccountBill, AccountBillDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

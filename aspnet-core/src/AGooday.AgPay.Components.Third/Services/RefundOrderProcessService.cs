@@ -78,7 +78,7 @@ namespace AGooday.AgPay.Components.Third.Services
         /// <param name="refundOrder"></param>
         public async Task UpdatePayOrderProfitAndGenAccountBillAsync(RefundOrderDto refundOrder)
         {
-            var payOrderProfits = _payOrderProfitService.GetByPayOrderIdAsNoTracking(refundOrder.PayOrderId);
+            var payOrderProfits = await _payOrderProfitService.GetByPayOrderIdAsNoTrackingAsync(refundOrder.PayOrderId);
             if (payOrderProfits != null && payOrderProfits.Any())
             {
                 IPaymentService paymentService = _paymentServiceFactory.GetService(refundOrder.IfCode);

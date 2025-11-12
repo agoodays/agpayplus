@@ -6,8 +6,8 @@ using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Domain.Queries.SysUsers;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -102,10 +102,9 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<SysUserDto> GetByIdAsync(long recordId, string belongInfoId)
         {
-            var entity = await _sysUserRepository.GetAllAsNoTracking()
-                .Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefaultAsync();
-            var dto = _mapper.Map<SysUserDto>(entity);
-            return dto;
+            var query = _sysUserRepository.GetAllAsNoTracking()
+                .Where(w => w.SysUserId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId));
+            return await query.FirstOrDefaultProjectToAsync<SysUser, SysUserDto>(_mapper);
         }
 
         public IEnumerable<SysUserDto> GetByIds(List<long> recordIds)
@@ -127,40 +126,42 @@ namespace AGooday.AgPay.Application.Services
             return dto;
         }
 
-        public PaginatedList<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long? currentUserId)
+        public PaginatedResult<SysUserListDto> GetPaginatedData(SysUserQueryDto dto, long? currentUserId)
         {
-            var query = (from u in _sysUserRepository.GetAllAsNoTracking()
-                         join ut in _sysUserTeamRepository.GetAllAsNoTracking() on u.TeamId equals ut.TeamId into temp
-                         from team in temp.DefaultIfEmpty()
-                         where (string.IsNullOrWhiteSpace(dto.SysType) || u.SysType.Equals(dto.SysType))
-                         && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || u.BelongInfoId.Equals(dto.BelongInfoId))
-                         && (string.IsNullOrWhiteSpace(dto.Realname) || u.Realname.Contains(dto.Realname))
-                         && (dto.UserType.Equals(null) || u.UserType.Equals(dto.UserType))
-                         && (dto.SysUserId.Equals(null) || u.SysUserId.Equals(dto.SysUserId))
-                         && (currentUserId.Equals(null) || !u.SysUserId.Equals(currentUserId))
-                         select new { u, team }).OrderByDescending(o => o.u.CreatedAt);
+            var query = from u in _sysUserRepository.GetAllAsNoTracking()
+                        join ut in _sysUserTeamRepository.GetAllAsNoTracking()
+                            on u.TeamId equals ut.TeamId into teamGroup
+                        from team in teamGroup.DefaultIfEmpty()
+                        select new SysUserQueryResult { SysUser = u, SysUserTeam = team };
 
-            var records = PaginatedList<SysUserListDto>.Create(query, s =>
-            {
-                var item = _mapper.Map<SysUserListDto>(s.u);
-                item.TeamName = s.team?.TeamName;
-                return item;
-            }, dto.PageNumber, dto.PageSize);
-            return records;
-        }
+            query.WhereIfNotEmpty(dto.SysType, w => w.SysUser.SysType == dto.SysType)
+                .WhereIfNotEmpty(dto.BelongInfoId, w => w.SysUser.BelongInfoId == dto.BelongInfoId)
+                .WhereIfNotEmpty(dto.Realname, w => w.SysUser.Realname.Contains(dto.Realname))
+                .WhereIfNotNull(dto.UserType, w => w.SysUser.UserType == dto.UserType.Value)
+                .WhereIfNotNull(dto.SysUserId, w => w.SysUser.SysUserId == dto.SysUserId.Value)
+                .WhereIfNotNull(currentUserId, w => w.SysUser.SysUserId != currentUserId.Value);
 
-        public async Task<PaginatedList<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long? currentUserId)
-        {
-            var query = _mapper.Map<SysUserQuery>(dto);
-            query.CurrentUserId = currentUserId;
-            var result = (IQueryable<SysUserQueryResult>)await Bus.SendQuery(query);
-            var records = await PaginatedList<SysUserListDto>.CreateAsync(result, s =>
+            query = query.OrderByDescending(o => o.SysUser.CreatedAt);
+
+            return query.ToPaginatedResult<SysUserQueryResult, SysUserListDto>(s =>
             {
                 var item = _mapper.Map<SysUserListDto>(s.SysUser);
                 item.TeamName = s.SysUserTeam?.TeamName;
                 return item;
             }, dto.PageNumber, dto.PageSize);
-            return records;
+        }
+
+        public async Task<PaginatedResult<SysUserListDto>> GetPaginatedDataAsync(SysUserQueryDto dto, long? currentUserId)
+        {
+            var query = _mapper.Map<SysUserQuery>(dto);
+            query.CurrentUserId = currentUserId;
+            var result = (IQueryable<SysUserQueryResult>)await Bus.SendQuery(query);
+            return await result.ToPaginatedResultAsync<SysUserQueryResult, SysUserListDto>(s =>
+            {
+                var item = _mapper.Map<SysUserListDto>(s.SysUser);
+                item.TeamName = s.SysUserTeam?.TeamName;
+                return item;
+            }, dto.PageNumber, dto.PageSize);
         }
     }
 }

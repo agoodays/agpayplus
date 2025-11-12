@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                     支付宝渠道：买家支付宝用户号buyer_user_id
                     微信渠道：微信平台的sub_openid*/
                     data.TryGetString("wx_user_id", out string userId);
-                    var wxResponse = data.GetValue("wx_response")?.ToObject<JObject>(); ;
+                    var wxResponse = data.GetValue("wx_response")?.ToObject<JObject>();
                     var alipayResponse = data.GetValue("alipay_response")?.ToObject<JObject>();
                     var unionpayResponse = data.GetValue("unionpay_response")?.ToObject<JObject>();
                     var subOpenid = wxResponse?.GetValue("sub_openid").ToString();

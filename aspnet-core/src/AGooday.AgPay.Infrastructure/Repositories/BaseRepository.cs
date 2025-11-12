@@ -156,6 +156,29 @@ namespace AGooday.AgPay.Infrastructure.Repositories
             return Db.Set<T>().AsNoTracking();
         }
         /// <summary>
+        /// 根据条件获取第一个实体
+        /// </summary>
+        /// <param name="predicate">查询条件</param>
+        public virtual async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            return await DbSet.FirstOrDefaultAsync(predicate);
+        }
+        /// <summary>
+        /// 根据条件获取第一个实体
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <param name="predicate">查询条件</param>
+        public virtual async Task<TEntity> FirstOrDefaultAsNoTrackingAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            return await DbSet.AsNoTracking().FirstOrDefaultAsync(predicate);
+        }
+        /// <summary>
         /// 根据对象进行更新
         /// </summary>
         /// <param name="entity"></param>
@@ -643,6 +666,29 @@ namespace AGooday.AgPay.Infrastructure.Repositories
         {
             // 跟踪与非跟踪查询：https://learn.microsoft.com/zh-cn/ef/core/querying/tracking
             return Db.Set<T>().AsNoTracking();
+        }
+        /// <summary>
+        /// 根据条件获取第一个实体
+        /// </summary>
+        /// <param name="predicate">查询条件</param>
+        public virtual async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            return await DbSet.FirstOrDefaultAsync(predicate);
+        }
+        /// <summary>
+        /// 根据条件获取第一个实体
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <param name="predicate">查询条件</param>
+        public virtual async Task<TEntity> FirstOrDefaultAsNoTrackingAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            if (predicate == null)
+                throw new ArgumentNullException(nameof(predicate));
+
+            return await DbSet.AsNoTracking().FirstOrDefaultAsync(predicate);
         }
         /// <summary>
         /// 根据对象进行更新

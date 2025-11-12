@@ -3,8 +3,8 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -44,20 +44,19 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<IEnumerable<PayInterfaceDefineDto>> PayIfDefineListAsync(byte? state)
         {
-            var entities = await _payInterfaceDefineRepository.GetAllAsNoTracking()
-                .Where(w => !state.HasValue || w.State.Equals(state))
-                .OrderByDescending(o => o.CreatedAt).ToListAsync();
+            var query = _payInterfaceDefineRepository.GetAllAsNoTracking()
+                .WhereIfNotNull(state, w => w.State.Equals(state))
+                .OrderByDescending(o => o.CreatedAt);
 
-            var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entities);
-            return result;
+            return await query.ToListProjectToAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper);
         }
 
-        public IEnumerable<PayInterfaceDefineDto> GetByIfCodes(IEnumerable<string> ifCodes)
+        public async Task<IEnumerable<PayInterfaceDefineDto>> GetByIfCodesAsync(IEnumerable<string> ifCodes)
         {
-            var entities = _payInterfaceDefineRepository.GetAllAsNoTracking()
-                .Where(w => ifCodes.Contains(w.IfCode)); ;
-            var result = _mapper.Map<IEnumerable<PayInterfaceDefineDto>>(entities);
-            return result;
+            var query = _payInterfaceDefineRepository.GetAllAsNoTracking()
+                .Where(w => ifCodes.Contains(w.IfCode));
+
+            return await query.ToListProjectToAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper);
         }
     }
 }

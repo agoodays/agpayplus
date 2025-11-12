@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -31,12 +32,11 @@ namespace AGooday.AgPay.Application.Services
         }
 
 
-        public Task<PaginatedList<SysRoleEntRelaDto>> GetPaginatedDataAsync(SysRoleEntRelaQueryDto dto)
+        public Task<PaginatedResult<SysRoleEntRelaDto>> GetPaginatedDataAsync(SysRoleEntRelaQueryDto dto)
         {
             var query = _sysRoleEntRelaRepository.GetAllAsNoTracking()
                 .Where(w => string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Equals(dto.RoleId));
-            var records = PaginatedList<SysRoleEntRela>.CreateAsync<SysRoleEntRelaDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<SysRoleEntRela, SysRoleEntRelaDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
 
         /// <summary>

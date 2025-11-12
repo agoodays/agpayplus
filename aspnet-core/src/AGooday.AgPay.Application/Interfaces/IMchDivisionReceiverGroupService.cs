@@ -9,6 +9,6 @@ namespace AGooday.AgPay.Application.Interfaces
         Task<MchDivisionReceiverGroupDto> GetByIdAsNoTrackingAsync(long recordId, string mchNo);
         IEnumerable<MchDivisionReceiverGroupDto> GetByMchNo(string mchNo);
         Task<MchDivisionReceiverGroupDto> FindByIdAndMchNoAsync(long receiverGroupId, string mchNo);
-        Task<PaginatedList<MchDivisionReceiverGroupDto>> GetPaginatedDataAsync(MchDivisionReceiverGroupQueryDto dto);
+        Task<PaginatedResult<MchDivisionReceiverGroupDto>> GetPaginatedDataAsync(MchDivisionReceiverGroupQueryDto dto);
     }
 }

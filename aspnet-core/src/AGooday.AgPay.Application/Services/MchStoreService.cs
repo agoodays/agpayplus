@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -53,39 +54,37 @@ namespace AGooday.AgPay.Application.Services
         public async Task<MchStoreDto> GetByIdAsNoTrackingAsync(long recordId)
         {
             var entity = await _mchStoreRepository.GetByIdAsNoTrackingAsync(recordId);
-            var dto = _mapper.Map<MchStoreDto>(entity);
-            return dto;
+            return _mapper.Map<MchStoreDto>(entity);
         }
 
-        public IEnumerable<MchStoreDto> GetByMchNoAsNoTracking(string mchNo)
+        public Task<List<MchStoreDto>> GetByMchNoAsNoTrackingAsync(string mchNo)
         {
-            var records = _mchStoreRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
-            return _mapper.Map<IEnumerable<MchStoreDto>>(records);
+            var query = _mchStoreRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
+            return query.ToListProjectToAsync<MchStore, MchStoreDto>(_mapper);
         }
 
-        public IEnumerable<MchStoreDto> GetByStoreIdsAsNoTracking(IEnumerable<long?> storeIds)
+        public Task<List<MchStoreDto>> GetByStoreIdsAsNoTrackingAsync(IEnumerable<long?> storeIds)
         {
-            var records = _mchStoreRepository.GetAllAsNoTracking().Where(w => storeIds.Contains(w.StoreId));
-            return _mapper.Map<IEnumerable<MchStoreDto>>(records);
+            var query = _mchStoreRepository.GetAllAsNoTracking().Where(w => storeIds.Contains(w.StoreId));
+            return query.ToListProjectToAsync<MchStore, MchStoreDto>(_mapper);
         }
 
-        public Task<PaginatedList<MchStoreListDto>> GetPaginatedDataAsync(MchStoreQueryDto dto, List<long> storeIds = null)
+        public Task<PaginatedResult<MchStoreListDto>> GetPaginatedDataAsync(MchStoreQueryDto dto, List<long> storeIds = null)
         {
             var query = _mchStoreRepository.GetAllAsNoTracking()
-                .Join(_mchInfoRepository.GetAllAsNoTracking(),
-                ms => ms.MchNo, mi => mi.MchNo,
-                (ms, mi) => new { ms, mi })
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.ms.MchNo.Equals(dto.MchNo))
-                && (dto.StoreId.Equals(null) || w.ms.StoreId.Equals(dto.StoreId))
-                && (storeIds == null || storeIds.Equals(w.ms.StoreId))
-                && (string.IsNullOrWhiteSpace(dto.StoreName) || w.ms.StoreName.Contains(dto.StoreName))
-                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.mi.AgentNo.Equals(dto.AgentNo)))
-                .OrderByDescending(o => o.ms.CreatedAt);
+                .Join(_mchInfoRepository.GetAllAsNoTracking(), ms => ms.MchNo, mi => mi.MchNo, (ms, mi) => new { ms, mi })
+                .WhereIfNotEmpty(dto.MchNo, w => w.ms.MchNo.Equals(dto.MchNo))
+                .WhereIfNotNull(dto.StoreId, w => w.ms.StoreId.Equals(dto.StoreId))
+                .WhereIfNotNull(storeIds, w => storeIds.Equals(w.ms.StoreId))
+                .WhereIfNotEmpty(dto.StoreName, w => w.ms.StoreName.Contains(dto.StoreName))
+                .WhereIfNotEmpty(dto.AgentNo, w => w.mi.AgentNo.Equals(dto.AgentNo))
+                .Select(s => new MchStoreQueryResult { MchStore = s.ms, MchInfo = s.mi })
+                .OrderByDescending(o => o.MchStore.CreatedAt);
 
-            var records = PaginatedList<MchStoreListDto>.CreateAsync(query, s =>
+            var records = query.ToPaginatedResultAsync<MchStoreQueryResult, MchStoreListDto>(s =>
             {
-                var item = _mapper.Map<MchStoreListDto>(s.ms);
-                item.MchName = s.mi.MchName;
+                var item = _mapper.Map<MchStoreListDto>(s.MchStore);
+                item.MchName = s.MchInfo.MchName;
                 return item;
             }, dto.PageNumber, dto.PageSize);
             return records;

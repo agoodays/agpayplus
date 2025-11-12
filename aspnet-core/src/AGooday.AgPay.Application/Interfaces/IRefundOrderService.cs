@@ -16,7 +16,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="refundOrderId"></param>
         /// <returns></returns>
         Task<RefundOrderDto> QueryMchOrderAsync(string mchNo, string mchRefundNo, string refundOrderId);
-        Task<PaginatedList<RefundOrderDto>> GetPaginatedDataAsync(RefundOrderQueryDto dto);
+        Task<PaginatedResult<RefundOrderDto>> GetPaginatedDataAsync(RefundOrderQueryDto dto);
         Task<JObject> StatisticsAsync(RefundOrderQueryDto dto);
         Task<long> SumSuccessRefundAmountAsync(string payOrderId);
         /// <summary>

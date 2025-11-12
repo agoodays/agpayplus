@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -43,13 +44,12 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public async Task<PaginatedList<QrCodeShellDto>> GetPaginatedDataAsync(QrCodeShellQueryDto dto)
+        public Task<PaginatedResult<QrCodeShellDto>> GetPaginatedDataAsync(QrCodeShellQueryDto dto)
         {
             var query = _qrCodeShellRepository.GetAllAsNoTracking()
-                .Where(w => string.IsNullOrWhiteSpace(dto.ShellAlias) || w.ShellAlias.Contains(dto.ShellAlias))
+                .WhereIfNotEmpty(dto.ShellAlias, w => w.ShellAlias.Contains(dto.ShellAlias))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<QrCodeShell>.CreateAsync<QrCodeShellDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<QrCodeShell, QrCodeShellDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

@@ -7,10 +7,10 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         Task<PayOrderDivisionRecordDto> GetByIdAsync(long recordId, string mchNo);
         Task<PayOrderDivisionRecordDto> GetByIdAsNoTrackingAsync(long recordId, string mchNo);
-        IEnumerable<PayOrderDivisionRecordDto> GetByPayOrderId(string payOrderId);
-        List<PayOrderDivisionRecordDto> GetByBatchOrderId(PayOrderDivisionRecordQueryDto dto);
-        Task<PaginatedList<PayOrderDivisionRecordDto>> GetPaginatedDataAsync(PayOrderDivisionRecordQueryDto dto);
-        PaginatedList<PayOrderDivisionRecordDto> DistinctBatchOrderIdList(PayOrderDivisionRecordQueryDto dto);
+        Task<List<PayOrderDivisionRecordDto>> GetByPayOrderIdAsync(string payOrderId, byte? state);
+        Task<List<PayOrderDivisionRecordDto>> GetByBatchOrderIdAsync(PayOrderDivisionRecordQueryDto dto);
+        Task<PaginatedResult<PayOrderDivisionRecordDto>> GetPaginatedDataAsync(PayOrderDivisionRecordQueryDto dto);
+        Task<PaginatedResult<PayOrderDivisionRecordDto>> DistinctBatchOrderIdListAsync(PayOrderDivisionRecordQueryDto dto);
         Task<bool> UpdateRecordSuccessOrFailBySingleItemAsync(long recordId, byte state, string channelRespResult);
         Task<int> UpdateRecordSuccessOrFailAsync(List<PayOrderDivisionRecordDto> records, byte state, string channelBatchOrderId, string channelRespResult);
         Task<bool> UpdateResendStateAsync(string payOrderId);

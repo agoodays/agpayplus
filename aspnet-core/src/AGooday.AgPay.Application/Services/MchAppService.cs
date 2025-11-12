@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -55,42 +56,45 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<MchAppDto>(entity);
         }
 
-        public IEnumerable<MchAppDto> GetByMchNoAsNoTracking(string mchNo)
-        {
-            var records = _mchAppRepository.GetAllAsNoTracking().Where(w => w.MchNo.Equals(mchNo));
-            return _mapper.Map<IEnumerable<MchAppDto>>(records);
-        }
-
-        public IEnumerable<MchAppDto> GetByMchNos(IEnumerable<string> mchNos)
-        {
-            var records = _mchAppRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
-            return _mapper.Map<IEnumerable<MchAppDto>>(records);
-        }
-
-        public IEnumerable<MchAppDto> GetByAppIds(IEnumerable<string> appIds)
-        {
-            var records = _mchAppRepository.GetAllAsNoTracking().Where(w => appIds.Contains(w.AppId));
-            return _mapper.Map<IEnumerable<MchAppDto>>(records);
-        }
-
-        public Task<PaginatedList<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null)
+        public Task<List<MchAppDto>> GetByMchNoAsNoTrackingAsync(string mchNo)
         {
             var query = _mchAppRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (string.IsNullOrWhiteSpace(dto.AppName) || w.AppName.Contains(dto.AppName))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State)))
+                .Where(w => w.MchNo.Equals(mchNo));
+            return query.ToListProjectToAsync<MchApp, MchAppDto>(_mapper);
+        }
+
+        public Task<List<MchAppDto>> GetByMchNosAsNoTrackingAsync(IEnumerable<string> mchNos)
+        {
+            var query = _mchAppRepository.GetAllAsNoTracking()
+                .Where(w => mchNos.Contains(w.MchNo));
+            return query.ToListProjectToAsync<MchApp, MchAppDto>(_mapper);
+        }
+
+        public Task<List<MchAppDto>> GetByAppIdsAsNoTrackingAsync(IEnumerable<string> appIds)
+        {
+            var query = _mchAppRepository.GetAllAsNoTracking()
+                .Where(w => appIds.Contains(w.AppId));
+            return query.ToListProjectToAsync<MchApp, MchAppDto>(_mapper);
+        }
+
+        public Task<PaginatedResult<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null)
+        {
+            var query = _mchAppRepository.GetAllAsNoTracking()
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.AppId, w => w.AppId.Equals(dto.AppId))
+                .WhereIfNotEmpty(dto.AppName, w => w.AppName.Contains(dto.AppName))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
                 .OrderByDescending(o => o.CreatedAt);
 
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
                 var mchNos = _mchInfoRepository.GetAllAsNoTracking()
-                    .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                    && w.AgentNo.Equals(agentNo)).Select(s => s.MchNo);
+                    .Where(w => w.AgentNo.Equals(agentNo))
+                    .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                    .Select(s => s.MchNo);
                 query = query.Where(w => mchNos.Contains(w.MchNo)).OrderByDescending(o => o.CreatedAt);
             }
-            var records = PaginatedList<MchApp>.CreateAsync<MchAppDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<MchApp, MchAppDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

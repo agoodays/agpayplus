@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -40,20 +41,19 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public Task<PaginatedList<SysLogDto>> GetPaginatedDataAsync(SysLogQueryDto dto)
+        public Task<PaginatedResult<SysLogDto>> GetPaginatedDataAsync(SysLogQueryDto dto)
         {
             var query = _sysLogRepository.GetAllAsNoTracking()
-                .Where(w => (dto.UserId.Equals(null) || w.UserId.Equals(dto.UserId))
-                && (string.IsNullOrWhiteSpace(dto.UserName) || w.UserName.Contains(dto.UserName))
-                && (string.IsNullOrWhiteSpace(dto.UserIp) || w.UserIp.Contains(dto.UserIp))
-                && (string.IsNullOrWhiteSpace(dto.MethodRemark) || w.MethodRemark.Contains(dto.MethodRemark))
-                && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
-                && (dto.LogType.Equals(null) || w.LogType.Equals(dto.LogType))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .WhereIfNotNull(dto.UserId, w => w.UserId.Equals(dto.UserId))
+                .WhereIfNotEmpty(dto.UserName, w => w.UserName.Contains(dto.UserName))
+                .WhereIfNotEmpty(dto.UserIp, w => w.UserIp.Contains(dto.UserIp))
+                .WhereIfNotEmpty(dto.MethodRemark, w => w.MethodRemark.Contains(dto.MethodRemark))
+                .WhereIfNotEmpty(dto.SysType, w => w.SysType.Equals(dto.SysType))
+                .WhereIfNotNull(dto.LogType, w => w.LogType.Equals(dto.LogType))
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd)
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysLog>.CreateAsync<SysLogDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<SysLog, SysLogDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

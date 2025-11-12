@@ -99,7 +99,7 @@ namespace AGooday.AgPay.Components.Third.Channel.DgPay
                     data.TryGetString("req_seq_id", out string reqSeqId);//请求流水号
                     data.TryGetString("out_trans_id", out string outTransId);//用户账单上的交易订单号	
                     data.TryGetString("party_order_id", out string partyOrderId);//用户账单上的商户订单号	
-                    var wxResponse = data.GetValue("wx_response")?.ToObject<JObject>(); ;
+                    var wxResponse = data.GetValue("wx_response")?.ToObject<JObject>();
                     var alipayResponse = data.GetValue("alipay_response")?.ToObject<JObject>();
                     var unionpayResponse = data.GetValue("unionpay_response")?.ToObject<JObject>();
                     var subOpenid = wxResponse?.GetValue("sub_openid").ToString();

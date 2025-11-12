@@ -5,9 +5,9 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AGooday.AgPay.Infrastructure.Extensions.DataAccess;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -67,25 +67,24 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<SysRoleDto> GetByIdAsNoTrackingAsync(string recordId, string belongInfoId)
         {
-            var entity = await _sysRoleRepository.GetAllAsNoTracking().Where(w => w.RoleId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId)).FirstOrDefaultAsync();
-            var dto = _mapper.Map<SysRoleDto>(entity);
-            return dto;
+            var query = _sysRoleRepository.GetAllAsNoTracking()
+                .Where(w => w.RoleId.Equals(recordId) && w.BelongInfoId.Equals(belongInfoId));
+            return await query.FirstOrDefaultProjectToAsync<SysRole, SysRoleDto>(_mapper);
         }
 
-        public Task<PaginatedList<SysRoleDto>> GetPaginatedDataAsync(SysRoleQueryDto dto)
+        public Task<PaginatedResult<SysRoleDto>> GetPaginatedDataAsync(SysRoleQueryDto dto)
         {
             var query = _sysRoleRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.RoleName) || w.RoleName.Contains(dto.RoleName))
-                && (string.IsNullOrWhiteSpace(dto.RoleId) || w.RoleId.Equals(dto.RoleId))
-                && (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
-                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Equals(dto.BelongInfoId)))
+                .WhereIfNotEmpty(dto.RoleName, w => w.RoleName.Contains(dto.RoleName))
+                .WhereIfNotEmpty(dto.RoleId, w => w.RoleId.Equals(dto.RoleId))
+                .WhereIfNotEmpty(dto.SysType, w => w.SysType.Equals(dto.SysType))
+                .WhereIfNotEmpty(dto.BelongInfoId, w => w.BelongInfoId.Equals(dto.BelongInfoId))
                 .OrderByDescending(o => o.UpdatedAt);
             if (!string.IsNullOrEmpty(dto.SortField) && !string.IsNullOrEmpty(dto.SortOrder))
             {
                 query = query.OrderBy(dto.SortField, dto.SortOrder.Equals(PageQuery.DESCEND, StringComparison.OrdinalIgnoreCase));
             }
-            var records = PaginatedList<SysRole>.CreateAsync<SysRoleDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<SysRole, SysRoleDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

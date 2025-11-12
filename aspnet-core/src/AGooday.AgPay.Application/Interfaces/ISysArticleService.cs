@@ -5,6 +5,6 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysArticleService : IAgPayService<SysArticleDto, long>
     {
-        Task<PaginatedList<SysArticleDto>> GetPaginatedDataAsync(SysArticleQueryDto dto, string agentNo = null);
+        Task<PaginatedResult<SysArticleDto>> GetPaginatedDataAsync(SysArticleQueryDto dto, string agentNo = null);
     }
 }

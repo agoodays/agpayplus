@@ -28,7 +28,7 @@ namespace AGooday.AgPay.Common.Exceptions
                 StatusCode = statusCode,
                 Content = text,
                 ContentType = MediaTypeNames.Text.Html
-            }; ;
+            };
             return new ResponseException(entity);
         }
     }

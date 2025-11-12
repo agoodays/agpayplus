@@ -10,7 +10,7 @@ namespace AGooday.AgPay.Application.Interfaces
         Task<bool> IsExistOrderUseWayCodeAsync(string wayCode);
         Task<bool> IsExistOrderByMchOrderNoAsync(string mchNo, string mchOrderNo);
         Task<PayOrderDto> QueryMchOrderAsync(string mchNo, string payOrderId, string mchOrderNo);
-        Task<PaginatedList<PayOrderDto>> GetPaginatedDataAsync(PayOrderQueryDto dto);
+        Task<PaginatedResult<PayOrderDto>> GetPaginatedDataAsync(PayOrderQueryDto dto);
         Task<JObject> StatisticsAsync(PayOrderQueryDto dto);
         /// <summary>
         /// 更新订单状态 【订单生成】 --》 【支付中】

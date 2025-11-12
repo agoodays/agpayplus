@@ -136,7 +136,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.SysUser
             dto.MatchRule.UserEntRules = dto.MatchRule?.UserEntRules != null && dto.MatchRule.UserEntRules?.Count > 0 ? dto.MatchRule.UserEntRules : null;
             dto.MatchRule.MchLevelArray = dto.MatchRule?.MchLevelArray != null && dto.MatchRule.MchLevelArray?.Count > 0 ? dto.MatchRule.MchLevelArray : null;
             dto.MatchRule = dto.MatchRule.GetType()
-                .GetProperties().All(property => property.GetValue(dto.MatchRule) == null) ? null : dto.MatchRule;
+                .GetProperties().Any(property => property.GetValue(dto.MatchRule) == null) ? null : dto.MatchRule;
         }
 
         /// <summary>

@@ -53,10 +53,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         public async Task<ApiPageRes<MchAppDto>> ListAsync([FromQuery] MchAppQueryDto dto)
         {
             var data = await _mchAppService.GetPaginatedDataAsync(dto);
-            var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
-            var mchInfos = _mchInfoService.GetByMchNos(mchNos);
+            var mchNos = data.Items.Select(s => s.MchNo).Distinct().ToList();
+            var mchInfos = await _mchInfoService.GetByMchNosAsNoTrackingAsync(mchNos);
             //JArray records = new JArray();
-            foreach (var item in data)
+            foreach (var item in data.Items)
             {
                 //var jitem = JObject.FromObject(item);
                 //jitem["mchType"] = mchInfos.First(s => s.MchNo == item.MchNo).Type;

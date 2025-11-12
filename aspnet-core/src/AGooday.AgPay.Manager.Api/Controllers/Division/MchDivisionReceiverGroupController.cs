@@ -46,9 +46,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Division
         public async Task<ApiPageRes<MchDivisionReceiverGroupDto>> ListAsync([FromQuery] MchDivisionReceiverGroupQueryDto dto)
         {
             var data = await _mchDivisionReceiverGroupService.GetPaginatedDataAsync(dto);
-            var mchNos = data.Select(s => s.MchNo).Distinct().ToList();
-            var mchInfos = _mchInfoService.GetByMchNos(mchNos);
-            foreach (var item in data)
+            var mchNos = data.Items.Select(s => s.MchNo).Distinct().ToList();
+            var mchInfos = await _mchInfoService.GetByMchNosAsNoTrackingAsync(mchNos);
+            foreach (var item in data.Items)
             {
                 item.AddExt("mchName", mchInfos?.FirstOrDefault(s => s.MchNo == item.MchNo)?.MchName);
             }

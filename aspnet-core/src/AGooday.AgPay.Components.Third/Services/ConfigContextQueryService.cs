@@ -286,7 +286,7 @@ namespace AGooday.AgPay.Components.Third.Services
             {
                 return (await _configContextService.GetMchAppConfigContextAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId)).GetPaypalWrapper();
             }
-            PpPayNormalMchParams ppPayNormalMchParams = (PpPayNormalMchParams)await QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.PPPAY); ;
+            PpPayNormalMchParams ppPayNormalMchParams = (PpPayNormalMchParams)await QueryNormalMchParamsAsync(mchAppConfigContext.MchNo, mchAppConfigContext.AppId, CS.IF_CODE.PPPAY);
             return PayPalWrapper.BuildPaypalWrapper(ppPayNormalMchParams);
         }
 

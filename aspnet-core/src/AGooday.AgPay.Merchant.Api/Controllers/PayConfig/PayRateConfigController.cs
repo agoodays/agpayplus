@@ -40,7 +40,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
         public ApiRes SavedMapData(string configMode, string infoId, string ifCode)
         {
-            return ApiRes.Ok(_payRateConfigService.GetByInfoIdAndIfCodeJson(configMode, infoId, ifCode));
+            return ApiRes.Ok(_payRateConfigService.GetByInfoIdAndIfCodeJsonAsync(configMode, infoId, ifCode));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_ADD)]
         public ApiRes SaveOrUpdate(PayRateConfigSaveDto dto)
         {
-            _payRateConfigService.SaveOrUpdate(dto);
+            _payRateConfigService.SaveOrUpdateAsync(dto);
             return ApiRes.Ok();
         }
     }

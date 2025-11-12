@@ -43,13 +43,13 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             };
                             var refundOrders = await refundOrderService.GetPaginatedDataAsync(dto);
 
-                            if (refundOrders == null || refundOrders.Count == 0)
+                            if (refundOrders == null || refundOrders.Items.Count == 0)
                             {
                                 //本次查询无结果, 不再继续查询;
                                 break;
                             }
 
-                            foreach (var refundOrder in refundOrders)
+                            foreach (var refundOrder in refundOrders.Items)
                             {
                                 await channelOrderReissueService.ProcessRefundOrderAsync(refundOrder);
                             }

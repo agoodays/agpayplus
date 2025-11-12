@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Common.Utils
                 .Replace("-----BEGIN PRIVATE KEY-----", string.Empty)
                 .Replace("-----END PRIVATE KEY-----", string.Empty)
                 .Replace("-----BEGIN EC PRIVATE KEY-----", string.Empty)
-                .Replace("-----END EC PRIVATE KEY-----", string.Empty); ;
+                .Replace("-----END EC PRIVATE KEY-----", string.Empty);
             privateKeyPem = Regex.Replace(privateKeyPem, "\\s+", string.Empty);
             return Convert.FromBase64String(privateKeyPem);
         }

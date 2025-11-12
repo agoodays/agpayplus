@@ -157,7 +157,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                         throw ResponseException.BuildText("ERROR");
                     }
                     // 核对金额
-                    long wxPayAmt = result.TotalFee; ;
+                    long wxPayAmt = result.TotalFee;
                     long dbPayAmt = payOrder.Amount;
                     if (dbPayAmt != wxPayAmt)
                     {

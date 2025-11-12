@@ -7,6 +7,6 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         Task<bool> IsExistPayWayCodeAsync(string wayCode);
         Task<string> GetWayTypeByWayCodeAsync(string wayCode);
-        Task<PaginatedList<T>> GetPaginatedDataAsync<T>(PayWayQueryDto dto);
+        Task<PaginatedResult<T>> GetPaginatedDataAsync<T>(PayWayQueryDto dto);
     }
 }

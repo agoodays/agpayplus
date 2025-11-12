@@ -176,7 +176,7 @@ namespace AGooday.AgPay.Components.Third.Services
             mchInfoConfigContext.MchNo = mchInfo.MchNo;
             mchInfoConfigContext.MchType = mchInfo.Type;
             mchInfoConfigContext.MchInfo = mchInfo;
-            _mchAppService.GetByMchNoAsNoTracking(mchNo).ToList().ForEach(mchApp =>
+            (await _mchAppService.GetByMchNoAsNoTrackingAsync(mchNo)).ForEach(mchApp =>
             {
                 //1. 更新商户内appId集合
                 mchInfoConfigContext.PutMchApp(mchApp);
@@ -190,7 +190,7 @@ namespace AGooday.AgPay.Components.Third.Services
                     mchAppConfigContext.MchInfo = mchInfo;
                 }
             });
-            _mchStoreService.GetByMchNoAsNoTracking(mchNo).ToList().ForEach(mchStore =>
+            (await _mchStoreService.GetByMchNoAsNoTrackingAsync(mchNo)).ForEach(mchStore =>
             {
                 //1. 更新商户内门店集合
                 mchInfoConfigContext.PutMchStore(mchStore);
@@ -252,8 +252,8 @@ namespace AGooday.AgPay.Components.Third.Services
             mchAppConfigContext.MchApp = dbMchApp;
 
             // 查询商户的所有支持的参数配置
-            var allConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP, appId);
-            var allOauth2ConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP_OAUTH2, appId);
+            var allConfigList = await _payInterfaceConfigService.GetByInfoIdAsync(CS.INFO_TYPE.MCH_APP, appId);
+            var allOauth2ConfigList = await _payInterfaceConfigService.GetByInfoIdAsync(CS.INFO_TYPE.MCH_APP_OAUTH2, appId);
 
             // 普通商户
             if (mchInfo.Type == CS.MCH_TYPE_NORMAL)
@@ -372,13 +372,13 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             //查询出所有商户的配置信息并更新
-            var mchNoList = _mchInfoService.GetByIsvNo(isvNo).Select(s => s.MchNo);
+            var mchNoList = (await _mchInfoService.GetByIsvNoAsNoTrackingAsync(isvNo)).Select(s => s.MchNo);
 
             // 查询出所有 所属当前服务商的所有应用集合
             IEnumerable<string> mchAppIdList = new List<string>();
             if (mchNoList?.Count() > 0)
             {
-                mchAppIdList = _mchAppService.GetByMchNos(mchNoList).Select(s => s.AppId);
+                mchAppIdList = (await _mchAppService.GetByMchNosAsNoTrackingAsync(mchNoList)).Select(s => s.AppId);
             }
 
             IsvConfigContext isvConfigContext = new IsvConfigContext();
@@ -404,8 +404,8 @@ namespace AGooday.AgPay.Components.Third.Services
             isvConfigContext.IsvInfo = isvInfo;
 
             // 查询商户的所有支持的参数配置
-            var allConfigList = _payInterfaceConfigService.GetByInfoId(CS.INFO_TYPE.ISV, isvNo);
-            var allOauth2ConfigList = _payInterfaceConfigService.GetPayOauth2ConfigByStartsWithInfoId(CS.INFO_TYPE.ISV_OAUTH2, isvNo);
+            var allConfigList = await _payInterfaceConfigService.GetByInfoIdAsync(CS.INFO_TYPE.ISV, isvNo);
+            var allOauth2ConfigList = await _payInterfaceConfigService.GetPayOauth2ConfigByStartsWithInfoIdAsync(CS.INFO_TYPE.ISV_OAUTH2, isvNo);
 
             foreach (var payInterfaceConfig in allConfigList)
             {

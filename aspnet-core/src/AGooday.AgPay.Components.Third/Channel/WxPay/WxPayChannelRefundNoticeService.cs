@@ -219,7 +219,7 @@ namespace AGooday.AgPay.Components.Third.Channel.WxPay
                         throw ResponseException.BuildText("ERROR");
                     }
                     // 核对金额
-                    long wxPayAmt = notifyResult.TotalFee; ;
+                    long wxPayAmt = notifyResult.TotalFee;
                     long dbPayAmt = refundOrder.RefundAmount;
                     if (dbPayAmt != wxPayAmt)
                     {

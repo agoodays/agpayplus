@@ -155,9 +155,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
                 // 固定前两行，第一列，`FreezePanes()`方法的第一个参数设置为3，表示从第三行开始向下滚动时会被冻结，第二个参数设置为3，表示从第二行开始向右滚动时会被冻结
                 worksheet.View.FreezePanes(3, 2);
                 // 将每个订单添加到工作表中
-                for (int i = 0; i < result.Count; i++)
+                for (int i = 0; i < result.Items.Count; i++)
                 {
-                    var item = result[i];
+                    var item = result.Items[i];
                     var orderJO = JObject.FromObject(item);
                     for (int j = 0; j < excelHeaders.Count; j++)
                     {
@@ -183,7 +183,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Statistic
 
                 // 设置单元格样式，例如居中对齐和加粗字体
                 var cols = excelHeaders.Count + 1;
-                var rows = result.Count + 3;
+                var rows = result.Items.Count + 3;
                 for (int i = 1; i < rows; i++)
                 {
                     worksheet.Row(i).Height = 25;

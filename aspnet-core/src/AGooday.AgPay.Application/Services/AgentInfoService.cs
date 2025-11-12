@@ -6,6 +6,7 @@ using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -76,19 +77,17 @@ namespace AGooday.AgPay.Application.Services
             return _mapper.Map<IEnumerable<AgentInfoDto>>(source);
         }
 
-        public Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(AgentInfoQueryDto dto)
+        public Task<PaginatedResult<AgentInfoDto>> GetPaginatedDataAsync(AgentInfoQueryDto dto)
         {
             var agentInfos = GetAgentInfos(dto);
-            var records = PaginatedList<AgentInfo>.CreateAsync<AgentInfoDto>(agentInfos, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return agentInfos.ToPaginatedResultAsync<AgentInfo, AgentInfoDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
 
-        public Task<PaginatedList<AgentInfoDto>> GetPaginatedDataAsync(string agentNo, AgentInfoQueryDto dto)
+        public Task<PaginatedResult<AgentInfoDto>> GetPaginatedDataAsync(string agentNo, AgentInfoQueryDto dto)
         {
             var agentInfos = GetAgentInfos(dto);
             var subAgentInfos = GetSons(agentInfos, agentNo).Where(w => w.AgentNo != agentNo);
-            var records = PaginatedList<AgentInfo>.CreateAsync<AgentInfoDto>(subAgentInfos, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return subAgentInfos.ToPaginatedResultAsync<AgentInfo, AgentInfoDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
 
         private IOrderedQueryable<AgentInfo> GetAgentInfos(AgentInfoQueryDto dto)
@@ -101,13 +100,13 @@ namespace AGooday.AgPay.Application.Services
             }
 
             var agentInfos = _agentInfoRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                && (agentNos.Count == 0 || agentNos.Contains(dto.AgentNo))
-                && (string.IsNullOrWhiteSpace(dto.Pid) || w.Pid.Equals(dto.Pid))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (string.IsNullOrWhiteSpace(dto.AgentName) || w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))
-                && (string.IsNullOrWhiteSpace(dto.ContactTel) || w.IsvNo.Equals(dto.ContactTel))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State)))
+                .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo)))
+                .WhereIf(agentNos.Count == 0, w => agentNos.Contains(dto.AgentNo))
+                .WhereIfNotEmpty(dto.Pid, w => w.Pid.Equals(dto.Pid))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotEmpty(dto.AgentName, w => w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))
+                .WhereIfNotEmpty(dto.ContactTel, w => w.IsvNo.Equals(dto.ContactTel))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
                 .OrderByDescending(o => o.CreatedAt);
             return agentInfos;
         }

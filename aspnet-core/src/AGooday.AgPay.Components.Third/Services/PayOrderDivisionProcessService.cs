@@ -95,8 +95,7 @@ namespace AGooday.AgPay.Components.Third.Services
             if (isResend.Value)
             {
                 // 根据payOrderId && 待分账（ 重试时将更新为待分账状态 ）  ， 此处不可查询出分账成功的订单。
-                recordList = _payOrderDivisionRecordService.GetByPayOrderId(payOrderId)
-                    .Where(w => w.State == (byte)PayOrderDivisionRecordState.STATE_WAIT).ToList();
+                recordList = await _payOrderDivisionRecordService.GetByPayOrderIdAsync(payOrderId, (byte)PayOrderDivisionRecordState.STATE_WAIT);
             }
             else
             {
@@ -260,7 +259,8 @@ namespace AGooday.AgPay.Components.Third.Services
             }
 
             //全部分账账号
-            var allMchReceiver = await _mchDivisionReceiverService.GetPaginatedDataAsync(queryWrapper);
+            var paginatedData = await _mchDivisionReceiverService.GetPaginatedDataAsync(queryWrapper);
+            var allMchReceiver = paginatedData.Items;
             if (!allMchReceiver.Any())
             {
                 return allMchReceiver;

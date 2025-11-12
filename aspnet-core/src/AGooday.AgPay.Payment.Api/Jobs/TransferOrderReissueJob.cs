@@ -44,13 +44,13 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             };
                             var transferOrders = await transferOrderService.GetPaginatedDataAsync(dto);
 
-                            if (transferOrders == null || transferOrders.Count == 0)
+                            if (transferOrders == null || transferOrders.Items.Count == 0)
                             {
                                 //本次查询无结果, 不再继续查询;
                                 break;
                             }
 
-                            foreach (var transferOrder in transferOrders)
+                            foreach (var transferOrder in transferOrders.Items)
                             {
                                 await transferOrderReissueService.ProcessOrderAsync(transferOrder);
                             }

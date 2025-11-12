@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -44,15 +45,14 @@ namespace AGooday.AgPay.Application.Services
             return entity?.WayType ?? PayWayType.OTHER.ToString();
         }
 
-        public Task<PaginatedList<T>> GetPaginatedDataAsync<T>(PayWayQueryDto dto)
+        public Task<PaginatedResult<T>> GetPaginatedDataAsync<T>(PayWayQueryDto dto)
         {
             var query = _payWayRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
-                && (string.IsNullOrWhiteSpace(dto.WayName) || w.WayName.Contains(dto.WayName))
-                && (string.IsNullOrWhiteSpace(dto.WayType) || w.WayType.Equals(dto.WayType)))
+                .WhereIfNotEmpty(dto.WayCode, w => w.WayCode.Equals(dto.WayCode))
+                .WhereIfNotEmpty(dto.WayName, w => w.WayName.Contains(dto.WayName))
+                .WhereIfNotEmpty(dto.WayType, w => w.WayType.Equals(dto.WayType))
                 .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            var records = PaginatedList<PayWay>.CreateAsync<T>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<PayWay, T>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

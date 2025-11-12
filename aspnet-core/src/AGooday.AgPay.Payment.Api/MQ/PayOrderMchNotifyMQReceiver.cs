@@ -31,7 +31,7 @@ namespace AGooday.AgPay.Payment.Api.MQ
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var payOrderService = scope.ServiceProvider.GetService<IPayOrderService>(); ;
+                var payOrderService = scope.ServiceProvider.GetService<IPayOrderService>();
                 var mchNotifyRecordService = scope.ServiceProvider.GetService<IMchNotifyRecordService>();
                 try
                 {

@@ -1,9 +1,11 @@
 ﻿using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Domain.Queries.SysUsers;
 
 namespace AGooday.AgPay.Domain.Interfaces
 {
     public interface ISysUserRepository : IAgPayRepository<SysUser, long>
     {
+        IQueryable<SysUserQueryResult> GetSysUsers(SysUserQuery request);
         Task<bool> IsExistLoginUsernameAsync(string loginUsername, string sysType);
         Task<bool> IsExistTelphoneAsync(string telphone, string sysType);
         Task<bool> IsExistUserNoAsync(string userNo, string sysType);

@@ -166,10 +166,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
 
-            var ifCodes = _payIfConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP, appId)
+            var ifCodes = (await _payIfConfigService.GetByInfoIdAsync(CS.INFO_TYPE.MCH_APP, appId))
                 .Select(s => s.IfCode).ToList();
 
-            var result = _payIfDefineService.GetByIfCodes(ifCodes)
+            var result = (await _payIfDefineService.GetByIfCodesAsync(ifCodes))
                 .Select(s => new { s.IfCode, s.IfName, s.BgColor, s.Icon });
             return ApiRes.Ok(result);
         }

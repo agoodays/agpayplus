@@ -7,8 +7,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
@@ -57,66 +57,88 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<RefundOrderDto> QueryMchOrderAsync(string mchNo, string mchRefundNo, string refundOrderId)
         {
-            var entity = await _refundOrderRepository.GetAllAsNoTracking()
+            var query = _refundOrderRepository.GetAllAsNoTracking()
                 .Where(w => w.MchNo.Equals(mchNo)
                 && ((!string.IsNullOrEmpty(refundOrderId) && w.RefundOrderId.Equals(refundOrderId))
-                || (!string.IsNullOrEmpty(mchRefundNo) && w.MchRefundNo.Equals(mchRefundNo))))
-                .FirstOrDefaultAsync();
-            return _mapper.Map<RefundOrderDto>(entity);
+                || (!string.IsNullOrEmpty(mchRefundNo) && w.MchRefundNo.Equals(mchRefundNo))));
+            return await query.FirstOrDefaultProjectToAsync<RefundOrder, RefundOrderDto>(_mapper);
         }
 
-        public Task<PaginatedList<RefundOrderDto>> GetPaginatedDataAsync(RefundOrderQueryDto dto)
+        public Task<PaginatedResult<RefundOrderDto>> GetPaginatedDataAsync(RefundOrderQueryDto dto)
         {
             var query = GetRefundOrders(dto).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<RefundOrder>.CreateAsync<RefundOrderDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<RefundOrder, RefundOrderDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
 
         private IQueryable<RefundOrder> GetRefundOrders(RefundOrderQueryDto dto)
         {
             var result = _refundOrderRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
-                && (string.IsNullOrWhiteSpace(dto.IfCode) || w.WayCode.Equals(dto.IfCode))
-                && (string.IsNullOrWhiteSpace(dto.WayCode) || w.WayCode.Equals(dto.WayCode))
-                && (string.IsNullOrWhiteSpace(dto.RefundOrderId) || w.RefundOrderId.Equals(dto.RefundOrderId))
-                && (string.IsNullOrWhiteSpace(dto.MchRefundNo) || w.MchRefundNo.Equals(dto.MchRefundNo))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.PayOrderId.Equals(dto.UnionOrderId)
-                || w.RefundOrderId.Equals(dto.UnionOrderId) || w.MchRefundNo.Equals(dto.UnionOrderId)
-                || w.ChannelPayOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))// 三合一订单
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.AgentNo, w => w.AgentNo.Equals(dto.AgentNo))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotNull(dto.MchType, w => w.MchType.Equals(dto.MchType))
+                .WhereIfNotEmpty(dto.IfCode, w => w.IfCode.Equals(dto.IfCode))
+                .WhereIfNotEmpty(dto.WayCode, w => w.WayCode.Equals(dto.WayCode))
+                .WhereIfNotEmpty(dto.RefundOrderId, w => w.RefundOrderId.Equals(dto.RefundOrderId))
+                .WhereIfNotEmpty(dto.MchRefundNo, w => w.MchRefundNo.Equals(dto.MchRefundNo))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
+                .WhereIfNotEmpty(dto.AppId, w => w.AppId.Equals(dto.AppId))
+                .WhereIfNotEmpty(dto.UnionOrderId, w => w.PayOrderId.Equals(dto.UnionOrderId) || w.RefundOrderId.Equals(dto.UnionOrderId) || w.MchRefundNo.Equals(dto.UnionOrderId) || w.ChannelPayOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))// 三合一订单
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd);
             return result;
         }
 
         public async Task<JObject> StatisticsAsync(RefundOrderQueryDto dto)
         {
-            var refundOrders = GetRefundOrders(dto);
-            var allRefundAmount = await refundOrders.SumAsync(s => s.RefundAmount);
-            var allRefundCount = await refundOrders.CountAsync();
-            var refund = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS));
-            var refundFeeAmount = await refund.SumAsync(s => s.RefundFeeAmount);
-            var refundAmount = await refund.SumAsync(s => s.RefundAmount);
-            var refundCount = await refund.CountAsync();
+            // 获取所有统计数据
+            var statistics = await GetRefundOrders(dto)
+                .GroupBy(x => 1) // 常量分组
+                .Select(g => new
+                {
+                    // 总退款统计
+                    AllRefundAmount = g.Sum(o => o.RefundAmount),
+                    AllRefundCount = g.Count(),
+
+                    // 成功退款统计
+                    RefundFeeAmount = g.Where(o => o.State == (byte)RefundOrderState.STATE_SUCCESS)
+                                     .Sum(o => o.RefundFeeAmount),
+                    RefundAmount = g.Where(o => o.State == (byte)RefundOrderState.STATE_SUCCESS)
+                                  .Sum(o => o.RefundAmount),
+                    RefundCount = g.Count(o => o.State == (byte)RefundOrderState.STATE_SUCCESS)
+                })
+                .FirstOrDefaultAsync();
+
+            // 处理空结果
+            statistics ??= new
+            {
+                AllRefundAmount = 0L,
+                AllRefundCount = 0,
+                RefundFeeAmount = 0L,
+                RefundAmount = 0L,
+                RefundCount = 0
+            };
+
+            // 计算成功率
+            var successRate = statistics.AllRefundCount > 0
+                ? Math.Round(statistics.RefundCount / Convert.ToDecimal(statistics.AllRefundCount), 2, MidpointRounding.AwayFromZero)
+                : 0M;
+
             JObject result = new JObject();
-            result.Add("allRefundAmount", Decimal.Round(allRefundAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            result.Add("allRefundCount", allRefundCount);
-            result.Add("refundAmount", Decimal.Round(refundAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            result.Add("refundCount", refundCount);
-            result.Add("refundFeeAmount", refundFeeAmount);
-            result.Add("round", Math.Round(allRefundCount > 0 ? refundCount / Convert.ToDecimal(allRefundCount) : 0M, 2, MidpointRounding.AwayFromZero));
+            result.Add("allRefundAmount", Decimal.Round(statistics.AllRefundAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("allRefundCount", statistics.AllRefundCount);
+            result.Add("refundAmount", Decimal.Round(statistics.RefundAmount / 100M, 2, MidpointRounding.AwayFromZero));
+            result.Add("refundCount", statistics.RefundCount);
+            result.Add("refundFeeAmount", statistics.RefundFeeAmount);
+            result.Add("round", successRate);
             return result;
         }
 
         public Task<long> SumSuccessRefundAmountAsync(string payOrderId)
         {
             return _refundOrderRepository.GetAllAsNoTracking()
-                .Where(w => w.PayOrderId.Equals(payOrderId)
-                && w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
-                .SumAsync(s => s.RefundAmount);
+                .Where(w => w.PayOrderId.Equals(payOrderId) && w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .SafeSumAsync(s => s.RefundAmount);
         }
 
         /// <summary>
@@ -259,35 +281,9 @@ namespace AGooday.AgPay.Application.Services
             var updatedCount = _refundOrderRepository.GetAll()
                 .Where(w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
                 && w.ExpiredTime < DateTime.Now)
-                .ExecuteUpdateAsync(s => s
-                    .SetProperty(p => p.State, p => (byte)RefundOrderState.STATE_CLOSED)
+                .UpdateAsync(s => s.SetProperty(p => p.State, p => (byte)RefundOrderState.STATE_CLOSED)
                     .SetProperty(p => p.UpdatedAt, now));
             return updatedCount;
-
-            //// 使用 ExecuteUpdate 直接在数据库中批量更新
-            //var now = DateTime.Now;
-            //var updatedCount = RelationalQueryableExtensions.ExecuteUpdateAsync(
-            //    _refundOrderRepository.GetAll()
-            //        .Where(w => (new byte[] { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
-            //        && w.ExpiredTime < DateTime.Now),
-            //    s => s
-            //        .SetProperty(p => p.State, p => (byte)RefundOrderState.STATE_CLOSED)
-            //        .SetProperty(p => p.UpdatedAt, now));
-            //return updatedCount;
-
-            //var updateRecords = _refundOrderRepository.GetAll()
-            //    .Where(w => (new List<byte>() { (byte)RefundOrderState.STATE_INIT, (byte)RefundOrderState.STATE_ING }).Contains(w.State)
-            //    && w.ExpiredTime < DateTime.Now);
-            //if (updateRecords.Any())
-            //{
-            //    foreach (var refundOrder in updateRecords)
-            //    {
-            //        refundOrder.State = (byte)RefundOrderState.STATE_CLOSED;
-            //    }
-            //    _refundOrderRepository.UpdateRange(updateRecords);
-            //    return _refundOrderRepository.SaveChangesAsync();
-            //}
-            //return Task.FromResult(0);
         }
         /// <summary>
         /// 更新支付订单分润并生成账单

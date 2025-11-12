@@ -5,6 +5,7 @@ using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -50,15 +51,14 @@ namespace AGooday.AgPay.Application.Services
             return _isvInfoRepository.IsExistIsvNoAsync(isvNo);
         }
 
-        public Task<PaginatedList<IsvInfoDto>> GetPaginatedDataAsync(IsvInfoQueryDto dto)
+        public Task<PaginatedResult<IsvInfoDto>> GetPaginatedDataAsync(IsvInfoQueryDto dto)
         {
             var query = _isvInfoRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvName) || w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State)))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotEmpty(dto.IsvName, w => w.IsvName.Contains(dto.IsvName) || w.IsvShortName.Contains(dto.IsvName))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<IsvInfo>.CreateAsync<IsvInfoDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<IsvInfo, IsvInfoDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

@@ -52,16 +52,16 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         [PermissionAuth(PermCode.MGR.ENT_MCH_PAY_PASSAGE_LIST)]
         public async Task<ApiPageRes<MchPayPassagePayWayDto>> ListAsync(string appId, [FromQuery] PayWayQueryDto dto)
         {
-            var payWays = await _payWayService.GetPaginatedDataAsync<MchPayPassagePayWayDto>(dto);
-            if (payWays?.Count > 0)
+            var data = await _payWayService.GetPaginatedDataAsync<MchPayPassagePayWayDto>(dto);
+            if (data.Items?.Count > 0)
             {
                 // 支付方式代码集合
-                var wayCodes = payWays.Select(s => s.WayCode).ToList();
+                var wayCodes = data.Items.Select(s => s.WayCode).ToList();
 
                 // 应用支付通道集合
                 var mchPayPassages = _mchPayPassageService.GetByAppIdAndWayCodesAsNoTracking(appId, wayCodes);
 
-                foreach (var payWay in payWays)
+                foreach (var payWay in data.Items)
                 {
                     payWay.PassageState = CS.NO;
                     payWay.IsConfig = CS.NO;
@@ -76,7 +76,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                     }
                 }
             }
-            return ApiPageRes<MchPayPassagePayWayDto>.Pages(payWays);
+            return ApiPageRes<MchPayPassagePayWayDto>.Pages(data);
         }
 
         /// <summary>

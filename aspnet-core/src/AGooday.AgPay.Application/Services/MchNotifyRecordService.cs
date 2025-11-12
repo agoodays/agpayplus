@@ -5,8 +5,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -34,21 +34,20 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public Task<PaginatedList<MchNotifyRecordDto>> GetPaginatedDataAsync(MchNotifyQueryDto dto)
+        public Task<PaginatedResult<MchNotifyRecordDto>> GetPaginatedDataAsync(MchNotifyQueryDto dto)
         {
             var query = _mchNotifyRecordRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (string.IsNullOrWhiteSpace(dto.OrderId) || w.OrderId.Equals(dto.OrderId))
-                && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (dto.OrderType.Equals(null) || w.OrderType.Equals(dto.OrderType))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotEmpty(dto.OrderId, w => w.OrderId.Equals(dto.OrderId))
+                .WhereIfNotEmpty(dto.MchOrderNo, w => w.MchOrderNo.Equals(dto.MchOrderNo))
+                .WhereIfNotEmpty(dto.AppId, w => w.AppId.Equals(dto.AppId))
+                .WhereIfNotNull(dto.OrderType, w => w.OrderType.Equals(dto.OrderType))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd)
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchNotifyRecord>.CreateAsync<MchNotifyRecordDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<MchNotifyRecord, MchNotifyRecordDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
 
         /// <summary>
@@ -59,9 +58,7 @@ namespace AGooday.AgPay.Application.Services
         /// <returns></returns>
         public async Task<MchNotifyRecordDto> FindByOrderAndTypeAsync(string orderId, byte orderType)
         {
-            var entity = await _mchNotifyRecordRepository.GetAllAsNoTracking()
-                .Where(w => w.OrderId.Equals(orderId) && w.OrderType.Equals(orderType))
-                .FirstOrDefaultAsync();
+            var entity = await _mchNotifyRecordRepository.FirstOrDefaultAsNoTrackingAsync(w => w.OrderId.Equals(orderId) && w.OrderType.Equals(orderType));
             return _mapper.Map<MchNotifyRecordDto>(entity);
         }
 

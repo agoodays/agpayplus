@@ -46,13 +46,13 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             };
                             var payOrders = await payOrderService.GetPaginatedDataAsync(dto);
 
-                            if (payOrders == null || payOrders.Count == 0)
+                            if (payOrders == null || payOrders.Items.Count == 0)
                             {
                                 //本次查询无结果, 不再继续查询;
                                 break;
                             }
 
-                            foreach (var payOrder in payOrders)
+                            foreach (var payOrder in payOrders.Items)
                             {
                                 await channelOrderReissueService.ProcessPayOrderAsync(payOrder);
                             }

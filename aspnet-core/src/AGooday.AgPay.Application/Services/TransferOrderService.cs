@@ -5,8 +5,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 
 namespace AGooday.AgPay.Application.Services
@@ -32,57 +32,113 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<TransferOrderDto> QueryMchOrderAsync(string mchNo, string mchOrderNo, string transferId)
         {
-            var entity = await _transferOrderRepository.GetAllAsNoTracking()
-                .Where(w => w.MchNo.Equals(mchNo)
-                && ((!string.IsNullOrEmpty(transferId) && w.TransferId.Equals(transferId))
-                || (!string.IsNullOrEmpty(mchOrderNo) && w.MchOrderNo.Equals(mchOrderNo))))
-                .FirstOrDefaultAsync();
+            var entity = await _transferOrderRepository.FirstOrDefaultAsNoTrackingAsync(w => w.MchNo.Equals(mchNo)
+                && ((!string.IsNullOrEmpty(transferId) && w.TransferId.Equals(transferId)) || (!string.IsNullOrEmpty(mchOrderNo) && w.MchOrderNo.Equals(mchOrderNo))));
             return _mapper.Map<TransferOrderDto>(entity);
         }
 
-        public Task<PaginatedList<TransferOrderDto>> GetPaginatedDataAsync(TransferOrderQueryDto dto)
+        public Task<PaginatedResult<TransferOrderDto>> GetPaginatedDataAsync(TransferOrderQueryDto dto)
         {
             var query = GetTransferOrders(dto).OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<TransferOrder>.CreateAsync<TransferOrderDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<TransferOrder, TransferOrderDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
-
         private IQueryable<TransferOrder> GetTransferOrders(TransferOrderQueryDto dto)
         {
-            var result = _transferOrderRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
-                && (string.IsNullOrWhiteSpace(dto.TransferId) || w.TransferId.Equals(dto.TransferId))
-                && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
-                && (string.IsNullOrWhiteSpace(dto.ChannelOrderNo) || w.ChannelOrderNo.Equals(dto.ChannelOrderNo))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.TransferId.Equals(dto.UnionOrderId)
-                || w.MchOrderNo.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
-            return result;
+            var query = _transferOrderRepository.GetAllAsNoTracking()
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotNull(dto.MchType, w => w.MchType.Equals(dto.MchType))
+                .WhereIfNotEmpty(dto.TransferId, w => w.TransferId.Equals(dto.TransferId))
+                .WhereIfNotEmpty(dto.MchOrderNo, w => w.MchOrderNo.Equals(dto.MchOrderNo))
+                .WhereIfNotEmpty(dto.ChannelOrderNo, w => w.ChannelOrderNo.Equals(dto.ChannelOrderNo))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
+                .WhereIfNotEmpty(dto.AppId, w => w.AppId.Equals(dto.AppId))
+                .WhereIfNotEmpty(dto.UnionOrderId, w => w.TransferId.Equals(dto.UnionOrderId) || w.MchOrderNo.Equals(dto.UnionOrderId) || w.ChannelOrderNo.Equals(dto.UnionOrderId))
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd);
+            return query;
         }
 
         public async Task<JObject> StatisticsAsync(TransferOrderQueryDto dto)
         {
-            var transferOrders = GetTransferOrders(dto);
-            var allTransferAmount = await transferOrders.SumAsync(s => s.Amount);
-            var allTransferCount = await transferOrders.CountAsync();
-            var refund = transferOrders.Where(w => w.State.Equals((byte)TransferOrderState.STATE_SUCCESS));
-            //var transferFeeAmount = await refund.SumAsync(s => s.FeeAmount);
-            var transferAmount = await refund.SumAsync(s => s.Amount);
-            var transferCount = await refund.CountAsync();
-            JObject result = new JObject();
-            result.Add("allTransferAmount", Decimal.Round(allTransferAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            result.Add("allTransferCount", allTransferCount);
-            result.Add("transferAmount", Decimal.Round(transferAmount / 100M, 2, MidpointRounding.AwayFromZero));
-            result.Add("transferCount", transferCount);
-            result.Add("transferFeeAmount", 0);
-            result.Add("round", Math.Round(allTransferAmount > 0 ? transferCount / Convert.ToDecimal(allTransferAmount) : 0M, 2, MidpointRounding.AwayFromZero));
+            var baseQuery = GetTransferOrders(dto);
+
+            // 使用单个查询获取所有统计数据
+            var statistics = await baseQuery
+                .GroupBy(x => 1) // 按常量分组，实现整体聚合
+                .Select(g => new
+                {
+                    AllTransferAmount = g.Sum(x => x.Amount),
+                    AllTransferCount = g.Count(),
+                    TransferAmount = g.Where(x => x.State == (byte)TransferOrderState.STATE_SUCCESS).Sum(x => x.Amount),
+                    TransferCount = g.Count(x => x.State == (byte)TransferOrderState.STATE_SUCCESS)
+                })
+                .SafeFirstOrDefaultAsync();
+
+            // 处理查询结果为 null 的情况
+            statistics ??= new { AllTransferAmount = 0L, AllTransferCount = 0, TransferAmount = 0L, TransferCount = 0 };
+
+            var allTransferAmount = statistics.AllTransferAmount;
+            var allTransferCount = statistics.AllTransferCount;
+            var transferAmount = statistics.TransferAmount;
+            var transferCount = statistics.TransferCount;
+
+            // 安全计算比率，避免除零
+            var successRate = allTransferCount > 0
+                ? Math.Round(transferCount / (decimal)allTransferCount, 2, MidpointRounding.AwayFromZero)
+                : 0M;
+
+            var result = new JObject
+            {
+                ["allTransferAmount"] = Decimal.Round(allTransferAmount / 100M, 2, MidpointRounding.AwayFromZero),
+                ["allTransferCount"] = allTransferCount,
+                ["transferAmount"] = Decimal.Round(transferAmount / 100M, 2, MidpointRounding.AwayFromZero),
+                ["transferCount"] = transferCount,
+                ["transferFeeAmount"] = 0,
+                ["successRate"] = successRate  // 更合理的字段名
+            };
+
             return result;
         }
+
+        #region
+        //private IQueryable<TransferOrder> GetTransferOrders(TransferOrderQueryDto dto)
+        //{
+        //    var result = _transferOrderRepository.GetAllAsNoTracking()
+        //        .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
+        //        && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
+        //        && (dto.MchType.Equals(null) || w.MchType.Equals(dto.MchType))
+        //        && (string.IsNullOrWhiteSpace(dto.TransferId) || w.TransferId.Equals(dto.TransferId))
+        //        && (string.IsNullOrWhiteSpace(dto.MchOrderNo) || w.MchOrderNo.Equals(dto.MchOrderNo))
+        //        && (string.IsNullOrWhiteSpace(dto.ChannelOrderNo) || w.ChannelOrderNo.Equals(dto.ChannelOrderNo))
+        //        && (dto.State.Equals(null) || w.State.Equals(dto.State))
+        //        && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
+        //        && (string.IsNullOrWhiteSpace(dto.UnionOrderId) || w.TransferId.Equals(dto.UnionOrderId)
+        //        || w.MchOrderNo.Equals(dto.UnionOrderId)|| w.ChannelOrderNo.Equals(dto.UnionOrderId))
+        //        && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
+        //        && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd));
+        //    return result;
+        //}
+
+        //public async Task<JObject> StatisticsAsync(TransferOrderQueryDto dto)
+        //{
+        //    var transferOrders = GetTransferOrders(dto);
+        //    var allTransferAmount = await transferOrders.SumAsync(s => s.Amount);
+        //    var allTransferCount = await transferOrders.CountAsync();
+        //    var refund = transferOrders.Where(w => w.State.Equals((byte)TransferOrderState.STATE_SUCCESS));
+        //    //var transferFeeAmount = await refund.SumAsync(s => s.FeeAmount);
+        //    var transferAmount = await refund.SumAsync(s => s.Amount);
+        //    var transferCount = await refund.CountAsync();
+        //    JObject result = new JObject();
+        //    result.Add("allTransferAmount", Decimal.Round(allTransferAmount / 100M, 2, MidpointRounding.AwayFromZero));
+        //    result.Add("allTransferCount", allTransferCount);
+        //    result.Add("transferAmount", Decimal.Round(transferAmount / 100M, 2, MidpointRounding.AwayFromZero));
+        //    result.Add("transferCount", transferCount);
+        //    result.Add("transferFeeAmount", 0);
+        //    result.Add("round", Math.Round(allTransferAmount > 0 ? transferCount / Convert.ToDecimal(allTransferAmount) : 0M, 2, MidpointRounding.AwayFromZero));
+        //    return result;
+        //} 
+        #endregion
 
         /// <summary>
         /// 更新转账订单状态 【转账订单生成】 --》 【转账中】

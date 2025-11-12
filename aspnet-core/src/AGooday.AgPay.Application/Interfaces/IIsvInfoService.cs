@@ -6,6 +6,6 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface IIsvInfoService : IAgPayService<IsvInfoDto>
     {
         Task<bool> IsExistIsvNoAsync(string isvNo);
-        Task<PaginatedList<IsvInfoDto>> GetPaginatedDataAsync(IsvInfoQueryDto dto);
+        Task<PaginatedResult<IsvInfoDto>> GetPaginatedDataAsync(IsvInfoQueryDto dto);
     }
 }

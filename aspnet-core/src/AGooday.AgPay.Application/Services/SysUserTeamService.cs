@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -38,17 +39,16 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public Task<PaginatedList<SysUserTeamDto>> GetPaginatedDataAsync(SysUserTeamQueryDto dto)
+        public Task<PaginatedResult<SysUserTeamDto>> GetPaginatedDataAsync(SysUserTeamQueryDto dto)
         {
             var query = _sysUserTeamRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.SysType) || w.SysType.Equals(dto.SysType))
-                && (string.IsNullOrWhiteSpace(dto.BelongInfoId) || w.BelongInfoId.Equals(dto.BelongInfoId))
-                && (string.IsNullOrWhiteSpace(dto.TeamName) || w.TeamName.Contains(dto.TeamName))
-                && (string.IsNullOrWhiteSpace(dto.TeamNo) || w.TeamNo.Equals(dto.TeamNo))
-                && (dto.TeamId.Equals(null) || w.TeamId.Equals(dto.TeamId)))
+                .WhereIfNotEmpty(dto.SysType, w => w.SysType.Equals(dto.SysType))
+                .WhereIfNotEmpty(dto.BelongInfoId, w => w.BelongInfoId.Equals(dto.BelongInfoId))
+                .WhereIfNotEmpty(dto.TeamName, w => w.TeamName.Contains(dto.TeamName))
+                .WhereIfNotEmpty(dto.TeamNo, w => w.TeamNo.Equals(dto.TeamNo))
+                .WhereIfNotNull(dto.TeamId, w => w.TeamId.Equals(dto.TeamId))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<SysUserTeam>.CreateAsync<SysUserTeamDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<SysUserTeam, SysUserTeamDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

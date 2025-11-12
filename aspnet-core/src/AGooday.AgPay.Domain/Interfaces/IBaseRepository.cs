@@ -82,6 +82,19 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <returns></returns>
         IQueryable<T> GetAllAsNoTracking<T>() where T : class;
         /// <summary>
+        /// 根据条件获取第一个实体
+        /// </summary>
+        /// <param name="predicate">查询条件</param>
+        /// <returns></returns>
+        Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+        /// <summary>
+        /// 根据条件获取第一个实体
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <param name="predicate">查询条件</param>
+        /// <returns></returns>
+        Task<TEntity> FirstOrDefaultAsNoTrackingAsync(Expression<Func<TEntity, bool>> predicate);
+        /// <summary>
         /// 根据对象进行更新
         /// </summary>
         /// <param name="entity"></param>
@@ -265,6 +278,19 @@ namespace AGooday.AgPay.Domain.Interfaces
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         IQueryable<T> GetAllAsNoTracking<T>() where T : class;
+        /// <summary>
+        /// 根据条件获取第一个实体
+        /// </summary>
+        /// <param name="predicate">查询条件</param>
+        /// <returns></returns>
+        Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
+        /// <summary>
+        /// 根据条件获取第一个实体
+        /// 不要追踪（跟踪）从数据库中检索的实体对象
+        /// </summary>
+        /// <param name="predicate">查询条件</param>
+        /// <returns></returns>
+        Task<TEntity> FirstOrDefaultAsNoTrackingAsync(Expression<Func<TEntity, bool>> predicate);
         /// <summary>
         /// 根据对象进行更新
         /// </summary>

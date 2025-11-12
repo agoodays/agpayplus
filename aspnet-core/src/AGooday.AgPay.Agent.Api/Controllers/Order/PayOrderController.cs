@@ -62,7 +62,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
         {
             dto.BindDateRange();
             dto.AgentNo = await GetCurrentAgentNoAsync();
-            var payOrders = await _payOrderService.GetPaginatedDataAsync(dto);
+            var data = await _payOrderService.GetPaginatedDataAsync(dto);
             // 得到所有支付方式
             Dictionary<string, string> payWayNameMap = new Dictionary<string, string>();
             _payWayService.GetAllAsNoTracking()
@@ -72,12 +72,12 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
                     payWayNameMap.Add(c.WayCode, c.WayName);
                 });
 
-            foreach (var payOrder in payOrders)
+            foreach (var payOrder in data.Items)
             {
                 // 存入支付方式名称
                 payOrder.AddExt("wayName", payWayNameMap.TryGetValue(payOrder.WayCode, out string wayName) ? wayName : payOrder.WayCode);
             }
-            return ApiPageRes<PayOrderDto>.Pages(payOrders);
+            return ApiPageRes<PayOrderDto>.Pages(data);
         }
 
         /// <summary>
@@ -150,9 +150,9 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
                 // 固定前两行，第一列，`FreezePanes()`方法的第一个参数设置为3，表示从第三行开始向下滚动时会被冻结，第二个参数设置为3，表示从第二行开始向右滚动时会被冻结
                 worksheet.View.FreezePanes(3, 2);
                 // 将每个订单添加到工作表中
-                for (int i = 0; i < payOrders.Count; i++)
+                for (int i = 0; i < payOrders.Items.Count; i++)
                 {
-                    var order = payOrders[i];
+                    var order = payOrders.Items[i];
                     var orderJO = JObject.FromObject(order);
                     for (int j = 0; j < excelHeaders.Count; j++)
                     {
@@ -178,7 +178,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Order
 
                 // 设置单元格样式，例如居中对齐和加粗字体
                 var cols = excelHeaders.Count + 1;
-                var rows = payOrders.Count + 3;
+                var rows = payOrders.Items.Count + 3;
                 for (int i = 1; i < rows; i++)
                 {
                     worksheet.Row(i).Height = 25;

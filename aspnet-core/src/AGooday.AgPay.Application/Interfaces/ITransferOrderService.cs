@@ -15,7 +15,7 @@ namespace AGooday.AgPay.Application.Interfaces
         /// <param name="transferId"></param>
         /// <returns></returns>
         Task<TransferOrderDto> QueryMchOrderAsync(string mchNo, string mchOrderNo, string transferId);
-        Task<PaginatedList<TransferOrderDto>> GetPaginatedDataAsync(TransferOrderQueryDto dto);
+        Task<PaginatedResult<TransferOrderDto>> GetPaginatedDataAsync(TransferOrderQueryDto dto);
         Task<JObject> StatisticsAsync(TransferOrderQueryDto dto);
         /// <summary>
         /// 更新转账订单状态 【转账订单生成】 --》 【转账中】

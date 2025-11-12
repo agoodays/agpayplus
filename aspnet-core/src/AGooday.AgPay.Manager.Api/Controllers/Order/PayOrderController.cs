@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
         public async Task<ApiPageRes<PayOrderDto>> ListAsync([FromQuery] PayOrderQueryDto dto)
         {
             dto.BindDateRange();
-            var payOrders = await _payOrderService.GetPaginatedDataAsync(dto);
+            var data = await _payOrderService.GetPaginatedDataAsync(dto);
             // 得到所有支付方式
             Dictionary<string, string> payWayNameMap = new Dictionary<string, string>();
             _payWayService.GetAllAsNoTracking()
@@ -75,7 +75,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 });
             var ifDefines = _payIfDefineService.GetAllAsNoTracking();
 
-            foreach (var payOrder in payOrders)
+            foreach (var payOrder in data.Items)
             {
                 // 存入支付方式名称
                 payOrder.AddExt("wayName", payWayNameMap.TryGetValue(payOrder.WayCode, out string wayCode) ? wayCode : payOrder.WayCode);
@@ -88,7 +88,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 }
             }
 
-            return ApiPageRes<PayOrderDto>.Pages(payOrders);
+            return ApiPageRes<PayOrderDto>.Pages(data);
         }
 
         /// <summary>
@@ -158,9 +158,9 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
                 // 固定前两行，第一列，`FreezePanes()`方法的第一个参数设置为3，表示从第三行开始向下滚动时会被冻结，第二个参数设置为3，表示从第二行开始向右滚动时会被冻结
                 worksheet.View.FreezePanes(3, 2);
                 // 将每个订单添加到工作表中
-                for (int i = 0; i < payOrders.Count; i++)
+                for (int i = 0; i < payOrders.Items.Count; i++)
                 {
-                    var order = payOrders[i];
+                    var order = payOrders.Items[i];
                     var orderJO = JObject.FromObject(order);
                     for (int j = 0; j < excelHeaders.Count; j++)
                     {
@@ -186,7 +186,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
 
                 // 设置单元格样式，例如居中对齐和加粗字体
                 var cols = excelHeaders.Count + 1;
-                var rows = payOrders.Count + 3;
+                var rows = payOrders.Items.Count + 3;
                 for (int i = 1; i < rows; i++)
                 {
                     worksheet.Row(i).Height = 25;
@@ -222,7 +222,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Order
             }
             if (payOrder.State.Equals((byte)PayOrderState.STATE_SUCCESS) || payOrder.State.Equals((byte)PayOrderState.STATE_REFUND))
             {
-                var profitList = _payOrderProfitService.GetByPayOrderIdAsNoTracking(payOrder.PayOrderId)
+                var profitList = (await _payOrderProfitService.GetByPayOrderIdAsNoTrackingAsync(payOrder.PayOrderId))
                     .Select(s => new { s.InfoId, s.InfoName, s.InfoType, s.ProfitAmount });
                 payOrder.AddExt("profitList", profitList);
             }

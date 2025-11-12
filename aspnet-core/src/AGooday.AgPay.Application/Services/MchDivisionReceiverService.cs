@@ -5,8 +5,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -36,26 +36,23 @@ namespace AGooday.AgPay.Application.Services
 
         public async Task<MchDivisionReceiverDto> GetByIdAsNoTrackingAsync(long recordId, string mchNo)
         {
-            var entity = await _mchDivisionReceiverRepository.GetAllAsNoTracking()
-                .Where(w => w.ReceiverId.Equals(recordId) && w.MchNo.Equals(mchNo))
-                .FirstOrDefaultAsync();
-            return _mapper.Map<MchDivisionReceiverDto>(entity);
+            var query = _mchDivisionReceiverRepository.GetAllAsNoTracking()
+                .Where(w => w.ReceiverId.Equals(recordId) && w.MchNo.Equals(mchNo));
+            return await query.FirstOrDefaultProjectToAsync<MchDivisionReceiver, MchDivisionReceiverDto>(_mapper);
         }
 
         public Task<int> GetCountAsync(HashSet<long> receiverIds, string mchNo, string appId, string ifCode, byte state = CS.YES)
         {
             return _mchDivisionReceiverRepository.GetAllAsNoTracking()
-                    .Where(w => receiverIds.Contains(w.ReceiverId)
+                    .SafeCountAsync(w => receiverIds.Contains(w.ReceiverId)
                     && w.MchNo.Equals(mchNo) && w.AppId.Equals(appId)
-                    && w.IfCode.Equals(ifCode) && w.State.Equals(state))
-                    .CountAsync();
+                    && w.IfCode.Equals(ifCode) && w.State.Equals(state));
         }
 
         public Task<int> GetCountAsync(HashSet<long> receiverGroupIds, string mchNo)
         {
             return _mchDivisionReceiverRepository.GetAllAsNoTracking()
-                    .Where(w => receiverGroupIds.Contains(w.ReceiverGroupId) && w.MchNo.Equals(mchNo))
-                    .CountAsync();
+                    .SafeCountAsync(w => receiverGroupIds.Contains(w.ReceiverGroupId) && w.MchNo.Equals(mchNo));
         }
 
         public Task<bool> IsExistUseReceiverGroupAsync(long receiverGroupId)
@@ -63,21 +60,20 @@ namespace AGooday.AgPay.Application.Services
             return _mchDivisionReceiverRepository.IsExistUseReceiverGroupAsync(receiverGroupId);
         }
 
-        public Task<PaginatedList<MchDivisionReceiverDto>> GetPaginatedDataAsync(MchDivisionReceiverQueryDto dto)
+        public Task<PaginatedResult<MchDivisionReceiverDto>> GetPaginatedDataAsync(MchDivisionReceiverQueryDto dto)
         {
             var query = _mchDivisionReceiverRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (dto.ReceiverId.Equals(null) || w.ReceiverId.Equals(dto.ReceiverId))
-                && (string.IsNullOrWhiteSpace(dto.ReceiverAlias) || w.ReceiverAlias.Equals(dto.ReceiverAlias))
-                && (dto.ReceiverGroupId.Equals(null) || w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
-                && (string.IsNullOrWhiteSpace(dto.ReceiverGroupName) || w.ReceiverGroupName.Equals(dto.ReceiverGroupName))
-                && (!dto.State.HasValue || w.State.Equals(dto.State))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (string.IsNullOrWhiteSpace(dto.IfCode) || w.IfCode.Equals(dto.IfCode)))
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotNull(dto.ReceiverId, w => w.ReceiverId.Equals(dto.ReceiverId))
+                .WhereIfNotEmpty(dto.ReceiverAlias, w => w.ReceiverAlias.Equals(dto.ReceiverAlias))
+                .WhereIfNotNull(dto.ReceiverGroupId, w => w.ReceiverGroupId.Equals(dto.ReceiverGroupId))
+                .WhereIfNotEmpty(dto.ReceiverGroupName, w => w.ReceiverGroupName.Equals(dto.ReceiverGroupName))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
+                .WhereIfNotEmpty(dto.AppId, w => w.AppId.Equals(dto.AppId))
+                .WhereIfNotEmpty(dto.IfCode, w => w.IfCode.Equals(dto.IfCode))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchDivisionReceiver>.CreateAsync<MchDivisionReceiverDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<MchDivisionReceiver, MchDivisionReceiverDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

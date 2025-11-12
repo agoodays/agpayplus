@@ -52,13 +52,12 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.Transfer
         /// <returns></returns>
         [HttpGet, Route("ifCodes/{appId}")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_TRANSFER_IF_CODE_LIST)]
-        public ApiRes IfCodeList(string appId)
+        public async Task<ApiRes> IfCodeListAsync(string appId)
         {
-            var ifCodes = _payIfConfigService.GetByInfoId(CS.INFO_TYPE.MCH_APP, appId)
-                .Select(s => s.IfCode);
+            var ifCodes = (await _payIfConfigService.GetByInfoIdAsync(CS.INFO_TYPE.MCH_APP, appId)).Select(s => s.IfCode);
             if (ifCodes is null)
                 return ApiRes.Ok(ifCodes);
-            var result = _payIfDefineService.GetByIfCodes(ifCodes);
+            var result = await _payIfDefineService.GetByIfCodesAsync(ifCodes);
             return ApiRes.Ok(result);
         }
 

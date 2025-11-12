@@ -8,7 +8,7 @@ namespace AGooday.AgPay.Application.Interfaces
         Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode);
         IEnumerable<MchPayPassageDto> GetMchPayPassageByMchNoAndAppId(string mchNo, string appId);
         IEnumerable<MchPayPassageDto> GetByAppIdAndWayCodesAsNoTracking(string appId, List<string> wayCodes);
-        Task<PaginatedList<AvailablePayInterfaceDto>> SelectAvailablePayInterfaceListAsync(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize);
+        Task<PaginatedResult<AvailablePayInterfaceDto>> SelectAvailablePayInterfaceListAsync(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize);
         Task<bool> SetMchPassageAsync(string mchNo, string appId, string wayCode, string ifCode, byte state);
         Task<bool> SaveOrUpdateBatchSelfAsync(List<MchPayPassageDto> mchPayPassages, string mchNo);
         Task<MchPayPassageDto> FindMchPayPassageAsync(string mchNo, string appId, string wayCode);

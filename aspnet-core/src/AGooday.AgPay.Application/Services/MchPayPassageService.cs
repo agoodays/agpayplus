@@ -5,8 +5,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Application.Services
         /// <param name="infoType"></param>
         /// <param name="mchType"></param>
         /// <returns></returns>
-        public async Task<PaginatedList<AvailablePayInterfaceDto>> SelectAvailablePayInterfaceListAsync(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
+        public async Task<PaginatedResult<AvailablePayInterfaceDto>> SelectAvailablePayInterfaceListAsync(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
         {
             //var result = _payInterfaceDefineRepository.GetAll()
             //    .Join(_payInterfaceDefineRepository.GetAll<PayInterfaceConfig>(),
@@ -124,7 +124,7 @@ namespace AGooday.AgPay.Application.Services
                     }
                 }
             }
-            var records = PaginatedList<AvailablePayInterfaceDto>.Create(result, pageNumber, pageSize);
+            var records = PaginatedResult<AvailablePayInterfaceDto>.Create(result, pageNumber, pageSize);
             return records;
         }
 
@@ -156,12 +156,13 @@ namespace AGooday.AgPay.Application.Services
             if (state.Equals(CS.YES))
             {
                 var updateRecords = mchPayPassages.Where(w => !w.IfCode.Equals(ifCode) && w.State.Equals(CS.YES));
-                await updateRecords.ForEachAsync(item =>
-                {
-                    item.State = CS.NO;
-                    item.UpdatedAt = DateTime.Now;
-                });
-                _mchPayPassageRepository.UpdateRange(updateRecords);
+                //await updateRecords.ForEachAsync(item =>
+                //{
+                //    item.State = CS.NO;
+                //    item.UpdatedAt = DateTime.Now;
+                //});
+                //_mchPayPassageRepository.UpdateRange(updateRecords);
+                await updateRecords.UpdateAsync(s => s.SetProperty(p => p.State, p => CS.NO).SetProperty(p => p.UpdatedAt, p => DateTime.Now));
             }
             var (result, _) = await _mchPayPassageRepository.SaveChangesWithResultAsync();
             return result;

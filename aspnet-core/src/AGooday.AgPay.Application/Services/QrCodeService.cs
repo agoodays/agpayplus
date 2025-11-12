@@ -6,8 +6,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 
 namespace AGooday.AgPay.Application.Services
 {
@@ -58,7 +58,7 @@ namespace AGooday.AgPay.Application.Services
             var batchIdPrefix = DateTime.Now.ToString("yyyyMMdd");
             var qrCodes = await _qrCodeRepository.GetAllAsNoTracking()
                 .Where(w => (w.BatchId ?? string.Empty).StartsWith(batchIdPrefix))
-                .OrderByDescending(o => o.BatchId).FirstOrDefaultAsync();
+                .OrderByDescending(o => o.BatchId).SafeFirstOrDefaultAsync();
             return $"{Convert.ToInt64(qrCodes?.BatchId ?? $"{batchIdPrefix}00") + 1}";
         }
 
@@ -95,20 +95,19 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public Task<PaginatedList<QrCodeDto>> GetPaginatedDataAsync(QrCodeQueryDto dto)
+        public Task<PaginatedResult<QrCodeDto>> GetPaginatedDataAsync(QrCodeQueryDto dto)
         {
             var query = _qrCodeRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.QrcId) || w.QrcId.Equals(dto.QrcId))
-                && (string.IsNullOrWhiteSpace(dto.BatchId) || w.MchNo.Equals(dto.BatchId))
-                && (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (string.IsNullOrWhiteSpace(dto.AppId) || w.AppId.Equals(dto.AppId))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .WhereIfNotEmpty(dto.QrcId, w => w.QrcId.Equals(dto.QrcId))
+                .WhereIfNotEmpty(dto.BatchId, w => w.BatchId.Equals(dto.BatchId))
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.AgentNo, w => w.AgentNo.Equals(dto.AgentNo))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
+                .WhereIfNotEmpty(dto.AppId, w => w.AppId.Equals(dto.AppId))
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd)
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<QrCode>.CreateAsync<QrCodeDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<QrCode, QrCodeDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

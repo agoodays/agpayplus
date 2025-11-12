@@ -46,7 +46,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         {
             var data = await _qrCodeShellService.GetPaginatedDataAsync(dto);
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            foreach (var item in data)
+            foreach (var item in data.Items)
             {
                 item.AddExt("shellImgViewUrl", dbApplicationConfig.GenShellImgViewUrl(item.Id.ToString()));
             }

@@ -5,6 +5,6 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface ISysUserTeamService : IAgPayService<SysUserTeamDto>
     {
-        Task<PaginatedList<SysUserTeamDto>> GetPaginatedDataAsync(SysUserTeamQueryDto dto);
+        Task<PaginatedResult<SysUserTeamDto>> GetPaginatedDataAsync(SysUserTeamQueryDto dto);
     }
 }

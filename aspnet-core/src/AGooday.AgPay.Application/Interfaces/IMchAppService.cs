@@ -7,9 +7,9 @@ namespace AGooday.AgPay.Application.Interfaces
     {
         Task<MchAppDto> GetByIdAsync(string recordId, string mchNo);
         Task<MchAppDto> GetByIdAsNoTrackingAsync(string recordId, string mchNo);
-        IEnumerable<MchAppDto> GetByMchNoAsNoTracking(string mchNo);
-        IEnumerable<MchAppDto> GetByMchNos(IEnumerable<string> mchNos);
-        IEnumerable<MchAppDto> GetByAppIds(IEnumerable<string> appIds);
-        Task<PaginatedList<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null);
+        Task<List<MchAppDto>> GetByMchNoAsNoTrackingAsync(string mchNo);
+        Task<List<MchAppDto>> GetByMchNosAsNoTrackingAsync(IEnumerable<string> mchNos);
+        Task<List<MchAppDto>> GetByAppIdsAsNoTrackingAsync(IEnumerable<string> appIds);
+        Task<PaginatedResult<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null);
     }
 }

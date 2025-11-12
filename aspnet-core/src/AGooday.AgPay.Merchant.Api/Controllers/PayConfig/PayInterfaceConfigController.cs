@@ -112,7 +112,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                     {
                         var parentAgents = _agentInfoService.GetParents(agentInfo.Pid);
                         var agentNos = parentAgents.Select(o => o.AgentNo).ToList();
-                        var agentPayInterfaceConfigs = _payIfConfigService.GetByInfoIdAndIfCodes(CS.INFO_TYPE.AGENT, agentNos, ifCode);
+                        var agentPayInterfaceConfigs = await _payIfConfigService.GetByInfoIdAndIfCodesAsync(CS.INFO_TYPE.AGENT, agentNos, ifCode);
                         foreach (var item in agentPayInterfaceConfigs)
                         {
                             isSupportApplyments.Add(item.IsOpenApplyment);
@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
                         {
                             var mchParentAgents = _agentInfoService.GetParents(mchInfo.AgentNo);
                             var agentNos = mchParentAgents.Select(o => o.AgentNo).ToList();
-                            var agentPayInterfaceConfigs = _payIfConfigService.GetByInfoIdAndIfCodes(CS.INFO_TYPE.AGENT, agentNos, ifCode);
+                            var agentPayInterfaceConfigs = await _payIfConfigService.GetByInfoIdAndIfCodesAsync(CS.INFO_TYPE.AGENT, agentNos, ifCode);
                             foreach (var item in agentPayInterfaceConfigs)
                             {
                                 isSupportApplyments.Add(item.IsOpenApplyment);
@@ -185,8 +185,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         {
             dto.IfRate = dto.IfRate / 100;// 存入真实费率
             //添加更新者信息
-            long userId = await GetCurrentUserIdAsync();
-            string realName = (await GetCurrentUserAsync()).SysUser.Realname;
+            var user = await GetCurrentUserAsync();
+            long userId = user.SysUser.SysUserId;
+            string realName = user.SysUser.Realname;
             dto.UpdatedUid = userId;
             dto.UpdatedBy = realName;
             dto.UpdatedAt = DateTime.Now;

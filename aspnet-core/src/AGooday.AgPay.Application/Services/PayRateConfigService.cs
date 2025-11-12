@@ -6,8 +6,8 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using static AGooday.AgPay.Application.DataTransfer.PayRateConfigSaveDto;
@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Application.Services
             _payInterfaceDefineRepository = payInterfaceDefineRepository;
         }
 
-        public async Task<PaginatedList<PayWayDto>> GetPayWaysByInfoIdAsync(PayWayUsableQueryDto dto)
+        public async Task<PaginatedResult<PayWayDto>> GetPayWaysByInfoIdAsync(PayWayUsableQueryDto dto)
         {
             var infoType = string.Empty;
             var configMode = dto.ConfigMode;
@@ -73,7 +73,7 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE.AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE.AGENT;
                     var agent = await _agentInfoRepository.GetByIdAsync(dto.InfoId);
-                    wayCodes = GetPayWayCodes(dto.IfCode, agent.IsvNo, agent.Pid, payIfWayCodes);
+                    wayCodes = await GetPayWayCodesAsync(dto.IfCode, agent.IsvNo, agent.Pid, payIfWayCodes);
                     break;
                 case CS.CONFIG_MODE.MGR_MCH:
                 case CS.CONFIG_MODE.AGENT_MCH:
@@ -85,7 +85,7 @@ namespace AGooday.AgPay.Application.Services
                     wayCodes = payIfWayCodes;
                     if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
                     {
-                        wayCodes = GetPayWayCodes(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo, payIfWayCodes);
+                        wayCodes = await GetPayWayCodesAsync(dto.IfCode, mchInfo.IsvNo, mchInfo.AgentNo, payIfWayCodes);
                     }
                     break;
                 default:
@@ -93,31 +93,30 @@ namespace AGooday.AgPay.Application.Services
             }
             var payWays = _payWayRepository.GetAllAsNoTracking().Where(w => wayCodes.Contains(w.WayCode))
                 .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<PayWay>.CreateAsync<PayWayDto>(payWays, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return await payWays.ToPaginatedResultAsync<PayWay, PayWayDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
 
-        private List<string> GetPayWayCodes(string ifCode, string isvNo, string agentNo, List<string> wayCodes)
+        private async Task<List<string>> GetPayWayCodesAsync(string ifCode, string isvNo, string agentNo, List<string> wayCodes)
         {
             // 服务商开通支付方式
-            var isvWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode)
-                .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToList();
+            var isvWayCodes = await _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode)
+                .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToListAsync();
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
-                return GetAgentPayWayCodes(ifCode, isvWayCodes, agentNo);
+                return await GetAgentPayWayCodesAsync(ifCode, isvWayCodes, agentNo);
             }
             return isvWayCodes;
         }
 
-        private List<string> GetAgentPayWayCodes(string ifCode, List<string> wayCodes, string agentNo)
+        private async Task<List<string>> GetAgentPayWayCodesAsync(string ifCode, List<string> wayCodes, string agentNo)
         {
             // 代理商开通支付方式
-            var agentWayCodes = _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode)
-                .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToList();
+            var agentWayCodes = await _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode)
+                .Where(w => wayCodes.Contains(w.WayCode)).Select(s => s.WayCode).Distinct().ToListAsync();
             var agent = _agentInfoRepository.GetById(agentNo);
             if (!string.IsNullOrWhiteSpace(agent.Pid))
             {
-                return GetAgentPayWayCodes(ifCode, agentWayCodes, agent.Pid);
+                return await GetAgentPayWayCodesAsync(ifCode, agentWayCodes, agent.Pid);
             }
             else
             {
@@ -127,7 +126,7 @@ namespace AGooday.AgPay.Application.Services
 
         #region 丢弃
         [Obsolete("请使用 GetByInfoIdAndIfCodeJson() 代替")]
-        public Dictionary<string, Dictionary<string, PayRateConfigDto>> GetByInfoIdAndIfCode(string configMode, string infoId, string ifCode)
+        public async Task<Dictionary<string, Dictionary<string, PayRateConfigDto>>> GetByInfoIdAndIfCodeAsync(string configMode, string infoId, string ifCode)
         {
             string isvNo;
             string infoType;
@@ -136,21 +135,21 @@ namespace AGooday.AgPay.Application.Services
             {
                 case CS.CONFIG_MODE.MGR_ISV:
                     infoType = CS.INFO_TYPE.ISV;
-                    rateConfig.Add(CS.CONFIG_TYPE.ISVCOST, GetPayRateConfig(CS.CONFIG_TYPE.ISVCOST, infoType, infoId, ifCode));
-                    rateConfig.Add(CS.CONFIG_TYPE.AGENTDEF, GetPayRateConfig(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
-                    rateConfig.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfig(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
+                    rateConfig.Add(CS.CONFIG_TYPE.ISVCOST, await GetPayRateConfigAsync(CS.CONFIG_TYPE.ISVCOST, infoType, infoId, ifCode));
+                    rateConfig.Add(CS.CONFIG_TYPE.AGENTDEF, await GetPayRateConfigAsync(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
+                    rateConfig.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, await GetPayRateConfigAsync(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
                     break;
                 case CS.CONFIG_MODE.MGR_AGENT:
                 case CS.CONFIG_MODE.AGENT_SELF:
                 case CS.CONFIG_MODE.AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE.AGENT;
                     var agent = _agentInfoRepository.GetById(infoId);
-                    rateConfig.Add(CS.CONFIG_TYPE.AGENTDEF, GetPayRateConfig(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
-                    rateConfig.Add(CS.CONFIG_TYPE.AGENTRATE, GetPayRateConfig(CS.CONFIG_TYPE.AGENTRATE, infoType, infoId, ifCode));
-                    rateConfig.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfig(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode)); if (!configMode.Equals(CS.CONFIG_MODE.AGENT_SELF))
+                    rateConfig.Add(CS.CONFIG_TYPE.AGENTDEF, await GetPayRateConfigAsync(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
+                    rateConfig.Add(CS.CONFIG_TYPE.AGENTRATE, await GetPayRateConfigAsync(CS.CONFIG_TYPE.AGENTRATE, infoType, infoId, ifCode));
+                    rateConfig.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, await GetPayRateConfigAsync(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode)); if (!configMode.Equals(CS.CONFIG_MODE.AGENT_SELF))
                     {
                         isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_AGENT) ? agent.IsvNo : string.Empty;
-                        GetReadOnlyRate(ifCode, rateConfig, isvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
+                        await GetReadOnlyRateAsync(ifCode, rateConfig, isvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
                     }
                     break;
                 case CS.CONFIG_MODE.MGR_MCH:
@@ -160,11 +159,11 @@ namespace AGooday.AgPay.Application.Services
                     infoType = CS.INFO_TYPE.MCH_APP;
                     var mchApp = _mchAppRepository.GetById(infoId);
                     var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
-                    rateConfig.Add(CS.CONFIG_TYPE.MCHRATE, GetPayRateConfig(CS.CONFIG_TYPE.MCHRATE, infoType, infoId, ifCode));
+                    rateConfig.Add(CS.CONFIG_TYPE.MCHRATE, await GetPayRateConfigAsync(CS.CONFIG_TYPE.MCHRATE, infoType, infoId, ifCode));
                     if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
                     {
                         isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_MCH) ? mchInfo.IsvNo : string.Empty;
-                        GetReadOnlyRate(ifCode, rateConfig, isvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
+                        await GetReadOnlyRateAsync(ifCode, rateConfig, isvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
                     }
                     break;
                 default:
@@ -174,32 +173,32 @@ namespace AGooday.AgPay.Application.Services
         }
 
         [Obsolete("请使用 GetReadOnlyRateJson() 代替")]
-        private void GetReadOnlyRate(string ifCode, Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig, string isvNo, string agentNo, string configType)
+        private async Task GetReadOnlyRateAsync(string ifCode, Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig, string isvNo, string agentNo, string configType)
         {
             if (!string.IsNullOrWhiteSpace(isvNo))
             {
                 // 服务商底价
-                rateConfig.Add(CS.CONFIG_TYPE.READONLYISVCOST, GetPayRateConfig(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode));
+                rateConfig.Add(CS.CONFIG_TYPE.READONLYISVCOST, await GetPayRateConfigAsync(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode));
             }
             // 上级代理商费率
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
                 // 上级代理商费率
-                rateConfig.Add(CS.CONFIG_TYPE.READONLYPARENTAGENT, GetPayRateConfig(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode));
+                rateConfig.Add(CS.CONFIG_TYPE.READONLYPARENTAGENT, await GetPayRateConfigAsync(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode));
                 // 上级默认费率
-                rateConfig.Add(CS.CONFIG_TYPE.READONLYPARENTDEFRATE, GetPayRateConfig(configType, CS.INFO_TYPE.AGENT, agentNo, ifCode));
+                rateConfig.Add(CS.CONFIG_TYPE.READONLYPARENTDEFRATE, await GetPayRateConfigAsync(configType, CS.INFO_TYPE.AGENT, agentNo, ifCode));
             }
             else
             {
-                rateConfig.Add(CS.CONFIG_TYPE.READONLYPARENTDEFRATE, GetPayRateConfig(configType, CS.INFO_TYPE.ISV, isvNo, ifCode));
+                rateConfig.Add(CS.CONFIG_TYPE.READONLYPARENTDEFRATE, await GetPayRateConfigAsync(configType, CS.INFO_TYPE.ISV, isvNo, ifCode));
             }
         }
 
         [Obsolete("请使用 GetPayRateConfigJson() 代替")]
-        private Dictionary<string, PayRateConfigDto> GetPayRateConfig(string configType, string infoType, string infoId, string ifCode)
+        private async Task<Dictionary<string, PayRateConfigDto>> GetPayRateConfigAsync(string configType, string infoType, string infoId, string ifCode)
         {
             Dictionary<string, PayRateConfigDto> keyValues = new Dictionary<string, PayRateConfigDto>();
-            var payRateConfigs = GetPayRateConfigs(configType, infoType, infoId, ifCode);
+            var payRateConfigs = await GetPayRateConfigsAsync(configType, infoType, infoId, ifCode);
             foreach (var payRateConfig in payRateConfigs)
             {
                 keyValues.Add(payRateConfig.WayCode, payRateConfig);
@@ -208,7 +207,7 @@ namespace AGooday.AgPay.Application.Services
         }
         #endregion
 
-        public JObject GetByInfoIdAndIfCodeJson(string configMode, string infoId, string ifCode)
+        public async Task<JObject> GetByInfoIdAndIfCodeJsonAsync(string configMode, string infoId, string ifCode)
         {
             string isvNo;
             string infoType;
@@ -217,22 +216,22 @@ namespace AGooday.AgPay.Application.Services
             {
                 case CS.CONFIG_MODE.MGR_ISV:
                     infoType = CS.INFO_TYPE.ISV;
-                    result.Add(CS.CONFIG_TYPE.ISVCOST, GetPayRateConfigJson(CS.CONFIG_TYPE.ISVCOST, infoType, infoId, ifCode));
-                    result.Add(CS.CONFIG_TYPE.AGENTDEF, GetPayRateConfigJson(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
-                    result.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfigJson(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
+                    result.Add(CS.CONFIG_TYPE.ISVCOST, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.ISVCOST, infoType, infoId, ifCode));
+                    result.Add(CS.CONFIG_TYPE.AGENTDEF, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
+                    result.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
                     break;
                 case CS.CONFIG_MODE.MGR_AGENT:
                 case CS.CONFIG_MODE.AGENT_SELF:
                 case CS.CONFIG_MODE.AGENT_SUBAGENT:
                     infoType = CS.INFO_TYPE.AGENT;
                     var agent = _agentInfoRepository.GetById(infoId);
-                    result.Add(CS.CONFIG_TYPE.AGENTDEF, GetPayRateConfigJson(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
-                    result.Add(CS.CONFIG_TYPE.AGENTRATE, GetPayRateConfigJson(CS.CONFIG_TYPE.AGENTRATE, infoType, infoId, ifCode));
-                    result.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, GetPayRateConfigJson(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
+                    result.Add(CS.CONFIG_TYPE.AGENTDEF, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.AGENTDEF, infoType, infoId, ifCode));
+                    result.Add(CS.CONFIG_TYPE.AGENTRATE, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.AGENTRATE, infoType, infoId, ifCode));
+                    result.Add(CS.CONFIG_TYPE.MCHAPPLYDEF, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, infoId, ifCode));
                     if (!configMode.Equals(CS.CONFIG_MODE.AGENT_SELF))
                     {
                         isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_AGENT) ? agent.IsvNo : string.Empty;
-                        GetReadOnlyRateJson(ifCode, result, isvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
+                        await GetReadOnlyRateJsonAsync(ifCode, result, isvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
                     }
                     break;
                 case CS.CONFIG_MODE.MGR_MCH:
@@ -242,11 +241,11 @@ namespace AGooday.AgPay.Application.Services
                     infoType = CS.INFO_TYPE.MCH_APP;
                     var mchApp = _mchAppRepository.GetById(infoId);
                     var mchInfo = _mchInfoRepository.GetById(mchApp.MchNo);
-                    result.Add(CS.CONFIG_TYPE.MCHRATE, GetPayRateConfigJson(CS.CONFIG_TYPE.MCHRATE, infoType, infoId, ifCode));
+                    result.Add(CS.CONFIG_TYPE.MCHRATE, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.MCHRATE, infoType, infoId, ifCode));
                     if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
                     {
                         isvNo = configMode.Equals(CS.CONFIG_MODE.MGR_MCH) ? mchInfo.IsvNo : string.Empty;
-                        GetReadOnlyRateJson(ifCode, result, isvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
+                        await GetReadOnlyRateJsonAsync(ifCode, result, isvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
                     }
                     break;
                 default:
@@ -255,30 +254,30 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        private void GetReadOnlyRateJson(string ifCode, JObject result, string isvNo, string agentNo, string configType)
+        private async Task GetReadOnlyRateJsonAsync(string ifCode, JObject result, string isvNo, string agentNo, string configType)
         {
             if (!string.IsNullOrWhiteSpace(isvNo))
             {
                 // 服务商底价
-                result.Add(CS.CONFIG_TYPE.READONLYISVCOST, GetPayRateConfigJson(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode));
+                result.Add(CS.CONFIG_TYPE.READONLYISVCOST, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode));
             }
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
                 // 上级代理商费率
-                result.Add(CS.CONFIG_TYPE.READONLYPARENTAGENT, GetPayRateConfigJson(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode));
+                result.Add(CS.CONFIG_TYPE.READONLYPARENTAGENT, await GetPayRateConfigJsonAsync(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode));
                 // 上级默认费率
-                result.Add(CS.CONFIG_TYPE.READONLYPARENTDEFRATE, GetPayRateConfigJson(configType, CS.INFO_TYPE.AGENT, agentNo, ifCode));
+                result.Add(CS.CONFIG_TYPE.READONLYPARENTDEFRATE, await GetPayRateConfigJsonAsync(configType, CS.INFO_TYPE.AGENT, agentNo, ifCode));
             }
             else
             {
-                result.Add(CS.CONFIG_TYPE.READONLYPARENTDEFRATE, GetPayRateConfigJson(configType, CS.INFO_TYPE.ISV, isvNo, ifCode));
+                result.Add(CS.CONFIG_TYPE.READONLYPARENTDEFRATE, await GetPayRateConfigJsonAsync(configType, CS.INFO_TYPE.ISV, isvNo, ifCode));
             }
         }
 
-        private JObject GetPayRateConfigJson(string configType, string infoType, string infoId, string ifCode)
+        private async Task<JObject> GetPayRateConfigJsonAsync(string configType, string infoType, string infoId, string ifCode)
         {
             JObject result = new JObject();
-            var payRateConfigs = GetPayRateConfigs(configType, infoType, infoId, ifCode);
+            var payRateConfigs = await GetPayRateConfigsAsync(configType, infoType, infoId, ifCode);
             foreach (var item in payRateConfigs)
             {
                 JObject payRateConfig = new JObject();
@@ -318,9 +317,9 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        private List<PayRateConfigItem> GetPayRateConfigItems(string configType, string infoType, string infoId, string ifCode)
+        private async Task<List<PayRateConfigItem>> GetPayRateConfigItemsAsync(string configType, string infoType, string infoId, string ifCode)
         {
-            var payRateConfigs = GetPayRateConfigs(configType, infoType, infoId, ifCode);
+            var payRateConfigs = await GetPayRateConfigsAsync(configType, infoType, infoId, ifCode);
             var result = payRateConfigs.Select(item =>
             {
                 var r = new PayRateConfigItem()
@@ -366,17 +365,19 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        private List<PayRateConfigDto> GetPayRateConfigs(string configType, string infoType, string infoId, string ifCode)
+        private async Task<List<PayRateConfigDto>> GetPayRateConfigsAsync(string configType, string infoType, string infoId, string ifCode)
         {
-            var payRateConfigs = _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(configType, infoType, infoId, ifCode);
-            var result = _mapper.Map<List<PayRateConfigDto>>(payRateConfigs);
-            foreach (var item in result)
+            var payRateConfigs = await _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(configType, infoType, infoId, ifCode)
+                .ToListProjectToAsync<PayRateConfig, PayRateConfigDto>(_mapper);
+            var rateConfigIds = payRateConfigs.Select(s => s.Id).ToList();
+            var payRateLevelConfigs = await _payRateLevelConfigRepository.GetByRateConfigIdsAsNoTracking(rateConfigIds)
+                .ToListProjectToAsync<PayRateLevelConfig, PayRateLevelConfigDto>(_mapper);
+            foreach (var item in payRateConfigs)
             {
-                var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIdAsNoTracking(item.Id);
-                item.PayRateLevelConfigs = _mapper.Map<List<PayRateLevelConfigDto>>(payRateLevelConfigs);
+                item.PayRateLevelConfigs = payRateLevelConfigs.Where(w => w.RateConfigId == item.Id).ToList();
             }
 
-            return result;
+            return payRateConfigs;
         }
 
         public async Task<PayRateConfigItem> GetPayRateConfigItemAsync(string configType, string infoType, string infoId, string ifCode, string wayCode)
@@ -425,12 +426,12 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public bool SaveOrUpdate(PayRateConfigSaveDto dto)
+        public async Task<bool> SaveOrUpdateAsync(PayRateConfigSaveDto dto)
         {
             try
             {
                 _uow.BeginTransaction();
-                var checkResult = PayRateConfigCheck(dto);
+                var checkResult = await PayRateConfigCheckAsync(dto);
                 if (!checkResult.IsPassed)
                 {
                     throw new BizException(checkResult.Message);
@@ -563,7 +564,7 @@ namespace AGooday.AgPay.Application.Services
             _payRateConfigRepository.SaveChanges();
         }
 
-        private (bool IsPassed, string Message) PayRateConfigCheck(PayRateConfigSaveDto dto)
+        private async Task<(bool IsPassed, string Message)> PayRateConfigCheckAsync(PayRateConfigSaveDto dto)
         {
             var infoId = dto.InfoId;
             var ifCode = dto.IfCode;
@@ -675,7 +676,7 @@ namespace AGooday.AgPay.Application.Services
                     AGENTRATE = dto.AGENTRATE; // 当前代理商费率
                     AGENTDEF = dto.AGENTDEF; // 下级代理商默认费率
                     MCHAPPLYDEF = dto.MCHAPPLYDEF; // 代理商子商户进件默认
-                    PARENTRATE = GetParentRate(ifCode, agent.IsvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
+                    PARENTRATE = await GetParentRateAsync(ifCode, agent.IsvNo, agent.Pid, CS.CONFIG_TYPE.AGENTDEF);
                     for (int i = 0; i < AGENTRATE.Count; i++)
                     {
                         var mainFee = AGENTRATE[i];
@@ -771,7 +772,7 @@ namespace AGooday.AgPay.Application.Services
                     MCHRATE = dto.MCHRATE; // 商户费率
                     if (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB))
                     {
-                        PARENTRATE = GetParentRate(ifCode, mchInfo.IsvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
+                        PARENTRATE = await GetParentRateAsync(ifCode, mchInfo.IsvNo, mchInfo.AgentNo, CS.CONFIG_TYPE.MCHAPPLYDEF);
                         for (int i = 0; i < MCHRATE.Count; i++)
                         {
                             var mainFee = MCHRATE[i];
@@ -857,18 +858,18 @@ namespace AGooday.AgPay.Application.Services
             return $"{name}异常： [{wayCode}]{(levelIndex == null ? "" : $"{modeName}的第[{++levelIndex}]阶梯")}设置费率{{{(feeRate * 100):F4}%}} 需要【大于等于】【{thanName}】的{(levelIndex == null ? "" : "阶梯")}配置值：{{{(thanFeeRate * 100):F4}%}}";
         }
 
-        private List<PayRateConfigItem> GetParentRate(string ifCode, string isvNo, string agentNo, string configType)
+        private async Task<List<PayRateConfigItem>> GetParentRateAsync(string ifCode, string isvNo, string agentNo, string configType)
         {
             List<PayRateConfigItem> ISVCOST, READONLYPARENTAGENT = null, READONLYPARENTDEFRATE = null, PARENTRATE;
 
             // 服务商底价
-            ISVCOST = GetPayRateConfigItems(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode);
+            ISVCOST = await GetPayRateConfigItemsAsync(CS.CONFIG_TYPE.ISVCOST, CS.INFO_TYPE.ISV, isvNo, ifCode);
             if (!string.IsNullOrWhiteSpace(agentNo))
             {
                 // 上级代理商费率
-                READONLYPARENTAGENT = GetPayRateConfigItems(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode);
+                READONLYPARENTAGENT = await GetPayRateConfigItemsAsync(CS.CONFIG_TYPE.AGENTRATE, CS.INFO_TYPE.AGENT, agentNo, ifCode);
                 // 上级默认费率
-                READONLYPARENTDEFRATE = GetPayRateConfigItems(configType, CS.INFO_TYPE.AGENT, agentNo, ifCode);
+                READONLYPARENTDEFRATE = await GetPayRateConfigItemsAsync(configType, CS.INFO_TYPE.AGENT, agentNo, ifCode);
             }
             //else
             //{

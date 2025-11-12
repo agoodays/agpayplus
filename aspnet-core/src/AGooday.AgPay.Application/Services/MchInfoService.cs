@@ -5,6 +5,7 @@ using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -77,31 +78,30 @@ namespace AGooday.AgPay.Application.Services
             return Bus.SendCommand(command);
         }
 
-        public IEnumerable<MchInfoDto> GetByMchNos(List<string> mchNos)
+        public Task<List<MchInfoDto>> GetByMchNosAsNoTrackingAsync(List<string> mchNos)
         {
-            var records = _mchInfoRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
-            return _mapper.Map<IEnumerable<MchInfoDto>>(records);
+            var query = _mchInfoRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
+            return query.ToListProjectToAsync<MchInfo, MchInfoDto>(_mapper);
         }
 
-        public IEnumerable<MchInfoDto> GetByIsvNo(string isvNo)
+        public Task<List<MchInfoDto>> GetByIsvNoAsNoTrackingAsync(string isvNo)
         {
-            var records = _mchInfoRepository.GetAllAsNoTracking().Where(w => w.IsvNo.Equals(isvNo));
-            return _mapper.Map<IEnumerable<MchInfoDto>>(records);
+            var query = _mchInfoRepository.GetAllAsNoTracking().Where(w => w.IsvNo.Equals(isvNo));
+            return query.ToListProjectToAsync<MchInfo, MchInfoDto>(_mapper);
         }
 
-        public Task<PaginatedList<MchInfoDto>> GetPaginatedDataAsync(MchInfoQueryDto dto)
+        public Task<PaginatedResult<MchInfoDto>> GetPaginatedDataAsync(MchInfoQueryDto dto)
         {
             var query = _mchInfoRepository.GetAllAsNoTracking()
-                .Where(w => (string.IsNullOrWhiteSpace(dto.MchNo) || w.MchNo.Equals(dto.MchNo))
-                && (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo))
-                && (string.IsNullOrWhiteSpace(dto.IsvNo) || w.IsvNo.Equals(dto.IsvNo))
-                && (string.IsNullOrWhiteSpace(dto.MchName) || w.MchName.Contains(dto.MchName) || w.MchShortName.Contains(dto.MchName))
-                && (dto.Type.Equals(null) || w.Type.Equals(dto.Type))
-                && (dto.State.Equals(null) || w.State.Equals(dto.State))
-                && (dto.CreatedUid.Equals(null) || w.CreatedUid.Equals(dto.CreatedUid)))
+                .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
+                .WhereIfNotEmpty(dto.AgentNo, w => w.AgentNo.Equals(dto.AgentNo))
+                .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
+                .WhereIfNotEmpty(dto.MchName, w => w.MchName.Contains(dto.MchName) || w.MchShortName.Contains(dto.MchName))
+                .WhereIfNotNull(dto.Type, w => w.Type.Equals(dto.Type))
+                .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
+                .WhereIfNotNull(dto.CreatedUid, w => w.CreatedUid.Equals(dto.CreatedUid))
                 .OrderByDescending(o => o.CreatedAt);
-            var records = PaginatedList<MchInfo>.CreateAsync<MchInfoDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<MchInfo, MchInfoDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
                 result.Add(new { InfoId = infoId, Remark = "服务商默认" });
             }
             string infoType = GetInfoType(configMode);
-            var data = _payIfConfigService.GetPayOauth2ConfigByStartsWithInfoId(infoType, infoId)
+            var data = (await _payIfConfigService.GetPayOauth2ConfigByStartsWithInfoIdAsync(infoType, infoId))
                 .Where(w => !w.InfoId.Equals(infoId))
                 .GroupBy(g => new { g.InfoId, g.Remark })
                 .Select(s => new { s.Key.InfoId, s.Key.Remark });
@@ -69,7 +69,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         public async Task<ApiRes> SaveAsync(PayOauth2ConfigRequest model)
         {
             string infoType = GetInfoType(model.ConfigMode);
-            var data = _payIfConfigService.GetByInfoId(infoType, model.CopySourceInfoId);
+            var data = await _payIfConfigService.GetByInfoIdAsync(infoType, model.CopySourceInfoId);
             data ??= new List<PayInterfaceConfigDto>()
             {
                 new PayInterfaceConfigDto() { InfoType = infoType, InfoId = model.InfoId, IfCode = CS.IF_CODE.WXPAY, Remark = model.Remark },

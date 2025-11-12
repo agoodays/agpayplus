@@ -77,7 +77,7 @@ namespace AGooday.AgPay.Components.Third.Channel.PpPay
 
         public Task<ChannelRetMsg> DoReturn(HttpRequest request, object parameters, PayOrderDto payOrder, MchAppConfigContext mchAppConfigContext)
         {
-            JObject obj = JObject.FromObject(parameters); ;
+            JObject obj = JObject.FromObject(parameters);
             // 获取 Paypal 订单 ID
             string ppOrderId = obj.GetValue("token")?.ToString();
             // 统一处理订单

@@ -72,7 +72,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Division
                 //_logger.LogInformation($"{logPrefix}, 解析数据为: divisionBatchId={divisionBatchId}, params={mutablePair.First().Value}");
 
                 // 通过 batchId 查询出列表（ 注意：  需要按照ID 排序！！！！ ）
-                List<PayOrderDivisionRecordDto> recordList = _payOrderDivisionRecordService.GetByBatchOrderId(new PayOrderDivisionRecordQueryDto()
+                List<PayOrderDivisionRecordDto> recordList = await _payOrderDivisionRecordService.GetByBatchOrderIdAsync(new PayOrderDivisionRecordQueryDto()
                 {
                     BatchOrderId = divisionBatchId,
                     State = (byte)PayOrderDivisionRecordState.STATE_ACCEPT,

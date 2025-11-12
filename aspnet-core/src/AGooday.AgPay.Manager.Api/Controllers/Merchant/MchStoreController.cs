@@ -71,7 +71,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
                 var bindStoreIds = _sysUserService.GetByBelongInfoIdAsNoTracking(dto.MchNo)
                      .Where(w => w.UserType.Equals(dto.UserType))
                      .SelectMany(s => s.BindStoreIds).Distinct();
-                foreach (var item in data.Where(s => bindStoreIds.Contains(s.StoreId.Value)))
+                foreach (var item in data.Items.Where(s => bindStoreIds.Contains(s.StoreId.Value)))
                 {
                     item.AddExt("hasDirector", true);
                 }

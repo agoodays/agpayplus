@@ -16,13 +16,13 @@
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public static ApiPageRes<T> Pages(PaginatedList<T> data)
+        public static ApiPageRes<T> Pages(PaginatedResult<T> data)
         {
             PageBean<T> innerPage = new PageBean<T>();
-            innerPage.Records = data.ToList(); //记录明细
+            innerPage.Records = data.Items; //记录明细
             innerPage.Total = data.TotalCount; //总条数
             innerPage.Current = data.PageIndex; //当前页码
-            innerPage.HasNext = data.HasNext; //是否有下一页
+            innerPage.HasNext = data.HasNextPage; //是否有下一页
 
             ApiPageRes<T> result = new ApiPageRes<T>();
             result.Data = innerPage;
@@ -38,7 +38,7 @@
         /// <summary>
         /// 数据列表
         /// </summary>
-        public List<T> Records { get; set; }
+        public IList<T> Records { get; set; }
 
         /// <summary>
         /// 总数量

@@ -1,4 +1,5 @@
 ﻿using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Domain.Models;
 
 namespace AGooday.AgPay.Application.DataTransfer
 {
@@ -26,5 +27,11 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 代理商号
         /// </summary>
         public string AgentNo { get; set; }
+    }
+
+    public class MchStoreQueryResult
+    {
+        public MchStore MchStore { get; set; }
+        public MchInfo MchInfo { get; set; }
     }
 }

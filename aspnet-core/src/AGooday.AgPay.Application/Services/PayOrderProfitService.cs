@@ -3,6 +3,7 @@ using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -42,16 +43,16 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public IEnumerable<PayOrderProfitDto> GetByPayOrderIdAsNoTracking(string payOrderId)
+        public async Task<IEnumerable<PayOrderProfitDto>> GetByPayOrderIdAsNoTrackingAsync(string payOrderId)
         {
-            var records = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId);
-            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(records);
+            var query = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId);
+            return await query.ToListProjectToAsync<PayOrderProfit, PayOrderProfitDto>(_mapper);
         }
 
-        public IEnumerable<PayOrderProfitDto> GetByPayOrderIdsAsNoTracking(List<string> payOrderIds)
+        public async Task<IEnumerable<PayOrderProfitDto>> GetByPayOrderIdsAsNoTrackingAsync(List<string> payOrderIds)
         {
-            var records = _payOrderProfitRepository.GetByPayOrderIdsAsNoTracking(payOrderIds);
-            return _mapper.Map<IEnumerable<PayOrderProfitDto>>(records);
+            var query = _payOrderProfitRepository.GetByPayOrderIdsAsNoTracking(payOrderIds);
+            return await query.ToListProjectToAsync<PayOrderProfit, PayOrderProfitDto>(_mapper);
         }
     }
 }

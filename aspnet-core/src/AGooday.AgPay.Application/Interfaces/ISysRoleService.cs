@@ -9,6 +9,6 @@ namespace AGooday.AgPay.Application.Interfaces
         Task<bool> UpdateAsync(SysRoleModifyDto dto);
         Task<bool> RemoveRoleAsync(string roleId);
         Task<SysRoleDto> GetByIdAsNoTrackingAsync(string recordId, string belongInfoId);
-        Task<PaginatedList<SysRoleDto>> GetPaginatedDataAsync(SysRoleQueryDto dto);
+        Task<PaginatedResult<SysRoleDto>> GetPaginatedDataAsync(SysRoleQueryDto dto);
     }
 }

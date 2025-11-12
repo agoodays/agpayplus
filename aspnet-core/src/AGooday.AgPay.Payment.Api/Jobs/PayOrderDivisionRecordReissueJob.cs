@@ -44,25 +44,25 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                                 State = (byte)PayOrderDivisionRecordState.STATE_ACCEPT,
                                 CreatedStart = DateTime.Now.AddMinutes(-5), // 当前时间 减去5分钟。
                             };
-                            var pageRecordList = payOrderDivisionRecordService.DistinctBatchOrderIdList(dto);
+                            var paginatedResult = await payOrderDivisionRecordService.DistinctBatchOrderIdListAsync(dto);
 
-                            _logger.LogInformation("任务 [{JobKey}] 处理分账补单任务, 共计{TotalCount}条", context.JobDetail.Key, pageRecordList.TotalCount);
+                            _logger.LogInformation("任务 [{JobKey}] 处理分账补单任务, 共计{TotalCount}条", context.JobDetail.Key, paginatedResult.TotalCount);
                             //_logger.LogInformation($"处理分账补单任务, 共计{pageRecordList.TotalCount}条");
 
-                            if (pageRecordList == null || pageRecordList.Count == 0)
+                            if (paginatedResult == null || paginatedResult.Items.Count == 0)
                             {
                                 //本次查询无结果, 不再继续查询;
                                 break;
                             }
 
-                            foreach (var batchRecord in pageRecordList)
+                            foreach (var batchRecord in paginatedResult.Items)
                             {
                                 try
                                 {
                                     string batchOrderId = batchRecord.BatchOrderId;
 
                                     // 通过 batchId 查询出列表（ 注意：  需要按照ID 排序！！！！ ）
-                                    List<PayOrderDivisionRecordDto> recordList = payOrderDivisionRecordService.GetByBatchOrderId(new PayOrderDivisionRecordQueryDto()
+                                    List<PayOrderDivisionRecordDto> recordList = await payOrderDivisionRecordService.GetByBatchOrderIdAsync(new PayOrderDivisionRecordQueryDto()
                                     {
                                         BatchOrderId = batchOrderId,
                                         State = (byte)PayOrderDivisionRecordState.STATE_ACCEPT,
@@ -120,7 +120,7 @@ namespace AGooday.AgPay.Payment.Api.Jobs
                             }
 
                             //已经到达页码最大量，无需再次查询
-                            if (pageRecordList.TotalPages <= currentPageIndex)
+                            if (paginatedResult.TotalPages <= currentPageIndex)
                             {
                                 break;
                             }

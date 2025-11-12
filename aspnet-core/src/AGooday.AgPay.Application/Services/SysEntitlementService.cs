@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 
 namespace AGooday.AgPay.Application.Services
@@ -48,16 +49,16 @@ namespace AGooday.AgPay.Application.Services
         public IEnumerable<SysEntitlementDto> GetBySysType(string sysType, string entId)
         {
             var records = _sysEntitlementRepository.GetAllAsNoTracking()
-                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
-                && (string.IsNullOrWhiteSpace(entId) || w.EntId.Equals(entId)));
+                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE))
+                .WhereIfNotEmpty(entId, w => w.EntId.Equals(entId));
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(records);
         }
 
         public IEnumerable<SysEntitlementDto> GetByIds(string sysType, List<string> entIds)
         {
             var records = _sysEntitlementRepository.GetAllAsNoTracking()
-                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE)
-                && (!(entIds != null && entIds.Count > 0) || entIds.Contains(w.EntId)));
+                .Where(w => w.SysType.Equals(sysType) && w.State.Equals(CS.PUB_USABLE))
+                .WhereIf(entIds != null && entIds.Count > 0, w => entIds.Contains(w.EntId));
             return _mapper.Map<IEnumerable<SysEntitlementDto>>(records);
         }
 

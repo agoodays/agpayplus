@@ -106,7 +106,7 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 支付状态: 0-订单生成, 1-转账中, 2-转账成功, 3-转账失败, 4-订单关闭
         /// </summary>
-        public byte State { get; set; }
+        public byte? State { get; set; }
 
         /// <summary>
         /// 特定渠道发起额外参数

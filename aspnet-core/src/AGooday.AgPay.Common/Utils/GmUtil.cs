@@ -521,7 +521,7 @@ namespace AGooday.AgPay.Common.Utils
                 // ASN1ObjectIdentifier sm2DataOid = (ASN1ObjectIdentifier) priSeq.getObjectAt(0);
                 // ASN1ObjectIdentifier sm4AlgOid = (ASN1ObjectIdentifier) priSeq.getObjectAt(1);
                 Asn1OctetString priKeyAsn1 = (Asn1OctetString)priSeq[2];
-                byte[] key = KDF(System.Text.Encoding.UTF8.GetBytes(pwd), 32);
+                byte[] key = KDF(Encoding.UTF8.GetBytes(pwd), 32);
                 byte[] priKeyD = Sm4DecryptCBC(Arrays.CopyOfRange(key, 16, 32),
                         priKeyAsn1.GetOctets(),
                         Arrays.CopyOfRange(key, 0, 16), SM4_CBC_PKCS7PADDING);
@@ -600,8 +600,8 @@ namespace AGooday.AgPay.Common.Utils
             //log.Info("public key q:" + ((ECPublicKeyParameters)kp.Public).Q); //{x, y, zs...}
 
             //签名验签
-            byte[] msg = System.Text.Encoding.UTF8.GetBytes("message digest");
-            byte[] userId = System.Text.Encoding.UTF8.GetBytes("userId");
+            byte[] msg = Encoding.UTF8.GetBytes("message digest");
+            byte[] userId = Encoding.UTF8.GetBytes("userId");
             byte[] sig = SignSm3WithSm2(msg, userId, kp.Private);
             //log.Info("testSignSm3WithSm2: " + Hex.ToHexString(sig));
             //log.Info("testVerifySm3WithSm2: " + VerifySm3WithSm2(msg, userId, sig, kp.Public));
@@ -625,10 +625,10 @@ namespace AGooday.AgPay.Common.Utils
             AsymmetricCipherKeyPair kp2 = GenerateKeyPair();
             AsymmetricKeyParameter publicKey2 = kp2.Public;
             AsymmetricKeyParameter privateKey2 = kp2.Private;
-            byte[] bs = Sm2Encrypt(System.Text.Encoding.UTF8.GetBytes("s"), publicKey2);
+            byte[] bs = Sm2Encrypt(Encoding.UTF8.GetBytes("s"), publicKey2);
             //log.Info("testSm2Enc dec: " + Hex.ToHexString(bs));
             bs = Sm2Decrypt(bs, privateKey2);
-            //log.Info("testSm2Enc dec: " + System.Text.Encoding.UTF8.GetString(bs));
+            //log.Info("testSm2Enc dec: " + Encoding.UTF8.GetString(bs));
 
             // sm4 encrypt and decrypt test ---------------------
             //0123456789abcdeffedcba9876543210 + 0123456789abcdeffedcba9876543210 -> 681edf34d206965e86b3e94f536e4246
@@ -636,7 +636,7 @@ namespace AGooday.AgPay.Common.Utils
             byte[] key = Hex.Decode("0123456789abcdeffedcba9876543210");
             byte[] cipher = Hex.Decode("595298c7c6fd271f0402f804c33d3f66");
             bs = Sm4EncryptECB(key, plain, GmUtil.SM4_ECB_NOPADDING);
-            //log.Info("testSm4EncEcb: " + Hex.ToHexString(bs)); ;
+            //log.Info("testSm4EncEcb: " + Hex.ToHexString(bs));
             bs = Sm4DecryptECB(key, bs, GmUtil.SM4_ECB_NOPADDING);
             //log.Info("testSm4DecEcb: " + Hex.ToHexString(bs));
 
@@ -649,13 +649,13 @@ namespace AGooday.AgPay.Common.Utils
             //log.Info("testReadSm2File, prikey: " + Hex.ToHexString(((ECPrivateKeyParameters)sm2Cert.privateKey).D.ToByteArray()));
             //log.Info("testReadSm2File, certId: " + sm2Cert.certId);
 
-            bs = Sm2Encrypt(System.Text.Encoding.UTF8.GetBytes("s"), ((ECPublicKeyParameters)sm2Cert.publicKey));
+            bs = Sm2Encrypt(Encoding.UTF8.GetBytes("s"), ((ECPublicKeyParameters)sm2Cert.publicKey));
             //log.Info("testSm2Enc dec: " + Hex.ToHexString(bs));
             bs = Sm2Decrypt(bs, ((ECPrivateKeyParameters)sm2Cert.privateKey));
-            //log.Info("testSm2Enc dec: " + System.Text.Encoding.UTF8.GetString(bs));
+            //log.Info("testSm2Enc dec: " + Encoding.UTF8.GetString(bs));
 
-            msg = System.Text.Encoding.UTF8.GetBytes("message digest");
-            userId = System.Text.Encoding.UTF8.GetBytes("userId");
+            msg = Encoding.UTF8.GetBytes("message digest");
+            userId = Encoding.UTF8.GetBytes("userId");
             sig = SignSm3WithSm2(msg, userId, ((ECPrivateKeyParameters)sm2Cert.privateKey));
             //log.Info("testSignSm3WithSm2: " + Hex.ToHexString(sig));
             //log.Info("testVerifySm3WithSm2: " + VerifySm3WithSm2(msg, userId, sig, ((ECPublicKeyParameters)sm2Cert.publicKey)));

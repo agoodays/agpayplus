@@ -4,6 +4,7 @@ using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Interfaces;
 using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Infrastructure.Extensions;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
@@ -44,19 +45,17 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        public async Task<PaginatedList<SysArticleDto>> GetPaginatedDataAsync(SysArticleQueryDto dto, string agentNo = null)
+        public Task<PaginatedResult<SysArticleDto>> GetPaginatedDataAsync(SysArticleQueryDto dto, string agentNo = null)
         {
             var query = _sysArticleRepository.GetAllAsNoTracking()
-                .Where(w => (dto.ArticleId.Equals(null) || w.ArticleId.Equals(dto.ArticleId))
-                && (string.IsNullOrWhiteSpace(dto.Title) || w.Title.Contains(dto.Title) || w.Subtitle.Contains(dto.Title))
-                && (dto.ArticleType.Equals(null) || w.ArticleType.Equals(dto.ArticleType))
-                && (string.IsNullOrWhiteSpace(dto.ArticleRange) || EF.Functions.JsonContains(w.ArticleRange,
-                JArray.FromObject(new string[] { dto.ArticleRange }).ToString(Newtonsoft.Json.Formatting.None)))// w.ArticleRange.Contains(dto.ArticleRange))
-                && (dto.CreatedStart.Equals(null) || w.CreatedAt >= dto.CreatedStart)
-                && (dto.CreatedEnd.Equals(null) || w.CreatedAt <= dto.CreatedEnd))
+                .WhereIfNotNull(dto.ArticleId, w => w.ArticleId.Equals(dto.ArticleId))
+                .WhereIfNotEmpty(dto.Title, w => w.Title.Contains(dto.Title) || w.Subtitle.Contains(dto.Title))
+                .WhereIfNotNull(dto.ArticleType.Equals(null), w => w.ArticleType.Equals(dto.ArticleType))
+                .WhereIfNotEmpty(dto.ArticleRange, w => EF.Functions.JsonContains(w.ArticleRange, JArray.FromObject(new string[] { dto.ArticleRange }).ToString(Newtonsoft.Json.Formatting.None)))// w.ArticleRange.Contains(dto.ArticleRange))
+                .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
+                .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd)
                 .OrderByDescending(o => o.CreatedAt);
-            var records = await PaginatedList<SysArticle>.CreateAsync<SysArticleDto>(query, _mapper, dto.PageNumber, dto.PageSize);
-            return records;
+            return query.ToPaginatedResultAsync<SysArticle, SysArticleDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

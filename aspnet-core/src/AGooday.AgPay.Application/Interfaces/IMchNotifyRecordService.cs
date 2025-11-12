@@ -5,7 +5,7 @@ namespace AGooday.AgPay.Application.Interfaces
 {
     public interface IMchNotifyRecordService : IAgPayService<MchNotifyRecordDto, long>
     {
-        Task<PaginatedList<MchNotifyRecordDto>> GetPaginatedDataAsync(MchNotifyQueryDto dto);
+        Task<PaginatedResult<MchNotifyRecordDto>> GetPaginatedDataAsync(MchNotifyQueryDto dto);
         Task<MchNotifyRecordDto> FindByOrderAndTypeAsync(string orderId, byte orderType);
         Task<MchNotifyRecordDto> FindByPayOrderAsync(string payOrderId);
         Task<MchNotifyRecordDto> FindByRefundOrderAsync(string payOrderId);

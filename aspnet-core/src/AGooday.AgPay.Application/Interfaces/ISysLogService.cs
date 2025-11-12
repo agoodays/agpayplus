@@ -6,6 +6,6 @@ namespace AGooday.AgPay.Application.Interfaces
     public interface ISysLogService : IAgPayService<SysLogDto, long>
     {
         Task<bool> RemoveByIdsAsync(List<long> recordIds);
-        Task<PaginatedList<SysLogDto>> GetPaginatedDataAsync(SysLogQueryDto dto);
+        Task<PaginatedResult<SysLogDto>> GetPaginatedDataAsync(SysLogQueryDto dto);
     }
 }
