@@ -97,9 +97,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         //如果有错误，下一步会在这里添加领域通知
         public bool Commit()
         {
-            if (_uow.Commit()) return true;
-
-            return false;
+            return _uow.Commit();
         }
         public Task<bool> CommitAsync()
         {

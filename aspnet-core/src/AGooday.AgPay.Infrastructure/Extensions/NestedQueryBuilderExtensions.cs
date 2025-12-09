@@ -3,14 +3,14 @@
     public static class NestedQueryBuilderExtensions
     {
         // 嵌套属性条件扩展
-        public static DynamicQueryBuilder<T> WhereNestedEqual<T, TProperty>(this DynamicQueryBuilder<T> builder, string propertyPath, TProperty value)
+        public static DynamicQueryBuilder<T> WhereNestedEqual<T, TProperty>(this DynamicQueryBuilder<T> builder, string propertyPath, object value)
         {
-            return builder.NestedEqual<TProperty>(propertyPath, value);
+            return builder.NestedEqual(propertyPath, value);
         }
 
-        public static DynamicQueryBuilder<T> WhereNestedContains<T, TProperty>(this DynamicQueryBuilder<T> builder, string propertyPath, string value)
+        public static DynamicQueryBuilder<T> WhereNestedContains<T>(this DynamicQueryBuilder<T> builder, string propertyPath, string value)
         {
-            return builder.NestedContains<TProperty>(propertyPath, value);
+            return builder.NestedContains(propertyPath, value);
         }
 
         // 嵌套集合条件扩展

@@ -304,7 +304,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
         }
 
         // 嵌套属性查询
-        public DynamicQueryBuilder<T> NestedEqual<TProperty>(string propertyPath, object value)
+        public DynamicQueryBuilder<T> NestedEqual(string propertyPath, object value)
         {
             if (value != null && !IsDefaultValue(value))
             {
@@ -314,7 +314,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             return this;
         }
 
-        public DynamicQueryBuilder<T> NestedContains<TProperty>(string propertyPath, string value)
+        public DynamicQueryBuilder<T> NestedContains(string propertyPath, string value)
         {
             if (!string.IsNullOrWhiteSpace(value))
             {

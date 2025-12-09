@@ -103,7 +103,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 } while (await _sysUserRepository.IsExistInviteCodeAsync(sysUser.InviteCode));
             }
 
-            BeginTransaction();
+            await BeginTransactionAsync();
             try
             {
                 await _sysUserRepository.AddAsync(sysUser);
@@ -138,14 +138,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 await _sysUserAuthRepository.AddAsync(sysUserAuthByTelphone);
                 #endregion
 
-                if (!Commit())
+                if (!await CommitAsync())
                 {
                     await Bus.RaiseEvent(new DomainNotification("", "添加用户失败"));
-                    RollbackTransaction();
+                    await RollbackTransactionAsync();
                     return;
                 }
 
-                CommitTransaction();
+                await CommitTransactionAsync();
 
                 if (request.IsNotify == CS.YES)
                 {
@@ -159,7 +159,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
             }
             catch (Exception e)
             {
-                RollbackTransaction();
+                await RollbackTransactionAsync();
                 await Bus.RaiseEvent(new DomainNotification("", e.Message));
                 return;
             }
@@ -211,7 +211,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return;
             }
 
-            BeginTransaction();
+            await BeginTransactionAsync();
             try
             {
                 // 删除用户登录信息
@@ -226,14 +226,14 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 if (!await CommitAsync())
                 {
                     await Bus.RaiseEvent(new DomainNotification("", "删除用户失败"));
-                    RollbackTransaction();
+                    await RollbackTransactionAsync();
                     return;
                 }
-                CommitTransaction();
+                await CommitTransactionAsync();
             }
             catch (Exception e)
             {
-                RollbackTransaction();
+                await RollbackTransactionAsync();
                 await Bus.RaiseEvent(new DomainNotification("", e.Message));
                 return;
             }
@@ -267,7 +267,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 return;
             }
 
-            BeginTransaction();
+            await BeginTransactionAsync();
             try
             {
                 //判断是否重置密码
@@ -283,6 +283,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     if (await _sysUserRepository.IsExistTelphoneAsync(request.Telphone, request.SysType))
                     {
                         await Bus.RaiseEvent(new DomainNotification("", "该手机号已关联其他用户！"));
+                        await RollbackTransactionAsync();
                         return;
                     }
                     await _sysUserAuthRepository.ResetAuthInfoAsync(request.SysUserId, request.SysType, null, request.Telphone, null);
@@ -294,6 +295,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     if (await _sysUserRepository.IsExistLoginUsernameAsync(request.LoginUsername, request.SysType))
                     {
                         await Bus.RaiseEvent(new DomainNotification("", "该登录用户名已关联其他用户！"));
+                        await RollbackTransactionAsync();
                         return;
                     }
                     await _sysUserAuthRepository.ResetAuthInfoAsync(request.SysUserId, request.SysType, request.LoginUsername, null, null);
@@ -305,6 +307,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     if (await _sysUserRepository.IsExistUserNoAsync(request.UserNo, request.SysType))
                     {
                         await Bus.RaiseEvent(new DomainNotification("", "该员工编号已关联其他用户！"));
+                        await RollbackTransactionAsync();
                         return;
                     }
                 }
@@ -322,18 +325,18 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                 _sysUserRepository.Update(sysUser);
 
-                if (!Commit())
+                if (!await CommitAsync())
                 {
                     await Bus.RaiseEvent(new DomainNotification("", "修改当前用户失败"));
-                    RollbackTransaction();
+                    await RollbackTransactionAsync();
                     return;
                 }
 
-                CommitTransaction();
+                await CommitTransactionAsync();
             }
             catch (Exception e)
             {
-                RollbackTransaction();
+                await RollbackTransactionAsync();
                 await Bus.RaiseEvent(new DomainNotification("", e.Message));
                 return;
             }
