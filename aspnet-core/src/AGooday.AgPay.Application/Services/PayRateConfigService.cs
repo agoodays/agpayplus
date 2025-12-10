@@ -430,7 +430,7 @@ namespace AGooday.AgPay.Application.Services
         {
             try
             {
-                _uow.BeginTransaction();
+                await _uow.BeginTransactionAsync();
                 var checkResult = await PayRateConfigCheckAsync(dto);
                 if (!checkResult.IsPassed)
                 {
@@ -467,11 +467,11 @@ namespace AGooday.AgPay.Application.Services
                     default:
                         break;
                 }
-                _uow.CommitTransaction();
+                await _uow.CommitTransactionAsync();
             }
             catch (Exception)
             {
-                _uow.RollbackTransaction();
+                await _uow.RollbackTransactionAsync();
                 throw;
             }
 

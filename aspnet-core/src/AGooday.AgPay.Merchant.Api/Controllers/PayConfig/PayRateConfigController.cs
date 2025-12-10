@@ -38,9 +38,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpGet, Route("savedMapData"), NoLog]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_LIST)]
-        public ApiRes SavedMapData(string configMode, string infoId, string ifCode)
+        public async Task<ApiRes> SavedMapDataAsync(string configMode, string infoId, string ifCode)
         {
-            return ApiRes.Ok(_payRateConfigService.GetByInfoIdAndIfCodeJsonAsync(configMode, infoId, ifCode));
+            return ApiRes.Ok(await _payRateConfigService.GetByInfoIdAndIfCodeJsonAsync(configMode, infoId, ifCode));
         }
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace AGooday.AgPay.Merchant.Api.Controllers.PayConfig
         /// <returns></returns>
         [HttpPost, Route(""), MethodLog("配置费率")]
         [PermissionAuth(PermCode.MCH.ENT_MCH_PAY_CONFIG_ADD)]
-        public ApiRes SaveOrUpdate(PayRateConfigSaveDto dto)
+        public async Task<ApiRes> SaveOrUpdateAsync(PayRateConfigSaveDto dto)
         {
-            _payRateConfigService.SaveOrUpdateAsync(dto);
+            await _payRateConfigService.SaveOrUpdateAsync(dto);
             return ApiRes.Ok();
         }
     }
