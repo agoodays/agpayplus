@@ -1,4 +1,5 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+﻿using System.Linq.Expressions;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
@@ -96,53 +97,101 @@ namespace AGooday.AgPay.Application.Services
                 _ => throw new NotImplementedException()
             };
         }
+        private Expression<Func<PayOrder, DateTime>> GetPayGroupingExpression(string format)
+        {
+            return format switch
+            {
+                "yyyy-MM-dd" => o => o.CreatedAt.Value.Date,
+                "yyyy-MM" => o => new DateTime(o.CreatedAt.Value.Year, o.CreatedAt.Value.Month, 1),
+                "yyyy" => o => new DateTime(o.CreatedAt.Value.Year, 1, 1),
+                // 可扩展：按小时、季度等
+                _ => throw new NotSupportedException($"不支持的时间分组格式: {format}")
+            };
+        }
+
+        private Expression<Func<RefundOrder, DateTime>> GetRefundGroupingExpression(string format)
+        {
+            return format switch
+            {
+                "yyyy-MM-dd" => o => o.CreatedAt.Value.Date,
+                "yyyy-MM" => o => new DateTime(o.CreatedAt.Value.Year, o.CreatedAt.Value.Month, 1),
+                "yyyy" => o => new DateTime(o.CreatedAt.Value.Year, 1, 1),
+                _ => throw new NotSupportedException($"不支持的时间分组格式: {format}")
+            };
+        }
 
         private async Task<PaginatedResult<StatisticResultDto>> TransactionStatisticsAsync(string agentNo, StatisticQueryDto dto)
         {
+            // 获取下级代理
             IEnumerable<AgentInfo> agents = await _agentInfoRepository.GetSubAgentsAsync(agentNo);
             var agentNos = agents?.Select(s => s.AgentNo);
+            // 构建基础查询（未分组）
             var (payOrders, refundOrders) = SelectOrderCount(dto, agentNos: agentNos);
 
-            var payRecords = payOrders
-                .GroupBy(g => g.CreatedAt.Value.ToString(dto.Format))
-                .Select(s => new StatisticResultDto()
+            // 获取分组表达式
+            var payGroupExpr = GetPayGroupingExpression(dto.Format);
+            var refundGroupExpr = GetRefundGroupingExpression(dto.Format);
+
+            // 【在数据库中】执行支付订单聚合（按天）
+            var payAggregates = await payOrders
+                .GroupBy(payGroupExpr)
+                .Select(s => new
                 {
-                    GroupDate = s.Key,
+                    Date = s.Key,
                     AllAmount = s.Sum(s => s.Amount),
                     AllCount = s.Count(),
                     PayAmount = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.Amount),
                     PayCount = s.Count(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)),
                     Fee = s.Where(w => w.State.Equals((byte)PayOrderState.STATE_SUCCESS) || w.State.Equals((byte)PayOrderState.STATE_REFUND)).Sum(s => s.MchOrderFeeAmount),
-                });
+                }).ToListAsync();
 
-            var refundRecords = refundOrders.Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS)).AsEnumerable()
-                .GroupBy(g => g.CreatedAt.Value.ToString(dto.Format))
-                .Select(s => new StatisticResultDto()
+            // 【在数据库中】执行退款订单聚合（按天）
+            var refundAggregates = await refundOrders
+                .Where(w => w.State.Equals((byte)RefundOrderState.STATE_SUCCESS))
+                .GroupBy(refundGroupExpr)
+                .Select(s => new
                 {
-                    GroupDate = s.Key,
+                    Date = s.Key,
                     RefundAmount = s.Sum(s => s.RefundAmount),
                     RefundCount = s.Count(),
                     RefundFee = s.Sum(s => s.RefundFeeAmount),
-                });
+                }).ToListAsync();
 
-            var records = payRecords
-                .Join(refundRecords, p => p.GroupDate, r => r.GroupDate, (p, r) => new { p, r })
-                .Select(s => new StatisticResultDto()
+            // 转为字典便于查找
+            var payDict = payAggregates.ToDictionary(x => x.Date);
+            var refundDict = refundAggregates.ToDictionary(x => x.Date);
+
+            // 合并所有出现过的日期
+            var allDates = new HashSet<DateTime>(payDict.Keys);
+            foreach (var date in refundDict.Keys)
+            {
+                allDates.Add(date);
+            }
+
+            // 在内存中合并 + 格式化 GroupDate
+            var merged = allDates.Select(date =>
+            {
+                var p = payDict.GetValueOrDefault(date, new { Date = date, AllAmount = 0L, AllCount = 0, PayAmount = 0L, PayCount = 0, Fee = 0L });
+                var r = refundDict.GetValueOrDefault(date, new { Date = date, RefundAmount = 0L, RefundCount = 0, RefundFee = 0L });
+
+                return new StatisticResultDto
                 {
-                    GroupDate = s.p.GroupDate,
-                    AllAmount = s.p.AllAmount,
-                    AllCount = s.p.AllCount,
-                    PayAmount = s.p.PayAmount,
-                    PayCount = s.p.PayCount,
-                    Round = Math.Round(s.p.AllCount > 0 ? s.p.PayCount / Convert.ToDecimal(s.p.AllCount) : 0M, 2, MidpointRounding.AwayFromZero),
-                    Fee = s.p.Fee,
-                    RefundAmount = s.r.RefundAmount,
-                    RefundCount = s.r.RefundCount,
-                    RefundFee = s.r.RefundFee,
-                })
-                .OrderByDescending(o => o.GroupDate);
+                    GroupDate = date.ToString(dto.Format),
+                    AllAmount = p.AllAmount,
+                    AllCount = p.AllCount,
+                    PayAmount = p.PayAmount,
+                    PayCount = p.PayCount,
+                    Round = p.AllCount > 0 ? Math.Round((decimal)p.PayCount / p.AllCount, 2, MidpointRounding.AwayFromZero) : 0M,
+                    Fee = p.Fee,
+                    RefundAmount = r.RefundAmount,
+                    RefundCount = r.RefundCount,
+                    RefundFee = r.RefundFee
+                };
+            })
+            .OrderByDescending(x => x.GroupDate); // 内存排序
 
-            return await records.ToPaginatedResultAsync(dto.PageNumber, dto.PageSize);
+            // 分页（注意：此时是 IEnumerable，需转为列表再分页）
+            return PaginatedResult<StatisticResultDto>.Create(merged, dto.PageNumber, dto.PageSize);
         }
 
         private async Task<PaginatedResult<StatisticResultDto>> MchStatisticsAsync(string agentNo, StatisticQueryDto dto)

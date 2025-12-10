@@ -101,7 +101,7 @@ namespace AGooday.AgPay.Application.Services
 
             var agentInfos = _agentInfoRepository.GetAllAsNoTracking()
                 .Where(w => (string.IsNullOrWhiteSpace(dto.AgentNo) || w.AgentNo.Equals(dto.AgentNo)))
-                .WhereIf(agentNos.Count == 0, w => agentNos.Contains(dto.AgentNo))
+                .WhereIf(agentNos != null && agentNos.Count > 0, w => agentNos.Contains(dto.AgentNo))
                 .WhereIfNotEmpty(dto.Pid, w => w.Pid.Equals(dto.Pid))
                 .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
                 .WhereIfNotEmpty(dto.AgentName, w => w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))

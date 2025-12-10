@@ -150,17 +150,17 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// <summary>
         /// 不可用金额
         /// </summary>
-        public int UnAmount { get; set; }
+        public long UnAmount { get; set; }
 
         /// <summary>
         /// 钱包余额
         /// </summary>
-        public int BalanceAmount { get; set; }
+        public long BalanceAmount { get; set; }
 
         /// <summary>
         /// 在途佣金
         /// </summary>
-        public int AuditProfitAmount { get; set; }
+        public long AuditProfitAmount { get; set; }
 
         /// <summary>
         /// 冻结金额

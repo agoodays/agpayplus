@@ -98,19 +98,6 @@ namespace AGooday.AgPay.Application.Services
             return result;
         }
 
-        // 状态判断辅助方法
-        private static bool IsSuccessfulPayState(byte state)
-        {
-            return state == (byte)PayOrderState.STATE_SUCCESS ||
-                   state == (byte)PayOrderState.STATE_REFUND;
-        }
-
-        private static bool IsRefundState(byte refundState)
-        {
-            return refundState == (byte)PayOrderRefund.REFUND_STATE_SUB ||
-                   refundState == (byte)PayOrderRefund.REFUND_STATE_ALL;
-        }
-
         public async Task<JObject> StatisticsAsync(PayOrderQueryDto dto)
         {
             // 获取所有统计数据
@@ -123,21 +110,21 @@ namespace AGooday.AgPay.Application.Services
                     AllPayCount = g.Count(),
 
                     // 失败支付统计
-                    FailPayAmount = g.Where(o => !IsSuccessfulPayState(o.State))
+                    FailPayAmount = g.Where(p => !(p.State == (byte)PayOrderState.STATE_SUCCESS || p.State == (byte)PayOrderState.STATE_REFUND))
                                    .Sum(o => o.Amount),
-                    FailPayCount = g.Count(o => !IsSuccessfulPayState(o.State)),
+                    FailPayCount = g.Count(p => !(p.State == (byte)PayOrderState.STATE_SUCCESS || p.State == (byte)PayOrderState.STATE_REFUND)),
 
                     // 成功支付统计
-                    MchFeeAmount = g.Where(o => IsSuccessfulPayState(o.State))
+                    MchFeeAmount = g.Where(p => p.State == (byte)PayOrderState.STATE_SUCCESS || p.State == (byte)PayOrderState.STATE_REFUND)
                                   .Sum(o => o.MchFeeAmount),
-                    PayAmount = g.Where(o => IsSuccessfulPayState(o.State))
+                    PayAmount = g.Where(p => p.State == (byte)PayOrderState.STATE_SUCCESS || p.State == (byte)PayOrderState.STATE_REFUND)
                                .Sum(o => o.Amount),
-                    PayCount = g.Count(o => IsSuccessfulPayState(o.State)),
+                    PayCount = g.Count(p => p.State == (byte)PayOrderState.STATE_SUCCESS || p.State == (byte)PayOrderState.STATE_REFUND),
 
                     // 退款统计
-                    RefundAmount = g.Where(o => IsRefundState(o.RefundState))
+                    RefundAmount = g.Where(p => p.State == (byte)PayOrderRefund.REFUND_STATE_SUB || p.State == (byte)PayOrderRefund.REFUND_STATE_ALL)
                                   .Sum(o => o.Amount),
-                    RefundCount = g.Count(o => IsRefundState(o.RefundState))
+                    RefundCount = g.Count(p => p.State == (byte)PayOrderRefund.REFUND_STATE_SUB || p.State == (byte)PayOrderRefund.REFUND_STATE_ALL)
                 })
                 .FirstOrDefaultAsync();
 
