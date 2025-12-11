@@ -19,7 +19,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
 
         public Task<MchApp> GetByIdAsync(string recordId, string mchNo)
         {
-            return GetAllAsNoTracking().FirstOrDefaultAsync(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId));
+            return GetAll().FirstOrDefaultAsync(w => w.MchNo.Equals(mchNo) && w.AppId.Equals(recordId));
         }
 
         public Task<MchApp> GetByIdAsNoTrackingAsync(string recordId, string mchNo)

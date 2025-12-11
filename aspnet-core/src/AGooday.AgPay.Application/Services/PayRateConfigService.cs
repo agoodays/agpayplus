@@ -125,7 +125,7 @@ namespace AGooday.AgPay.Application.Services
         }
 
         #region 丢弃
-        [Obsolete("请使用 GetByInfoIdAndIfCodeJson() 代替")]
+        [Obsolete("请使用 GetByInfoIdAndIfCodeJsonAsync() 代替")]
         public async Task<Dictionary<string, Dictionary<string, PayRateConfigDto>>> GetByInfoIdAndIfCodeAsync(string configMode, string infoId, string ifCode)
         {
             string isvNo;
@@ -172,7 +172,7 @@ namespace AGooday.AgPay.Application.Services
             return rateConfig;
         }
 
-        [Obsolete("请使用 GetReadOnlyRateJson() 代替")]
+        [Obsolete("请使用 GetReadOnlyRateJsonAsync() 代替")]
         private async Task GetReadOnlyRateAsync(string ifCode, Dictionary<string, Dictionary<string, PayRateConfigDto>> rateConfig, string isvNo, string agentNo, string configType)
         {
             if (!string.IsNullOrWhiteSpace(isvNo))
@@ -194,7 +194,7 @@ namespace AGooday.AgPay.Application.Services
             }
         }
 
-        [Obsolete("请使用 GetPayRateConfigJson() 代替")]
+        [Obsolete("请使用 GetPayRateConfigJsonAsync() 代替")]
         private async Task<Dictionary<string, PayRateConfigDto>> GetPayRateConfigAsync(string configType, string infoType, string infoId, string ifCode)
         {
             Dictionary<string, PayRateConfigDto> keyValues = new Dictionary<string, PayRateConfigDto>();
@@ -368,10 +368,10 @@ namespace AGooday.AgPay.Application.Services
         private async Task<List<PayRateConfigDto>> GetPayRateConfigsAsync(string configType, string infoType, string infoId, string ifCode)
         {
             var payRateConfigs = await _payRateConfigRepository.GetByInfoIdAndIfCodeAsNoTracking(configType, infoType, infoId, ifCode)
-                .ToListProjectToAsync<PayRateConfig, PayRateConfigDto>(_mapper);
+                .ToProjectedListAsync<PayRateConfig, PayRateConfigDto>(_mapper);
             var rateConfigIds = payRateConfigs.Select(s => s.Id).ToList();
             var payRateLevelConfigs = await _payRateLevelConfigRepository.GetByRateConfigIdsAsNoTracking(rateConfigIds)
-                .ToListProjectToAsync<PayRateLevelConfig, PayRateLevelConfigDto>(_mapper);
+                .ToProjectedListAsync<PayRateLevelConfig, PayRateLevelConfigDto>(_mapper);
             foreach (var item in payRateConfigs)
             {
                 item.PayRateLevelConfigs = payRateLevelConfigs.Where(w => w.RateConfigId == item.Id).ToList();
@@ -445,24 +445,24 @@ namespace AGooday.AgPay.Application.Services
                 {
                     case CS.CONFIG_MODE.MGR_ISV:
                         infoType = CS.INFO_TYPE.ISV;
-                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.ISVCOST, infoType, delPayWayCodes, dto.ISVCOST);
-                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
-                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
+                        await SaveOrUpdateAsync(infoId, ifCode, CS.CONFIG_TYPE.ISVCOST, infoType, delPayWayCodes, dto.ISVCOST);
+                        await SaveOrUpdateAsync(infoId, ifCode, CS.CONFIG_TYPE.AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
+                        await SaveOrUpdateAsync(infoId, ifCode, CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
                         break;
                     case CS.CONFIG_MODE.MGR_AGENT:
                     case CS.CONFIG_MODE.AGENT_SELF:
                     case CS.CONFIG_MODE.AGENT_SUBAGENT:
                         infoType = CS.INFO_TYPE.AGENT;
-                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTRATE, infoType, delPayWayCodes, dto.AGENTRATE);
-                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
-                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
+                        await SaveOrUpdateAsync(infoId, ifCode, CS.CONFIG_TYPE.AGENTRATE, infoType, delPayWayCodes, dto.AGENTRATE);
+                        await SaveOrUpdateAsync(infoId, ifCode, CS.CONFIG_TYPE.AGENTDEF, infoType, delPayWayCodes, dto.AGENTDEF);
+                        await SaveOrUpdateAsync(infoId, ifCode, CS.CONFIG_TYPE.MCHAPPLYDEF, infoType, delPayWayCodes, dto.MCHAPPLYDEF);
                         break;
                     case CS.CONFIG_MODE.MGR_MCH:
                     case CS.CONFIG_MODE.AGENT_MCH:
                     case CS.CONFIG_MODE.MCH_SELF_APP1:
                     case CS.CONFIG_MODE.MCH_SELF_APP2:
                         infoType = CS.INFO_TYPE.MCH_APP;
-                        SaveOrUpdate(infoId, ifCode, CS.CONFIG_TYPE.MCHRATE, infoType, delPayWayCodes, dto.MCHRATE);
+                        await SaveOrUpdateAsync(infoId, ifCode, CS.CONFIG_TYPE.MCHRATE, infoType, delPayWayCodes, dto.MCHRATE);
                         break;
                     default:
                         break;
@@ -478,10 +478,10 @@ namespace AGooday.AgPay.Application.Services
             return true;
         }
 
-        private void SaveOrUpdate(string infoId, string ifCode, string configType, string infoType, List<string> delPayWayCodes, List<PayRateConfigItem> items)
+        private async Task SaveOrUpdateAsync(string infoId, string ifCode, string configType, string infoType, List<string> delPayWayCodes, List<PayRateConfigItem> items)
         {
             var now = DateTime.Now;
-            DelPayWayCodeRateConfig(infoId, ifCode, configType, infoType, delPayWayCodes);
+            await DelPayWayCodeRateConfigAsync(infoId, ifCode, configType, infoType, delPayWayCodes);
             foreach (var item in items)
             {
                 var entity = _payRateConfigRepository.GetByUniqueKey(configType, infoType, infoId, ifCode, item.WayCode);
@@ -502,7 +502,7 @@ namespace AGooday.AgPay.Application.Services
                         CreatedAt = now,
                         UpdatedAt = now,
                     };
-                    _payRateConfigRepository.Add(entity);
+                    await _payRateConfigRepository.AddAsync(entity);
                 }
                 else
                 {
@@ -517,10 +517,11 @@ namespace AGooday.AgPay.Application.Services
                     entity.UpdatedAt = now;
                     _payRateConfigRepository.Update(entity);
                 }
-                _payRateConfigRepository.SaveChanges();
+                await _payRateConfigRepository.SaveChangesAsync();
 
                 if (item.FeeType.Equals(CS.FEE_TYPE_LEVEL))
                 {
+                    var payRateLevelConfigs = new List<PayRateLevelConfig>();
                     foreach (var level in (item.LevelMode.Equals(CS.LEVEL_MODE_NORMAL) ? item.NORMAL : item.UNIONPAY))
                     {
                         foreach (var levelitem in level.LevelList)
@@ -538,30 +539,31 @@ namespace AGooday.AgPay.Application.Services
                                 CreatedAt = now,
                                 UpdatedAt = now,
                             };
-                            _payRateLevelConfigRepository.Add(payRateLevelConfig);
+                            payRateLevelConfigs.Add(payRateLevelConfig);
                         }
                     }
+                    await _payRateLevelConfigRepository.AddRangeAsync(payRateLevelConfigs);
                 }
 
-                _payRateLevelConfigRepository.SaveChanges();
+                await _payRateLevelConfigRepository.SaveChangesAsync();
             }
         }
 
-        private void DelPayWayCodeRateConfig(string infoId, string ifCode, string configType, string infoType, List<string> delPayWayCodes)
+        private async Task DelPayWayCodeRateConfigAsync(string infoId, string ifCode, string configType, string infoType, List<string> delPayWayCodes)
         {
             var payRateConfigs = _payRateConfigRepository.GetByInfoIdAndIfCode(configType, infoType, infoId, ifCode).Where(w => delPayWayCodes.Contains(w.WayCode));
-            DelPayWayCodeRateConfig(payRateConfigs);
+            await DelPayWayCodeRateConfigAsync(payRateConfigs);
         }
 
-        private void DelPayWayCodeRateConfig(IQueryable<PayRateConfig> payRateConfigs)
+        private async Task DelPayWayCodeRateConfigAsync(IQueryable<PayRateConfig> payRateConfigs)
         {
             var ids = payRateConfigs.Select(s => s.Id).ToList();
             var payRateLevelConfigs = _payRateLevelConfigRepository.GetByRateConfigIds(ids);
             _payRateLevelConfigRepository.RemoveRange(payRateLevelConfigs);
-            _payRateLevelConfigRepository.SaveChanges();
+            await _payRateLevelConfigRepository.SaveChangesAsync();
 
             _payRateConfigRepository.RemoveRange(payRateConfigs);
-            _payRateConfigRepository.SaveChanges();
+            await _payRateConfigRepository.SaveChangesAsync();
         }
 
         private async Task<(bool IsPassed, string Message)> PayRateConfigCheckAsync(PayRateConfigSaveDto dto)
@@ -573,7 +575,7 @@ namespace AGooday.AgPay.Application.Services
             switch (configMode)
             {
                 case CS.CONFIG_MODE.MGR_ISV:
-                    var isv = _isvInfoRepository.GetById(infoId);
+                    var isv = await _isvInfoRepository.GetByIdAsNoTrackingAsync(infoId);
                     if (isv == null || isv.State != CS.YES)
                     {
                         return (false, "服务商不存在");
@@ -590,7 +592,7 @@ namespace AGooday.AgPay.Application.Services
                         {
                             if (dto.NoCheckRuleFlag.Equals(CS.YES))
                             {
-                                DelPayWayCodeRateConfig(agentRateConfigs);
+                                await DelPayWayCodeRateConfigAsync(agentRateConfigs);
                             }
                             else
                             {
@@ -602,7 +604,7 @@ namespace AGooday.AgPay.Application.Services
                         {
                             if (dto.NoCheckRuleFlag.Equals(CS.YES))
                             {
-                                DelPayWayCodeRateConfig(mchRateConfigs);
+                                await DelPayWayCodeRateConfigAsync(mchRateConfigs);
                             }
                             else
                             {
@@ -668,7 +670,7 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE.MGR_AGENT:
                 case CS.CONFIG_MODE.AGENT_SELF:
                 case CS.CONFIG_MODE.AGENT_SUBAGENT:
-                    var agent = _agentInfoRepository.GetById(infoId);
+                    var agent = await _agentInfoRepository.GetByIdAsNoTrackingAsync(infoId);
                     if (agent == null || agent.State != CS.YES)
                     {
                         return (false, "代理商不存在");
@@ -759,7 +761,7 @@ namespace AGooday.AgPay.Application.Services
                 case CS.CONFIG_MODE.AGENT_MCH:
                 case CS.CONFIG_MODE.MCH_SELF_APP1:
                 case CS.CONFIG_MODE.MCH_SELF_APP2:
-                    var mchApp = _mchAppRepository.GetById(infoId);
+                    var mchApp = await _mchAppRepository.GetByIdAsNoTrackingAsync(infoId);
                     if (mchApp == null || mchApp.State != CS.YES)
                     {
                         return (false, "商户应用不存在");

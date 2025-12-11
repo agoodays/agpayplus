@@ -57,7 +57,7 @@ namespace AGooday.AgPay.Application.Services
             var query = _payOrderDivisionRecordRepository.GetAllAsNoTracking()
                 .Where(w => w.PayOrderId.Equals(payOrderId))
                 .WhereIfNotNull(state, w => w.State.Equals(state));
-            return query.ToListProjectToAsync<PayOrderDivisionRecord, PayOrderDivisionRecordDto>(_mapper);
+            return query.ToProjectedListAsync<PayOrderDivisionRecord, PayOrderDivisionRecordDto>(_mapper);
         }
 
         public Task<List<PayOrderDivisionRecordDto>> GetByBatchOrderIdAsync(PayOrderDivisionRecordQueryDto dto)
@@ -66,7 +66,7 @@ namespace AGooday.AgPay.Application.Services
                 .WhereIfNotEmpty(dto.BatchOrderId, w => w.BatchOrderId.Equals(dto.BatchOrderId))
                 .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
                 .OrderBy(o => o.RecordId);
-            return query.ToListProjectToAsync<PayOrderDivisionRecord, PayOrderDivisionRecordDto>(_mapper);
+            return query.ToProjectedListAsync<PayOrderDivisionRecord, PayOrderDivisionRecordDto>(_mapper);
         }
 
         public Task<PaginatedResult<PayOrderDivisionRecordDto>> GetPaginatedDataAsync(PayOrderDivisionRecordQueryDto dto)

@@ -60,21 +60,21 @@ namespace AGooday.AgPay.Application.Services
         {
             var query = _mchAppRepository.GetAllAsNoTracking()
                 .Where(w => w.MchNo.Equals(mchNo));
-            return query.ToListProjectToAsync<MchApp, MchAppDto>(_mapper);
+            return query.ToListAsync<MchApp, MchAppDto>(_mapper);
         }
 
         public Task<List<MchAppDto>> GetByMchNosAsNoTrackingAsync(IEnumerable<string> mchNos)
         {
             var query = _mchAppRepository.GetAllAsNoTracking()
                 .Where(w => mchNos.Contains(w.MchNo));
-            return query.ToListProjectToAsync<MchApp, MchAppDto>(_mapper);
+            return query.ToListAsync<MchApp, MchAppDto>(_mapper);
         }
 
         public Task<List<MchAppDto>> GetByAppIdsAsNoTrackingAsync(IEnumerable<string> appIds)
         {
             var query = _mchAppRepository.GetAllAsNoTracking()
                 .Where(w => appIds.Contains(w.AppId));
-            return query.ToListProjectToAsync<MchApp, MchAppDto>(_mapper);
+            return query.ToListAsync<MchApp, MchAppDto>(_mapper);
         }
 
         public Task<PaginatedResult<MchAppDto>> GetPaginatedDataAsync(MchAppQueryDto dto, string agentNo = null)

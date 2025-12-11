@@ -46,13 +46,13 @@ namespace AGooday.AgPay.Application.Services
         public async Task<IEnumerable<PayOrderProfitDto>> GetByPayOrderIdAsNoTrackingAsync(string payOrderId)
         {
             var query = _payOrderProfitRepository.GetByPayOrderIdAsNoTracking(payOrderId);
-            return await query.ToListProjectToAsync<PayOrderProfit, PayOrderProfitDto>(_mapper);
+            return await query.ToProjectedListAsync<PayOrderProfit, PayOrderProfitDto>(_mapper);
         }
 
         public async Task<IEnumerable<PayOrderProfitDto>> GetByPayOrderIdsAsNoTrackingAsync(List<string> payOrderIds)
         {
             var query = _payOrderProfitRepository.GetByPayOrderIdsAsNoTracking(payOrderIds);
-            return await query.ToListProjectToAsync<PayOrderProfit, PayOrderProfitDto>(_mapper);
+            return await query.ToProjectedListAsync<PayOrderProfit, PayOrderProfitDto>(_mapper);
         }
     }
 }

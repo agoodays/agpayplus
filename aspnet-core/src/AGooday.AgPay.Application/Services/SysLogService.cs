@@ -53,7 +53,7 @@ namespace AGooday.AgPay.Application.Services
                 .WhereIfNotNull(dto.CreatedStart, w => w.CreatedAt >= dto.CreatedStart)
                 .WhereIfNotNull(dto.CreatedEnd, w => w.CreatedAt <= dto.CreatedEnd)
                 .OrderByDescending(o => o.CreatedAt);
-            return query.ToPaginatedResultAsync<SysLog, SysLogDto>(_mapper, dto.PageNumber, dto.PageSize);
+            return query.ToProjectedPaginatedResultAsync<SysLog, SysLogDto>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

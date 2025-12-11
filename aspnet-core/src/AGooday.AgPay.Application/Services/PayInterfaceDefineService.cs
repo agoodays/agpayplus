@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Application.Services
                 .WhereIfNotNull(state, w => w.State.Equals(state))
                 .OrderByDescending(o => o.CreatedAt);
 
-            return await query.ToListProjectToAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper);
+            return await query.ToListAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper);
         }
 
         public async Task<IEnumerable<PayInterfaceDefineDto>> GetByIfCodesAsync(IEnumerable<string> ifCodes)
@@ -56,7 +56,7 @@ namespace AGooday.AgPay.Application.Services
             var query = _payInterfaceDefineRepository.GetAllAsNoTracking()
                 .Where(w => ifCodes.Contains(w.IfCode));
 
-            return await query.ToListProjectToAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper);
+            return await query.ToListAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper);
         }
     }
 }

@@ -81,13 +81,13 @@ namespace AGooday.AgPay.Application.Services
         public Task<List<MchInfoDto>> GetByMchNosAsNoTrackingAsync(List<string> mchNos)
         {
             var query = _mchInfoRepository.GetAllAsNoTracking().Where(w => mchNos.Contains(w.MchNo));
-            return query.ToListProjectToAsync<MchInfo, MchInfoDto>(_mapper);
+            return query.ToListAsync<MchInfo, MchInfoDto>(_mapper);
         }
 
         public Task<List<MchInfoDto>> GetByIsvNoAsNoTrackingAsync(string isvNo)
         {
             var query = _mchInfoRepository.GetAllAsNoTracking().Where(w => w.IsvNo.Equals(isvNo));
-            return query.ToListProjectToAsync<MchInfo, MchInfoDto>(_mapper);
+            return query.ToListAsync<MchInfo, MchInfoDto>(_mapper);
         }
 
         public Task<PaginatedResult<MchInfoDto>> GetPaginatedDataAsync(MchInfoQueryDto dto)

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading;
 using AGooday.AgPay.Common.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -293,51 +294,6 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             return new PaginatedResult<T>(items, totalCount, pageIndex, pageSize);
         }
 
-        public static PaginatedResult<TDestination> ToPaginatedResult<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper, int pageIndex, int pageSize)
-        {
-            //var count = query.Count();
-            //if (pageIndex > 0 && pageSize > 0)
-            //{
-            //    query = query.PageBy(pageIndex, pageSize);
-            //}
-            //var records = mapper.Map<List<TDestination>>(query.ToList());
-            //return new PaginatedResult<TDestination>(records, count, pageIndex, pageSize);
-
-            // 使用 ProjectTo 在数据库层面进行映射
-            var projectedQuery = query.ProjectTo<TDestination>(mapper.ConfigurationProvider);
-            //var count = projectedQuery.Count(); 
-            //if (pageIndex > 0 && pageSize > 0)
-            //{
-            //    projectedQuery = projectedQuery.PageBy(pageIndex, pageSize);
-            //}
-            //var records = projectedQuery.ToList();
-            //return new PaginatedResult<TDestination>(records, count, pageIndex, pageSize);
-            return projectedQuery.ToPaginatedResult(pageIndex, pageSize);
-        }
-
-        public static async Task<PaginatedResult<TDestination>> ToPaginatedResultAsync<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper, int pageIndex, int pageSize, CancellationToken cancellationToken = default)
-        {
-            //var count = await query.CountAsync();
-            //if (pageIndex > 0 && pageSize > 0)
-            //{
-            //    query = query.PageBy(pageIndex, pageSize);
-            //}
-            //var items = await query.ToListAsync();
-            //var records = mapper.Map<List<TDestination>>(items);
-            //return new PaginatedResult<TDestination>(records, count, pageIndex, pageSize);
-
-            // 使用 ProjectTo 在数据库层面进行映射
-            var projectedQuery = query.ProjectTo<TDestination>(mapper.ConfigurationProvider);
-            //var count = await projectedQuery.CountAsync(cancellationToken);
-            //if (pageIndex > 0 && pageSize > 0)
-            //{
-            //    projectedQuery = projectedQuery.PageBy(pageIndex, pageSize);
-            //}
-            //var records = await projectedQuery.ToListAsync(cancellationToken);
-            //return new PaginatedResult<TDestination>(records, count, pageIndex, pageSize);
-            return await projectedQuery.ToPaginatedResultAsync(pageIndex, pageSize, cancellationToken);
-        }
-
         public static PaginatedResult<TDestination> ToPaginatedResult<TSource, TDestination>(this IQueryable<TSource> query, Func<TSource, TDestination> selector, int pageIndex, int pageSize)
         {
             var count = query.Count();
@@ -358,6 +314,54 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             }
             var records = query.Select(selector).ToList();
             return new PaginatedResult<TDestination>(records, count, pageIndex, pageSize);
+        }
+
+        /// <summary>
+        /// 同步分页 + 内存映射（安全，支持 JArray.Parse 等 .NET 方法）
+        /// </summary>
+        public static PaginatedResult<TDestination> ToPaginatedResult<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper, int pageIndex, int pageSize)
+        {
+            // 先查实体（在数据库分页）
+            var entityResult = query.ToPaginatedResult(pageIndex, pageSize);
+
+            // 再在内存中映射（安全执行 JArray.Parse）
+            var dtos = mapper.Map<List<TDestination>>(entityResult.Items);
+
+            return new PaginatedResult<TDestination>(dtos, entityResult.TotalCount, pageIndex, pageSize);
+        }
+
+        /// <summary>
+        /// 异步分页 + 内存映射（安全，支持 JArray.Parse 等 .NET 方法）
+        /// </summary>
+        public static async Task<PaginatedResult<TDestination>> ToPaginatedResultAsync<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper, int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+        {
+            // 先查实体（在数据库分页）
+            var entityResult = await query.ToPaginatedResultAsync(pageIndex, pageSize, cancellationToken);
+
+            // 再在内存中映射（安全执行 JArray.Parse）
+            var dtos = mapper.Map<List<TDestination>>(entityResult.Items);
+
+            return new PaginatedResult<TDestination>(dtos, entityResult.TotalCount, pageIndex, pageSize);
+        }
+
+        /// <summary>
+        /// 同步分页 + 数据库投影（仅用于简单映射，不能含 JArray.Parse 等）
+        /// </summary>
+        public static PaginatedResult<TDestination> ToProjectedPaginatedResult<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper, int pageIndex, int pageSize)
+        {
+            // 使用 ProjectTo 在数据库层面进行映射
+            var projectedQuery = query.ProjectTo<TDestination>(mapper.ConfigurationProvider);
+            return projectedQuery.ToPaginatedResult(pageIndex, pageSize);
+        }
+
+        /// <summary>
+        /// 异步分页 + 数据库投影（仅用于简单映射，不能含 JArray.Parse 等）
+        /// </summary>
+        public static async Task<PaginatedResult<TDestination>> ToProjectedPaginatedResultAsync<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper, int pageIndex, int pageSize, CancellationToken cancellationToken = default)
+        {
+            // 使用 ProjectTo 在数据库层面进行映射
+            var projectedQuery = query.ProjectTo<TDestination>(mapper.ConfigurationProvider);
+            return await projectedQuery.ToPaginatedResultAsync(pageIndex, pageSize, cancellationToken);
         }
 
         #endregion
@@ -654,7 +658,29 @@ namespace AGooday.AgPay.Infrastructure.Extensions
 
         #region 投影 ToListAsync 扩展
 
-        public static List<TDestination> ToListProjectTo<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper)
+        public static List<TDestination> ToList<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper)
+        {
+            if (mapper == null)
+                throw new ArgumentNullException(nameof(mapper));
+
+            return mapper.Map<List<TDestination>>(query.ToList());
+        }
+
+        /// <summary>
+        /// 异步投影到目标类型并转换为列表
+        /// </summary>
+        public static async Task<List<TDestination>> ToListAsync<TSource, TDestination>(
+            this IQueryable<TSource> query,
+            IMapper mapper,
+            CancellationToken cancellationToken = default)
+        {
+            if (mapper == null)
+                throw new ArgumentNullException(nameof(mapper));
+
+            return mapper.Map<List<TDestination>>(await query.ToListAsync(cancellationToken)); ;
+        }
+
+        public static List<TDestination> ToProjectedList<TSource, TDestination>(this IQueryable<TSource> query, IMapper mapper)
         {
             if (mapper == null)
                 throw new ArgumentNullException(nameof(mapper));
@@ -665,7 +691,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
         /// <summary>
         /// 异步投影到目标类型并转换为列表
         /// </summary>
-        public static async Task<List<TDestination>> ToListProjectToAsync<TSource, TDestination>(
+        public static async Task<List<TDestination>> ToProjectedListAsync<TSource, TDestination>(
             this IQueryable<TSource> query,
             IMapper mapper,
             CancellationToken cancellationToken = default)
