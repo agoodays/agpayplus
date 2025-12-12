@@ -15,9 +15,9 @@ namespace AGooday.AgPay.Application.Config
         /// </summary>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        public string GenShellImgViewUrl(string recordId)
+        public string GenShellImgViewUrl(string recordId, DateTime? dateTime)
         {
-            return $"{MgrSiteUrl}/api/qrc/shell/imgview/{AgPayUtil.AesEncode(recordId)}.png?t={DateTime.Now.DateToTimeStamp()}";
+            return $"{MgrSiteUrl}/api/qrc/shell/imgview/{AgPayUtil.AesEncode(recordId)}.png?t={(dateTime ?? DateTime.Now).DateToTimeStamp()}";
         }
 
         /// <summary>

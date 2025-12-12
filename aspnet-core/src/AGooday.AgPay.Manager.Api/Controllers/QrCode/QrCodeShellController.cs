@@ -48,7 +48,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
             foreach (var item in data.Items)
             {
-                item.AddExt("shellImgViewUrl", dbApplicationConfig.GenShellImgViewUrl(item.Id.ToString()));
+                item.AddExt("shellImgViewUrl", dbApplicationConfig.GenShellImgViewUrl(item.Id.ToString(), item.UpdatedAt));
             }
             return ApiPageRes<QrCodeShellDto>.Pages(data);
         }
@@ -122,7 +122,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
                 return ApiRes.Fail(ApiCode.SYS_OPERATION_FAIL_SELETE);
             }
             DBApplicationConfig dbApplicationConfig = _sysConfigService.GetDBApplicationConfig();
-            qrCodeShell.AddExt("shellImgViewUrl", dbApplicationConfig.GenShellImgViewUrl(qrCodeShell.Id.ToString()));
+            qrCodeShell.AddExt("shellImgViewUrl", dbApplicationConfig.GenShellImgViewUrl(qrCodeShell.Id.ToString(), qrCodeShell.UpdatedAt));
             return ApiRes.Ok(qrCodeShell);
         }
 
