@@ -177,11 +177,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             if (qrCodeShell != null)
             {
                 var buffer = GetQrCodeShellImage(qrCodeShell);
-                using (var stream = new MemoryStream(buffer))
-                {
-                    // 返回生成的码牌图片
-                    return File(stream.ToArray(), "image/png");
-                }
+                return File(buffer, "image/png");
             }
             return null;
         }
@@ -193,51 +189,46 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
             var buffer = QrCodeBuilder.Generate(iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"));
 
             // 将位图对象转换为 PNG 格式并输出到响应流
-            using (var stream = new MemoryStream(buffer))
-            {
-                // 返回生成的码牌图片
-                return File(stream.ToArray(), "image/png");
-            }
+            return File(buffer, "image/png");
         }
 
         [HttpGet, Route("stylea.png"), AllowAnonymous]
-        public IActionResult StyleA()
-        {
-            var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay.png");
-
-            var payTypes = new List<QrCodePayType>() {
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
-            };
-
-            var buffer = DrawQrCode.GenerateStyleAImage(title: "吉日科技", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
-            using (var stream = new MemoryStream(buffer))
-            {
-                // 返回生成的码牌图片
-                return File(stream.ToArray(), "image/png");
-            }
-        }
+        public IActionResult StyleA() => GenerateQrCode("吉日科技", "jeepay.png", isStyleA: true);
 
         [HttpGet, Route("styleb.png"), AllowAnonymous]
-        public IActionResult StyleB()
+        public IActionResult StyleB() => GenerateQrCode("吉日科技", "jeepay_blue.png", isStyleA: false);
+
+        private IActionResult GenerateQrCode(string title, string logoFileName, bool isStyleA)
         {
-            var logoPath = Path.Combine(_env.WebRootPath, "images", "jeepay_blue.png");
-
-            var payTypes = new List<QrCodePayType>() {
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "unionpay.png"), Alias = "银联", Name="unionpay"  },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "ysfpay.png"), Alias = "云闪付", Name="ysfpay" },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "wxpay.png"), Alias = "微信", Name="wxpay"  },
-                new QrCodePayType (){ ImgUrl = Path.Combine(_env.WebRootPath, "images", "alipay.png"), Alias = "支付宝", Name="alipay" },
-            };
-
-            var buffer = DrawQrCode.GenerateStyleBImage(title: "吉日科技", logoPath: logoPath, iconPath: Path.Combine(_env.WebRootPath, "images", "avatar.png"), payTypes: payTypes);
-            using (var stream = new MemoryStream(buffer))
+            var root = Path.Combine(_env.WebRootPath, "images");
+            string EnsureFile(string fileName)
             {
-                // 返回生成的码牌图片
-                return File(stream.ToArray(), "image/png");
+                var path = Path.Combine(root, fileName);
+                if (!System.IO.File.Exists(path))
+                    throw new FileNotFoundException($"Missing image: {fileName}");
+                return path;
             }
+
+            var logoPath = EnsureFile(logoFileName);
+            var iconPath = EnsureFile("avatar.png");
+            var payTypes = new[]
+            {
+                ("unionpay.png", "银联", "unionpay"),
+                ("ysfpay.png", "云闪付", "ysfpay"),
+                ("wxpay.png", "微信", "wxpay"),
+                ("alipay.png", "支付宝", "alipay")
+            }.Select(t => new QrCodePayType
+            {
+                ImgUrl = EnsureFile(t.Item1),
+                Alias = t.Item2,
+                Name = t.Item3
+            }).ToList();
+
+            byte[] buffer = isStyleA
+                ? DrawQrCode.GenerateStyleAImage(title: title, logoPath: logoPath, iconPath: iconPath, payTypes: payTypes)
+                : DrawQrCode.GenerateStyleBImage(title: title, logoPath: logoPath, iconPath: iconPath, payTypes: payTypes);
+
+            return File(buffer, "image/png");
         }
     }
 }

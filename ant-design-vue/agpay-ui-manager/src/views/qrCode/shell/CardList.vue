@@ -67,7 +67,7 @@ export default {
     return {
       agpayCard: {
         name: '码牌模版',
-        height: 300,
+        height: 360,
         span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 },
         addAuthority: this.$access('ENT_DEVICE_QRC_SHELL_ADD')
       },

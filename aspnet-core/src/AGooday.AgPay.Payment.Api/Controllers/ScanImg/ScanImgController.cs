@@ -33,11 +33,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.ScanImg
             }
 
             var buffer = _qrCode.GetQRCode(plainText);
-            using (var stream = new MemoryStream(buffer))
-            {
-                // 返回生成的码牌图片
-                return File(stream.ToArray(), "image/png");
-            }
+            return File(buffer, "image/png");
         }
     }
 }
