@@ -91,7 +91,7 @@
                 <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
               </template>
             </AgUpload>
-            <span class="agpay-tip-text">(显示在顶部， 透明图片， 建议尺寸： 924 X 282)</span>
+            <span class="agpay-tip-text">{{ logoImgTipText }}</span>
           </a-form-model-item>
           <a-form-model-item label="二维码上的logo：" prop="qrInnerImgUrl">
             <AgUpload
@@ -106,7 +106,7 @@
               </template>
             </AgUpload>
             <div class="agpay-tip-text">
-              <span>(建议尺寸： 100 X 100)</span>
+              <span>{{ qrInnerImgTipText }}</span>
             </div>
           </a-form-model-item>
         </a-form-model>
@@ -154,6 +154,8 @@ export default {
       btnLoading: false,
       payTypeOptions: payTypeOptions,
       action: upload.form, // 上传图标地址
+      logoImgTipText: '(显示在顶部，透明图片，建议尺寸：924 X 282)',
+      qrInnerImgTipText: '(建议尺寸：100 X 100)',
       saveObject: {
         styleCode: 'shellA',
         configInfo: {
@@ -231,6 +233,16 @@ export default {
     },
     onChange () {
       const that = this
+      switch (that.saveObject.styleCode) {
+        case 'shellA':
+          that.logoImgTipText = '(显示在顶部，透明图片，建议尺寸：924 X 282)'
+          break
+        case 'shellB':
+          that.logoImgTipText = '(显示在顶部，建议尺寸：548 X 148)'
+          break
+        default:
+          that.logoImgTipText = '(显示在顶部，透明图片，建议尺寸：924 X 282)'
+      }
       req.post(API_URL_QRC_SHELL_LIST + '/view', that.saveObject).then(res => {
         that.saveObject.shellImgViewUrl = res
         that.$forceUpdate()

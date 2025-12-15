@@ -193,10 +193,10 @@ namespace AGooday.AgPay.Manager.Api.Controllers.QrCode
         }
 
         [HttpGet, Route("stylea.png"), AllowAnonymous]
-        public IActionResult StyleA() => GenerateQrCode("吉日科技", "jeepay.png", isStyleA: true);
+        public IActionResult StyleA() => GenerateQrCode("吉日科技", "agpay_white.png", isStyleA: true);
 
         [HttpGet, Route("styleb.png"), AllowAnonymous]
-        public IActionResult StyleB() => GenerateQrCode("吉日科技", "jeepay_blue.png", isStyleA: false);
+        public IActionResult StyleB() => GenerateQrCode("吉日科技", "agpay_blue.png", isStyleA: false);
 
         private IActionResult GenerateQrCode(string title, string logoFileName, bool isStyleA)
         {
