@@ -1,8 +1,7 @@
 <template>
   <div id="userLayout" :class="['user-layout-wrapper']">
     <div class="content-header">
-      <img src="~@/assets/logo.svg" style="height: 30px;">
-      <img src="@/assets/svg/agpay.svg" alt="agpay" style="width:90px;margin: 5px 0 0 5px">
+      <img src="@/assets/agpay_blue.png" alt="agpay" style="width:160px;">
     </div>
     <div class="content-body">
       <div class="content-main" style="justify-content: flex-end;">

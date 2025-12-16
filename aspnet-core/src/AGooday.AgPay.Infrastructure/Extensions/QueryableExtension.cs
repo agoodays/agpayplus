@@ -95,7 +95,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             var efFunctions = Expression.Constant(EF.Functions);
             var valueArray = Expression.Constant(cleanValues); // 传 object[] 而非 JSON 字符串
 
-            var jsonContainsMethod = typeof(MySqlDbFunctionsExtensions)
+            var jsonContainsMethod = typeof(MySqlJsonDbFunctionsExtensions)
                 .GetMethod("JsonContains", new[] { typeof(DbFunctions), typeof(string), typeof(object) });
 
             if (jsonContainsMethod == null)
@@ -127,7 +127,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             var body = jsonProperty.Body;
             var ef = Expression.Constant(EF.Functions);
             var str = Expression.Constant(jsonStr);
-            var method = typeof(MySqlDbFunctionsExtensions)
+            var method = typeof(MySqlJsonDbFunctionsExtensions)
                 .GetMethod("JsonContains", new[] { typeof(DbFunctions), typeof(string), typeof(string) });
             var call = Expression.Call(null, method!, ef, body, str);
             var lambda = Expression.Lambda<Func<T, bool>>(call, param);
@@ -154,7 +154,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
 
             // 构建 EF.Functions.JsonContains 调用
             var efFunctions = Expression.Constant(EF.Functions);
-            var jsonContainsMethod = typeof(MySqlDbFunctionsExtensions)
+            var jsonContainsMethod = typeof(MySqlJsonDbFunctionsExtensions)
                 .GetMethod("JsonContains", new[] { typeof(DbFunctions), typeof(string), typeof(string) });
 
             var jsonContainsCall = Expression.Call(
@@ -185,7 +185,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             var parameter = Expression.Parameter(typeof(T), "x");
             var propertyAccess = Expression.Invoke(jsonProperty, parameter);
             var efFunctions = Expression.Constant(EF.Functions);
-            var jsonContainsMethod = typeof(MySqlDbFunctionsExtensions)
+            var jsonContainsMethod = typeof(MySqlJsonDbFunctionsExtensions)
                 .GetMethod("JsonContains", new[] { typeof(DbFunctions), typeof(string), typeof(string) });
 
             Expression combinedCondition = null;
@@ -231,7 +231,7 @@ namespace AGooday.AgPay.Infrastructure.Extensions
             var propertyAccess = Expression.Invoke(jsonProperty, parameter);
 
             // 使用 JSON_EXTRACT 或类似函数检查键是否存在
-            var jsonExtractMethod = typeof(MySqlDbFunctionsExtensions)
+            var jsonExtractMethod = typeof(MySqlJsonDbFunctionsExtensions)
                 .GetMethod("JsonExtract", new[] { typeof(DbFunctions), typeof(string), typeof(string) });
 
             var efFunctions = Expression.Constant(EF.Functions);
