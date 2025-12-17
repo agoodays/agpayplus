@@ -22,7 +22,7 @@ namespace AGooday.AgPay.Infrastructure.Repositories
                         from team in teamGroup.DefaultIfEmpty()
                         select new SysUserQueryResult { SysUser = u, SysUserTeam = team };
 
-            query.WhereIfNotEmpty(request.SysType, w => w.SysUser.SysType == request.SysType)
+            query = query.WhereIfNotEmpty(request.SysType, w => w.SysUser.SysType == request.SysType)
                 .WhereIfNotEmpty(request.BelongInfoId, w => w.SysUser.BelongInfoId == request.BelongInfoId)
                 .WhereIfNotEmpty(request.Realname, w => w.SysUser.Realname.Contains(request.Realname))
                 .WhereIfNotNull(request.UserType, w => w.SysUser.UserType == request.UserType.Value)

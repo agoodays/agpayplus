@@ -134,7 +134,7 @@ namespace AGooday.AgPay.Application.Services
                         from team in teamGroup.DefaultIfEmpty()
                         select new SysUserQueryResult { SysUser = u, SysUserTeam = team };
 
-            query.WhereIfNotEmpty(dto.SysType, w => w.SysUser.SysType == dto.SysType)
+            query = query.WhereIfNotEmpty(dto.SysType, w => w.SysUser.SysType == dto.SysType)
                 .WhereIfNotEmpty(dto.BelongInfoId, w => w.SysUser.BelongInfoId == dto.BelongInfoId)
                 .WhereIfNotEmpty(dto.Realname, w => w.SysUser.Realname.Contains(dto.Realname))
                 .WhereIfNotNull(dto.UserType, w => w.SysUser.UserType == dto.UserType.Value)
