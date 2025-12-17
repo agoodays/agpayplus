@@ -39,6 +39,6 @@ export const asyncRouteDefine = {
   'DivisionReceiverPage': { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/DivisionReceiverPage') }, // 分账账号管理
   'DivisionRecordPage': { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/DivisionRecordPage') }, // 分账记录
 
-  'NoticeInfoPage': { defaultPath: '/notices', component: () => import('@/views/notice/NoticeList') } // 公告管理
+  'NoticeInfoPage': { defaultPath: '/notices', component: () => import('@/views/notice/List') } // 公告管理
 
 }

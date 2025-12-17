@@ -10,8 +10,8 @@
     <div class="article-container">
       <div class="title">{{ detailData.title }}</div>
       <div class="author">
-        <span class="auther-text">作者：{{ detailData.publisher }}</span>
-        <span>时间：{{ detailData.publishTime }}</span>
+        <span class="auther-text"><a-icon type="user" /> {{ detailData.publisher }}</span>
+        <span><a-icon type="history" /> {{ detailData.publishTime }}</span>
       </div>
       <div class="content" v-html="detailData.content"></div>
     </div>

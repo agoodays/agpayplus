@@ -33,5 +33,5 @@ export const asyncRouteDefine = {
   'PayOrderListPage': { defaultPath: '/payOrder', component: () => import('@/views/order/pay/PayOrderList') }, // 支付订单列表
   'RefundOrderListPage': { defaultPath: '/refundOrder', component: () => import('@/views/order/refund/RefundOrderList') }, // 退款订单列表
   'AgentConfigPage': { defaultPath: '/config', component: () => import('@/views/config/AgentConfigPage') }, // 系统配置
-  'NoticeInfoPage': { defaultPath: '/notices', component: () => import('@/views/notice/NoticeList') } // 公告管理
+  'NoticeInfoPage': { defaultPath: '/notices', component: () => import('@/views/notice/List') } // 公告管理
 }
