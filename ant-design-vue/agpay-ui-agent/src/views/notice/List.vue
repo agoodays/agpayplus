@@ -58,9 +58,10 @@ export default {
     return {
       isShowMore: false,
       btnLoading: false,
-      searchData: {
+      defaultSearchData: {
         articleType: 1 // 文章类型: 1-公告
       },
+      searchData: defaultSearchData,
       listData: [],
       pagination: {
         onChange: page => {
@@ -86,7 +87,7 @@ export default {
     handleSearchFormData (searchData) {
       // 如果是空对象或者为null/undefined
       if (!searchData || Object.keys(searchData).length === 0) {
-        this.searchData = { articleType: 1 }
+        this.searchData = { ...this.defaultSearchData }
       } else {
         this.searchData = { ...searchData }
       }

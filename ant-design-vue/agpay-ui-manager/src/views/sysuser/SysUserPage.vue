@@ -145,10 +145,11 @@ export default {
   data () {
     return {
       tableColumns: tableColumns,
-      searchData: {
+      defaultSearchData: {
         userType: '',
         sysType: 'MGR'
       },
+      searchData: defaultSearchData,
       userTypeOptions: userTypeList,
       isShowMore: false,
       btnLoading: false
@@ -180,7 +181,12 @@ export default {
       return userTypeList.find(f => f.userType === userType).userTypeName
     },
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...this.defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

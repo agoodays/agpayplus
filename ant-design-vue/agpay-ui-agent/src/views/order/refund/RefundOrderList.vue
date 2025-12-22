@@ -399,9 +399,10 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {
+      defaultSearchData: {
         queryDateRange: 'today'
       },
+      searchData: defaultSearchData,
       countInitData: {
         allRefundAmount: 0.00,
         allRefundCount: 0,
@@ -423,7 +424,12 @@ export default {
   },
   methods: {
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...this.defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

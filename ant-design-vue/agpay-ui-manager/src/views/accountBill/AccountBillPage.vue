@@ -217,11 +217,12 @@
         isShowMore: false,
         btnLoading: true,
         tableColumns: tableColumns,
-        searchData: {
+        defaultSearchData: {
           queryDateRange: 'today',
           infoType: 'PLATFORM',
           accountType: 1
         },
+        searchData: defaultSearchData,
         visible: false,
         detailData: {}
       }
@@ -232,7 +233,11 @@
     },
     methods: {
       handleSearchFormData (searchData) {
-        this.searchData = searchData
+        if (!searchData || Object.keys(searchData).length === 0) {
+          this.searchData = { ...this.defaultSearchData }
+        } else {
+          this.searchData = { ...searchData }
+        }
       },
       setIsShowMore (isShowMore) {
         this.isShowMore = isShowMore

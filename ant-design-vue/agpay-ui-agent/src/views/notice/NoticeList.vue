@@ -66,16 +66,22 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {
+      defaultSearchData: {
         articleType: 1 // 文章类型: 1-公告
-      }
+      },
+      searchData: defaultSearchData
     }
   },
   mounted () {
   },
   methods: {
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...this.defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore
