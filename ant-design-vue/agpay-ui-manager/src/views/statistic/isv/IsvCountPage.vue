@@ -182,23 +182,19 @@ export default {
   name: 'IsvCountPage',
   components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
   data () {
-    let queryDateRange = 'today'
-    if (this.$route.query.hasOwnProperty('queryDateRange')) {
-      queryDateRange = this.$route.query.queryDateRange
-    }
-    let isvNo = ''
-    if (this.$route.query.isvNo) {
-      isvNo = this.$route.query.isvNo
-    }
+    const queryDateRange = this.$route.query.queryDateRange || 'today'
+    const isvNo = this.$route.query.isvNo || ''
+
     return {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {
+      defaultSearchData: {
         method: 'isv',
         isvNo: isvNo,
         queryDateRange: queryDateRange
       },
+      searchData: {},
       detailQueryDateRange: queryDateRange,
       countInitData: {
         allAmount: 0.00,
@@ -215,15 +211,26 @@ export default {
   },
   computed: {
   },
+  created () {
+    // 在组件创建时，将默认数据复制给 searchData
+    // 使用扩展运算符或 Object.assign 来避免引用关联
+    this.searchData = { ...this.defaultSearchData }
+    // 或者：this.searchData = Object.assign({}, this.defaultSearchData);
+  },
   mounted () {
   },
   methods: {
     handleSearchFormData (searchData) {
-      this.searchData = searchData
       // if (!Object.keys(searchData).length) {
       //   this.searchData.queryDateRange = 'today'
       // }
       // this.$forceUpdate()
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...this.defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

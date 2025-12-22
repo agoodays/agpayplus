@@ -419,6 +419,11 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
+// 默认查询条件数据
+const defaultSearchData = {
+  queryDateRange: 'today'
+}
+
 export default {
   name: 'RefundOrderList',
   components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgDateRangePicker, AgTextUp },
@@ -428,9 +433,7 @@ export default {
       btnLoading: false,
       tableColumns: tableColumns,
       ifDefineList: [],
-      searchData: {
-        queryDateRange: 'today'
-      },
+      searchData: defaultSearchData,
       countInitData: {
         allRefundAmount: 0.00,
         allRefundCount: 0,
@@ -456,7 +459,12 @@ export default {
       return req.list(API_URL_MCH_LIST, params)
     },
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

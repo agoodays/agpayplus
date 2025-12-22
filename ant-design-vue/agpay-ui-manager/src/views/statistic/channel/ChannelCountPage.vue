@@ -171,6 +171,12 @@ const tableColumns = [
   { key: 'round', width: 110, scopedSlots: { title: 'roundTitle', titleValue: '成功率', customRender: 'roundSlot' } }
 ]
 
+// 默认查询条件数据对象
+const defaultSearchData = {
+  method: 'channel',
+  queryDateRange: 'today' // 查询日期范围
+}
+
 export default {
   name: 'ChannelCountPage',
   components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
@@ -179,10 +185,7 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {
-        method: 'channel',
-        queryDateRange: 'today'
-      },
+      searchData: defaultSearchData,
       countInitData: {
         allAmount: 0.00,
         allCount: 0,
@@ -202,11 +205,16 @@ export default {
   },
   methods: {
     handleSearchFormData (searchData) {
-      this.searchData = searchData
       // if (!Object.keys(searchData).length) {
       //   this.searchData.queryDateRange = 'today'
       // }
       // this.$forceUpdate()
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

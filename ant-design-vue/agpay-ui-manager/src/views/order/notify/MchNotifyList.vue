@@ -247,6 +247,10 @@ const tableColumns = [
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
+// 默认查询条件数据
+const defaultSearchData = {
+  queryDateRange: 'today' // 查询时间范围，默认今天
+}
 
 export default {
   name: 'MchNotifyList',
@@ -256,9 +260,7 @@ export default {
       isShowMore: false,
       btnLoading: true,
       tableColumns: tableColumns,
-      searchData: {
-        queryDateRange: 'today'
-      },
+      searchData: defaultSearchData,
       createdStart: '', // 选择开始时间
       createdEnd: '', // 选择结束时间
       visible: false,
@@ -274,7 +276,12 @@ export default {
       return req.list(API_URL_MCH_LIST, params)
     },
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

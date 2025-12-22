@@ -678,6 +678,14 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
+// 默认查询条件数据对象
+const defaultSearchData = {
+  queryDateRange: 'today'
+}
+
+// 默认订单号类型
+const orderNoType = 'payOrderId'
+
 export default {
   name: 'PayOrderList',
   components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgDateRangePicker, AgTextUp, RefundModal },
@@ -686,11 +694,9 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      orderNoType: 'payOrderId',
+      orderNoType: orderNoType,
       ifDefineList: [],
-      searchData: {
-        queryDateRange: 'today'
-      },
+      searchData: defaultSearchData,
       createdStart: '', // 选择开始时间
       createdEnd: '', // 选择结束时间
       visible: false,
@@ -712,11 +718,19 @@ export default {
       return req.list(API_URL_MCH_LIST, params)
     },
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      console.log('searchData', searchData)
       // if (!Object.keys(searchData).length) {
       //   this.searchData.queryDateRange = 'today'
       // }
       // this.$forceUpdate()
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        console.log('reset to defaultSearchData', defaultSearchData)
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
+      this.orderNoType = orderNoType
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

@@ -140,15 +140,18 @@ const userTypeList = [
   { userTypeName: '店员', userType: 12 }
 ]
 
+// 默认查询条件数据对象
+const defaultSearchData = {
+  userType: '',
+  sysType: 'MGR'
+}
+
 export default {
   components: { AgSearchForm, AgTable, AgTableColumns, AgTableColState, AgTextUp, InfoAddOrEdit, InviteCode, RoleDist },
   data () {
     return {
       tableColumns: tableColumns,
-      searchData: {
-        userType: '',
-        sysType: 'MGR'
-      },
+      searchData: defaultSearchData,
       userTypeOptions: userTypeList,
       isShowMore: false,
       btnLoading: false
@@ -180,7 +183,12 @@ export default {
       return userTypeList.find(f => f.userType === userType).userTypeName
     },
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

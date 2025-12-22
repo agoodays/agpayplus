@@ -52,15 +52,17 @@ import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import { API_URL_ARTICLE_LIST, req } from '@/api/manage'
 import InfoDetail from './Detail'
+// 默认查询条件数据对象
+const defaultSearchData = {
+  articleType: 1 // 文章类型: 1-公告
+}
 export default {
   components: { AgSearchForm, AgTable, AgDateRangePicker, AgTextUp, InfoDetail },
   data () {
     return {
       isShowMore: false,
       btnLoading: false,
-      searchData: {
-        articleType: 1 // 文章类型: 1-公告
-      },
+      searchData: defaultSearchData,
       listData: [],
       pagination: {
         onChange: page => {
@@ -86,7 +88,7 @@ export default {
     handleSearchFormData (searchData) {
       // 如果是空对象或者为null/undefined
       if (!searchData || Object.keys(searchData).length === 0) {
-        this.searchData = { articleType: 1 }
+        this.searchData = { ...defaultSearchData }
       } else {
         this.searchData = { ...searchData }
       }

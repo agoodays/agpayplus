@@ -189,75 +189,82 @@
   </div>
 </template>
 <script>
-  import AgSearchForm from '@/components/AgSearch/AgSearchForm'
-  import AgTable from '@/components/AgTable/AgTable'
-  import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
-  import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
-  import AgTableColumns from '@/components/AgTable/AgTableColumns'
-  import { API_URL_ACCOUNT_BILL_LIST, req } from '@/api/manage'
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
+import AgTable from '@/components/AgTable/AgTable'
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
+import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import { API_URL_ACCOUNT_BILL_LIST, req } from '@/api/manage'
 
-  // eslint-disable-next-line no-unused-vars
-  const tableColumns = [
-    { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
-    { key: 'bizType', title: '业务类型', width: 160, scopedSlots: { customRender: 'bizTypeSlot' } },
-    { key: 'infoName', title: '角色名称', width: 260, scopedSlots: { customRender: 'infoNameSlot' } },
-    { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
-    { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
-    { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
-    { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联订单号', width: 200 },
-    { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
-    { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
-  ]
+// eslint-disable-next-line no-unused-vars
+const tableColumns = [
+  { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
+  { key: 'bizType', title: '业务类型', width: 160, scopedSlots: { customRender: 'bizTypeSlot' } },
+  { key: 'infoName', title: '角色名称', width: 260, scopedSlots: { customRender: 'infoNameSlot' } },
+  { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联订单号', width: 200 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+]
 
-  export default {
-    name: 'AccountBillPage',
-    components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
-    data () {
-      return {
-        isShowMore: false,
-        btnLoading: true,
-        tableColumns: tableColumns,
-        searchData: {
-          queryDateRange: 'today',
-          infoType: 'PLATFORM',
-          accountType: 1
-        },
-        visible: false,
-        detailData: {}
+// 默认查询条件数据对象
+const defaultSearchData = {
+  queryDateRange: 'today',
+  infoType: 'PLATFORM',
+  accountType: 1
+}
+
+export default {
+  name: 'AccountBillPage',
+  components: { AgSearchForm, AgTable, AgTableColumns, AgDateRangePicker, AgTextUp },
+  data () {
+    return {
+      isShowMore: false,
+      btnLoading: true,
+      tableColumns: tableColumns,
+      searchData: defaultSearchData,
+      visible: false,
+      detailData: {}
+    }
+  },
+  computed: {
+  },
+  mounted () {
+  },
+  methods: {
+    handleSearchFormData (searchData) {
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
       }
     },
-    computed: {
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
     },
-    mounted () {
+    queryFunc () {
+      this.btnLoading = true
+      this.$refs.infoTable.refTable(true)
     },
-    methods: {
-      handleSearchFormData (searchData) {
-        this.searchData = searchData
-      },
-      setIsShowMore (isShowMore) {
-        this.isShowMore = isShowMore
-      },
-      queryFunc () {
-        this.btnLoading = true
-        this.$refs.infoTable.refTable(true)
-      },
-      // 请求table接口数据
-      reqTableDataFunc: (params) => {
-        return req.list(API_URL_ACCOUNT_BILL_LIST, params)
-      },
-      searchFunc: function () { // 点击【查询】按钮点击事件
-        this.$refs.infoTable.refTable(true)
-      },
-      detailFunc: function (recordId) {
-        const that = this
-        req.getById(API_URL_ACCOUNT_BILL_LIST, recordId).then(res => {
-          that.detailData = res
-        })
-        this.visible = true
-      },
-      onClose () {
-        this.visible = false
-      }
+    // 请求table接口数据
+    reqTableDataFunc: (params) => {
+      return req.list(API_URL_ACCOUNT_BILL_LIST, params)
+    },
+    searchFunc: function () { // 点击【查询】按钮点击事件
+      this.$refs.infoTable.refTable(true)
+    },
+    detailFunc: function (recordId) {
+      const that = this
+      req.getById(API_URL_ACCOUNT_BILL_LIST, recordId).then(res => {
+        that.detailData = res
+      })
+      this.visible = true
+    },
+    onClose () {
+      this.visible = false
     }
   }
+}
 </script>

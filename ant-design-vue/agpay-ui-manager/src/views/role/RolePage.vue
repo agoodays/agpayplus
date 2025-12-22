@@ -79,6 +79,11 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
+// 默认查询条件数据对象
+const defaultSearchData = {
+  sysType: 'MGR' // 所属系统: MGR-运营平台, AGENT-代理商, MCH-商户
+}
+
 export default {
   name: 'RolePage',
   components: { AgSearchForm, AgTable, AgTableColumns, AgTextUp, InfoAddOrEdit },
@@ -87,16 +92,19 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {
-        sysType: 'MGR'
-      }
+      searchData: defaultSearchData
     }
   },
   mounted () {
   },
   methods: {
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

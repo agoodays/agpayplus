@@ -587,6 +587,9 @@ const tableColumns = [
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
   { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
+const defaultSearchData = {
+  queryDateRange: 'today'
+}
 
 export default {
   name: 'PayOrderList',
@@ -596,9 +599,7 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {
-        queryDateRange: 'today'
-      },
+      searchData: defaultSearchData,
       countInitData: {
         mchFeeAmount: 0.00,
         failPayAmount: 0.00,
@@ -627,11 +628,16 @@ export default {
   },
   methods: {
     handleSearchFormData (searchData) {
-      this.searchData = searchData
       // if (!Object.keys(searchData).length) {
       //   this.searchData.queryDateRange = 'today'
       // }
       // this.$forceUpdate()
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

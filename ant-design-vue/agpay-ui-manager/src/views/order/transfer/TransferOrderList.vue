@@ -160,6 +160,11 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
+// 默认查询条件数据
+const defaultSearchData = {
+  queryDateRange: 'today' // 查询时间范围，默认今天
+}
+
 export default {
   name: 'TransferOrderList',
   components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, AgDateRangePicker, AgTextUp, TransferOrderDetail },
@@ -168,9 +173,7 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {
-        queryDateRange: 'today'
-      }
+      searchData: defaultSearchData
     }
   },
   methods: {
@@ -178,7 +181,12 @@ export default {
       return req.list(API_URL_MCH_LIST, params)
     },
     handleSearchFormData (searchData) {
-      this.searchData = searchData
+      // 如果是空对象或者为null/undefined
+      if (!searchData || Object.keys(searchData).length === 0) {
+        this.searchData = { ...defaultSearchData }
+      } else {
+        this.searchData = { ...searchData }
+      }
     },
     setIsShowMore (isShowMore) {
       this.isShowMore = isShowMore

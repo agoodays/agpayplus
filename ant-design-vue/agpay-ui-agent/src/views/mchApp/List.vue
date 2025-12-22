@@ -93,7 +93,7 @@ export default {
     return {
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: { 'mchNo': '' }
+      searchData: { mchNo: '' }
     }
   },
   mounted () {

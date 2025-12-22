@@ -108,9 +108,7 @@ export default {
       isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {
-        mchNo: ''
-      }
+      searchData: { mchNo: '' }
     }
   },
   mounted () {
