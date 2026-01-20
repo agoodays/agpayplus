@@ -13,10 +13,10 @@
         <slot name="topLeftSlot"></slot>
       </div>
       <div class="operation-icons">
-        <span class="pd-0-20" v-if="isShowAutoRefresh">
-          <span style="margin-right: 10px; color: rgb(169, 179, 177);">
+          <span class="pd-0-20" v-if="isShowAutoRefresh">
+          <span class="ag-countdown">
             自动刷新：
-            <span style="margin-right: 5px; color: rgb(0, 0, 0);">{{ countdown }}s</span>
+            <span class="ag-countdown-value">{{ countdown }}s</span>
           </span>
           <a-switch v-model="enableAutoRefresh" />
         </span>
@@ -24,11 +24,10 @@
           <template #title>
             <span>数据导出</span>
           </template>
-          <span
+            <span
             v-if="isShowDownload"
             @click="downloadData"
-            class="pd-0-20"
-            style="cursor: pointer; font-size: 16px; color: #000;"
+            class="pd-0-20 ag-action-icon"
           >
             <a-icon type="download" />
           </span>
@@ -38,7 +37,7 @@
             <template #title>
               <span>表格密度</span>
             </template>
-            <span class="pd-0-20" style="cursor: pointer; font-size: 16px; color: #000;">
+              <span class="pd-0-20 ag-action-icon">
               <a-icon type="column-height" />
             </span>
           </a-tooltip>
@@ -55,7 +54,7 @@
             <template #title>
               <span>列设置</span>
             </template>
-            <span class="pd-0-20" style="cursor: pointer; font-size: 16px; color: #000;">
+              <span class="pd-0-20 ag-action-icon">
               <a-icon type="setting" />
             </span>
           </a-tooltip>
@@ -181,7 +180,7 @@ const customRow = (record, index) => {
   if (!tableRowCrossColor) {
     return {};
   }
-  return { style: { 'background-color': index % 2 === 0 ? '#FCFCFC' : '#FFFFFF' } };
+  return { style: { 'background-color': index % 2 === 0 ? 'var(--table-row-alt-bg)' : 'var(--base-bg-color)' } };
 };
 
 // Lifecycle hooks
@@ -195,5 +194,17 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-/* 样式可以根据需要调整 */
+.ag-countdown {
+  margin-right: 10px;
+  color: var(--text-color-weak);
+}
+.ag-countdown-value {
+  margin-left: 5px;
+  color: var(--text-color);
+}
+.ag-action-icon {
+  cursor: pointer;
+  font-size: 16px;
+  color: var(--text-color);
+}
 </style>

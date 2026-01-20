@@ -63,7 +63,7 @@ watch(
   }
 
   input::-webkit-input-placeholder {
-    color: #bfbfbf;
+    color: var(--text-color-weak);
     text-indent: 0;
   }
 
@@ -73,12 +73,12 @@ watch(
     left: 0;
     bottom: 6px;
     padding: 2px 11px;
-    color: #bfbfbf;
+    color: var(--text-color-weak);
     font-size: 13px;
     text-transform: uppercase;
     transition: all 0.3s ease-in-out;
-    border-radius: 3px;
-    background: rgba(122, 184, 147, 0);
+    border-radius: var(--border-radius-small);
+    background: transparent;
     height: 20px;
     line-height: 20px;
     display: flex;
@@ -103,14 +103,14 @@ watch(
   input:active,
   input:valid + label {
     text-indent: 0;
-    background: #fff;
+    background: var(--base-bg-color);
   }
 
   input:focus + label,
   input:active + label,
   input:valid + label {
-    color: #fff;
-    background: var(--ant-primary-color);
+    color: var(--text-on-primary);
+    background: var(--primary-color);
     transform: translateY(-33px);
   }
 
@@ -124,15 +124,15 @@ watch(
   }
 
   input:valid + label {
-    background: #dadada; // 更换背景色
+    background: var(--hover-bg-color); // 更换背景色
   }
 
   input:valid + label:after {
-    border-top: 4px solid #dadada; // 更换背景色
+    border-top: 4px solid var(--hover-bg-color); // 更换背景色
   }
 
   label.active {
-    color: #fff;
+    color: var(--text-on-primary);
     background: var(--ant-primary-color);
     transform: translateY(-33px);
   }

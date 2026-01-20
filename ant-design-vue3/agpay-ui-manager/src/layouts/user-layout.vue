@@ -3,7 +3,7 @@
     <img src="/@/assets/logo.svg" class="header-logo">
   </div>
   <div class="content-body">
-    <div class="content-main" style="justify-content: flex-end;">
+    <div class="content-main justify-end">
       <div class="banner-content"></div>
       <div class="user-layout-content">
         <router-view />
@@ -50,7 +50,7 @@ const { token } = useToken();
   left: 0;
   right: 0;
   height: 80px;
-  background-color: #ffffffd9;
+  background-color: var(--base-bg-color);
   backdrop-filter: blur(50px) saturate(180%)
 }
 
@@ -73,6 +73,10 @@ const { token } = useToken();
   align-items: center
 }
 
+.content-body .content-main.justify-end {
+  justify-content: flex-end;
+}
+
 .user-layout-content {
   transition: .3s ease
 }
@@ -91,11 +95,11 @@ const { token } = useToken();
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  background: #fff;
-  box-shadow: 0 30px 60px -35px #0000001a;
-  border: 1px solid #e7eaf3;
+  background: var(--base-bg-color);
+  box-shadow: 0 30px 60px -35px var(--shadow-color);
+  border: 1px solid var(--border-color);
   align-items: center;
-  border-radius: 15px;
+  border-radius: var(--border-radius-lg);
   transition: all .3s,border 0s ease
 }
 
@@ -130,8 +134,8 @@ const { token } = useToken();
   font-size: 14px
 }
 
-.user-layout-content .footer .links a {
-  color: #00000073;
+  .user-layout-content .footer .links a {
+  color: var(--text-color-muted);
   transition: all .3s
 }
 
@@ -139,8 +143,8 @@ const { token } = useToken();
   margin-right: 40px
 }
 
-.user-layout-content .footer .copyright {
-  color: #00000073;
+  .user-layout-content .footer .copyright {
+  color: var(--text-color-muted);
   font-size: 14px
 }
 
@@ -160,9 +164,9 @@ const { token } = useToken();
   width: 50%
 }
 
-.footer-info {
+  .footer-info {
   padding-bottom: 25px;
-  color: #b3b3b3;
+  color: var(--text-color-secondary);
   font-size: 14px;
   letter-spacing: 1.5px;
   text-align: center
@@ -193,7 +197,7 @@ const { token } = useToken();
   cursor: pointer
 }
 
-.footer-info a {
-  color: #b3b3b3
+  .footer-info a {
+  color: var(--text-color-secondary)
 }
 </style>

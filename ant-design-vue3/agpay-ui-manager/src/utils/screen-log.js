@@ -8,6 +8,6 @@ export const printANSI = () => {
  :: AgPay ::        (v1.0.0.RELEASE)
  适合互联网企业使用的开源支付系统 : https://www.agooday.com
 `
-  console.log(`%c${text}`, 'color: #fc4d50')
-  console.log('%cThanks for using AgPay!', 'color: #fff; font-size: 14px; font-weight: 300; text-shadow:#000 1px 0 0,#000 0 1px 0,#000 -1px 0 0,#000 0 -1px 0;')
+  console.log(text)
+  console.log('Thanks for using AgPay!')
 }

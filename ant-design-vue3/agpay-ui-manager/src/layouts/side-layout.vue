@@ -3,9 +3,9 @@
     <a-layout-sider class="ag-layout-side" v-model:collapsed="collapsed" :width="260" :trigger="null" collapsible>
       <div class="ag-side-logo">        
         <!-- 当侧边栏卷起来的时候，切换仅有图标 -->
-        <img src="/@/assets/logo.svg" alt="agooday" style="width: 32px; height: 32px; margin-left: 8px;">
+        <img src="/@/assets/logo.svg" alt="agooday" class="logo-icon">
         <!-- 在这里可以添加title，我们以图片的方式替代文字 -->
-        <img v-show="!collapsed" src="/@/assets/agpay.svg" alt="agpay" style="width:90px; height: 32px; margin: 5px 0 0 5px">
+        <img v-show="!collapsed" src="/@/assets/agpay.svg" alt="agpay" class="logo-full">
       </div>
       <a-menu class="ag-side-menu" v-model:selectedKeys="selectedKeys" theme="dark" mode="inline">
         <a-menu-item key="1">
@@ -128,12 +128,14 @@ const handleLogout = () => {
       height: 32px;
       // background: rgba(255, 255, 255, 0.3);
       margin: 16px;
+      .logo-icon { width: 32px; height: 32px; margin-left: 8px; }
+      .logo-full { width: 90px; height: 32px; margin: 5px 0 0 5px }
     }
     .ag-side-menu {}
   }
   .ag-layout-main {
     .ag-layout-header{
-      background: #f5f5f5;
+    background: var(--layout-bg);
       padding: 0;
       .ag-layout-header-main{
         padding: 0 24px;
@@ -144,7 +146,7 @@ const handleLogout = () => {
             .user-name {
               padding: 5px;
               // font-size: 16px;
-              color: rgba(0, 0, 0, 0.85);
+              color: var(--text-color);
             }
           }
         }
@@ -163,7 +165,7 @@ const handleLogout = () => {
       margin: 0 15px 24px;
       padding: 0 15px;
       min-height: 280px;
-      background: #f5f5f5;
+      background: var(--layout-bg);
     }
   }
   .ag-layout-footer {
@@ -171,14 +173,14 @@ const handleLogout = () => {
     padding: 7px 0px;
     display: flex;
     justify-content: center;
-    .ag-version {
+      .ag-version {
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.45);
+      color: var(--text-color-muted);
       a {
-        color: rgba(0, 0, 0, 0.45);
+        color: var(--text-color-muted);
       }
       a:hover {
-        color: @primary-color;
+        color: var(--primary-color);
       }
     }
   }

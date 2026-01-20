@@ -1,5 +1,5 @@
 <template>
-  <a-row :gutter="[24,24]" style="width:100%">
+  <a-row :gutter="[24,24]" class="ag-card-row">
     <!-- 卡片默认新增框 -->
     <a-col
         :xxl="24/span.xxl"
@@ -51,30 +51,27 @@ const props = defineProps({
 
 const cardList = ref([]);
 
-const reqCardListFunc = async () => {
-  // Assuming you have an async API call here
-  const response = await fetch('your-api-endpoint');
-  const data = await response.json();
-  return data;
-};
-
 const refCardList = async () => {
-  const resData = await reqCardListFunc();
-  cardList.value = resData;
+  const resData = await props.reqCardListFunc();
+  cardList.value = resData || [];
 };
 
 onMounted(refCardList);
 </script>
 
+.style-placeholder{}
 <style lang="less" scoped>
+.ag-card-row {
+  width: 100%;
+}
 .ag-card-add {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 2px dashed rgba(0, 0, 0, 0.15);
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 6px;
+  border: 2px dashed var(--border-dashed);
+  background: var(--surface-variant);
+  border-radius: var(--border-radius);
   box-sizing: border-box;
   cursor: pointer;
 }
@@ -84,8 +81,8 @@ onMounted(refCardList);
   position: relative;
 }
 .ag-card-add:hover {
-  border-color: rgba(25,83,255,0.3);
-  background: rgba(25,83,255,0.06);
+  border-color: var(--primary-color-hover);
+  background: var(--primary-color-weak);
   transition: all 0.3s ease-in-out;
 }
 .ag-card-add:hover .ag-card-add-icon {
@@ -97,7 +94,7 @@ onMounted(refCardList);
   transition: all 0.5s ease-in-out;
 }
 .ag-card-add:hover .ag-card-add-text {
-  color: rgba(25,83,255,1);
+  color: var(--primary-color-hover);
   transition: all 0.3s ease-in-out;
 }
 .ag-card-add-icon {
@@ -115,6 +112,6 @@ onMounted(refCardList);
 .ag-card-add-text {
   padding-top: 5px;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.35);
+  color: var(--text-color-weak);
 }
 </style>

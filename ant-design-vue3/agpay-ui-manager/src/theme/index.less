@@ -5,6 +5,35 @@
 
 @import 'ant-design-vue/dist/reset.css';
 @import 'ag-ui-style.less';
+@import 'antd-overrides.less';
+
+/* 运行时主题 CSS 变量默认值（会被 themeService 覆盖） */
+:root {
+  --primary-color: #1677ff;
+  --primary-color-hover: rgba(22,119,255,0.08);
+  --primary-color-weak: rgba(22,119,255,0.06);
+  --border-radius: 6px;
+  --side-menu-width: 200px;
+  --page-width: 99%;
+  --base-bg-color: #fff;
+  --text-color-weak: rgba(0,0,0,0.35);
+  --text-color: rgba(0,0,0,0.85);
+  --table-row-alt-bg: #FCFCFC;
+  --ant-primary-color: #1677ff;
+  --overlay-bg: #000;
+  --text-on-dark: rgba(255, 255, 255, 0.87);
+  --shadow-color: rgba(0,0,0,0.1);
+  --border-color: #e7eaf3;
+  --surface-variant: rgba(0, 0, 0, 0.03);
+  --border-dashed: rgba(0, 0, 0, 0.15);
+  --text-muted: rgba(0, 0, 0, 0.2);
+  --layout-bg: #f5f5f5;
+  --layout-surface: #f8f8f8;
+  --text-on-primary: #fff;
+  --text-color-muted: #00000073;
+  --text-color-secondary: #b3b3b3;
+  --hover-bg-color: #dadada;
+}
 
 /**********************************  基础样式 **********************************/
 * {
@@ -22,7 +51,7 @@ body {
   height: 100%;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
-  background-color: #f8f8f8;
+  background-color: var(--layout-surface);
   font-size: 14px;
   position: relative;
 }

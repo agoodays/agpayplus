@@ -12,11 +12,11 @@
             <a-form-item name="code">
               <a-input class="code-input" size="large" type="text" placeholder="请输入验证码" v-model:value="forgetObject.code"/>
             </a-form-item>
-            <div style="position: relative;">
+            <div class="send-button-wrap">
               <a-button
                   type="primary"
                   @click="sendCode()"
-                  style="height: 40px; margin-left: 10px;"
+                  class="send-code-button"
                   :disabled="codeExpireTime > 0"
               >
                 {{ codeExpireTime > 0 ? `${codeExpireTime}秒后重新发送` : '发送短信验证码' }}
@@ -32,7 +32,7 @@
         <a-input-password size="large" placeholder="请输入确认新密码" v-model:value="forgetObject.confirmPwd"/>
       </a-form-item>
       <a-form-item>
-        <a class="forge-password" style="float: right;" href="/login" >去登录 >></a>
+        <a class="forge-password" href="/login" >去登录 >></a>
       </a-form-item>
       <a-form-item class="submit">
         <a-button size="large" type="primary" class="forget-button" :loading="loading" @click="onSubmit">找回密码</a-button>
@@ -160,7 +160,7 @@ const retrieveSuccess = res => {
 </script>
 
 <style lang="less" scoped>
-.user-layout-forget {
+  .user-layout-forget {
   label {
     font-size: 14px;
   }
@@ -182,16 +182,16 @@ const retrieveSuccess = res => {
     margin-top: 24px;
     line-height: 22px;
 
-    .item-icon {
+      .item-icon {
       font-size: 24px;
-      color: rgba(0, 0, 0, 0.2);
+      color: var(--text-color-muted);
       margin-left: 16px;
       vertical-align: middle;
       cursor: pointer;
       transition: color 0.3s;
 
       &:hover {
-        color: #1890ff;
+        color: var(--primary-color);
       }
     }
 
@@ -208,7 +208,7 @@ const retrieveSuccess = res => {
     .code-img {
       width: 137px;
       height: 40px;
-      background-color: #ddd;
+      background-color: var(--surface-variant);
       img{
         width: 137px;
         height: 40px;
@@ -218,5 +218,16 @@ const retrieveSuccess = res => {
   .submit {
     margin-bottom: 0;
   }
+}
+
+.send-button-wrap {
+  position: relative;
+}
+.send-code-button {
+  height: 40px;
+  margin-left: 10px;
+}
+.forge-password {
+  float: right;
 }
 </style>

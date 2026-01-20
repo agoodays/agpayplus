@@ -1,0 +1,81 @@
+/* Antd overrides that use runtime CSS variables
+   This file intentionally avoids changing Antd's Less variables at build time.
+   Instead it overrides Antd classes using CSS custom properties defined in index.less
+*/
+
+/* Buttons */
+.ant-btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--text-on-primary, #fff) !important;
+  border-radius: var(--border-radius) !important;
+}
+.ant-btn-primary:hover {
+  background-color: var(--primary-color-hover) !important;
+  border-color: var(--primary-color-hover) !important;
+}
+.ant-btn {
+  border-radius: var(--border-radius) !important;
+}
+
+/* Menus */
+.ant-menu, .ant-menu-item, .ant-menu-submenu-title {
+  border-radius: var(--border-radius) !important;
+}
+.ant-menu-item:hover, .ant-menu-item-active {
+  background: var(--primary-color-weak) !important;
+}
+
+/* Inputs */
+.ant-input, .ant-input-affix-wrapper, .ant-input-search .ant-input {
+  border-radius: var(--border-radius) !important;
+  transition: border-color .2s ease;
+}
+.ant-input:focus, .ant-input-affix-wrapper-focused {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px var(--primary-color-hover) !important;
+}
+
+/* Select / Dropdown */
+.ant-select-selector {
+  border-radius: var(--border-radius) !important;
+}
+.ant-select-item-option-active, .ant-select-item-option-selected {
+  background: var(--primary-color-weak) !important;
+}
+
+/* Tags, Badges */
+.ant-tag, .ant-badge .ant-scroll-number {
+  border-radius: calc(var(--border-radius) / 1.5) !important;
+}
+
+/* Pagination: active color */
+.ant-pagination-item-active a {
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Table: selected/hover row */
+.ant-table-tbody > tr:hover > td {
+  background: var(--primary-color-weak) !important;
+}
+
+/* Form labels / help text */
+.ant-form-item-label > label {
+  color: var(--text-color-weak);
+}
+
+/* Modal primary buttons */
+.ant-modal .ant-btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Misc helper classes */
+.theme-primary-color {
+  color: var(--primary-color) !important;
+}
+.theme-bg-primary {
+  background-color: var(--primary-color) !important;
+  color: var(--text-on-primary, #fff) !important;
+}

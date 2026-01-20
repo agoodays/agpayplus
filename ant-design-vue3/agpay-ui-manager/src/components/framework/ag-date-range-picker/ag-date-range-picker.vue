@@ -5,7 +5,7 @@
       v-model="optionValue"
       placeholder=""
       @change="optionChange"
-      style="width: 100%"
+      class="full-width"
       ref="dateSelect"
     >
       <a-select-option v-for="o in options" :value="o.value" :key="o.value">
@@ -19,13 +19,13 @@
       @visibleChange="handleHoverChange"
     >
       <template #content>
-        <span style="white-space:nowrap;">{{ dateRangeTip }}</span>
+        <span class="nowrap">{{ dateRangeTip }}</span>
       </template>
       <a-range-picker
         v-if="optionValue === 'customDateTime'"
         v-model="dateRangeValue"
         @change="onChange"
-        style="width: 100%"
+        class="full-width"
         ref="dateRangePicker"
         :open="dateRangeOpen"
         @openChange="handleDateRangeOpenChange"
@@ -36,10 +36,12 @@
         }"
       >
         <a-icon slot="suffixIcon" type="sync" />
-        <template #renderExtraFooter style="float: right;">
-          <span class="ant-tag ant-tag-blue" style="cursor: pointer;" @click="onClick">
-            <a-icon type="left-circle" /> 返回日期下拉框
-          </span>
+        <template #renderExtraFooter>
+          <div class="render-extra-footer">
+            <span class="ant-tag ant-tag-blue render-extra-action" @click="onClick">
+              <a-icon type="left-circle" /> 返回日期下拉框
+            </span>
+          </div>
         </template>
       </a-range-picker>
     </a-popover>
@@ -157,4 +159,16 @@ setDateRangeValue(_optionValue, startDate, endDate);
 </script>
 
 <style scoped lang="less">
+.full-width {
+  width: 100%;
+}
+.nowrap {
+  white-space: nowrap;
+}
+.render-extra-footer {
+  text-align: right;
+}
+.render-extra-action {
+  cursor: pointer;
+}
 </style>

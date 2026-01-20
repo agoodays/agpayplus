@@ -1,13 +1,11 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path';
 import vue from '@vitejs/plugin-vue';
-import customVariables from '/@/theme/custom-variables';
+// custom-variables removed: theme will be applied at runtime via CSS variables
 
 const pathResolve = (dir) => {
   return resolve(__dirname, '.', dir);
 };
-
-console.log(customVariables)
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -27,7 +25,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       less: {
-        modifyVars: customVariables,
+        // 不再在构建时通过 less.modifyVars 覆盖主题；运行时使用 CSS 变量覆盖样式
+        modifyVars: {},
         javascriptEnabled: true,
       },
     },

@@ -30,6 +30,7 @@ export const appDefaultConfig = {
   // 网站名称
   websiteName: 'AgPay运营平台',
   // 主题颜色
+  // 主题颜色（作为回退值）。优先由运行时 CSS 变量 `--primary-color` 覆盖。
   primaryColor: '#1677ff',
   // 紧凑
   compactFlag: false,

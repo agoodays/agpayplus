@@ -15,7 +15,7 @@
             <a-form-item name="vercode">
               <a-input v-model:value="loginObject.vercode" class="code-input" size="large" type="text" placeholder="图形验证码"/>
             </a-form-item>
-            <div class="code-img" style="position: relative;background:#ddd">
+            <div class="code-img">
               <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
               <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">已过期 请刷新</div>
             </div>
@@ -27,7 +27,7 @@
         <!-- <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox> -->
         <a-checkbox v-model:checked="loginObject.isAutoLogin">自动登录</a-checkbox>
         <!-- 忘记密码 -->
-        <a class="forget-password" style="float: right;" href="/forget">忘记密码?</a>
+        <a class="forget-password" href="/forget">忘记密码?</a>
       </a-form-item>
       <a-form-item class="submit">
         <a-button size="large" type="primary" html-type="submit" class="login-button" :loading="loading" >登录</a-button>
@@ -157,13 +157,14 @@ onMounted(() => {
 </script>
 
 <style lang="less" scoped>
-.user-layout-login {
+  .user-layout-login {
   label {
     font-size: 14px;
   }
   .forget-password {
     //font-size: 14px;
     color: var(--ant-primary-color);
+    float: right;
   }
   button.login-button {
     padding: 0 15px;
@@ -176,16 +177,16 @@ onMounted(() => {
     margin-top: 24px;
     line-height: 22px;
 
-    .item-icon {
+      .item-icon {
       font-size: 24px;
-      color: rgba(0, 0, 0, 0.2);
+      color: var(--text-color-muted);
       margin-left: 16px;
       vertical-align: middle;
       cursor: pointer;
       transition: color 0.3s;
 
       &:hover {
-        color: #1890ff;
+        color: var(--primary-color);
       }
     }
 
@@ -203,7 +204,8 @@ onMounted(() => {
       width: 120px;
       height: 40px;
       margin-left: 10px;
-      background-color: #ddd;
+      position: relative;
+      background-color: var(--surface-variant);
       img{
         width: 120px;
         height: 40px;
@@ -220,11 +222,11 @@ onMounted(() => {
   top: 0;
   width: 100%;
   height: 100%;
-  background: #000;
+  background: var(--overlay-bg);
   opacity: 0.8;
   text-align:center;
   line-height: 40px;
-  color:#fff;
+  color: var(--text-on-dark);
   &:hover {
     cursor: pointer;
   }
