@@ -64,7 +64,7 @@ namespace AGooday.AgPay.Agent.Api.Middlewares
                     //errorResponse.Msg = "Internal Server errors. Check Logs!";
                     break;
             }
-            _logger.LogError(exception, "[{TraceIdentifier}] {Message}", context.TraceIdentifier, exception.Message);
+            _logger.LogError(exception, "{Message}", exception.Message);
             //_logger.LogError(exception, $"[{context.TraceIdentifier}] {exception.Message}");
             await response.WriteAsJsonAsync(errorResponse);
         }

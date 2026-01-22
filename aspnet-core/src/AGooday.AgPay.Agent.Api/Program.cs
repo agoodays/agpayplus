@@ -18,6 +18,7 @@ using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Components.SMS.Extensions;
+using AGooday.AgPay.Logging.Serilog;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -45,13 +46,12 @@ services.AddSingleton(new Appsettings(builder.Configuration));
 //用户信息
 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-//// 注入日志
-//services.AddLogging(config =>
-//{
-//    //Microsoft.Extensions.Logging.Log4Net.AspNetCore
-//    config.AddLog4Net();
-//});
-services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
+// 构建 Logger 配置
+builder.Host.UseAgSerilog(builder.Configuration, options =>
+{
+    options.SystemName ??= typeof(Program).Assembly.GetName().Name ?? "Agent";
+    options.Version ??= typeof(Program).Assembly.GetName().Version?.ToString() ?? "1.0.0";
+});
 
 services.AddScoped<IOpLogHandler, OpLogHandler>();
 
@@ -253,7 +253,7 @@ var app = builder.Build();
 var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
 // 自定义中间件
-app.UseNdc();
+app.UseAgSerilogRequestContext();
 app.UseCalculateExecutionTime();
 app.UseRequestResponseLogging();
 

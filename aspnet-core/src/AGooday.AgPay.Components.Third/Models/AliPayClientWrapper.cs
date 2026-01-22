@@ -1,9 +1,9 @@
 ﻿using AGooday.AgPay.Application.Params.AliPay;
 using AGooday.AgPay.Common.Constants;
+using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Third.Exceptions;
 using AGooday.AgPay.Components.Third.Utils;
 using Aop.Api;
-using log4net;
 
 namespace AGooday.AgPay.Components.Third.Models
 {
@@ -12,8 +12,6 @@ namespace AGooday.AgPay.Components.Third.Models
     /// </summary>
     public class AliPayClientWrapper
     {
-        private readonly ILog logger = LogManager.GetLogger(typeof(AliPayClientWrapper));
-
         /// <summary>
         /// 默认为 不使用证书方式
         /// </summary>
@@ -51,13 +49,13 @@ namespace AGooday.AgPay.Components.Third.Models
             // 调起接口前出现异常，如私钥问题。  调起后出现验签异常等。
             catch (AopException e)
             {
-                logger.Error("调起支付宝Execute[AopException]异常！", e);
+                LogUtil<AgHttpClient>.Error("调起支付宝Execute[AopException]异常！", e);
                 //如果数据返回出现验签异常，则需要抛出： UNKNOWN 异常。
                 throw ChannelException.SysError(e.Message);
             }
             catch (Exception e)
             {
-                logger.Error("调起支付宝Execute[Exception]异常！", e);
+                LogUtil<AgHttpClient>.Error("调起支付宝Execute[Exception]异常！", e);
                 throw ChannelException.SysError($"调用支付宝client服务异常：{e.Message}");
             }
         }

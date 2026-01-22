@@ -1,113 +1,37 @@
-﻿using log4net;
+﻿using Serilog;
 
 namespace AGooday.AgPay.Common.Utils
 {
     public static class LogUtil<T> where T : class
     {
-        /// <summary>
-        /// 日志记录器
-        /// </summary>
-        private static readonly ILog Log = null;
-
-        static LogUtil()
-        {
-            Log = LogManager.GetLogger(typeof(T));
-        }
+        private static readonly ILogger Logger = Log.ForContext<T>();
 
         public static void Info(string message)
-        {
-            if (Log.IsInfoEnabled)
-            {
-                Log.Info(message);
-            }
-        }
+            => Logger.Information(message);
 
-        public static void Info(Exception e)
-        {
-            if (Log.IsInfoEnabled)
-            {
-                Log.Info(e);
-            }
-        }
-
-        public static void Info(string message, Exception e)
-        {
-            if (Log.IsInfoEnabled)
-            {
-                Log.Info(message, e);
-            }
-        }
+        public static void Info(string message, Exception exception)
+            => Logger.Information(exception, message);
 
         public static void Warn(string message)
-        {
-            if (Log.IsWarnEnabled)
-            {
-                Log.Warn(message);
-            }
-        }
+            => Logger.Warning(message);
 
-        public static void Warn(Exception e)
-        {
-            if (Log.IsWarnEnabled)
-            {
-                Log.Warn(e);
-            }
-        }
-
-        public static void Warn(string message, Exception e)
-        {
-            if (Log.IsWarnEnabled)
-            {
-                Log.Warn(message, e);
-            }
-        }
+        public static void Warn(string message, Exception exception)
+            => Logger.Warning(exception, message);
 
         public static void Debug(string message)
-        {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug(message);
-            }
-        }
+            => Logger.Debug(message);
 
-        public static void Debug(Exception e)
-        {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug(e);
-            }
-        }
-
-        public static void Debug(string message, Exception e)
-        {
-            if (Log.IsDebugEnabled)
-            {
-                Log.Debug(message, e);
-            }
-        }
+        public static void Debug(string message, Exception exception)
+            => Logger.Debug(exception, message);
 
         public static void Error(string message)
-        {
-            if (Log.IsErrorEnabled)
-            {
-                Log.Error(message);
-            }
-        }
+            => Logger.Error(message);
 
-        public static void Error(Exception e)
-        {
-            if (Log.IsErrorEnabled)
-            {
-                Log.Error(e);
-            }
-        }
+        public static void Error(string message, Exception exception)
+            => Logger.Error(exception, message);
 
-        public static void Error(string message, Exception e)
-        {
-            if (Log.IsErrorEnabled)
-            {
-                Log.Error(message, e);
-            }
-        }
+        // 可选：单独记录异常（带默认消息）
+        public static void Error(Exception exception)
+            => Logger.Error(exception, "An error occurred.");
     }
 }

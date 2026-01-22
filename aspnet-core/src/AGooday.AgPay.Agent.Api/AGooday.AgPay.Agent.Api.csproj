@@ -21,6 +21,7 @@
     <ProjectReference Include="..\AGooday.AgPay.Components.MQ\AGooday.AgPay.Components.MQ.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Components.OSS\AGooday.AgPay.Components.OSS.csproj" />
     <ProjectReference Include="..\AGooday.AgPay.Components.SMS\AGooday.AgPay.Components.SMS.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Logging.Serilog\AGooday.AgPay.Logging.Serilog.csproj" />
   </ItemGroup>
 
 </Project>

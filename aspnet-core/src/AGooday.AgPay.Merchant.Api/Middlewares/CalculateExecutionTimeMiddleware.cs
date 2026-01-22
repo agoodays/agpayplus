@@ -23,15 +23,14 @@ namespace AGooday.AgPay.Merchant.Api.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            //context.TraceIdentifier = Guid.NewGuid().ToString("N");
             stopwatch = new Stopwatch();
             stopwatch.Start();
 
             await _next.Invoke(context);
 
             stopwatch.Stop();
-            _logger.LogInformation("[{TraceIdentifier}] RequestMethod: {RequestMethod}, RequestPath: {RequestPath}, ElapsedMilliseconds: {ElapsedMilliseconds} ms, Response StatusCode: {ResponseStatusCode}",
-                context.TraceIdentifier, context.Request.Method, context.Request.Path, stopwatch.ElapsedMilliseconds, context.Response.StatusCode);
+            _logger.LogInformation("RequestMethod: {RequestMethod}, RequestPath: {RequestPath}, ElapsedMilliseconds: {ElapsedMilliseconds} ms, Response StatusCode: {ResponseStatusCode}",
+                context.Request.Method, context.Request.Path, stopwatch.ElapsedMilliseconds, context.Response.StatusCode);
             //_logger.LogInformation($"[{context.TraceIdentifier}] RequestMethod: {context.Request.Method}, RequestPath: {context.Request.Path}, ElapsedMilliseconds: {stopwatch.ElapsedMilliseconds} ms, Response StatusCode: {context.Response.StatusCode}");
         }
     }

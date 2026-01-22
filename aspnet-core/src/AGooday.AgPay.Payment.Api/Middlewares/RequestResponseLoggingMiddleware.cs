@@ -54,7 +54,7 @@ namespace AGooday.AgPay.Payment.Api.Middlewares
                 catch (Exception e)
                 {
                     // 记录异常
-                    _logger.LogError(e, "[{TraceIdentifier}] {Message}", context.TraceIdentifier, e.Message);
+                    _logger.LogError(e, "{Message}", e.Message);
                     //_logger.LogError(e, $"[{context.TraceIdentifier}] {e.Message}");
                 }
                 finally
@@ -81,7 +81,7 @@ namespace AGooday.AgPay.Payment.Api.Middlewares
                 body = await sr.ReadToEndAsync(),
             };
 
-            _logger.LogInformation("[{TraceIdentifier}] RequestData: {RequestData}", context.TraceIdentifier, JsonConvert.SerializeObject(content));
+            _logger.LogInformation("RequestData: {RequestData}", JsonConvert.SerializeObject(content));
             //_logger.LogInformation($"[{context.TraceIdentifier}] RequestData: {JsonConvert.SerializeObject(content)}");
 
             request.Body.Position = 0;
@@ -98,7 +98,7 @@ namespace AGooday.AgPay.Payment.Api.Middlewares
 
             if (!string.IsNullOrEmpty(responseBody))
             {
-                _logger.LogInformation("[{TraceIdentifier}] ResponseData: {ResponseData}", context.TraceIdentifier, responseBody);
+                _logger.LogInformation("ResponseData: {ResponseData}", responseBody);
                 //_logger.LogInformation($"[{context.TraceIdentifier}] ResponseData: {responseBody}");
             }
         }
