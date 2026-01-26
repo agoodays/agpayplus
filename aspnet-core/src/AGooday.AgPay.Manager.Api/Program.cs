@@ -268,6 +268,9 @@ services.AddSingleton<WsChannelUserIdServer>();
 // 绑定配置
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
+// 注册统一健康检查
+services.AddAppHealthChecks();
+
 var app = builder.Build();
 
 // 读取配置
@@ -325,5 +328,39 @@ app.UseExceptionHandling();
 
 // 路由映射
 app.MapControllers();
+
+// 健康检查端点
+app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = _ => true,
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description,
+                data = e.Value.Data,
+                duration = e.Value.Duration.TotalMilliseconds
+            }),
+            totalDuration = report.TotalDuration.TotalMilliseconds
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
+app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
+
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live")
+});
 
 app.Run();

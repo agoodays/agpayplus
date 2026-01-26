@@ -9,5 +9,6 @@
     {
         public string JobType { get; set; }
         public string CronExpression { get; set; }
+        public string Description { get; set; }
     }
 }

@@ -10,24 +10,28 @@ namespace AGooday.AgPay.Payment.Api.Jobs
     [DisallowConcurrentExecution]
     public class RefundOrderExpiredJob : AbstractJob
     {
-        public RefundOrderExpiredJob(ILogger<RefundOrderExpiredJob> logger,
-            IServiceScopeFactory serviceScopeFactory,
-            ICacheService cacheService)
-            : base(logger, serviceScopeFactory, cacheService)
+        private readonly IRefundOrderService _refundOrderService;
+
+        public RefundOrderExpiredJob(
+            ILogger<RefundOrderExpiredJob> logger,
+            ICacheService cacheService,
+            IRefundOrderService refundOrderService)
+            : base(logger, cacheService)
         {
+            _refundOrderService = refundOrderService;
         }
+
+        protected override TimeSpan GetLockExpiry() => TimeSpan.FromMinutes(2);
+        protected override TimeSpan GetMaxExecutionTime() => TimeSpan.FromMinutes(3);
+        protected override bool AllowFallbackExecution() => false;
 
         public override async Task Execute(IJobExecutionContext context)
         {
             await ExecuteLockTakeAsync(context.JobDetail.Key.ToString(), async () =>
             {
-                using (var scope = _serviceScopeFactory.CreateScope())
-                {
-                    var refundOrderService = scope.ServiceProvider.GetService<IRefundOrderService>();
-                    int updateCount = await refundOrderService.UpdateOrderExpiredAsync();
-                    _logger.LogInformation("任务 [{JobKey}] 处理退款订单超时{updateCount}条.", context.JobDetail.Key, updateCount);
-                    //_logger.LogInformation($"处理退款订单超时{updateCount}条.");
-                }
+                int updateCount = await _refundOrderService.UpdateOrderExpiredAsync();
+                _logger.LogInformation("任务 [{JobKey}] 处理退款订单超时 {UpdateCount} 条。",
+                    context.JobDetail.Key, updateCount);
             });
         }
     }

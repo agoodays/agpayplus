@@ -26,5 +26,12 @@ namespace AGooday.AgPay.Components.MQ.Vender
         Task ReceiveAsync();
 
         Task CloseAsync();
+
+        /// <summary>
+        /// 检查 MQ 可用性，返回 true 表示可用
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        Task<bool> CheckHealthAsync(CancellationToken cancellationToken = default);
     }
 }
