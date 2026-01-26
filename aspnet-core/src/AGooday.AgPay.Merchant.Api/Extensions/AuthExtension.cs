@@ -18,16 +18,30 @@ namespace AGooday.AgPay.Merchant.Api.Extensions
                     .ToList();
             }
 
-            if (auth.UserType.Equals(CS.USER_TYPE.DIRECTOR) || auth.UserType.Equals(CS.USER_TYPE.CLERK))
+            if (auth.SysType.Equals(CS.SYS_TYPE.MGR) || auth.SysType.Equals(CS.SYS_TYPE.AGENT))
             {
-                ents = authService.GetEntsBySysType(auth.SysType, null)
-                    .Where(w => w.MatchRule != null && w.MatchRule.UserEntRules != null && w.MatchRule.UserEntRules.Intersect(auth.EntRules).Any())
-                    .ToList();
+                if (auth.UserType.Equals(CS.USER_TYPE.Expand))
+                {
+                    ents = authService.GetEntsBySysType(auth.SysType, null)
+                        .Where(w => w.MatchRule != null && w.MatchRule.EpUserEnt.Value)
+                        .ToList();
+                }
             }
-            ents = ents.Where(w => w.MatchRule == null
-            || (w.MatchRule.MchType == null && w.MatchRule.MchLevelArray == null)
-            || (w.MatchRule.MchType != null && w.MatchRule.MchType.Equals(auth.MchType))
-            || (w.MatchRule.MchLevelArray != null && w.MatchRule.MchLevelArray.Contains(auth.MchLevel))).ToList();
+
+            if (auth.SysType.Equals(CS.SYS_TYPE.MCH))
+            {
+                if (auth.UserType.Equals(CS.USER_TYPE.DIRECTOR) || auth.UserType.Equals(CS.USER_TYPE.CLERK))
+                {
+                    ents = authService.GetEntsBySysType(auth.SysType, null)
+                        .Where(w => w.MatchRule != null && w.MatchRule.UserEntRules != null && w.MatchRule.UserEntRules.Intersect(auth.EntRules).Any())
+                        .ToList();
+                }
+                ents = ents.Where(w => w.MatchRule == null
+                || (w.MatchRule.MchType == null && w.MatchRule.MchLevelArray == null)
+                || (w.MatchRule.MchType != null && w.MatchRule.MchType.Equals(auth.MchType))
+                || (w.MatchRule.MchLevelArray != null && w.MatchRule.MchLevelArray.Contains(auth.MchLevel))).ToList();
+            }
+
             authorities.AddRange(ents.Select(s => s.EntId));
         }
     }
