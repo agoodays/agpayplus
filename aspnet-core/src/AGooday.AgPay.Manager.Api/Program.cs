@@ -151,6 +151,7 @@ services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = JwtBearerDefaults.AuthenticationScheme,
     });
+    options.OperationFilter<SwaggerSecurityScheme>();
 
     /**
      * 修改项目文件 .csproj
@@ -163,7 +164,6 @@ services.AddSwaggerGen(options =>
      * 配置 Swagger 注释路径
      * var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
      * options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-     * options.OperationFilter<SwaggerSecurityScheme>();
      * **/
 
     //注册全局认证（所有的接口都可以使用认证）

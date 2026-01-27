@@ -146,6 +146,20 @@ services.AddSwaggerGen(options =>
         Scheme = JwtBearerDefaults.AuthenticationScheme,
     });
     options.OperationFilter<SwaggerSecurityScheme>();
+
+    /**
+     * 修改项目文件 .csproj
+     * 生成XML注释文件，以便Swagger可以读取
+     * <PropertyGroup>
+     *     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+     *     <NoWarn>$(NoWarn);1591</NoWarn>
+     * </PropertyGroup>
+     * 
+     * 配置 Swagger 注释路径
+     * var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+     * options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+     * **/
+
     //注册全局认证（所有的接口都可以使用认证）
     //options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     //{
