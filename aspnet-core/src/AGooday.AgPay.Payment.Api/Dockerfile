@@ -22,11 +22,13 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["AGooday.AgPay.Payment.Api/AGooday.AgPay.Payment.Api.csproj", "AGooday.AgPay.Payment.Api/"]
 COPY ["AGooday.AgPay.Application/AGooday.AgPay.Application.csproj", "AGooday.AgPay.Application/"]
+COPY ["AGooday.AgPay.Base.Api/AGooday.AgPay.Base.Api.csproj", "AGooday.AgPay.Base.Api/"]
 COPY ["AGooday.AgPay.Infrastructure/AGooday.AgPay.Infrastructure.csproj", "AGooday.AgPay.Infrastructure/"]
 COPY ["AGooday.AgPay.Domain/AGooday.AgPay.Domain.csproj", "AGooday.AgPay.Domain/"]
 COPY ["AGooday.AgPay.Common/AGooday.AgPay.Common.csproj", "AGooday.AgPay.Common/"]
 COPY ["AGooday.AgPay.Components.MQ/AGooday.AgPay.Components.MQ.csproj", "AGooday.AgPay.Components.MQ/"]
 COPY ["AGooday.AgPay.Domain.Core/AGooday.AgPay.Domain.Core.csproj", "AGooday.AgPay.Domain.Core/"]
+COPY ["AGooday.AgPay.Logging.Serilog/AGooday.AgPay.Logging.Serilog.csproj", "AGooday.AgPay.Logging.Serilog/"]
 COPY ["AGooday.AgPay.Notice.Email/AGooday.AgPay.Notice.Email.csproj", "AGooday.AgPay.Notice.Email/"]
 COPY ["AGooday.AgPay.Notice.Core/AGooday.AgPay.Notice.Core.csproj", "AGooday.AgPay.Notice.Core/"]
 COPY ["AGooday.AgPay.Components.Cache/AGooday.AgPay.Components.Cache.csproj", "AGooday.AgPay.Components.Cache/"]

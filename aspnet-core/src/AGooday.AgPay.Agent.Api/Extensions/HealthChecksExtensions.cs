@@ -1,14 +1,16 @@
-using AGooday.AgPay.Agent.Api.HealthChecks;
+﻿using AGooday.AgPay.Base.Api.Extensions;
 
 namespace AGooday.AgPay.Agent.Api.Extensions
 {
+    /// <summary>
+    /// Agent.Api 健康检查配置
+    /// </summary>
     public static class HealthChecksExtensions
     {
         public static IServiceCollection AddAppHealthChecks(this IServiceCollection services)
         {
-            services.AddHealthChecks()
-                .AddCheck<RedisHealthCheck>("redis", tags: new[] { "ready", "live" })
-                .AddCheck<MQHealthCheck>("rabbitmq", tags: new[] { "ready" });
+            // 使用 Base.Api 提供的基础健康检查（Redis + MQ）
+            services.AddBaseHealthChecks();
             return services;
         }
     }

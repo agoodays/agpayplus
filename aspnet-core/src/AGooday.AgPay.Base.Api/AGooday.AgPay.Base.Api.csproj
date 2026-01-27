@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--<Nullable>enable</Nullable>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EPPlus" Version="7.6.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Quartz" Version="3.13.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <PackageReference Include="UAParser" Version="3.1.47" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AGooday.AgPay.AopSdk\AGooday.AgPay.AopSdk.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Application\AGooday.AgPay.Application.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Common\AGooday.AgPay.Common.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Components.Cache\AGooday.AgPay.Components.Cache.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Components.MQ\AGooday.AgPay.Components.MQ.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Components.OCR\AGooday.AgPay.Components.OCR.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Components.OSS\AGooday.AgPay.Components.OSS.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Components.SMS\AGooday.AgPay.Components.SMS.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Components.Third\AGooday.AgPay.Components.Third.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Logging.Serilog\AGooday.AgPay.Logging.Serilog.csproj" />
+    <ProjectReference Include="..\AGooday.AgPay.Notice.Sms\AGooday.AgPay.Notice.Sms.csproj" />
+  </ItemGroup>
+
+</Project>

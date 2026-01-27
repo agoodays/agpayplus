@@ -1,10 +1,12 @@
-﻿using AGooday.AgPay.Common.Models;
+﻿using AGooday.AgPay.Base.Api.Extensions;
+using AGooday.AgPay.Base.Api.Middlewares;
+using AGooday.AgPay.Base.Api.Models;
+using AGooday.AgPay.Base.Api.MQ;
+using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Cache.Extensions;
 using AGooday.AgPay.Components.Cache.Options;
 using AGooday.AgPay.Components.MQ.Models;
-using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Extensions;
@@ -16,8 +18,6 @@ using AGooday.AgPay.Logging.Serilog;
 using AGooday.AgPay.Payment.Api.Extensions;
 using AGooday.AgPay.Payment.Api.FilterAttributes;
 using AGooday.AgPay.Payment.Api.Jobs;
-using AGooday.AgPay.Payment.Api.Middlewares;
-using AGooday.AgPay.Payment.Api.Models;
 using AGooday.AgPay.Payment.Api.MQ;
 using AGooday.AgPay.Payment.Api.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -122,54 +122,25 @@ NativeInjectorBootStrapper.RegisterServices(services);
 services.AddNotice(builder.Configuration);
 
 #region RabbitMQ
-services.AddTransient<RabbitMQSender>();
-services.AddSingleton<IMQSenderFactory, MQSenderFactory>();
-services.AddSingleton<IMQSender>(provider =>
-{
-    var factory = provider.GetRequiredService<IMQSenderFactory>();
-    return factory.CreateSender();
-});
-
-// 动态注册 Receiver
-var receiverTypes = new[]
-{
-    typeof(PayOrderDivisionRabbitMQReceiver),
-    typeof(PayOrderMchNotifyRabbitMQReceiver),
-    typeof(PayOrderReissueRabbitMQReceiver),
-    typeof(ResetAppConfigRabbitMQReceiver),
-    typeof(ResetIsvAgentMchAppInfoRabbitMQReceiver)
-};
-
-foreach (var type in receiverTypes)
-{
-    services.AddSingleton(typeof(IMQMsgReceiver), type);
-}
-
-var specificReceiverTypes = new[]
-{
-    (typeof(PayOrderDivisionMQ.IMQReceiver), typeof(PayOrderDivisionMQReceiver)),
-    (typeof(PayOrderMchNotifyMQ.IMQReceiver), typeof(PayOrderMchNotifyMQReceiver)),
-    (typeof(PayOrderReissueMQ.IMQReceiver), typeof(PayOrderReissueMQReceiver)),
-    (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver)),
-    (typeof(ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver), typeof(ResetIsvAgentMchAppInfoMQReceiver))
-};
-
-foreach (var (serviceType, implementationType) in specificReceiverTypes)
-{
-    services.AddSingleton(serviceType, implementationType);
-}
-//services.AddSingleton<IMQMsgReceiver, PayOrderDivisionRabbitMQReceiver>();
-//services.AddSingleton<IMQMsgReceiver, PayOrderMchNotifyRabbitMQReceiver>();
-//services.AddSingleton<IMQMsgReceiver, PayOrderReissueRabbitMQReceiver>();
-//services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-//services.AddSingleton<IMQMsgReceiver, ResetIsvAgentMchAppInfoRabbitMQReceiver>();
-//services.AddSingleton<PayOrderDivisionMQ.IMQReceiver, PayOrderDivisionMQReceiver>();
-//services.AddSingleton<PayOrderMchNotifyMQ.IMQReceiver, PayOrderMchNotifyMQReceiver>();
-//services.AddSingleton<PayOrderReissueMQ.IMQReceiver, PayOrderReissueMQReceiver>();
-//services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
-//services.AddSingleton<ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver, ResetIsvAgentMchAppInfoMQReceiver>();
-// 注册 HostedService
-services.AddHostedService<MQReceiverHostedService>();
+// 注册 RabbitMQ 服务并动态注册 Receiver
+services.AddRabbitMQServices(
+    rabbitMQReceiverTypes: new[]
+    {
+        typeof(PayOrderDivisionRabbitMQReceiver),
+        typeof(PayOrderMchNotifyRabbitMQReceiver),
+        typeof(PayOrderReissueRabbitMQReceiver),
+        typeof(ResetAppConfigRabbitMQReceiver),
+        typeof(ResetIsvAgentMchAppInfoRabbitMQReceiver)
+    },
+    specificReceiverTypes: new[]
+    {
+        (typeof(PayOrderDivisionMQ.IMQReceiver), typeof(PayOrderDivisionMQReceiver)),
+        (typeof(PayOrderMchNotifyMQ.IMQReceiver), typeof(PayOrderMchNotifyMQReceiver)),
+        (typeof(PayOrderReissueMQ.IMQReceiver), typeof(PayOrderReissueMQReceiver)),
+        (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver)),
+        (typeof(ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver), typeof(ResetIsvAgentMchAppInfoMQReceiver))
+    }
+);
 #endregion
 
 #region Quartz
@@ -312,42 +283,7 @@ app.UseRouting().UseEndpoints(endpoints =>
     //});
 });
 
-#region 健康检查端点
-// 完整健康检查（所有检查项）
-app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-{
-    Predicate = _ => true,
-    ResponseWriter = async (context, report) =>
-    {
-        context.Response.ContentType = "application/json";
-        var result = System.Text.Json.JsonSerializer.Serialize(new
-        {
-            status = report.Status.ToString(),
-            checks = report.Entries.Select(e => new
-            {
-                name = e.Key,
-                status = e.Value.Status.ToString(),
-                description = e.Value.Description,
-                data = e.Value.Data,
-                duration = e.Value.Duration.TotalMilliseconds
-            }),
-            totalDuration = report.TotalDuration.TotalMilliseconds
-        });
-        await context.Response.WriteAsync(result);
-    }
-});
-
-// Kubernetes 就绪探针（检查应用是否准备好接收流量）
-app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-{
-    Predicate = check => check.Tags.Contains("ready")
-});
-
-// Kubernetes 存活探针（检查应用是否还活着）
-app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-{
-    Predicate = check => check.Tags.Contains("live")
-});
-#endregion
+// 映射标准健康检查端点
+app.MapStandardHealthChecks();
 
 app.Run();

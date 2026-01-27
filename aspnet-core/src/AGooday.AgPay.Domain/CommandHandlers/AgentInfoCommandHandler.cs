@@ -281,7 +281,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                 // 推送mq删除redis用户认证信息
                 if (removeCacheUserIdList.Count != 0)
                 {
-                    await _mqSender.SendAsync(CleanAgentLoginAuthCacheMQ.Build(removeCacheUserIdList));
+                    await _mqSender.SendAsync(CleanLoginAuthCacheMQ.Build(CS.SYS_TYPE.AGENT, removeCacheUserIdList));
                 }
 
                 // 更新代理商信息
@@ -362,7 +362,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
 
                 // 推送mq删除redis用户缓存
                 var userIdList = sysUsers.Select(s => s.SysUserId).ToList();
-                await _mqSender.SendAsync(CleanAgentLoginAuthCacheMQ.Build(userIdList));
+                await _mqSender.SendAsync(CleanLoginAuthCacheMQ.Build(CS.SYS_TYPE.AGENT, userIdList));
 
                 // 推送mq到目前节点进行更新数据
                 await _mqSender.SendAsync(ResetIsvAgentMchAppInfoConfigMQ.Build(ResetIsvAgentMchAppInfoConfigMQ.RESET_TYPE_AGENT_INFO, null, agentInfo.AgentNo, null, null));

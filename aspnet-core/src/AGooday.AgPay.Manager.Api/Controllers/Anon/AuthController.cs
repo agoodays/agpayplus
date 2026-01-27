@@ -1,5 +1,8 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Base.Api.Attributes;
+using AGooday.AgPay.Base.Api.Extensions;
+using AGooday.AgPay.Base.Api.Models;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
@@ -8,9 +11,6 @@ using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Components.SMS.Extensions;
 using AGooday.AgPay.Components.SMS.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
-using AGooday.AgPay.Manager.Api.Attributes;
-using AGooday.AgPay.Manager.Api.Extensions;
-using AGooday.AgPay.Manager.Api.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

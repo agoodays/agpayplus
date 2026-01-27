@@ -1,23 +1,23 @@
+ï»¿using AGooday.AgPay.Base.Api.Authorization;
+using AGooday.AgPay.Base.Api.Extensions;
+using AGooday.AgPay.Base.Api.Extensions.AuthContext;
+using AGooday.AgPay.Base.Api.Filter;
+using AGooday.AgPay.Base.Api.Middlewares;
+using AGooday.AgPay.Base.Api.Models;
+using AGooday.AgPay.Base.Api.MQ;
+using AGooday.AgPay.Base.Api.OpLog;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Cache.Extensions;
 using AGooday.AgPay.Components.Cache.Options;
 using AGooday.AgPay.Components.MQ.Models;
-using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Components.SMS.Extensions;
 using AGooday.AgPay.Logging.Serilog;
-using AGooday.AgPay.Merchant.Api.Authorization;
 using AGooday.AgPay.Merchant.Api.Extensions;
-using AGooday.AgPay.Merchant.Api.Extensions.AuthContext;
-using AGooday.AgPay.Merchant.Api.Filter;
-using AGooday.AgPay.Merchant.Api.Middlewares;
-using AGooday.AgPay.Merchant.Api.Models;
-using AGooday.AgPay.Merchant.Api.MQ;
 using AGooday.AgPay.Merchant.Api.OpLog;
 using AGooday.AgPay.Merchant.Api.WebSockets;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,24 +30,24 @@ using Newtonsoft.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 var logging = builder.Logging;
-// µ÷ÓÃ ClearProviders ÒÔ´ÓÉú³ÉÆ÷ÖĞÉ¾³ıËùÓĞ ILoggerProvider ÊµÀı
+// è°ƒç”¨ ClearProviders ä»¥ä»ç”Ÿæˆå™¨ä¸­åˆ é™¤æ‰€æœ‰ ILoggerProvider å®ä¾‹
 logging.ClearProviders();
-//// Í¨³££¬ÈÕÖ¾¼¶±ğÓ¦ÔÚÅäÖÃÖĞÖ¸¶¨£¬¶ø²»ÊÇÔÚ´úÂëÖĞÖ¸¶¨¡£
+//// é€šå¸¸ï¼Œæ—¥å¿—çº§åˆ«åº”åœ¨é…ç½®ä¸­æŒ‡å®šï¼Œè€Œä¸æ˜¯åœ¨ä»£ç ä¸­æŒ‡å®šã€‚
 //logging.AddFilter("Microsoft", LogLevel.Warning);
-// Ìí¼Ó¿ØÖÆÌ¨ÈÕÖ¾¼ÇÂ¼Ìá¹©³ÌĞò¡£
+// æ·»åŠ æ§åˆ¶å°æ—¥å¿—è®°å½•æä¾›ç¨‹åºã€‚
 logging.AddConsole();
 
 // Add services to the container.
 var services = builder.Services;
 var Env = builder.Environment;
 
-//ÓÃ»§ĞÅÏ¢
+//ç”¨æˆ·ä¿¡æ¯
 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 //services.AddSingleton(new Appsettings(Env.ContentRootPath));
 services.AddSingleton(new Appsettings(builder.Configuration));
 
-// ¹¹½¨ Logger ÅäÖÃ
+// æ„å»º Logger é…ç½®
 builder.Host.UseAgSerilog(builder.Configuration, options =>
 {
     options.SystemName ??= typeof(Program).Assembly.GetName().Name ?? "Merchant";
@@ -71,9 +71,9 @@ builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
 #endregion
 
 #region CORS
-// ´Ó appsettings.json ÖĞ¶ÁÈ¡ CORS ÅäÖÃ
+// ä» appsettings.json ä¸­è¯»å– CORS é…ç½®
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-// Ìí¼Ó CORS ·şÎñ
+// æ·»åŠ  CORS æœåŠ¡
 services.AddCors(o =>
     o.AddPolicy("CorsPolicy",
         builder => builder
@@ -102,13 +102,13 @@ services.Configure<SysRSA2Config>(sysRSA2Section);
 AgPayUtil.AES_KEY = builder.Configuration["AesKey"];
 var sysRSA2Config = sysRSA2Section.Get<SysRSA2Config>();
 AgPayUtil.RSA2_PRIVATE_KEY = sysRSA2Config.PrivateKey;
-// Automapper ×¢Èë
+// Automapper æ³¨å…¥
 services.AddAutoMapperSetup();
 
-// Newtonsoft.Json È«²¿ÅäÖÃ 
+// Newtonsoft.Json å…¨éƒ¨é…ç½® 
 JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
-    Formatting = Formatting.None,//¸ñÊ½»¯
+    Formatting = Formatting.None,//æ ¼å¼åŒ–
     DateFormatString = "yyyy-MM-dd HH:mm:ss",
     ContractResolver = new CamelCasePropertyNamesContractResolver(),
     NullValueHandling = NullValueHandling.Ignore
@@ -116,7 +116,7 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 
 services.AddControllersWithViews(options =>
 {
-    //ÈÕÖ¾¹ıÂËÆ÷
+    //æ—¥å¿—è¿‡æ»¤å™¨
     options.Filters.Add<OpLogActionFilter>();
 })
     .AddApplicationPart(typeof(OssFileController).Assembly)
@@ -127,7 +127,7 @@ services.AddControllersWithViews(options =>
         options.SerializerSettings.Formatting = Formatting.None;
         //options.SerializerSettings.ContractResolver = new DefaultContractResolver();
         options.SerializerSettings.DateFormatString = "yyyy-MM-dd HH:mm:ss";
-        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key Ê××Ö·ûĞ¡Ğ´£¨´óÍÕ·å×ªĞ¡ÍÕ·å£©
+        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();//Json key é¦–å­—ç¬¦å°å†™ï¼ˆå¤§é©¼å³°è½¬å°é©¼å³°ï¼‰
         options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
         options.SerializerSettings.Converters.Add(new BaseModelJsonConverter<BaseModel>());
     });
@@ -146,7 +146,7 @@ services.AddSwaggerGen(options =>
         Scheme = JwtBearerDefaults.AuthenticationScheme,
     });
     options.OperationFilter<SwaggerSecurityScheme>();
-    //×¢²áÈ«¾ÖÈÏÖ¤£¨ËùÓĞµÄ½Ó¿Ú¶¼¿ÉÒÔÊ¹ÓÃÈÏÖ¤£©
+    //æ³¨å†Œå…¨å±€è®¤è¯ï¼ˆæ‰€æœ‰çš„æ¥å£éƒ½å¯ä»¥ä½¿ç”¨è®¤è¯ï¼‰
     //options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     //{
     //    {
@@ -167,55 +167,32 @@ services.AddSwaggerGen(options =>
 });
 
 // Adding MediatR for Domain Events
-// ÁìÓòÃüÁî¡¢ÁìÓòÊÂ¼şµÈ×¢Èë
-// ÒıÓÃ°ü MediatR.Extensions.Microsoft.DependencyInjection
-//services.AddMediatR(typeof(MyxxxHandler));//µ¥µ¥×¢ÈëÄ³Ò»¸ö´¦Àí³ÌĞò
-//»ò
-services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());//Ä¿µÄÊÇÎªÁËÉ¨ÃèHandlerµÄÊµÏÖ¶ÔÏó²¢Ìí¼Óµ½IOCµÄÈİÆ÷ÖĞ
+// é¢†åŸŸå‘½ä»¤ã€é¢†åŸŸäº‹ä»¶ç­‰æ³¨å…¥
+// å¼•ç”¨åŒ… MediatR.Extensions.Microsoft.DependencyInjection
+//services.AddMediatR(typeof(MyxxxHandler));//å•å•æ³¨å…¥æŸä¸€ä¸ªå¤„ç†ç¨‹åº
+//æˆ–
+services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>());//ç›®çš„æ˜¯ä¸ºäº†æ‰«æHandlerçš„å®ç°å¯¹è±¡å¹¶æ·»åŠ åˆ°IOCçš„å®¹å™¨ä¸­
 
-// .NET Core Ô­ÉúÒÀÀµ×¢Èë
-// µ¥Ğ´Ò»²ãÓÃÀ´Ìí¼ÓÒÀÀµÏî£¬´ÓÕ¹Ê¾²ã Presentation ÖĞ¸ôÀë
+// .NET Core åŸç”Ÿä¾èµ–æ³¨å…¥
+// å•å†™ä¸€å±‚ç”¨æ¥æ·»åŠ ä¾èµ–é¡¹ï¼Œä»å±•ç¤ºå±‚ Presentation ä¸­éš”ç¦»
 NativeInjectorBootStrapper.RegisterServices(services);
 
 services.AddNotice(builder.Configuration);
 
 #region RabbitMQ
-services.AddTransient<RabbitMQSender>();
-services.AddSingleton<IMQSenderFactory, MQSenderFactory>();
-services.AddSingleton<IMQSender>(provider =>
-{
-    var factory = provider.GetRequiredService<IMQSenderFactory>();
-    return factory.CreateSender();
-});
-
-// ¶¯Ì¬×¢²á Receiver
-var receiverTypes = new[]
-{
-    typeof(ResetAppConfigRabbitMQReceiver),
-    typeof(CleanMchLoginAuthCacheRabbitMQReceiver)
-};
-
-foreach (var type in receiverTypes)
-{
-    services.AddSingleton(typeof(IMQMsgReceiver), type);
-}
-
-var specificReceiverTypes = new[]
-{
-    (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver)),
-    (typeof(CleanMchLoginAuthCacheMQ.IMQReceiver), typeof(CleanMchLoginAuthCacheMQReceiver))
-};
-
-foreach (var (serviceType, implementationType) in specificReceiverTypes)
-{
-    services.AddSingleton(serviceType, implementationType);
-}
-//services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-//services.AddSingleton<IMQMsgReceiver, CleanMchLoginAuthCacheRabbitMQReceiver>();
-//services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
-//services.AddSingleton<CleanMchLoginAuthCacheMQ.IMQReceiver, CleanMchLoginAuthCacheMQReceiver>();
-// ×¢²á HostedService
-services.AddHostedService<MQReceiverHostedService>();
+// æ³¨å†Œ RabbitMQ æœåŠ¡å¹¶åŠ¨æ€æ³¨å†Œ Receiver
+services.AddRabbitMQServices(
+    rabbitMQReceiverTypes: new[]
+    {
+        typeof(ResetAppConfigRabbitMQReceiver),
+        typeof(CleanLoginAuthCacheRabbitMQReceiver)
+    },
+    specificReceiverTypes: new[]
+    {
+        (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver)),
+        (typeof(CleanLoginAuthCacheMQ.IMQReceiver), typeof(CleanLoginAuthCacheMQReceiver))
+    }
+);
 #endregion
 
 #region OSS
@@ -226,100 +203,69 @@ OSSNativeInjectorBootStrapper.RegisterServices(services);
 SMSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
-//¼ÓÈë WebSocket ´¦Àí·şÎñ
+//åŠ å…¥ WebSocket å¤„ç†æœåŠ¡
 services.AddSingleton<WsChannelUserIdServer>();
 services.AddSingleton<WsPayOrderServer>();
 
-// °ó¶¨ÅäÖÃ
+// ç»‘å®šé…ç½®
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
-// ×¢²áÍ³Ò»½¡¿µ¼ì²é
+// æ³¨å†Œç»Ÿä¸€å¥åº·æ£€æŸ¥
 services.AddAppHealthChecks();
 
 var app = builder.Build();
 
-// ¶ÁÈ¡ÅäÖÃ
+// è¯»å–é…ç½®
 var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
-// ¼ÓÈë WebSocket ¹¦ÄÜ
+// åŠ å…¥ WebSocket åŠŸèƒ½
 app.UseWebSockets(new WebSocketOptions
 {
     KeepAliveInterval = TimeSpan.FromSeconds(30)
 });
 
-// ×Ô¶¨ÒåÖĞ¼ä¼ş
+// è‡ªå®šä¹‰ä¸­é—´ä»¶
 app.UseAgSerilogRequestContext();
 app.UseCalculateExecutionTime();
 app.UseRequestResponseLogging();
 
-// Swagger ÎÄµµ£¨¿ª·¢»·¾³ÏÂ£©
+// Swagger æ–‡æ¡£ï¼ˆå¼€å‘ç¯å¢ƒä¸‹ï¼‰
 //if (app.Environment.IsDevelopment())
 //{
 app.UseSwagger();
 app.UseSwaggerUI();
 //}
 
-// ¸ù¾İÅäÖÃ¾ö¶¨ÊÇ·ñÆôÓÃ HTTPS ÖØ¶¨Ïò
+// æ ¹æ®é…ç½®å†³å®šæ˜¯å¦å¯ç”¨ HTTPS é‡å®šå‘
 if (appSettings.ForceHttpsRedirection)
 {
-    // Ç¿ÖÆ HTTPS ÖØ¶¨Ïò
+    // å¼ºåˆ¶ HTTPS é‡å®šå‘
     app.UseHttpsRedirection();
 }
 
-// ¾²Ì¬ÎÄ¼ş·şÎñ
+// é™æ€æ–‡ä»¶æœåŠ¡
 app.UseStaticFiles();
 
-// ÆôÓÃ CORS ÖĞ¼ä¼ş
+// å¯ç”¨ CORS ä¸­é—´ä»¶
 app.UseCors("CorsPolicy");
 
-// ÈÏÖ¤ÖĞ¼ä¼ş£¨¼ì²âÓÃ»§ÊÇ·ñµÇÂ¼£©
+// è®¤è¯ä¸­é—´ä»¶ï¼ˆæ£€æµ‹ç”¨æˆ·æ˜¯å¦ç™»å½•ï¼‰
 app.UseAuthentication();
 
-// ÅäÖÃ HttpContext ·ÃÎÊÆ÷
+// é…ç½® HttpContext è®¿é—®å™¨
 var httpContextAccessor = app.Services.GetRequiredService<IHttpContextAccessor>();
 AuthContextService.Configure(httpContextAccessor);
 
-// ÊÚÈ¨ÖĞ¼ä¼ş£¨¼ì²âÓÃ»§ÊÇ·ñÓĞÈ¨ÏŞ·ÃÎÊ×ÊÔ´£©
+// æˆæƒä¸­é—´ä»¶ï¼ˆæ£€æµ‹ç”¨æˆ·æ˜¯å¦æœ‰æƒé™è®¿é—®èµ„æºï¼‰
 app.UseAuthorization();
 
-// Òì³£´¦ÀíÖĞ¼ä¼ş£¨·ÅÔÚÂ·ÓÉÖĞ¼ä¼şÖ®Ç°£©
+// å¼‚å¸¸å¤„ç†ä¸­é—´ä»¶ï¼ˆæ”¾åœ¨è·¯ç”±ä¸­é—´ä»¶ä¹‹å‰ï¼‰
 app.UseExceptionHandling();
 
-// Â·ÓÉÓ³Éä
+// è·¯ç”±æ˜ å°„
 app.MapControllers();
 
-// ½¡¿µ¼ì²é¶Ëµã
-app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-{
-    Predicate = _ => true,
-    ResponseWriter = async (context, report) =>
-    {
-        context.Response.ContentType = "application/json";
-        var result = System.Text.Json.JsonSerializer.Serialize(new
-        {
-            status = report.Status.ToString(),
-            checks = report.Entries.Select(e => new
-            {
-                name = e.Key,
-                status = e.Value.Status.ToString(),
-                description = e.Value.Description,
-                data = e.Value.Data,
-                duration = e.Value.Duration.TotalMilliseconds
-            }),
-            totalDuration = report.TotalDuration.TotalMilliseconds
-        });
-        await context.Response.WriteAsync(result);
-    }
-});
-
-app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-{
-    Predicate = check => check.Tags.Contains("ready")
-});
-
-app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-{
-    Predicate = check => check.Tags.Contains("live")
-});
+// æ˜ å°„æ ‡å‡†å¥åº·æ£€æŸ¥ç«¯ç‚¹
+app.MapStandardHealthChecks();
 
 app.Run();

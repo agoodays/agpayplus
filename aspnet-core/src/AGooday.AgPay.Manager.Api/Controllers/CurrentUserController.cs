@@ -1,13 +1,14 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Base.Api.Attributes;
+using AGooday.AgPay.Base.Api.Controllers;
+using AGooday.AgPay.Base.Api.Models;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Cache.Services;
 using AGooday.AgPay.Domain.Core.Notifications;
-using AGooday.AgPay.Manager.Api.Attributes;
-using AGooday.AgPay.Manager.Api.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
@@ -57,7 +58,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers
                 var entIds = currentUser.Authorities.ToList();
 
                 //2. 查询出用户所有菜单集合 (包含左侧显示菜单 和 其他类型菜单 )
-                var sysEnts = _authService.GetEntsBySysType(user.SysType, entIds, new List<string> { CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER });
+                var sysEnts = _authService.GetEntsBySysType(user.SysType, entIds, [CS.ENT_TYPE.MENU_LEFT, CS.ENT_TYPE.MENU_OTHER]);
 
                 //递归转换为树状结构
                 //JsonConvert.DefaultSettings = () => new JsonSerializerSettings

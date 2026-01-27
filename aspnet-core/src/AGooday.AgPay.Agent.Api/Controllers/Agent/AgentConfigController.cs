@@ -1,8 +1,9 @@
-﻿using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Authorization;
-using AGooday.AgPay.Agent.Api.Models;
-using AGooday.AgPay.Application.Interfaces;
+﻿using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Base.Api.Attributes;
+using AGooday.AgPay.Base.Api.Authorization;
+using AGooday.AgPay.Base.Api.Controllers;
+using AGooday.AgPay.Base.Api.Models;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
@@ -35,7 +36,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers.Agent
         /// <returns></returns>
         [HttpPut, Route("agentSipw"), MethodLog("更改支付密码")]
         [PermissionAuth(PermCode.AGENT.ENT_AGENT_CONFIG_EDIT)]
-        public async Task<ApiRes> SetAgentSipwAsync(ModifyAgentSipw model)
+        public async Task<ApiRes> SetAgentSipwAsync(ModifyPwd model)
         {
             var agentInfo = await _agentInfoService.GetByIdAsync(await GetCurrentAgentNoAsync());
             string currentSipw = Base64Util.DecodeBase64(model.OriginalPwd);

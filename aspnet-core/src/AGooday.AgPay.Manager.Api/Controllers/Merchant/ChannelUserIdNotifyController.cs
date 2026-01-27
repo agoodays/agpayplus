@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Manager.Api.Attributes;
+﻿using AGooday.AgPay.Base.Api.Attributes;
 using AGooday.AgPay.Manager.Api.WebSockets;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
