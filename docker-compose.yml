@@ -5,7 +5,6 @@ services:
     build:
       context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: agpay-ui-manager/Dockerfile # 指定Dockerfile相对于新的context的路径
-    container_name: agpay-plus-ui-manager
     ports:
       - "8817:80"  # 将宿主机的 8817 端口映射到容器的 80 端口
     environment:
@@ -14,13 +13,12 @@ services:
       # - VUE_APP_BASE_URL=/
       - VUE_APP_API_BASE_URL=https://${IPORDOMAIN}:9817 # 更新为实际生产服务器IP或域名
     networks:
-      - agpay-plus-network
+      - app-network
 
   ui-agent:
     build:
       context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: agpay-ui-agent/Dockerfile # 指定Dockerfile相对于新的context的路径
-    container_name: agpay-plus-ui-agent
     ports:
       - "8816:80"  # 将宿主机的 8816 端口映射到容器的 80 端口
     environment:
@@ -29,28 +27,23 @@ services:
       # - VUE_APP_BASE_URL=/
       - VUE_APP_API_BASE_URL=https://${IPORDOMAIN}:9816 # 更新为实际生产服务器IP或域名
     networks:
-      - agpay-plus-network
+      - app-network
 
   ui-merchant:
     build:
-      context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
-      dockerfile: agpay-ui-merchant/Dockerfile # 指定Dockerfile相对于新的context的路径
-    container_name: agpay-plus-ui-merchant
+      context: ./ant-design-vue
+      dockerfile: agpay-ui-merchant/Dockerfile
     ports:
-      - "8818:80"  # 将宿主机的 8818 端口映射到容器的 80 端口
+      - "8818:80"
     environment:
-      # - NODE_ENV=production
-      # - VUE_APP_PREVIEW=false
-      # - VUE_APP_BASE_URL=/
-      - VUE_APP_API_BASE_URL=https://${IPORDOMAIN}:9818 # 更新为实际生产服务器IP或域名
+      - VUE_APP_API_BASE_URL=https://${IPORDOMAIN}:9818
     networks:
-      - agpay-plus-network
+      - app-network
 
   manager-api:
     build:
-      context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
-      dockerfile: agpay-ui-manager/Dockerfile # 指定Dockerfile相对于新的context的路径
-    container_name: agpay-plus-manager-api
+      context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
+      dockerfile: AGooday.AgPay.Manager.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
     ports:
       - "5817:5817"
       - "9817:9817"
@@ -77,29 +70,27 @@ services:
       - ASPNETCORE_HTTPS_PORT=9817
       - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
-      - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=3306;uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE} # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
+      - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=${MYSQL_PORT};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
       - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=1 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
     volumes:
-      # 在 Docker 命令中，Windows 的 E 盘可以通过 /e/ 来表示，同理，C 盘可以使用 /c/ 表示
-      - /e/app/agpayplus/logs:/app/agpayplus/logs 
-      - /e/app/agpayplus/upload:/app/agpayplus/upload
-      # 使用 PowerShell 自动转换，PowerShell 中运行 Docker 命令，可以直接使用 Windows 风格的路径，PowerShell 会自动进行转换
-      # -v E:\app\agpayplus\logs:/app/agpayplus/logs
-      # -v E:\app\agpayplus\upload:/app/agpayplus/upload
-      - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
-      # - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
+      - ${DATA_PATH_HOST}/logs:/app/agpayplus/logs
+      - ${DATA_PATH_HOST}/upload:/app/agpayplus/upload
+      - ${CERT_PATH}:/https:ro
     depends_on:
-      # - db
-      - redis
-      - rabbitmq
+      # 生产环境使用宿主机 MySQL，取消 db 依赖
+      # db:
+      #   condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - agpay-plus-network
+      - app-network
 
   agent-api:
     build:
       context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: AGooday.AgPay.Agent.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
-    container_name: agpay-plus-agent-api
     ports:
       - "5816:5816"
       - "9816:9816"
@@ -126,29 +117,27 @@ services:
       - ASPNETCORE_HTTPS_PORT=9816
       - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
-      - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=3306;uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE} # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
+      - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=${MYSQL_PORT};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
       - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=2 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
     volumes:
-      # 在 Docker 命令中，Windows 的 E 盘可以通过 /e/ 来表示，同理，C 盘可以使用 /c/ 表示
-      - /e/app/agpayplus/logs:/app/agpayplus/logs 
-      - /e/app/agpayplus/upload:/app/agpayplus/upload
-      # 使用 PowerShell 自动转换，PowerShell 中运行 Docker 命令，可以直接使用 Windows 风格的路径，PowerShell 会自动进行转换
-      # -v E:\app\agpayplus\logs:/app/agpayplus/logs
-      # -v E:\app\agpayplus\upload:/app/agpayplus/upload
-      - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
-      # - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
+      - ${DATA_PATH_HOST}/logs:/app/agpayplus/logs
+      - ${DATA_PATH_HOST}/upload:/app/agpayplus/upload
+      - ${CERT_PATH}:/https:ro
     depends_on:
-      # - db
-      - redis
-      - rabbitmq
+      # 生产环境使用宿主机 MySQL，取消 db 依赖
+      # db:
+      #   condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - agpay-plus-network
+      - app-network
 
   merchant-api:
     build:
       context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: AGooday.AgPay.Merchant.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
-    container_name: agpay-plus-merchant-api
     ports:
       - "5818:5818"
       - "9818:9818"
@@ -175,90 +164,101 @@ services:
       - ASPNETCORE_HTTPS_PORT=9818
       - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
-      - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=3306;uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE} # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
+      - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=${MYSQL_PORT};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
       - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=3 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
     volumes:
-      # 在 Docker 命令中，Windows 的 E 盘可以通过 /e/ 来表示，同理，C 盘可以使用 /c/ 表示
-      - /e/app/agpayplus/logs:/app/agpayplus/logs 
-      - /e/app/agpayplus/upload:/app/agpayplus/upload
-      # 使用 PowerShell 自动转换，PowerShell 中运行 Docker 命令，可以直接使用 Windows 风格的路径，PowerShell 会自动进行转换
-      # -v E:\app\agpayplus\logs:/app/agpayplus/logs
-      # -v E:\app\agpayplus\upload:/app/agpayplus/upload
-      - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
-      # - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
+      - ${DATA_PATH_HOST}/logs:/app/agpayplus/logs
+      - ${DATA_PATH_HOST}/upload:/app/agpayplus/upload
+      - ${CERT_PATH}:/https:ro
     depends_on:
-      # - db
-      - redis
-      - rabbitmq
+      # 生产环境使用宿主机 MySQL，取消 db 依赖
+      # db:
+      #   condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - agpay-plus-network
+      - app-network
 
   payment-api:
     build:
-      context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
+      context: ./aspnet-core/src # 需要包含根目录（收银台前端在 ant-design-vue 目录）
       dockerfile: AGooday.AgPay.Payment.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
-    container_name: agpay-plus-payment-api
     ports:
       - "5819:5819"
       - "9819:9819"
     environment:
-      # CORS 配置
       - Cors__AllowedOrigins=https://${IPORDOMAIN}:8819,http://${IPORDOMAIN}:8819
-      
-      # JWT 配置
-      # - JWT__Issuer=https://${IPORDOMAIN}:9818
-      # - JWT__Audience=https://${IPORDOMAIN}:9818
-      # - JWT__Secret=JWTAuthenticationHIGHsecuredPasswordVVVp1OH7Xzyr # 注意：不要在生产环境中直接暴露敏感信息
-
-      # MQ 配置
       - MQ__Vender=RabbitMQ
-      - MQ__RabbitMQ__HostName=rabbitmq # 使用服务名称
+      - MQ__RabbitMQ__HostName=rabbitmq
       - MQ__RabbitMQ__UserName=admin
       - MQ__RabbitMQ__Password=admin
       - MQ__RabbitMQ__Port=5672
-
-      # 其他环境变量...
       - LANG=C.UTF-8
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
       - ASPNETCORE_URLS=https://+:9819;http://+:5819
       - ASPNETCORE_HTTPS_PORT=9819
       - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
-      - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=3306;uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE} # 使用 host.docker.internal 作为 MySQL 的主机地址，在 Linux 环境中，host.docker.internal 不可用，需替换为宿主机的 IP 地址。
-      - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=4 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
+      - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=${MYSQL_PORT};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
+      - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=4
     volumes:
-      # 在 Docker 命令中，Windows 的 E 盘可以通过 /e/ 来表示，同理，C 盘可以使用 /c/ 表示
-      - /e/app/agpayplus/logs:/app/agpayplus/logs 
-      - /e/app/agpayplus/upload:/app/agpayplus/upload
-      # 使用 PowerShell 自动转换，PowerShell 中运行 Docker 命令，可以直接使用 Windows 风格的路径，PowerShell 会自动进行转换
-      # -v E:\app\agpayplus\logs:/app/agpayplus/logs
-      # -v E:\app\agpayplus\upload:/app/agpayplus/upload
-      - ~/.aspnet/https:/https:ro # 在 Windows 上应调整为 C:\Users\<YourUsername>\.aspnet\https:/https:ro，对于Windows 系统来说，用户主目录的路径通常可以通过 %USERPROFILE% 环境变量获取
-      # - ${USERPROFILE}/.aspnet/https:/https:ro # 使用环境变量替换 ~
+      - ${DATA_PATH_HOST}/logs:/app/agpayplus/logs
+      - ${DATA_PATH_HOST}/upload:/app/agpayplus/upload
+      - ${CERT_PATH}:/https:ro
     depends_on:
-      # - db
-      - redis
-      - rabbitmq
+      # 注意：生产环境应使用宿主机 MySQL，取消 db 依赖
+      # db:
+      #   condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
-      - agpay-plus-network
+      - app-network
 
+  # ========================================
+  # MySQL 数据库服务（可选 - 仅用于开发/测试）
+  # ========================================
+  # ⚠️ 生产环境警告：
+  # 生产环境强烈建议使用宿主机 MySQL 或云数据库（RDS）
+  # Docker MySQL 仅适用于开发/测试环境
+  # 
+  # 启用方法：
+  #   1. 取消下面的 db 服务注释
+  #   2. 取消所有 API 服务中的 db 依赖注释
+  #   3. 修改 .env：MYSQL_SERVER_NAME=db
+  # 
+  # 详细说明：DATABASE_SETUP.md
+  # ========================================
   # db:
   #   image: mysql:8.0
-  #   container_name: agpay-plus-db
   #   environment:
-  #     MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #     MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
   #     MYSQL_DATABASE: ${MYSQL_DATABASE}
   #     MYSQL_USER: ${MYSQL_USER}
   #     MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  #     TZ: Asia/Shanghai
   #   ports:
-  #     - "3306:3306"
+  #     - "${MYSQL_PORT}:3306"
   #   volumes:
-  #     - ./aspnet-core/docs/sql/agpayplusinit.sql:/docker-entrypoint-initdb.d/init.sql
+  #     - ./aspnet-core/docs/sql/agpayplusinit.sql:/docker-entrypoint-initdb.d/init.sql:ro
   #     - db-data:/var/lib/mysql
+  #   command: 
+  #     - --character-set-server=utf8mb4
+  #     - --collation-server=utf8mb4_unicode_ci
+  #     - --default-authentication-plugin=mysql_native_password
+  #   healthcheck:
+  #     test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_PASSWORD}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   networks:
+  #     - app-network
 
   redis:
     image: redis
-    container_name: agpay-plus-redis
     ports:
       - "6379:6379" # 将宿主机的 6379 端口映射到容器的 6379 端口
     healthcheck:
@@ -267,12 +267,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - agpay-plus-network
+      - app-network
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: agpay-plus-rabbitmq
-    hostname: agpay-plus-rabbitmq
+    hostname: rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin
@@ -281,14 +280,32 @@ services:
       - "5672:5672"
     volumes:
       - ./aspnet-core/docs/rabbitmq_plugin:/plugins  # 挂载包含插件的本地目录到容器内的/plugins目录
+    command: >
+      bash -c "
+      cp /plugins/*.ez /opt/rabbitmq/plugins/ &&
+      rabbitmq-plugins enable rabbitmq_delayed_message_exchange &&
+      rabbitmq-server
+      "
     healthcheck:
       test: ["CMD", "rabbitmqctl", "status"]
       interval: 10s
       timeout: 5s
       retries: 5
     networks:
-      - agpay-plus-network
+      - app-network
 
 networks:
-  agpay-plus-network:
-    driver: bridge # 内部创建的 Bridge 网络
+  app-network:
+    driver: bridge
+
+# ========================================
+# Docker MySQL 数据卷（可选）
+# ========================================
+# 仅在使用 Docker MySQL 时需要
+# 如果使用宿主机 MySQL，此配置无需启用
+# 
+# 启用 Docker MySQL 时，取消下面的注释：
+# ========================================
+# volumes:
+#   db-data:
+#     driver: local

@@ -1,6 +1,26 @@
 # 请参阅 https://aka.ms/customizecontainer 以了解如何自定义调试容器，以及 Visual Studio 如何使用此 Dockerfile 生成映像以更快地进行调试。
 
-# 此阶段用于在快速模式(默认为调试配置)下从 VS 运行时
+# ============================================
+# 阶段 1: 构建 Cashier 前端
+# ============================================
+FROM node:16-alpine AS cashier-build
+WORKDIR /cashier
+
+# 设置 npm 镜像
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm config set timeout 60000
+
+# 复制 cashier 前端项目文件
+COPY ../../ant-design-vue/agpay-ui-cashier/package*.json ./
+RUN npm install
+
+# 复制源代码并构建
+COPY ../../ant-design-vue/agpay-ui-cashier/. .
+RUN npm run build
+
+# ============================================
+# 阶段 2: 运行时基础镜像
+# ============================================
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
@@ -16,7 +36,9 @@ EXPOSE 5819
 EXPOSE 9819
 ENV ASPNETCORE_URLS=http://+:5819;https://+:9819
 
-# 此阶段用于生成服务项目
+# ============================================
+# 阶段 3: 构建 .NET 后端
+# ============================================
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
@@ -40,12 +62,16 @@ COPY . .
 WORKDIR "/src/AGooday.AgPay.Payment.Api"
 RUN dotnet build "./AGooday.AgPay.Payment.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# 此阶段用于发布要复制到最终阶段的服务项目
+# ============================================
+# 阶段 4: 发布 .NET 应用
+# ============================================
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./AGooday.AgPay.Payment.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
-# 此阶段在生产中使用，或在常规模式下从 VS 运行时使用(在不使用调试配置时为默认值)
+# ============================================
+# 阶段 5: 最终运行镜像
+# ============================================
 FROM base AS final
 WORKDIR /app
 
@@ -55,5 +81,10 @@ RUN mkdir -p /app/agpayplus/logs && \
     chmod -R 777 /app/agpayplus/logs && \
     chmod -R 777 /app/agpayplus/upload
 
+# 复制 .NET 应用
 COPY --from=publish /app/publish .
+
+# 复制 Cashier 前端到 wwwroot/cashier
+COPY --from=cashier-build /cashier/dist ./wwwroot/cashier
+
 ENTRYPOINT ["dotnet", "AGooday.AgPay.Payment.Api.dll"]
