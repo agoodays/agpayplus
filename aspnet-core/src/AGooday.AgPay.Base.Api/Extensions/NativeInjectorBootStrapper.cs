@@ -20,7 +20,7 @@ using AGooday.AgPay.Infrastructure.UoW;
 using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace AGooday.AgPay.Payment.Api.Extensions
+namespace AGooday.AgPay.Base.Api.Extensions
 {
     public class NativeInjectorBootStrapper
     {
@@ -103,11 +103,7 @@ namespace AGooday.AgPay.Payment.Api.Extensions
             services.AddScoped<IRequestHandler<ModifyMchInfoCommand>, MchInfoCommandHandler>();
 
             // 领域层 - Memory缓存
-            services.AddSingleton<IMemoryCache>(factory =>
-            {
-                var cache = new MemoryCache(new MemoryCacheOptions());
-                return cache;
-            });
+            services.AddSingleton<IMemoryCache>(factory => new MemoryCache(new MemoryCacheOptions()));
 
             // 注入 基础设施层 - 数据层
             //services.AddDbContext<AgPayDbContext>(ServiceLifetime.Scoped);
