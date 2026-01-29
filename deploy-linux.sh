@@ -20,6 +20,40 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 NC='\033[0m' # No Color
 
+# 检测 Docker Compose 命令
+DOCKER_COMPOSE=""
+if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+fi
+
+# .env 文件解析函数（处理注释、空格、引号）
+get_env_value() {
+    local key="$1"
+    local env_file="${2:-$SCRIPT_DIR/.env}"
+    
+    if [ ! -f "$env_file" ]; then
+        echo ""
+        return 1
+    fi
+    
+    # 读取并处理 .env 文件
+    local value=$(grep -E "^\s*${key}\s*=" "$env_file" | \
+        head -n 1 | \
+        sed -e 's/^[[:space:]]*//' \
+            -e 's/[[:space:]]*$//' \
+            -e "s/^${key}=//" \
+            -e 's/^["'\'']//' \
+            -e 's/["'\'']*$//' \
+            -e 's/#.*//')
+    
+    # 展开 ~ 为 $HOME
+    value="${value/#\~/$HOME}"
+    
+    echo "$value"
+}
+
 # 解析参数
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -59,13 +93,14 @@ DOCKER_VERSION=$(docker version --format '{{.Server.Version}}')
 echo -e "${GREEN}  ✅ Docker 版本: $DOCKER_VERSION${NC}"
 
 # 检查 Docker Compose
-if ! docker compose version &> /dev/null; then
+if [ -z "$DOCKER_COMPOSE" ]; then
     echo -e "${RED}  ❌ Docker Compose 未安装${NC}"
+    echo -e "${GRAY}  请安装 Docker Compose v2 (docker compose) 或 v1 (docker-compose)${NC}"
     exit 1
 fi
 
-COMPOSE_VERSION=$(docker compose version --short)
-echo -e "${GREEN}  ✅ Docker Compose 版本: $COMPOSE_VERSION${NC}"
+COMPOSE_VERSION=$($DOCKER_COMPOSE version --short 2>/dev/null || $DOCKER_COMPOSE --version | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+echo -e "${GREEN}  ✅ Docker Compose: $DOCKER_COMPOSE ($COMPOSE_VERSION)${NC}"
 
 # 配置环境变量文件
 echo -e "\n${YELLOW}[2/7] 配置环境变量...${NC}"
@@ -125,7 +160,12 @@ fi
 
 # 创建数据目录
 echo -e "\n${YELLOW}[4/7] 创建数据目录...${NC}"
-DATA_PATH=$(grep "DATA_PATH_HOST=" "$SCRIPT_DIR/.env" | cut -d'=' -f2)
+DATA_PATH=$(get_env_value "DATA_PATH_HOST")
+
+if [ -z "$DATA_PATH" ]; then
+    echo -e "${RED}  ❌ .env 文件中未找到 DATA_PATH_HOST 配置${NC}"
+    exit 1
+fi
 
 directories=(
     "$DATA_PATH"
@@ -139,29 +179,42 @@ directories=(
 
 for dir in "${directories[@]}"; do
     if [ ! -d "$dir" ]; then
-        sudo mkdir -p "$dir"
-        sudo chown -R $(whoami):$(whoami) "$dir"
-        echo -e "${GREEN}  ✅ 创建目录: $dir${NC}"
+        # 尝试不用 sudo 创建，失败则提示使用 sudo
+        if mkdir -p "$dir" 2>/dev/null; then
+            echo -e "${GREEN}  ✅ 创建目录: $dir${NC}"
+        else
+            echo -e "${YELLOW}  需要 sudo 权限创建目录: $dir${NC}"
+            sudo mkdir -p "$dir"
+            sudo chown -R $(id -u):$(id -g) "$dir"
+            echo -e "${GREEN}  ✅ 创建目录: $dir${NC}"
+        fi
     else
-        echo -e "${GRAY}  ℹ️ 目录已存在: $dir${NC}"
+        # 检查目录是否可写
+        if [ -w "$dir" ]; then
+            echo -e "${GRAY}  ℹ️ 目录已存在: $dir${NC}"
+        else
+            echo -e "${YELLOW}  ⚠️ 目录存在但无写权限: $dir${NC}"
+            echo -e "${GRAY}  尝试修正权限...${NC}"
+            sudo chown -R $(id -u):$(id -g) "$dir" 2>/dev/null || true
+        fi
     fi
 done
 
 # 停止并删除旧容器
 echo -e "\n${YELLOW}[5/7] 清理旧容器...${NC}"
 cd "$SCRIPT_DIR"
-if docker compose ps -q &> /dev/null; then
-    docker compose down --remove-orphans &> /dev/null || true
+if $DOCKER_COMPOSE ps -q &> /dev/null; then
+    $DOCKER_COMPOSE down --remove-orphans &> /dev/null || true
     echo -e "${GREEN}  ✅ 已清理旧容器${NC}"
 else
-    echo -e "${GRAY}  ! 没有需要清理的容器${NC}"
+    echo -e "${GRAY}  ℹ️ 没有需要清理的容器${NC}"
 fi
 
 # 构建镜像
 echo -e "\n${YELLOW}[6/7] 构建 Docker 镜像...${NC}"
 echo -e "${GRAY}  这可能需要几分钟时间，请耐心等待...${NC}"
 cd "$SCRIPT_DIR"
-if docker compose build --no-cache; then
+if $DOCKER_COMPOSE build --no-cache; then
     echo -e "${GREEN}  ✅ 镜像构建成功${NC}"
 else
     echo -e "${RED}  ❌ 镜像构建失败${NC}"
@@ -171,7 +224,7 @@ fi
 # 启动服务
 echo -e "\n${YELLOW}[7/7] 启动服务...${NC}"
 cd "$SCRIPT_DIR"
-if docker compose up -d; then
+if $DOCKER_COMPOSE up -d; then
     echo -e "${GREEN}  ✅ 服务启动成功${NC}"
 else
     echo -e "${RED}  ❌ 服务启动失败${NC}"
@@ -192,7 +245,7 @@ echo -e "  收银台:      https://localhost:9819/cashier"
 echo -e "  RabbitMQ:    http://localhost:15672 (admin/admin)"
 echo -e "  Seq:         http://localhost:5341"
 echo ""
-echo -e "${GRAY}查看服务状态：docker compose ps${NC}"
-echo -e "${GRAY}查看服务日志：docker compose logs -f [service-name]${NC}"
-echo -e "${GRAY}停止所有服务：docker compose down${NC}"
+echo -e "${GRAY}查看服务状态：$DOCKER_COMPOSE ps${NC}"
+echo -e "${GRAY}查看服务日志：$DOCKER_COMPOSE logs -f [service-name]${NC}"
+echo -e "${GRAY}停止所有服务：$DOCKER_COMPOSE down${NC}"
 echo ""

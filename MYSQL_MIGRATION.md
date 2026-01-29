@@ -381,6 +381,3 @@ docker exec <mysql-container> mysql -u root -p -e "USE agpayplusdb; SHOW TABLES;
 4. 保留备份文件和日志，便于排查
 
 ---
-
-**最后更新**：2024
-**版本**：1.0.0

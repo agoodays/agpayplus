@@ -219,5 +219,3 @@ docker compose build --no-cache payment-api
 - ✅ 端口 8819 已释放，可用于其他服务
 
 ---
-
-**最后更新**: 2024

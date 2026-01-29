@@ -23,6 +23,20 @@ CYAN='\033[0;36m'
 GRAY='\033[0;37m'
 NC='\033[0m' # No Color
 
+# 检测 Docker Compose 命令
+DOCKER_COMPOSE=""
+if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
+    DOCKER_COMPOSE="docker compose"
+elif command -v docker-compose &> /dev/null; then
+    DOCKER_COMPOSE="docker-compose"
+fi
+
+if [ -z "$DOCKER_COMPOSE" ]; then
+    echo -e "${RED}  ❌ Docker Compose 未安装${NC}"
+    echo -e "${GRAY}  请安装 Docker Compose v2 (docker compose) 或 v1 (docker-compose)${NC}"
+    exit 1
+fi
+
 # 解析参数
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -145,7 +159,7 @@ if [ "$NO_BUILD" = false ]; then
     echo -e "${GRAY}  这可能需要几分钟时间...${NC}"
     if [ ${#BUILD_LIST[@]} -gt 0 ]; then
         BUILD_SERVICES=$(IFS=' '; echo "${BUILD_LIST[*]}")
-        if docker compose build --no-cache $BUILD_SERVICES; then
+    if $DOCKER_COMPOSE build --no-cache $BUILD_SERVICES; then
             echo -e "${GREEN}  ✅ 镜像构建成功${NC}"
         else
             echo -e "${RED}  ❌ 镜像构建失败${NC}"
@@ -163,7 +177,7 @@ fi
 if [ ${#PULL_LIST[@]} -gt 0 ]; then
     PULL_SERVICES=$(IFS=' '; echo "${PULL_LIST[*]}")
     echo -e "\n${YELLOW}正在拉取最新镜像: ${PULL_SERVICES}${NC}"
-    if docker compose pull $PULL_SERVICES; then
+        if $DOCKER_COMPOSE pull $PULL_SERVICES; then
         echo -e "${GREEN}  ✅ 镜像拉取完成${NC}"
     else
         echo -e "${YELLOW}  ! 镜像拉取失败，继续更新（可能使用本地镜像）${NC}"
@@ -176,11 +190,11 @@ for service in "${SERVICES_TO_UPDATE[@]}"; do
     echo -e "${GRAY}  正在更新: $service${NC}"
     
     # 停止并删除旧容器
-    docker compose stop "$service" &> /dev/null || true
-    docker compose rm -f "$service" &> /dev/null || true
+    $DOCKER_COMPOSE stop "$service" &> /dev/null || true
+    $DOCKER_COMPOSE rm -f "$service" &> /dev/null || true
     
     # 启动新容器
-    if docker compose up -d "$service"; then
+    if $DOCKER_COMPOSE up -d "$service"; then
         echo -e "${GREEN}  ✅ $service 更新成功${NC}"
     else
         echo -e "${RED}  ❌ $service 更新失败${NC}"
@@ -196,10 +210,10 @@ echo -e "${GREEN}  更新完成！${NC}"
 echo -e "${CYAN}========================================${NC}"
 echo ""
 echo -e "${CYAN}服务状态：${NC}"
-docker compose ps
+$DOCKER_COMPOSE ps
 
 echo -e "\n${CYAN}查看服务日志：${NC}"
 for service in "${SERVICES_TO_UPDATE[@]}"; do
-    echo -e "${GRAY}  docker compose logs -f $service${NC}"
+    echo -e "${GRAY}  $DOCKER_COMPOSE logs -f $service${NC}"
 done
 echo ""

@@ -13,6 +13,63 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
+# 检测 Docker Compose 命令
+$DockerCompose = ""
+if (Get-Command docker -ErrorAction SilentlyContinue) {
+    try {
+        docker compose version 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            $DockerCompose = "docker compose"
+        }
+    } catch {}
+}
+
+if (-not $DockerCompose) {
+    try {
+        docker-compose version 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            $DockerCompose = "docker-compose"
+        }
+    } catch {}
+}
+
+if (-not $DockerCompose) {
+    Write-Host "  ✗ Docker Compose 未安装" -ForegroundColor Red
+    Write-Host "  请安装 Docker Compose v2 (docker compose) 或 v1 (docker-compose)" -ForegroundColor Gray
+    exit 1
+}
+
+# .env 文件解析函数
+function Get-EnvValue {
+    param(
+        [string]$Key,
+        [string]$EnvFile = "$ScriptDir\.env"
+    )
+    
+    if (-not (Test-Path $EnvFile)) {
+        return $null
+    }
+    
+    $content = Get-Content $EnvFile -ErrorAction SilentlyContinue
+    $line = $content | Where-Object { $_ -match "^\s*$Key\s*=" } | Select-Object -First 1
+    
+    if ($line) {
+        # 移除键名、等号、空格、引号和注释
+        $value = $line -replace "^\s*$Key\s*=", "" `
+                      -replace "^[`"\']", "" `
+                      -replace "[`"\']*\s*#.*$", "" `
+                      -replace "[`"\']*$", ""
+        
+        # 展开 ${USERPROFILE}
+        $value = $value -replace '\$\{USERPROFILE\}', $env:USERPROFILE
+        $value = $value -replace '\$env:USERPROFILE', $env:USERPROFILE
+        
+        return $value.Trim()
+    }
+    
+    return $null
+}
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  AgPay+ Windows 部署脚本" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -33,8 +90,12 @@ try {
 
 # 检查 Docker Compose
 try {
-    $composeVersion = docker compose version --short 2>&1
-    Write-Host "  ✓ Docker Compose 版本: $composeVersion" -ForegroundColor Green
+    $composeVersion = if ($DockerCompose -eq "docker compose") {
+        (Invoke-Expression "$DockerCompose version --short" 2>&1)
+    } else {
+        (Invoke-Expression "$DockerCompose --version" 2>&1) -replace '.*version ', ''
+    }
+    Write-Host "  ✓ Docker Compose: $DockerCompose ($composeVersion)" -ForegroundColor Green
 } catch {
     Write-Host "  ✗ Docker Compose 未安装" -ForegroundColor Red
     exit 1
@@ -97,7 +158,13 @@ if (-not $SkipCert) {
 
 # 创建数据目录
 Write-Host "`n[4/7] 创建数据目录..." -ForegroundColor Yellow
-$dataPath = (Get-Content "$ScriptDir\.env" | Select-String "DATA_PATH_HOST=").ToString().Split("=")[1]
+$dataPath = Get-EnvValue -Key "DATA_PATH_HOST"
+
+if (-not $dataPath) {
+    Write-Host "  ✗ .env 文件中未找到 DATA_PATH_HOST 配置" -ForegroundColor Red
+    exit 1
+}
+
 $dataPath = $dataPath.Replace("/", "\")
 
 $directories = @(
@@ -123,7 +190,7 @@ foreach ($dir in $directories) {
 Write-Host "`n[5/7] 清理旧容器..." -ForegroundColor Yellow
 Push-Location $ScriptDir
 try {
-    docker compose down --remove-orphans 2>&1 | Out-Null
+    Invoke-Expression "$DockerCompose down --remove-orphans" 2>&1 | Out-Null
     Write-Host "  ✓ 已清理旧容器" -ForegroundColor Green
 } catch {
     Write-Host "  ! 没有需要清理的容器" -ForegroundColor Gray
@@ -135,7 +202,7 @@ Write-Host "`n[6/7] 构建 Docker 镜像..." -ForegroundColor Yellow
 Write-Host "  这可能需要几分钟时间，请耐心等待..." -ForegroundColor Gray
 Push-Location $ScriptDir
 try {
-    docker compose build --no-cache
+    Invoke-Expression "$DockerCompose build --no-cache"
     if ($LASTEXITCODE -ne 0) {
         throw "构建失败"
     }
@@ -151,7 +218,7 @@ Pop-Location
 Write-Host "`n[7/7] 启动服务..." -ForegroundColor Yellow
 Push-Location $ScriptDir
 try {
-    docker compose up -d
+    Invoke-Expression "$DockerCompose up -d"
     if ($LASTEXITCODE -ne 0) {
         throw "启动失败"
     }
@@ -177,7 +244,7 @@ Write-Host "  收银台:      https://localhost:9819/cashier" -ForegroundColor W
 Write-Host "  RabbitMQ:    http://localhost:15672 (admin/admin)" -ForegroundColor White
 Write-Host "  Seq:         http://localhost:5341" -ForegroundColor White
 Write-Host ""
-Write-Host "查看服务状态：docker compose ps" -ForegroundColor Gray
-Write-Host "查看服务日志：docker compose logs -f [service-name]" -ForegroundColor Gray
-Write-Host "停止所有服务：docker compose down" -ForegroundColor Gray
+Write-Host "查看服务状态：$DockerCompose ps" -ForegroundColor Gray
+Write-Host "查看服务日志：$DockerCompose logs -f [service-name]" -ForegroundColor Gray
+Write-Host "停止所有服务：$DockerCompose down" -ForegroundColor Gray
 Write-Host ""

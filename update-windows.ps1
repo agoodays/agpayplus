@@ -16,6 +16,32 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
+# 检测 Docker Compose 命令
+$DockerCompose = ""
+if (Get-Command docker -ErrorAction SilentlyContinue) {
+    try {
+        docker compose version 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            $DockerCompose = "docker compose"
+        }
+    } catch {}
+}
+
+if (-not $DockerCompose) {
+    try {
+        docker-compose version 2>&1 | Out-Null
+        if ($LASTEXITCODE -eq 0) {
+            $DockerCompose = "docker-compose"
+        }
+    } catch {}
+}
+
+if (-not $DockerCompose) {
+    Write-Host "  ✗ Docker Compose 未安装" -ForegroundColor Red
+    Write-Host "  请安装 Docker Compose v2 (docker compose) 或 v1 (docker-compose)" -ForegroundColor Gray
+    exit 1
+}
+
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  AgPay+ Windows 更新脚本" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
@@ -118,7 +144,7 @@ if (-not $NoBuild) {
     if ($buildList.Count -gt 0) {
         $buildServices = $buildList -join " "
         try {
-            Invoke-Expression "docker compose build --no-cache $buildServices"
+            Invoke-Expression "$DockerCompose build --no-cache $buildServices"
             if ($LASTEXITCODE -ne 0) { throw "构建失败" }
             Write-Host "  ✅ 镜像构建成功" -ForegroundColor Green
         } catch {
@@ -134,7 +160,7 @@ if (-not $NoBuild) {
         $pullServices = $pullList -join " "
         Write-Host "正在拉取最新镜像: $pullServices" -ForegroundColor Yellow
         try {
-            Invoke-Expression "docker compose pull $pullServices"
+            Invoke-Expression "$DockerCompose pull $pullServices"
             Write-Host "  ✅ 镜像拉取完成" -ForegroundColor Green
         } catch {
             Write-Host "  ! 镜像拉取失败，继续更新（可能使用本地镜像）" -ForegroundColor Yellow
@@ -152,11 +178,11 @@ try {
         Write-Host "  正在更新: $service" -ForegroundColor Gray
         
         # 停止并删除旧容器
-        docker compose stop $service 2>&1 | Out-Null
-        docker compose rm -f $service 2>&1 | Out-Null
+        Invoke-Expression "$DockerCompose stop $service" 2>&1 | Out-Null
+        Invoke-Expression "$DockerCompose rm -f $service" 2>&1 | Out-Null
         
         # 启动新容器
-        docker compose up -d $service
+        Invoke-Expression "$DockerCompose up -d $service"
         if ($LASTEXITCODE -ne 0) {
             throw "启动 $service 失败"
         }
@@ -178,10 +204,10 @@ Write-Host "  更新完成！" -ForegroundColor Green
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "服务状态：" -ForegroundColor Cyan
-docker compose ps
+Invoke-Expression "$DockerCompose ps"
 
 Write-Host "`n查看服务日志：" -ForegroundColor Cyan
 $servicesToUpdate | ForEach-Object { 
-    Write-Host "  docker compose logs -f $_" -ForegroundColor Gray 
+    Write-Host "  $DockerCompose logs -f $_" -ForegroundColor Gray 
 }
 Write-Host ""
