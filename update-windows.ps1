@@ -30,6 +30,7 @@ $allServices = @(
     "agent-api",
     "merchant-api",
     "payment-api",
+    "seq",
     "redis",
     "rabbitmq"
 )
@@ -37,8 +38,8 @@ $allServices = @(
 # 解析要更新的服务
 $servicesToUpdate = @()
 if ($Services -eq "") {
-    Write-Host "[提示] 将更新所有应用服务（不包括 redis 和 rabbitmq）" -ForegroundColor Yellow
-    $servicesToUpdate = $allServices | Where-Object { $_ -notmatch "redis|rabbitmq" }
+    Write-Host "[提示] 将更新所有应用服务（不包括 seq 、 redis 和 rabbitmq）" -ForegroundColor Yellow
+    $servicesToUpdate = $allServices | Where-Object { $_ -notmatch "seq|redis|rabbitmq" }
 } else {
     $servicesToUpdate = $Services -split "," | ForEach-Object { $_.Trim() }
     
@@ -103,18 +104,41 @@ if (Test-Path "$ScriptDir\.git") {
 if (-not $NoBuild) {
     Write-Host "`n[3/4] 重新构建镜像..." -ForegroundColor Yellow
     Write-Host "  这可能需要几分钟时间..." -ForegroundColor Gray
-    
-    $buildServices = $servicesToUpdate -join " "
-    try {
-        Invoke-Expression "docker compose build --no-cache $buildServices"
-        if ($LASTEXITCODE -ne 0) {
-            throw "构建失败"
+    # 区分基础镜像服务（seq/redis/rabbitmq）与应用服务
+    $buildList = @()
+    $pullList = @()
+    foreach ($svc in $servicesToUpdate) {
+        if ($svc -match '^(seq|redis|rabbitmq)$') {
+            $pullList += $svc
+        } else {
+            $buildList += $svc
         }
-        Write-Host "  ✅ 镜像构建成功" -ForegroundColor Green
-    } catch {
-        Write-Host "  ❌ 镜像构建失败" -ForegroundColor Red
-        Pop-Location
-        exit 1
+    }
+
+    if ($buildList.Count -gt 0) {
+        $buildServices = $buildList -join " "
+        try {
+            Invoke-Expression "docker compose build --no-cache $buildServices"
+            if ($LASTEXITCODE -ne 0) { throw "构建失败" }
+            Write-Host "  ✅ 镜像构建成功" -ForegroundColor Green
+        } catch {
+            Write-Host "  ❌ 镜像构建失败" -ForegroundColor Red
+            Pop-Location
+            exit 1
+        }
+    } else {
+        Write-Host "  ℹ️ 没有需要构建的服务" -ForegroundColor Gray
+    }
+
+    if ($pullList.Count -gt 0) {
+        $pullServices = $pullList -join " "
+        Write-Host "正在拉取最新镜像: $pullServices" -ForegroundColor Yellow
+        try {
+            Invoke-Expression "docker compose pull $pullServices"
+            Write-Host "  ✅ 镜像拉取完成" -ForegroundColor Green
+        } catch {
+            Write-Host "  ! 镜像拉取失败，继续更新（可能使用本地镜像）" -ForegroundColor Yellow
+        }
     }
 } else {
     Write-Host "`n[3/4] 跳过镜像构建..." -ForegroundColor Yellow

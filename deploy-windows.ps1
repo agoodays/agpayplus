@@ -103,7 +103,11 @@ $dataPath = $dataPath.Replace("/", "\")
 $directories = @(
     "$dataPath",
     "$dataPath\logs",
-    "$dataPath\upload"
+    "$dataPath\upload",
+    "$dataPath\seq",
+    "$dataPath\mysql",
+    "$dataPath\redis",
+    "$dataPath\rabbitmq"
 )
 
 foreach ($dir in $directories) {
@@ -171,6 +175,7 @@ Write-Host "  商户系统:    https://localhost:8818" -ForegroundColor White
 Write-Host "  支付网关:    https://localhost:9819" -ForegroundColor White
 Write-Host "  收银台:      https://localhost:9819/cashier" -ForegroundColor White
 Write-Host "  RabbitMQ:    http://localhost:15672 (admin/admin)" -ForegroundColor White
+Write-Host "  Seq:         http://localhost:5341" -ForegroundColor White
 Write-Host ""
 Write-Host "查看服务状态：docker compose ps" -ForegroundColor Gray
 Write-Host "查看服务日志：docker compose logs -f [service-name]" -ForegroundColor Gray

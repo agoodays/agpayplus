@@ -60,6 +60,7 @@ ALL_SERVICES=(
     "agent-api"
     "merchant-api"
     "payment-api"
+    "seq"
     "redis"
     "rabbitmq"
 )
@@ -67,9 +68,9 @@ ALL_SERVICES=(
 # 解析要更新的服务
 SERVICES_TO_UPDATE=()
 if [ -z "$SERVICES" ]; then
-    echo -e "${YELLOW}[提示] 将更新所有应用服务（不包括 redis 和 rabbitmq）${NC}"
+    echo -e "${YELLOW}[提示] 将更新所有应用服务（不包括 seq 、 redis 和 rabbitmq）${NC}"
     for service in "${ALL_SERVICES[@]}"; do
-        if [[ ! "$service" =~ ^(redis|rabbitmq)$ ]]; then
+        if [[ ! "$service" =~ ^(seq|redis|rabbitmq)$ ]]; then
             SERVICES_TO_UPDATE+=("$service")
         fi
     done
@@ -128,21 +129,45 @@ else
     echo -e "${GRAY}  ℹ️ 非 Git 仓库，跳过${NC}"
 fi
 
-# 重新构建镜像
+# 重新构建镜像（跳过基础镜像服务：seq、redis、rabbitmq）
+BUILD_LIST=()
+PULL_LIST=()
+for svc in "${SERVICES_TO_UPDATE[@]}"; do
+    if [[ "$svc" =~ ^(seq|redis|rabbitmq)$ ]]; then
+        PULL_LIST+=("$svc")
+    else
+        BUILD_LIST+=("$svc")
+    fi
+done
+
 if [ "$NO_BUILD" = false ]; then
     echo -e "\n${YELLOW}[3/4] 重新构建镜像...${NC}"
     echo -e "${GRAY}  这可能需要几分钟时间...${NC}"
-    
-    BUILD_SERVICES=$(IFS=' '; echo "${SERVICES_TO_UPDATE[*]}")
-    if docker compose build --no-cache $BUILD_SERVICES; then
-        echo -e "${GREEN}  ✅ 镜像构建成功${NC}"
+    if [ ${#BUILD_LIST[@]} -gt 0 ]; then
+        BUILD_SERVICES=$(IFS=' '; echo "${BUILD_LIST[*]}")
+        if docker compose build --no-cache $BUILD_SERVICES; then
+            echo -e "${GREEN}  ✅ 镜像构建成功${NC}"
+        else
+            echo -e "${RED}  ❌ 镜像构建失败${NC}"
+            exit 1
+        fi
     else
-        echo -e "${RED}  ❌ 镜像构建失败${NC}"
-        exit 1
+        echo -e "${GRAY}  ℹ️ 没有需要构建的服务${NC}"
     fi
 else
     echo -e "\n${YELLOW}[3/4] 跳过镜像构建...${NC}"
     echo -e "${GREEN}  ✅ 将使用现有镜像${NC}"
+fi
+
+# 对于基础镜像服务（seq/redis/rabbitmq）执行 pull（如果需要）
+if [ ${#PULL_LIST[@]} -gt 0 ]; then
+    PULL_SERVICES=$(IFS=' '; echo "${PULL_LIST[*]}")
+    echo -e "\n${YELLOW}正在拉取最新镜像: ${PULL_SERVICES}${NC}"
+    if docker compose pull $PULL_SERVICES; then
+        echo -e "${GREEN}  ✅ 镜像拉取完成${NC}"
+    else
+        echo -e "${YELLOW}  ! 镜像拉取失败，继续更新（可能使用本地镜像）${NC}"
+    fi
 fi
 
 # 更新服务

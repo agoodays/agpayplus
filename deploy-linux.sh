@@ -131,6 +131,10 @@ directories=(
     "$DATA_PATH"
     "$DATA_PATH/logs"
     "$DATA_PATH/upload"
+    "$DATA_PATH/seq"
+    "$DATA_PATH/mysql"
+    "$DATA_PATH/redis"
+    "$DATA_PATH/rabbitmq"
 )
 
 for dir in "${directories[@]}"; do
@@ -186,6 +190,7 @@ echo -e "  商户系统:    https://localhost:8818"
 echo -e "  支付网关:    https://localhost:9819"
 echo -e "  收银台:      https://localhost:9819/cashier"
 echo -e "  RabbitMQ:    http://localhost:15672 (admin/admin)"
+echo -e "  Seq:         http://localhost:5341"
 echo ""
 echo -e "${GRAY}查看服务状态：docker compose ps${NC}"
 echo -e "${GRAY}查看服务日志：docker compose logs -f [service-name]${NC}"

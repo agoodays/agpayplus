@@ -57,21 +57,24 @@ services:
       # - JWT__Secret=JWTAuthenticationHIGHsecuredPasswordVVVp1OH7Xzyr # 注意：不要在生产环境中直接暴露敏感信息
 
       # MQ 配置
-      - MQ__Vender=RabbitMQ
-      - MQ__RabbitMQ__HostName=rabbitmq # 使用服务名称
-      - MQ__RabbitMQ__UserName=admin
-      - MQ__RabbitMQ__Password=admin
-      - MQ__RabbitMQ__Port=5672
+      - MQ__Vender=${MQ_VENDER:-RabbitMQ}
+      - MQ__RabbitMQ__HostName=${MQ_HOSTNAME:-rabbitmq} # 使用服务名称或主机
+      - MQ__RabbitMQ__UserName=${MQ_USERNAME:-admin}
+      - MQ__RabbitMQ__Password=${MQ_PASSWORD:-admin}
+      - MQ__RabbitMQ__Port=${MQ_PORT:-5672}
 
       # 其他环境变量...
       - LANG=C.UTF-8
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
       - ASPNETCORE_URLS=https://+:9817;http://+:5817
       - ASPNETCORE_HTTPS_PORT=9817
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD:-123456}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH_IN_CONTAINER:-/https/agpayplusapi.pfx}
       - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=${MYSQL_PORT};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
       - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=1 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
+      - AgSerilog__SeqUrl=${SEQ_URL:-http://seq:80}
+      - AgSerilog__EnableSeq=${ENABLE_SEQ:-true}
+      - AgSerilog__SeqApiKey=${SEQ_API_KEY:-}
     volumes:
       - ${DATA_PATH_HOST}/logs:/app/agpayplus/logs
       - ${DATA_PATH_HOST}/upload:/app/agpayplus/upload
@@ -104,21 +107,24 @@ services:
       # - JWT__Secret=JWTAuthenticationHIGHsecuredPasswordVVVp1OH7Xzyr # 注意：不要在生产环境中直接暴露敏感信息
 
       # MQ 配置
-      - MQ__Vender=RabbitMQ
-      - MQ__RabbitMQ__HostName=rabbitmq # 使用服务名称
-      - MQ__RabbitMQ__UserName=admin
-      - MQ__RabbitMQ__Password=admin
-      - MQ__RabbitMQ__Port=5672
+      - MQ__Vender=${MQ_VENDER:-RabbitMQ}
+      - MQ__RabbitMQ__HostName=${MQ_HOSTNAME:-rabbitmq} # 使用服务名称或主机
+      - MQ__RabbitMQ__UserName=${MQ_USERNAME:-admin}
+      - MQ__RabbitMQ__Password=${MQ_PASSWORD:-admin}
+      - MQ__RabbitMQ__Port=${MQ_PORT:-5672}
 
       # 其他环境变量...
       - LANG=C.UTF-8
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
       - ASPNETCORE_URLS=https://+:9816;http://+:5816
       - ASPNETCORE_HTTPS_PORT=9816
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD:-123456}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH_IN_CONTAINER:-/https/agpayplusapi.pfx}
       - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=${MYSQL_PORT};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
       - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=2 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
+      - AgSerilog__SeqUrl=${SEQ_URL:-http://seq:80}
+      - AgSerilog__EnableSeq=${ENABLE_SEQ:-true}
+      - AgSerilog__SeqApiKey=${SEQ_API_KEY:-}
     volumes:
       - ${DATA_PATH_HOST}/logs:/app/agpayplus/logs
       - ${DATA_PATH_HOST}/upload:/app/agpayplus/upload
@@ -151,21 +157,24 @@ services:
       # - JWT__Secret=JWTAuthenticationHIGHsecuredPasswordVVVp1OH7Xzyr # 注意：不要在生产环境中直接暴露敏感信息
 
       # MQ 配置
-      - MQ__Vender=RabbitMQ
-      - MQ__RabbitMQ__HostName=rabbitmq # 使用服务名称
-      - MQ__RabbitMQ__UserName=admin
-      - MQ__RabbitMQ__Password=admin
-      - MQ__RabbitMQ__Port=5672
+      - MQ__Vender=${MQ_VENDER:-RabbitMQ}
+      - MQ__RabbitMQ__HostName=${MQ_HOSTNAME:-rabbitmq} # 使用服务名称或主机
+      - MQ__RabbitMQ__UserName=${MQ_USERNAME:-admin}
+      - MQ__RabbitMQ__Password=${MQ_PASSWORD:-admin}
+      - MQ__RabbitMQ__Port=${MQ_PORT:-5672}
 
       # 其他环境变量...
       - LANG=C.UTF-8
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
       - ASPNETCORE_URLS=https://+:9818;http://+:5818
       - ASPNETCORE_HTTPS_PORT=9818
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=123456
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD:-123456}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH_IN_CONTAINER:-/https/agpayplusapi.pfx}
       - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=${MYSQL_PORT};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
       - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=3 #1库：运营平台  #2库：代理商系统 #3库：商户系统 #4库：支付网关
+      - AgSerilog__SeqUrl=${SEQ_URL:-http://seq:80}
+      - AgSerilog__EnableSeq=${ENABLE_SEQ:-true}
+      - AgSerilog__SeqApiKey=${SEQ_API_KEY:-}
     volumes:
       - ${DATA_PATH_HOST}/logs:/app/agpayplus/logs
       - ${DATA_PATH_HOST}/upload:/app/agpayplus/upload
@@ -190,11 +199,11 @@ services:
       - "9819:9819"
     environment:
       - Cors__AllowedOrigins=https://${IPORDOMAIN}:8819,http://${IPORDOMAIN}:8819
-      - MQ__Vender=RabbitMQ
-      - MQ__RabbitMQ__HostName=rabbitmq
-      - MQ__RabbitMQ__UserName=admin
-      - MQ__RabbitMQ__Password=admin
-      - MQ__RabbitMQ__Port=5672
+      - MQ__Vender=${MQ_VENDER:-RabbitMQ}
+      - MQ__RabbitMQ__HostName=${MQ_HOSTNAME:-rabbitmq}
+      - MQ__RabbitMQ__UserName=${MQ_USERNAME:-admin}
+      - MQ__RabbitMQ__Password=${MQ_PASSWORD:-admin}
+      - MQ__RabbitMQ__Port=${MQ_PORT:-5672}
       - LANG=C.UTF-8
       - DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
       - ASPNETCORE_URLS=https://+:9819;http://+:5819
@@ -203,6 +212,9 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx
       - ConnectionStrings__Default=server=${MYSQL_SERVER_NAME};port=${MYSQL_PORT};uid=${MYSQL_USER};pwd=${MYSQL_PASSWORD};database=${MYSQL_DATABASE}
       - Redis__Default__Connection=redis:6379,abortConnect=false,defaultDatabase=4
+      - AgSerilog__SeqUrl=${SEQ_URL:-http://seq:80}
+      - AgSerilog__EnableSeq=${ENABLE_SEQ:-true}
+      - AgSerilog__SeqApiKey=${SEQ_API_KEY:-}
     volumes:
       - ${DATA_PATH_HOST}/logs:/app/agpayplus/logs
       - ${DATA_PATH_HOST}/upload:/app/agpayplus/upload
@@ -215,6 +227,17 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    networks:
+      - app-network
+
+  seq:
+    image: datalust/seq:latest
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5341:80"
+    volumes:
+      - ${DATA_PATH_HOST}/seq:/data
     networks:
       - app-network
 
@@ -244,7 +267,7 @@ services:
   #     - "${MYSQL_PORT}:3306"
   #   volumes:
   #     - ./aspnet-core/docs/sql/agpayplusinit.sql:/docker-entrypoint-initdb.d/init.sql:ro
-  #     - db-data:/var/lib/mysql
+  #     - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
   #   command: 
   #     - --character-set-server=utf8mb4
   #     - --collation-server=utf8mb4_unicode_ci
@@ -261,6 +284,8 @@ services:
     image: redis
     ports:
       - "6379:6379" # 将宿主机的 6379 端口映射到容器的 6379 端口
+    volumes:
+      - ${DATA_PATH_HOST}/redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -273,13 +298,14 @@ services:
     image: rabbitmq:3-management
     hostname: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
+      - RABBITMQ_DEFAULT_USER=${MQ_USERNAME:-admin}
+      - RABBITMQ_DEFAULT_PASS=${MQ_PASSWORD:-admin}
     ports:
       - "15672:15672"
       - "5672:5672"
     volumes:
       - ./aspnet-core/docs/rabbitmq_plugin:/plugins  # 挂载包含插件的本地目录到容器内的/plugins目录
+      - ${DATA_PATH_HOST}/rabbitmq:/var/lib/rabbitmq
     command: >
       bash -c "
       cp /plugins/*.ez /opt/rabbitmq/plugins/ &&
@@ -299,13 +325,18 @@ networks:
     driver: bridge
 
 # ========================================
-# Docker MySQL 数据卷（可选）
+# Docker MySQL 数据持久化（可选）
 # ========================================
-# 仅在使用 Docker MySQL 时需要
-# 如果使用宿主机 MySQL，此配置无需启用
+# MySQL 现在使用 host bind mount 方式
+# 数据将保存在 ${DATA_PATH_HOST}/mysql 目录
+# 与 Redis、RabbitMQ、Seq 等服务保持一致
 # 
-# 启用 Docker MySQL 时，取消下面的注释：
+# 优势：
+#   - 统一管理：所有数据在 ${DATA_PATH_HOST} 下
+#   - 便于备份：直接备份数据目录
+#   - 易于迁移：复制目录即可迁移
+#   - 位置透明：数据位置明确
+# 
+# 迁移说明：如果之前使用了 named volume，
+# 请参考 MYSQL_MIGRATION.md 进行数据迁移
 # ========================================
-# volumes:
-#   db-data:
-#     driver: local
