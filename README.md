@@ -611,6 +611,24 @@ docker run -d --name agpay-ui-agent -p 8816:80 --network agpay-plus-network agpa
 docker run -d --name agpay-ui-merchant -p 8818:80 --network agpay-plus-network agpay-ui-merchant
 ```
 
+### Docker Compose
+
+**推荐使用上面的自动化部署脚本，以下为手动命令参考：**
+
+```bash
+# 构建并启动服务
+agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up
+# 使用应用服务配置文件部署 -d 参数可以在后台运行服务
+agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up -d
+
+# 检查容器状态
+agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app ps
+
+# 重新构建并启动服务
+agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app build
+agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up -d
+```
+
 </details>
 
 ---
@@ -657,24 +675,6 @@ docker run -d --name agpay-ui-merchant -p 8818:80 --network agpay-plus-network a
 - 📝 [接口文档](https://www.yuque.com/xiangyisheng/agooday/cweewhugp7h7hvml)
 
 ---
-
-### Docker Compose
-
-**推荐使用上面的自动化部署脚本，以下为手动命令参考：**
-
-```bash
-# 构建并启动服务
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up
-# 使用应用服务配置文件部署 -d 参数可以在后台运行服务
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up -d
-
-# 检查容器状态
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app ps
-
-# 重新构建并启动服务
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app build
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up -d
-```
 
 **更多详细配置和说明，请参考：**
 - [README_DOCKER.md](README_DOCKER.md) - 快速入门
