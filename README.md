@@ -173,8 +173,10 @@ agpayplus/
 ├── .gitignore
 ├── README.md
 ├── LICENSE
-├── .env
-├── .env.app
+├── .env.example
+├── .env.development
+├── .env.staging
+├── .env.production
 ├── docker-compose-app.yml
 └── docker-compose.yml
 ```
@@ -213,10 +215,13 @@ AgPay+ 提供了完整的 **Docker Compose** 部署方案，支持 **一键部�
 **Windows:**
 ```powershell
 # 完整部署（包含环境检查、证书生成、服务启动）
-.\deploy-windows.ps1
+.\deploy.ps1
 
 # 更新服务
-.\update-windows.ps1
+.\update.ps1
+
+# 回滚到之前版本
+.\rollback.ps1
 
 # 生成 SSL 证书
 .\generate-cert-windows.ps1
@@ -225,13 +230,16 @@ AgPay+ 提供了完整的 **Docker Compose** 部署方案，支持 **一键部�
 **Linux/macOS:**
 ```bash
 # 添加执行权限
-chmod +x deploy-linux.sh update-linux.sh generate-cert-linux.sh
+chmod +x deploy.sh update.sh rollback.sh generate-cert-linux.sh
 
 # 完整部署
-./deploy-linux.sh
+./deploy.sh
 
 # 更新服务
-./update-linux.sh
+./update.sh
+
+# 回滚到之前版本
+./rollback.sh
 
 # 生成 SSL 证书
 ./generate-cert-linux.sh
@@ -240,9 +248,10 @@ chmod +x deploy-linux.sh update-linux.sh generate-cert-linux.sh
 #### 方式 2：Docker Compose 命令
 
 ```bash
-# 1. 配置环境变量
-cp .env.windows .env  # Windows
-cp .env.linux .env    # Linux/macOS
+# 1. 选择环境配置
+cp .env.development .env    # 开发环境
+cp .env.staging .env        # 预发布环境
+cp .env.production .env     # 生产环境
 
 # 2. 编辑配置文件
 vim .env
@@ -259,13 +268,33 @@ docker compose logs -f
 
 ### 📚 详细文档
 
+下列文档为本项目的详细说明与运维手册，建议按照顺序阅读：
+
 | 文档 | 说明 |
 |------|------|
-| **[README_DOCKER.md](README_DOCKER.md)** | 📖 **快速部署指南** - 5分钟快速上手 |
-| **[DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)** | 📘 **完整部署文档** - 详细步骤和配置说明 |
-| **[DATABASE_SETUP.md](DATABASE_SETUP.md)** | 📊 **数据库搭建指南** - MySQL 环境配置 |
-| **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** | ✅ **部署检查清单** - 上线前检查 |
-| **[CASHIER_DEPLOYMENT.md](CASHIER_DEPLOYMENT.md)** | 💳 **收银台部署说明** - 收银台集成方案 |
+| **[DEPLOYMENT_USAGE_GUIDE.md](DEPLOYMENT_USAGE_GUIDE.md)** | 📘 完整部署与更新指南（首选阅读，包含首次部署/更新/回滚/CI/CD） |
+| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | 📖 常用命令速查：一键命令、示例和操作速查表（运维速查表） |
+| **[README_DOCKER.md](README_DOCKER.md)** | 🚀 Docker 快速上手：5 分钟部署示例和常见问题 |
+| **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** | ✅ 上线前检查清单（生产环境准备、配置与校验） |
+| **[DATABASE_SETUP.md](DATABASE_SETUP.md)** | 🗄️ 数据库搭建与初始化（MySQL 配置、初始化脚本、远程访问） |
+| **[MYSQL_MIGRATION.md](MYSQL_MIGRATION.md)** | 🔄 MySQL 数据迁移指南与卷到宿主机迁移说明 |
+| **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | 🔧 故障排查指南（日志、常见问题及解决步骤） |
+| **[DOCKER_MIRROR_GUIDE.md](DOCKER_MIRROR_GUIDE.md)** | 🌐 镜像源与加速配置，提升拉取速度的建议 |
+| **[DOCKER_COMPOSE_DYNAMIC_CONFIG.md](DOCKER_COMPOSE_DYNAMIC_CONFIG.md)** | ⚙️ 动态配置与多环境并行运行说明（CI/CD、标签管理） |
+| **[CASHIER_DEPLOYMENT.md](CASHIER_DEPLOYMENT.md)** | 💳 收银台（Cashier）部署与集成说明 |
+| **[FEATURES_UPDATE.md](FEATURES_UPDATE.md)** | ✨ 功能变更与更新记录（添加/变更功能摘要） |
+| **[IMPLEMENTATION_REPORT.md](IMPLEMENTATION_REPORT.md)** | 📝 实现说明与设计记录（供开发/审计参考） |
+| **[README_DEPLOYMENT.md](README_DEPLOYMENT.md)** | 📚 部署脚本说明与示例（轻量参考） |
+
+额外模块与子项目说明：
+
+| 文档 | 说明 |
+|------|------|
+| **[aspnet-core/README.md](aspnet-core/README.md)** | 后端项目总览与代码结构 |
+| **[ant-design-vue/README.md](ant-design-vue/README.md)** | 前端项目总览（Vue 项目结构与运行） |
+| **[ant-design-vue/agpay-ui-cashier/README.md](ant-design-vue/agpay-ui-cashier/README.md)** | Cashier 前端工程说明 |
+
+如需导出或打印完整清单，请参阅 `DEPLOYMENT_USAGE_GUIDE.md` 的“文档索引”章节。若要我把 README 中的这些链接按另一种顺序或增加简短概要说明，请告知。
 
 ### 🎯 部署架构
 
@@ -330,11 +359,27 @@ AgPay+ 采用微服务架构，基于 Docker Compose 进行容器编排：
 
 #### 1. 环境变量配置
 
-编辑 `.env` 文件（从模板复制）：
+从环境模板创建配置文件：
+
+```bash
+# 开发环境
+cp .env.development .env
+
+# 预发布环境
+cp .env.staging .env
+
+# 生产环境
+cp .env.production .env
+```
+
+编辑 `.env` 文件：
 
 ```env
 # 基础配置
-IPORDOMAIN=localhost  # 生产环境改为实际域名或IP
+COMPOSE_PROJECT_NAME=agpayplus        # 项目名称
+IPORDOMAIN=localhost                  # 生产环境改为实际域名或IP
+IMAGE_PREFIX=agpay                    # 镜像前缀
+IMAGE_TAG=latest                      # 镜像标签
 
 # MySQL 配置
 MYSQL_SERVER_NAME=host.docker.internal  # Windows/macOS
@@ -342,15 +387,16 @@ MYSQL_SERVER_NAME=host.docker.internal  # Windows/macOS
 MYSQL_PORT=3306
 MYSQL_DATABASE=agpayplusdb
 MYSQL_USER=root
-MYSQL_PASSWORD=your_password  # 修改为实际密码
+MYSQL_PASSWORD=your_password            # 修改为实际密码
 
 # 数据路径
-DATA_PATH_HOST=E:/app/agpayplus  # Windows
-# DATA_PATH_HOST=/opt/agpayplus  # Linux
+DATA_PATH_HOST=E:/app/agpayplus         # Windows
+# DATA_PATH_HOST=/opt/agpayplus         # Linux
 
 # 证书路径
 CERT_PATH=${USERPROFILE}/.aspnet/https  # Windows
 # CERT_PATH=~/.aspnet/https             # Linux
+CERT_PASSWORD=123456
 ```
 
 #### 2. 数据库准备
@@ -425,12 +471,16 @@ docker compose down -v  # 同时删除数据卷
 
 ```bash
 # 更新所有应用服务
-./update-windows.ps1  # Windows
-./update-linux.sh     # Linux/macOS
+./update.ps1        # Windows
+./update.sh         # Linux/macOS
 
 # 更新指定服务
-./update-windows.ps1 -Services "payment-api"
-./update-linux.sh --services "payment-api,manager-api"
+./update.ps1 -Services "payment-api"                      # Windows
+./update.sh --services "payment-api,manager-api"          # Linux/macOS
+
+# 强制重新构建
+./update.ps1 -Services "payment-api" -Force               # Windows
+./update.sh --services "payment-api" --force              # Linux/macOS
 ```
 
 #### 手动更新
@@ -444,6 +494,24 @@ docker compose build [service_name]
 
 # 3. 重启服务
 docker compose up -d [service_name]
+```
+
+### 🔄 版本回滚
+
+#### 使用回滚脚本
+
+```bash
+# 查看可用备份
+./rollback.ps1 -List        # Windows
+./rollback.sh --list        # Linux/macOS
+
+# 回滚到最新备份
+./rollback.ps1              # Windows
+./rollback.sh               # Linux/macOS
+
+# 回滚到指定备份
+./rollback.ps1 -Backup "20240315_143022"        # Windows
+./rollback.sh --backup "20240315_143022"        # Linux/macOS
 ```
 
 ### 🐛 故障排查
@@ -483,7 +551,7 @@ docker compose build --no-cache
 docker compose up -d
 ```
 
-详见：[DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md) 第10章：故障排查
+详见：[TROUBLESHOOTING.md](TROUBLESHOOTING.md)
 
 ---
 
@@ -661,21 +729,31 @@ agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up -d
 4. ✅ 优化数据库索引
 5. ✅ 配置负载均衡
 
-详见：[DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md) 第11章：生产环境优化
+详见：[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)
 
 ---
 
 ## 🔗 相关链接
 
-- 📖 [快速部署文档](README_DOCKER.md)
-- 📘 [完整部署指南](DOCKER_DEPLOYMENT.md)
-- 📊 [数据库搭建](DATABASE_SETUP.md)
-- ✅ [部署检查清单](DEPLOYMENT_CHECKLIST.md)
-- 💳 [收银台部署](CASHIER_DEPLOYMENT.md)
-- 📝 [接口文档](https://www.yuque.com/xiangyisheng/agooday/cweewhugp7h7hvml)
+- 📖 [快速参考手册](QUICK_REFERENCE.md) - 常用命令速查
+- 📘 [完整使用指南](DEPLOYMENT_USAGE_GUIDE.md) - 详细的部署和更新说明
+- 📖 [Docker 快速指南](README_DOCKER.md) - Docker 快速上手
+- 📊 [数据库搭建](DATABASE_SETUP.md) - MySQL 环境配置
+- ✅ [部署检查清单](DEPLOYMENT_CHECKLIST.md) - 上线前检查
+- 💳 [收银台部署](CASHIER_DEPLOYMENT.md) - 收银台集成
+- 🔧 [故障排查指南](TROUBLESHOOTING.md) - 常见问题解决
+- 📝 [接口文档](https://www.yuque.com/xiangyisheng/agooday/cweewhugp7h7hvml) - API 接口说明
 
 ---
 
-**更多详细配置和说明，请参考：**
-- [README_DOCKER.md](README_DOCKER.md) - 快速入门
-- [DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md) - 完整文档
+**部署脚本说明：**
+- `deploy.sh` / `deploy.ps1` - 首次部署脚本（包含环境检查、证书生成、服务启动）
+- `update.sh` / `update.ps1` - 服务更新脚本（支持选择性更新服务）
+- `rollback.sh` / `rollback.ps1` - 版本回滚脚本（支持回滚到历史版本）
+- `generate-cert-linux.sh` / `generate-cert-windows.ps1` - SSL 证书生成脚本
+
+**环境配置文件：**
+- `.env.development` - 开发环境配置模板
+- `.env.staging` - 预发布环境配置模板
+- `.env.production` - 生产环境配置模板
+- `.env` - 当前使用的配置（从模板复制并修改）

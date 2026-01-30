@@ -7,12 +7,16 @@
 ### Windows 环境
 
 ```powershell
-# 1. 配置环境变量
-Copy-Item .env.windows .env
-# 编辑 .env 文件，修改 MySQL 密码等配置
+# 1. 选择环境配置
+Copy-Item .env.production .env      # 生产环境
+# Copy-Item .env.development .env   # 开发环境
+# Copy-Item .env.staging .env       # 预发布环境
 
-# 2. 一键部署
-.\deploy-windows.ps1
+# 2. 编辑配置文件
+notepad .env  # 修改 MySQL 密码、域名等配置
+
+# 3. 一键部署
+.\deploy.ps1
 ```
 
 ### Linux/macOS 环境
@@ -21,12 +25,16 @@ Copy-Item .env.windows .env
 # 1. 添加执行权限
 chmod +x *.sh
 
-# 2. 配置环境变量
-cp .env.linux .env
-# 编辑 .env 文件，修改配置
+# 2. 选择环境配置
+cp .env.production .env      # 生产环境
+# cp .env.development .env   # 开发环境
+# cp .env.staging .env       # 预发布环境
 
-# 3. 一键部署
-./deploy-linux.sh
+# 3. 编辑配置文件
+vim .env  # 修改配置
+
+# 4. 一键部署
+./deploy.sh
 ```
 
 ## 📋 前置要求
@@ -92,12 +100,12 @@ DATA_PATH_HOST=E:/app/agpayplus         # Windows
 
 **Windows:**
 ```powershell
-.\update-windows.ps1
+.\update.ps1
 ```
 
 **Linux/macOS:**
 ```bash
-./update-linux.sh
+./update.sh
 ```
 
 ### 更新指定服务
@@ -105,22 +113,28 @@ DATA_PATH_HOST=E:/app/agpayplus         # Windows
 **Windows:**
 ```powershell
 # 更新运营平台前后端
-.\update-windows.ps1 -Services "ui-manager,manager-api"
+.\update.ps1 -Services "ui-manager,manager-api"
 
 # 更新所有前端
-.\update-windows.ps1 -Services "ui-manager,ui-agent,ui-merchant"
+.\update.ps1 -Services "ui-manager,ui-agent,ui-merchant"
 
 # 更新支付网关（包含收银台前端）
-.\update-windows.ps1 -Services "payment-api"
+.\update.ps1 -Services "payment-api"
+
+# 更新支付网关并重新构建 Cashier
+.\update.ps1 -Services "payment-api" -BuildCashier
 ```
 
 **Linux/macOS:**
 ```bash
 # 更新运营平台前后端
-./update-linux.sh --services "ui-manager,manager-api"
+./update.sh --services "ui-manager,manager-api"
 
 # 更新所有前端
-./update-linux.sh --services "ui-manager,ui-agent,ui-merchant,ui-cashier"
+./update.sh --services "ui-manager,ui-agent,ui-merchant"
+
+# 更新支付网关并重新构建 Cashier
+./update.sh --services "payment-api" --build-cashier
 ```
 
 ### 可用服务列表
@@ -133,7 +147,61 @@ DATA_PATH_HOST=E:/app/agpayplus         # Windows
 - `merchant-api` - 商户系统后端
 - `payment-api` - 支付网关后端（包含收银台前端）
 
-**注意**：收银台（cashier）前端已集成到 `payment-api` 服务中，通过 `/cashier` 路径访问。
+**注意**：
+- 收银台（cashier）前端已集成到 `payment-api` 服务中
+- 通过 `/cashier` 路径访问
+- 默认不重新构建 cashier（节省时间）
+- 如果 cashier 有变更，使用 `--build-cashier` 参数
+
+## 🔙 版本回滚
+
+### 查看可用备份
+
+**Windows:**
+```powershell
+.\rollback.ps1 -List
+```
+
+**Linux/macOS:**
+```bash
+./rollback.sh --list
+```
+
+### 回滚到最新版本
+
+**Windows:**
+```powershell
+.\rollback.ps1
+```
+
+**Linux/macOS:**
+```bash
+./rollback.sh
+```
+
+### 回滚到指定版本
+
+**Windows:**
+```powershell
+.\rollback.ps1 -Backup "20240315_143022"
+```
+
+**Linux/macOS:**
+```bash
+./rollback.sh --backup "20240315_143022"
+```
+
+### 回滚指定服务
+
+**Windows:**
+```powershell
+.\rollback.ps1 -Services "manager-api,agent-api"
+```
+
+**Linux/macOS:**
+```bash
+./rollback.sh --services "manager-api,agent-api"
+```
 
 ## 📦 常用命令
 
@@ -199,15 +267,30 @@ ports:
 docker system prune -a
 
 # 重新部署
-.\deploy-windows.ps1  # Windows
-./deploy-linux.sh     # Linux/macOS
+.\deploy.ps1  # Windows
+./deploy.sh   # Linux/macOS
+```
+
+### 6. 更新失败需要回滚
+
+```bash
+# 自动回滚到最新备份
+.\rollback.ps1  # Windows
+./rollback.sh   # Linux/macOS
+
+# 查看回滚日志
+docker compose logs -f
 ```
 
 ## 📚 完整文档
 
 详细的部署文档、配置说明和故障排查，请参考：
 
-👉 [完整部署文档](DOCKER_DEPLOYMENT.md)
+- 📖 [快速参考手册](QUICK_REFERENCE.md) - 常用命令速查
+- 📘 [完整使用指南](DEPLOYMENT_USAGE_GUIDE.md) - 详细部署步骤
+- 🔧 [故障排查指南](TROUBLESHOOTING.md) - 常见问题解决
+- 📊 [数据库搭建](DATABASE_SETUP.md) - MySQL 配置
+- ✅ [部署检查清单](DEPLOYMENT_CHECKLIST.md) - 上线前检查
 
 ## 🔐 生产环境
 
@@ -220,8 +303,10 @@ docker system prune -a
 5. ✅ 启用日志轮转
 6. ✅ 配置资源限制
 7. ✅ 设置监控告警
+8. ✅ 定期备份数据库
+9. ✅ 测试回滚流程
 
-详见：[生产环境部署建议](DOCKER_DEPLOYMENT.md#生产环境部署建议)
+详见：[部署检查清单](DEPLOYMENT_CHECKLIST.md)
 
 ## 🏭️ 项目架构
 
@@ -229,16 +314,17 @@ docker system prune -a
 agpayplus/
 ├── 🔧 配置文件
 │   ├── docker-compose.yml       # Docker 编排配置
-│   ├── .env                     # 环境变量（实际使用）
-│   ├── .env.windows             # Windows 模板
-│   └── .env.linux               # Linux/macOS 模板
+│   ├── .env                     # 环境变量（当前使用，从模板复制）
+│   ├── .env.development         # 开发环境模板
+│   ├── .env.staging             # 预发布环境模板
+│   ├── .env.production          # 生产环境模板
+│   └── .env.example             # 配置示例
 ├── 📜 部署脚本
-│   ├── deploy-windows.ps1       # Windows 部署
-│   ├── deploy-linux.sh          # Linux/macOS 部署
-│   ├── update-windows.ps1       # Windows 更新
-│   ├── update-linux.sh          # Linux/macOS 更新
-│   ├── generate-cert-windows.ps1 # Windows 证书
-│   └── generate-cert-linux.sh   # Linux/macOS 证书
+│   ├── deploy.sh / deploy.ps1           # 统一部署脚本
+│   ├── update.sh / update.ps1           # 服务更新脚本
+│   ├── rollback.sh / rollback.ps1       # 版本回滚脚本
+│   ├── generate-cert-linux.sh           # Linux/macOS 证书生成
+│   └── generate-cert-windows.ps1        # Windows 证书生成
 ├── 🔙 后端服务
 │   └── aspnet-core/src/
 │       ├── AGooday.AgPay.Manager.Api/    # 运营平台 API
@@ -255,7 +341,9 @@ agpayplus/
 
 ## 🤝 获取帮助
 
-- 📖 [完整部署文档](DOCKER_DEPLOYMENT.md)
+- 📖 [快速参考](QUICK_REFERENCE.md) - 常用命令速查
+- 📘 [完整指南](DEPLOYMENT_USAGE_GUIDE.md) - 详细部署说明
+- 🔧 [故障排查](TROUBLESHOOTING.md) - 问题解决方案
 - 🐛 [问题反馈](https://github.com/agoodays/agpayplus/issues)
 - 💬 [讨论区](https://github.com/agoodays/agpayplus/discussions)
 

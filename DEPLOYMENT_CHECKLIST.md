@@ -126,22 +126,22 @@
 ### 3. 配置文件
 
 - [ ] 环境变量模板文件存在
-  ```bash
-  ls -l .env.windows .env.linux
-  ```
+```bash
+ls -l .env.development .env.staging .env.production .env.example
+```
 
 ## ✅ 环境配置
 
 ### 1. 环境变量配置
 
 - [ ] 已复制并编辑 `.env` 文件
-  ```bash
-  # Windows
-  Copy-Item .env.windows .env
+```bash
+# Windows
+Copy-Item .env.production .env
   
-  # Linux/macOS
-  cp .env.linux .env
-  ```
+# Linux/macOS
+cp .env.production .env
+```
 
 - [ ] 核心配置已正确设置
 
@@ -332,26 +332,26 @@
 
 ```powershell
 # 完整部署
-.\deploy-windows.ps1
+.\deploy.ps1
 
 # 如果已有证书，跳过证书生成
-.\deploy-windows.ps1 -SkipCert
+.\deploy.ps1 -SkipCert
 
 # 如果已配置 .env，跳过环境配置
-.\deploy-windows.ps1 -SkipEnv
+.\deploy.ps1 -SkipEnv
 ```
 
 ### Linux/macOS 部署
 
 ```bash
 # 完整部署
-./deploy-linux.sh
+./deploy.sh
 
 # 跳过证书生成
-./deploy-linux.sh --skip-cert
+./deploy.sh --skip-cert
 
 # 跳过环境配置
-./deploy-linux.sh --skip-env
+./deploy.sh --skip-env
 ```
 
 ## 📊 预期部署时间
@@ -369,7 +369,7 @@
 如果遇到问题，请查看：
 
 1. **部署日志**：`docker compose logs -f`
-2. **错误排查文档**：[DOCKER_DEPLOYMENT.md](DOCKER_DEPLOYMENT.md)
+2. **错误排查文档**：[TROUBLESHOOTING.md](TROUBLESHOOTING.md) - 常见问题与解决办法
 3. **收银台部署说明**：[CASHIER_DEPLOYMENT.md](CASHIER_DEPLOYMENT.md)
 
 常见问题：

@@ -299,20 +299,20 @@ docker compose up -d
 
 ### 部署脚本已兼容
 
-现有的部署脚本（`deploy-linux.sh`, `deploy-windows.ps1` 等）已自动支持动态配置，因为它们会读取 `.env` 文件。
+现有的部署脚本（`deploy.sh`, `deploy.ps1` 等）已自动支持动态配置，因为它们会读取 `.env` 文件。
 
 **使用示例**:
 ```sh
 # 生产环境（使用默认 .env）
-./deploy-linux.sh
+./deploy.sh
 
 # 开发环境
-cp .env.dev .env
-./deploy-linux.sh
+cp .env.development .env
+./deploy.sh
 
 # 或直接指定
-export $(cat .env.dev | xargs)
-./deploy-linux.sh
+export $(cat .env.development | xargs)
+./deploy.sh
 ```
 
 ---

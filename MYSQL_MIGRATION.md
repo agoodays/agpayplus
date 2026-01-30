@@ -78,7 +78,8 @@ sudo mkdir -p /opt/agpayplus/mysql
 sudo chown -R $(whoami):$(whoami) /opt/agpayplus/mysql
 
 # 或使用部署脚本自动创建
-./deploy-linux.sh --skip-cert --skip-env
+./deploy.sh --skip-cert --skip-env# 或使用部署脚本自动创建
+./deploy.sh --skip-cert --skip-env
 ```
 
 #### 5. 启动新的 MySQL 容器
@@ -365,9 +366,9 @@ docker exec <mysql-container> mysql -u root -p -e "USE agpayplusdb; SHOW TABLES;
 
 ## 📚 相关文档
 
-- [Docker 部署说明](DOCKER_DEPLOYMENT.md)
+- [快速参考手册](QUICK_REFERENCE.md)
 - [数据库设置说明](DATABASE_SETUP.md)
-- [部署指南](DEPLOYMENT_GUIDE.md)
+- [完整使用指南](DEPLOYMENT_USAGE_GUIDE.md)
 
 ---
 

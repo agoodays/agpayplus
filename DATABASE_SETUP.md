@@ -182,7 +182,7 @@ net start MySQL80
 
 ### 步骤 5：配置 .env 文件
 
-**Windows (.env.windows → .env)**
+**Windows (use `.env.production` / `.env.development` / `.env.staging` → `.env`)**
 
 ```env
 # 使用宿主机 MySQL
@@ -193,11 +193,13 @@ MYSQL_USER=root
 MYSQL_PASSWORD=your_actual_password  # 修改为实际密码
 ```
 
-**Linux (.env.linux → .env)**
+**Linux (use `.env.production` / `.env.development` / `.env.staging` → `.env`)**
 
 ```env
 # 获取 Docker 网桥 IP
 # ip addr show docker0 | grep inet
+
+
 # 输出示例: inet 172.17.0.1/16
 
 MYSQL_SERVER_NAME=172.17.0.1  # 使用上面获取的 IP
@@ -207,7 +209,7 @@ MYSQL_USER=root
 MYSQL_PASSWORD=your_actual_password  # 修改为实际密码
 ```
 
-**macOS (.env.linux → .env)**
+**macOS (use `.env.production` / `.env.development` / `.env.staging` → `.env`)**
 
 ```env
 # macOS 使用 Docker Desktop 内置的 host
@@ -216,6 +218,7 @@ MYSQL_PORT=3306
 MYSQL_DATABASE=agpayplusdb
 MYSQL_USER=root
 MYSQL_PASSWORD=your_actual_password  # 修改为实际密码
+
 ```
 
 ### 步骤 6：测试连接
@@ -237,12 +240,19 @@ docker run --rm mysql:8.0 mysql -h 172.17.0.1 -u root -p  # Linux
 ### 步骤 1：配置 .env 文件
 
 ```bash
-# 复制模板
-cp .env.windows .env  # Windows
-cp .env.linux .env    # Linux/macOS
+# 复制模板（请选择合适环境）
+cp .env.production .env      # 生产环境
+# cp .env.development .env   # 开发环境
+# cp .env.staging .env       # 预发布环境
 
 # 编辑配置
 vim .env
+# 复制模板（请选择合适环境）
+cp .env.production .env  # 生产环境
+# cp .env.development .env  # 开发环境
+# cp .env.staging .env      # 预发布环境
+
+# 编辑配置
 ```
 
 **配置内容：**
@@ -289,8 +299,8 @@ volumes:
 
 ```bash
 # 完整部署（包含 MySQL）
-./deploy-windows.ps1  # Windows
-./deploy-linux.sh     # Linux/macOS
+./deploy.ps1  # Windows
+./deploy.sh   # Linux/macOS
 
 # 或单独启动 MySQL
 docker compose up -d db
@@ -635,7 +645,7 @@ find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
 ## 📚 相关文档
 
 - [快速部署文档](README_DOCKER.md)
-- [完整部署指南](DOCKER_DEPLOYMENT.md)
+- [完整部署指南](DEPLOYMENT_USAGE_GUIDE.md)
 - [部署检查清单](DEPLOYMENT_CHECKLIST.md)
 
 ---

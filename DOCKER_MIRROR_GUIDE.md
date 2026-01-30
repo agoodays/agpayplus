@@ -227,7 +227,7 @@ docker pull nginx:latest
 docker info
 
 # 4. 重新部署
-.\deploy-windows-with-rollback.ps1
+.\deploy.ps1
 ```
 
 ### Linux
@@ -243,7 +243,7 @@ sudo systemctl restart docker
 docker info | grep -A 10 "Registry Mirrors"
 
 # 4. 重新部署
-./deploy-linux-with-rollback.sh
+./deploy.sh
 ```
 
 ---

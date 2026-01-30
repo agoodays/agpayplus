@@ -65,8 +65,8 @@ services:
 
   manager-api:
     build:
-      context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
-      dockerfile: AGooday.AgPay.Manager.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
+      context: ./aspnet-core/src # 设置构建上下文为后端源码目录
+      dockerfile: AGooday.AgPay.Manager.Api/Dockerfile # 指定Dockerfile相对于构建上下文的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
         com.docker.compose.service: "manager-api"
@@ -122,8 +122,8 @@ services:
 
   agent-api:
     build:
-      context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
-      dockerfile: AGooday.AgPay.Agent.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
+      context: ./aspnet-core/src # 设置构建上下文为后端源码目录
+      dockerfile: AGooday.AgPay.Agent.Api/Dockerfile # 指定Dockerfile相对于构建上下文的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
         com.docker.compose.service: "agent-api"
@@ -179,8 +179,8 @@ services:
 
   merchant-api:
     build:
-      context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
-      dockerfile: AGooday.AgPay.Merchant.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
+      context: ./aspnet-core/src # 设置构建上下文为后端源码目录
+      dockerfile: AGooday.AgPay.Merchant.Api/Dockerfile # 指定Dockerfile相对于构建上下文的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
         com.docker.compose.service: "merchant-api"
@@ -236,8 +236,10 @@ services:
 
   payment-api:
     build:
-      context: ./aspnet-core/src # 需要包含根目录（收银台前端在 ant-design-vue 目录）
-      dockerfile: AGooday.AgPay.Payment.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
+      context: . # 设置构建上下文为项目根目录（需要访问 ant-design-vue/agpay-ui-cashier）
+      dockerfile: aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile # 指定Dockerfile相对于项目根目录的路径
+      args:
+        BUILD_CASHIER: ${BUILD_CASHIER:-false} # 是否构建 cashier，默认 false
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
         com.docker.compose.service: "payment-api"

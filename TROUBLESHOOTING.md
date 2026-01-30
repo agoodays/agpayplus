@@ -30,7 +30,7 @@ dial tcp: connectex: A connection attempt failed
 }
 # 3. Apply & Restart
 # 4. 重新部署
-.\deploy-windows-with-rollback.ps1
+.\deploy.ps1
 ```
 
 #### Linux
@@ -38,7 +38,7 @@ dial tcp: connectex: A connection attempt failed
 sudo nano /etc/docker/daemon.json
 # 添加上述 JSON 配置
 sudo systemctl restart docker
-./deploy-linux-with-rollback.sh
+./deploy.sh
 ```
 
 **详细说明**：`DOCKER_MIRROR_GUIDE.md`
@@ -195,7 +195,8 @@ docker compose down -v
 docker volume rm agpayplus_mysql-data
 
 # 重新部署
-./deploy-linux-with-rollback.sh
+./deploy.sh
+
 ```
 
 ---
@@ -265,7 +266,8 @@ docker compose logs -f
 ls -la .backup/
 
 # 如果备份被删除，使用原脚本重新部署
-./deploy-linux.sh
+./deploy.sh
+
 ```
 
 ---
@@ -277,11 +279,11 @@ ls -la .backup/
 **解决方案**：
 
 ```bash
-# 1. 使用带回滚的更新脚本
-./update-linux-with-rollback.sh --services "manager-api"
+# 1. 使用更新脚本
+./update.sh --services "manager-api"
 
 # 2. 如果自动回滚失败，手动回滚
-./rollback-update.sh
+./rollback.sh
 
 # 3. 查看日志排查问题
 docker compose logs manager-api
@@ -454,10 +456,11 @@ cat docker-compose.yml >> config.txt
 
 ## 🔗 相关文档
 
-- `DEPLOYMENT_ROLLBACK_GUIDE.md` - 回滚机制完整指南
-- `DOCKER_MIRROR_GUIDE.md` - Docker 镜像源配置
-- `DEPLOYMENT_GUIDE.md` - 部署脚本说明
-- `MYSQL_MIGRATION.md` - MySQL 迁移指南
+- [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - 快速参考手册
+- [DEPLOYMENT_USAGE_GUIDE.md](./DEPLOYMENT_USAGE_GUIDE.md) - 完整使用指南
+- [README_DEPLOYMENT.md](./README_DEPLOYMENT.md) - 部署方案说明
+- [DOCKER_MIRROR_GUIDE.md](./DOCKER_MIRROR_GUIDE.md) - Docker 镜像源配置
+- [MYSQL_MIGRATION.md](./MYSQL_MIGRATION.md) - MySQL 迁移指南
 
 ---
 
