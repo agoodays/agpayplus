@@ -154,7 +154,7 @@ docker compose down
 docker compose down -v
 ```
 
-## ? 常见问题
+## ❓ 常见问题
 
 ### 1. Windows MySQL 连接失败
 

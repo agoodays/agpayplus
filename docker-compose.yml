@@ -5,6 +5,7 @@ services:
     build:
       context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: agpay-ui-manager/Dockerfile # 指定Dockerfile相对于新的context的路径
+    image: agpay-ui-manager:latest
     ports:
       - "8817:80"  # 将宿主机的 8817 端口映射到容器的 80 端口
     environment:
@@ -19,6 +20,7 @@ services:
     build:
       context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: agpay-ui-agent/Dockerfile # 指定Dockerfile相对于新的context的路径
+    image: agpay-ui-agent:latest
     ports:
       - "8816:80"  # 将宿主机的 8816 端口映射到容器的 80 端口
     environment:
@@ -33,6 +35,7 @@ services:
     build:
       context: ./ant-design-vue
       dockerfile: agpay-ui-merchant/Dockerfile
+    image: agpay-ui-merchant:latest
     ports:
       - "8818:80"
     environment:
@@ -44,6 +47,7 @@ services:
     build:
       context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: AGooday.AgPay.Manager.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
+    image: agpay-manager-api:latest
     ports:
       - "5817:5817"
       - "9817:9817"
@@ -94,6 +98,7 @@ services:
     build:
       context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: AGooday.AgPay.Agent.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
+    image: agpay-agent-api:latest
     ports:
       - "5816:5816"
       - "9816:9816"
@@ -144,6 +149,7 @@ services:
     build:
       context: ./aspnet-core/src # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: AGooday.AgPay.Merchant.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
+    image: agpay-merchant-api:latest
     ports:
       - "5818:5818"
       - "9818:9818"
@@ -194,6 +200,7 @@ services:
     build:
       context: ./aspnet-core/src # 需要包含根目录（收银台前端在 ant-design-vue 目录）
       dockerfile: AGooday.AgPay.Payment.Api/Dockerfile # 指定Dockerfile相对于新的context的路径
+    image: agpay-payment-api:latest
     ports:
       - "5819:5819"
       - "9819:9819"
