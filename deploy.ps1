@@ -116,11 +116,13 @@ function Get-EnvValue {
     $content = Get-Content $EnvFile | Where-Object { $_ -match "^\s*$Key\s*=" }
     if ($content) {
         $value = ($content -split '=', 2)[1].Trim()
-        $value = $value -replace '^["\' "]', '' -replace '["\' "]*$', ''
+        # ✅ 修复：使用 Trim 安全去除首尾引号和空格
+        $value = $value.Trim('"'' ')
+        # 移除行内注释（# 后的内容）
         $value = $value -replace '#.*$', ''
         $value = $value.Trim()
         
-        # 展开环境变量
+        # 展开系统环境变量（如 %USERPROFILE%）
         $value = [System.Environment]::ExpandEnvironmentVariables($value)
         
         return $value
@@ -133,26 +135,69 @@ function Get-EnvValue {
 # 检测 Docker Compose
 # ========================================
 function Get-DockerCompose {
-    $composeV2 = $null
-    $composeV1 = $null
-    
+    # 优先使用 Docker Compose V2 (docker compose)
     try {
-        docker compose version | Out-Null
-        $composeV2 = "docker compose"
+        $output = docker compose version 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            return @("docker", "compose")
+        }
     } catch {}
-    
+
+    # 回退到 V1 (docker-compose)
     try {
-        docker-compose version | Out-Null
-        $composeV1 = "docker-compose"
+        $output = docker-compose version 2>&1
+        if ($LASTEXITCODE -eq 0) {
+            return @("docker-compose")
+        }
     } catch {}
-    
-    if ($composeV2) {
-        return $composeV2
-    } elseif ($composeV1) {
-        return $composeV1
-    } else {
+
+    return $null
+}
+
+# ========================================
+# 调用 Docker Compose 的封装函数（兼容多种调用形式）
+# $DockerCompose 期望为数组：@("docker","compose") 或 @("docker-compose")
+# 用法：Invoke-DockerCompose -Arguments @('ps','-q')
+# ========================================
+function Invoke-DockerCompose {
+    param(
+        [string[]]$Arguments
+    )
+
+    if (-not $DockerCompose) {
+        Write-Error "Docker Compose command not found"
         return $null
     }
+    # Use Start-Process to capture stdout/stderr together and avoid PowerShell promoting stderr to a terminating error
+    $exe = $DockerCompose[0]
+    $argList = @()
+    if ($DockerCompose.Count -gt 1) { $argList += $DockerCompose[1..($DockerCompose.Count-1)] }
+    if ($Arguments) { $argList += $Arguments }
+
+    # Create unique temp files for stdout/stderr to avoid collisions
+    $tempDir = [System.IO.Path]::GetTempPath()
+    $outFile = Join-Path $tempDir ([System.Guid]::NewGuid().ToString() + ".out")
+    $errFile = Join-Path $tempDir ([System.Guid]::NewGuid().ToString() + ".err")
+    # Ensure the files exist so Start-Process can redirect to them
+    New-Item -Path $outFile -ItemType File -Force | Out-Null
+    New-Item -Path $errFile -ItemType File -Force | Out-Null
+    try {
+        $proc = Start-Process -FilePath $exe -ArgumentList $argList -NoNewWindow -RedirectStandardOutput $outFile -RedirectStandardError $errFile -Wait -PassThru
+        $Global:LastDockerComposeExitCode = $proc.ExitCode
+        $stdout = ""
+        $stderr = ""
+        if (Test-Path $outFile) { $stdout = Get-Content $outFile -Raw }
+        if (Test-Path $errFile) { $stderr = Get-Content $errFile -Raw }
+        if ($stdout -and $stderr) { $result = "$stdout`n$stderr" } elseif ($stdout) { $result = $stdout } else { $result = $stderr }
+    } catch {
+        Write-Error "Failed to execute Docker Compose: $_"
+        $Global:LastDockerComposeExitCode = 1
+        $result = $null
+    } finally {
+        Remove-Item $outFile,$errFile -ErrorAction SilentlyContinue
+    }
+
+    return $result
 }
 
 # ========================================
@@ -210,7 +255,7 @@ if (-not $DockerCompose) {
     exit 1
 }
 
-$composeVersion = & $DockerCompose.Split() version --short 2>$null
+$composeVersion = Invoke-DockerCompose -Arguments @('version','--short')
 Write-Success "Docker Compose 版本: $composeVersion"
 
 # ========================================
@@ -220,7 +265,7 @@ Write-Host ""
 Write-Step "[2/9] 检查现有部署..."
 
 $projectName = Get-EnvValue "COMPOSE_PROJECT_NAME"
-$existingContainers = & $DockerCompose.Split() ps -q 2>$null
+$existingContainers = Invoke-DockerCompose -Arguments @('ps','-q')
 $isFirstDeploy = $false
 
 if (-not $existingContainers -or $existingContainers.Count -eq 0) {
@@ -293,27 +338,46 @@ if (-not $SkipBackup -and -not $isFirstDeploy) {
     New-Item -ItemType Directory -Path $backupPath -Force | Out-Null
     
     Write-ColorOutput "  保存镜像信息..." "Gray"
-    & $DockerCompose.Split() ps --format json | Out-File "$backupPath\containers.json" -Encoding UTF8
-    & $DockerCompose.Split() images --format json | Out-File "$backupPath\images.json" -Encoding UTF8
+    Invoke-DockerCompose -Arguments @('ps','--format','json') | Out-File "$backupPath\containers.json" -Encoding UTF8
+    Invoke-DockerCompose -Arguments @('images','--format','json') | Out-File "$backupPath\images.json" -Encoding UTF8
     
     Write-ColorOutput "  导出镜像..." "Gray"
     $imagePrefix = Get-EnvValue "IMAGE_PREFIX"
     $imageTag = Get-EnvValue "IMAGE_TAG"
-    
+
     if ($Services.Count -gt 0) {
         foreach ($service in $Services) {
-            $image = "${imagePrefix}-${service}:${imageTag}"
+            # 使用子表达式避免 PowerShell 在遇到 ':' 时将其解释为命名空间访问
+            $image = "$($imagePrefix)-$($service):$($imageTag)"
             if (docker images -q $image 2>$null) {
                 Write-ColorOutput "    备份: $service" "Gray"
-                docker save $image | gzip > "$backupPath\${service}.tar.gz"
+                # On Windows gzip may not be available. Save as tar file using docker save -o
+                $outFile = "$backupPath\${service}.tar"
+                docker save -o $outFile $image
             }
         }
     } else {
-        $images = & $DockerCompose.Split() images --format "{{.Repository}}:{{.Tag}}"
-        foreach ($image in $images) {
-            $serviceName = $image -replace "${imagePrefix}-", "" -replace ":${imageTag}", ""
+        # Use JSON output from docker compose images to get repository/tag reliably
+        $imagesJson = Invoke-DockerCompose -Arguments @('images','--format','json')
+        $imageObjs = @()
+        if ($imagesJson) {
+            try {
+                $imageObjs = $imagesJson | ConvertFrom-Json
+            } catch {
+                $imageObjs = @()
+            }
+        }
+
+        foreach ($img in $imageObjs) {
+            $repo = $img.Repository
+            $tag = $img.Tag
+            if (-not $repo) { continue }
+            if (-not $tag) { $tag = 'latest' }
+            $image = "$($repo):$($tag)"
+            $serviceName = $repo -replace "${imagePrefix}-", "" -replace ":${imageTag}", ""
             Write-ColorOutput "    备份: $serviceName" "Gray"
-            docker save $image | gzip > "$backupPath\${serviceName}.tar.gz"
+            $outFile = "$backupPath\${serviceName}.tar"
+            docker save -o $outFile $image
         }
     }
     
@@ -359,7 +423,7 @@ if ($BuildCashier) {
 Write-Host ""
 Write-Step "[7/9] 构建镜像..."
 
-$buildCmd = $DockerCompose.Split() + @("build") + $buildArgs
+$buildCmd = $DockerCompose + @("build") + $buildArgs
 if ($Services.Count -gt 0) {
     Write-Info "构建服务: $($Services -join ', ')"
     $buildCmd += $Services
@@ -411,20 +475,25 @@ $deploySuccess = $false
 
 if ($Services.Count -gt 0) {
     Write-Info "停止指定服务..."
-    & $DockerCompose.Split() stop $Services
+    Invoke-DockerCompose -Arguments (@('stop') + $Services)
     
     Write-Info "启动指定服务..."
-    & $DockerCompose.Split() up -d $Services
+    Invoke-DockerCompose -Arguments (@('up','-d') + $Services)
 } else {
     Write-Info "部署所有服务..."
-    & $DockerCompose.Split() up -d
+    Invoke-DockerCompose -Arguments @('up','-d')
 }
 
-if ($LASTEXITCODE -eq 0) {
+# Determine compose exit code (Invoke-DockerCompose stores it in Global:LastDockerComposeExitCode)
+$composeExit = $null
+if ($null -ne $Global:LastDockerComposeExitCode) { $composeExit = $Global:LastDockerComposeExitCode } else { $composeExit = $LASTEXITCODE }
+
+if ($composeExit -eq 0) {
     $deploySuccess = $true
     Write-Success "服务启动成功"
 } else {
-    Write-Error "服务启动失败"
+    Write-Error "服务启动失败 (exit code: $composeExit)"
+    exit 1
 }
 
 # ========================================
@@ -438,21 +507,37 @@ Start-Sleep -Seconds 5
 if ($Services.Count -gt 0) {
     $checkServices = $Services
 } else {
-    $checkServices = & $DockerCompose.Split() ps --services
+    $rawServices = Invoke-DockerCompose -Arguments @('ps','--services')
+    # Filter out warning lines and empty lines
+    $checkServices = @()
+    if ($rawServices) {
+        $rawServices -split "`n" | ForEach-Object {
+            $line = $_.Trim()
+            # Only accept lines that look like a service name (word, dots, dashes, underscores)
+            if ($line -and ($line -match '^[\w\-.]+$')) { $checkServices += $line }
+        }
+    }
 }
 
 $failedServices = @()
 foreach ($service in $checkServices) {
-    $status = & $DockerCompose.Split() ps $service --format "{{.State}}" 2>$null
-    
-    if ($status -eq "running") {
+        $rawStatus = Invoke-DockerCompose -Arguments @('ps',$service,'--format','{{.State}}')
+        # Parse status: prefer known status values, otherwise pick last non-empty line
+        $status = $null
+        if ($rawStatus) {
+            $lines = $rawStatus -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+            $known = $lines | Where-Object { $_ -match '^(running|exited|paused|restarting|created)$' }
+            if ($known.Count -gt 0) { $status = $known[0] } elseif ($lines.Count -gt 0) { $status = $lines[-1] }
+        }
+
+    if ($status -eq 'running') {
         Write-Success "$service`: $status"
     } else {
         Write-Error "$service`: $status"
         $failedServices += $service
         
         Write-ColorOutput "    最近日志:" "Gray"
-        & $DockerCompose.Split() logs --tail=10 $service 2>&1 | ForEach-Object {
+        Invoke-DockerCompose -Arguments @('logs','--tail=10',$service) | ForEach-Object {
             Write-ColorOutput "      $_" "Gray"
         }
     }
@@ -481,7 +566,15 @@ if ($failedServices.Count -gt 0) {
         }
     } else {
         Write-Warning "无可用备份，请检查日志:"
-        Write-ColorOutput "  $DockerCompose logs -f" "Gray"
+        # 根据实际可用的 docker compose 形式显示命令提示（`docker compose` 或 `docker-compose`）
+        if ($DockerCompose -and $DockerCompose.Count -gt 1) {
+            $cmdPrefix = "$($DockerCompose[0]) $($DockerCompose[1..($DockerCompose.Count-1)] -join ' ')"
+        } elseif ($DockerCompose) {
+            $cmdPrefix = $DockerCompose[0]
+        } else {
+            $cmdPrefix = 'docker compose'
+        }
+        Write-ColorOutput "  日志查看: $cmdPrefix logs -f <服务名>" "Gray"
     }
     
     exit 1
@@ -510,10 +603,19 @@ Write-Host "  日志查看: " -NoNewline; Write-ColorOutput "http://${ipOrDomain
 Write-Host ""
 
 Write-ColorOutput "常用命令：" "Cyan"
-Write-ColorOutput "  查看状态: $DockerCompose ps" "Gray"
-Write-ColorOutput "  查看日志: $DockerCompose logs -f [服务名]" "Gray"
-Write-ColorOutput "  停止服务: $DockerCompose stop" "Gray"
-Write-ColorOutput "  重启服务: $DockerCompose restart [服务名]" "Gray"
+# 根据实际可用的 docker compose 形式显示命令提示（`docker compose` 或 `docker-compose`）
+if ($DockerCompose -and $DockerCompose.Count -gt 1) {
+    $cmdPrefix = "$($DockerCompose[0]) $($DockerCompose[1..($DockerCompose.Count-1)] -join ' ')"
+} elseif ($DockerCompose) {
+    $cmdPrefix = $DockerCompose[0]
+} else {
+    $cmdPrefix = 'docker compose'
+}
+
+Write-ColorOutput "  查看状态: $cmdPrefix ps" "Gray"
+Write-ColorOutput "  查看日志: $cmdPrefix logs -f <服务名>" "Gray"
+Write-ColorOutput "  停止服务: $cmdPrefix stop <服务名>" "Gray"
+Write-ColorOutput "  重启服务: $cmdPrefix restart <服务名>" "Gray"
 if (-not $SkipBackup) {
     Write-ColorOutput "  回滚版本: .\rollback.ps1" "Gray"
 }

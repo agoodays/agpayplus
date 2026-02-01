@@ -76,16 +76,42 @@ function Get-EnvValue {
 }
 
 # ========================================
-# 检测 Docker Compose 命令
+# 检测 Docker Compose 并提供调用封装
 # ========================================
-$DockerCompose = ""
-if (Get-Command docker -ErrorAction SilentlyContinue) {
-    if (docker compose version 2>$null) {
-        $DockerCompose = "docker compose"
+function Get-DockerCompose {
+    try { docker compose version > $null 2>&1; if ($LASTEXITCODE -eq 0) { return @('docker','compose') } } catch {}
+    try { docker-compose version > $null 2>&1; if ($LASTEXITCODE -eq 0) { return @('docker-compose') } } catch {}
+    return $null
+}
+
+$DockerCompose = Get-DockerCompose
+
+function Invoke-DockerCompose {
+    param([string[]]$Arguments)
+    if (-not $DockerCompose) { Write-Error "Docker Compose command not found"; return $null }
+
+    $exe = $DockerCompose[0]
+    $argList = @()
+    if ($DockerCompose.Count -gt 1) { $argList += $DockerCompose[1..($DockerCompose.Count-1)] }
+    if ($Arguments) { $argList += $Arguments }
+
+    $outFile = [System.IO.Path]::GetTempFileName()
+    $errFile = [System.IO.Path]::GetTempFileName()
+    try {
+        Start-Process -FilePath $exe -ArgumentList $argList -NoNewWindow -RedirectStandardOutput $outFile -RedirectStandardError $errFile -Wait -PassThru | Out-Null
+        $stdout = ""
+        $stderr = ""
+        if (Test-Path $outFile) { $stdout = Get-Content $outFile -Raw }
+        if (Test-Path $errFile) { $stderr = Get-Content $errFile -Raw }
+        if ($stdout -and $stderr) { $result = "$stdout`n$stderr" } elseif ($stdout) { $result = $stdout } else { $result = $stderr }
+    } catch {
+        Write-Error "Failed to execute Docker Compose: $_"
+        $result = $null
+    } finally {
+        Remove-Item $outFile,$errFile -ErrorAction SilentlyContinue
     }
-    elseif (Get-Command docker-compose -ErrorAction SilentlyContinue) {
-        $DockerCompose = "docker-compose"
-    }
+
+    return $result
 }
 
 # 备份目录
@@ -187,7 +213,7 @@ Write-Host ""
 Write-Step "[2/7] 检查现有部署..."
 
 $ProjectName = Get-EnvValue "COMPOSE_PROJECT_NAME"
-$ExistingContainers = & $DockerCompose ps -q 2>$null
+$ExistingContainers = Invoke-DockerCompose -Arguments @('ps','-q') 2>$null
 if (-not $ExistingContainers) {
     Write-Error "未检测到运行中的服务"
     Write-Warning "请先执行部署: .\deploy.ps1 -Environment $Environment"
@@ -210,8 +236,8 @@ New-Item -ItemType Directory -Path $BackupPath | Out-Null
 
 # 保存容器和镜像信息
 Write-Host "  保存容器和镜像信息..." -ForegroundColor Gray
-& $DockerCompose ps --format json | Out-File "$BackupPath\containers.json" -Encoding utf8 2>$null
-& $DockerCompose images --format json | Out-File "$BackupPath\images.json" -Encoding utf8 2>$null
+Invoke-DockerCompose -Arguments @('ps','--format','json') | Out-File "$BackupPath\containers.json" -Encoding utf8 2>$null
+Invoke-DockerCompose -Arguments @('images','--format','json') | Out-File "$BackupPath\images.json" -Encoding utf8 2>$null
 
 # 保存镜像
 Write-Host "  导出镜像..." -ForegroundColor Gray
@@ -220,16 +246,16 @@ $ImageTag = Get-EnvValue "IMAGE_TAG"
 
 if ($Services.Count -gt 0) {
     # 仅备份指定服务
-    foreach ($service in $Services) {
-        $image = "${ImagePrefix}-${service}:${ImageTag}"
-        if (docker images -q $image 2>$null) {
-            Write-Host "    备份: $service" -ForegroundColor Gray
-            docker save $image | gzip > "$BackupPath\${service}.tar.gz"
+        foreach ($service in $Services) {
+            $image = "$($ImagePrefix)-$($service):$($ImageTag)"
+            if (docker images -q $image 2>$null) {
+                Write-Host "    备份: $service" -ForegroundColor Gray
+                docker save $image | gzip > "$BackupPath\${service}.tar.gz"
+            }
         }
-    }
 } else {
     # 备份所有服务
-    $images = & $DockerCompose images --format "{{.Repository}}:{{.Tag}}"
+    $images = Invoke-DockerCompose -Arguments @('images','--format','{{.Repository}}:{{.Tag}}')
     foreach ($image in $images) {
         $serviceName = $image -replace "${ImagePrefix}-", "" -replace ":${ImageTag}", ""
         Write-Host "    备份: $serviceName" -ForegroundColor Gray
@@ -280,10 +306,12 @@ Write-Step "[5/7] 构建新镜像..."
 try {
     if ($Services.Count -gt 0) {
         Write-Info "构建服务: $($Services -join ', ')"
-        & $DockerCompose build $BuildArgs $Services
+        $args = @('build') + $BuildArgs + $Services
+        Invoke-DockerCompose -Arguments $args
     } else {
         Write-Info "构建所有服务"
-        & $DockerCompose build $BuildArgs
+        $args = @('build') + $BuildArgs
+        Invoke-DockerCompose -Arguments $args
     }
     
     if ($LASTEXITCODE -ne 0) {
@@ -331,13 +359,13 @@ if ($Services.Count -gt 0) {
         Write-Info "更新 $service..."
         
         # 停止旧服务
-        & $DockerCompose stop $service
+        Invoke-DockerCompose -Args @('stop',$service)
         
         # 删除旧容器
-        & $DockerCompose rm -f $service
+        Invoke-DockerCompose -Args @('rm','-f',$service)
         
         # 启动新服务
-        & $DockerCompose up -d $service
+        Invoke-DockerCompose -Args @('up','-d',$service)
         
         if ($LASTEXITCODE -eq 0) {
             Write-Success "$service 更新成功"
@@ -347,7 +375,7 @@ if ($Services.Count -gt 0) {
     }
 } else {
     Write-Info "更新所有服务..."
-    & $DockerCompose up -d
+    Invoke-DockerCompose -Args @('up','-d')
 }
 
 # ========================================
@@ -362,12 +390,12 @@ Start-Sleep -Seconds 10
 if ($Services.Count -gt 0) {
     $checkServices = $Services
 } else {
-    $checkServices = & $DockerCompose ps --services
+    $checkServices = Invoke-DockerCompose -Arguments @('ps','--services')
 }
 
 $failedServices = @()
 foreach ($service in $checkServices) {
-    $status = & $DockerCompose ps $service --format "{{.State}}" 2>$null
+        $status = Invoke-DockerCompose -Arguments @('ps',$service,'--format','{{.State}}') 2>$null
     
     if ($status -eq "running") {
         Write-Success "$service: $status"
@@ -377,7 +405,7 @@ foreach ($service in $checkServices) {
         
         # 显示失败的服务日志
         Write-Host "    最近日志:" -ForegroundColor Gray
-        & $DockerCompose logs --tail=20 $service 2>&1 | ForEach-Object { Write-Host "      $_" -ForegroundColor Gray }
+        Invoke-DockerCompose -Arguments @('logs','--tail=20',$service) 2>&1 | ForEach-Object { Write-Host "      $_" -ForegroundColor Gray }
     }
 }
 
@@ -430,8 +458,17 @@ Write-Host "  支付网关: " -NoNewline; Write-ColorOutput "https://${IpOrDomai
 Write-Host ""
 
 Write-ColorOutput "常用命令：" "Cyan"
-Write-Host "  查看状态: " -NoNewline; Write-ColorOutput "$DockerCompose ps" "Gray"
-Write-Host "  查看日志: " -NoNewline; Write-ColorOutput "$DockerCompose logs -f [服务名]" "Gray"
+# 根据实际可用的 docker compose 形式显示命令提示（`docker compose` 或 `docker-compose`）
+if ($DockerCompose -and $DockerCompose.Count -gt 1) {
+    $cmdPrefix = "$($DockerCompose[0]) $($DockerCompose[1..($DockerCompose.Count-1)] -join ' ')"
+} elseif ($DockerCompose) {
+    $cmdPrefix = $DockerCompose[0]
+} else {
+    $cmdPrefix = 'docker compose'
+}
+
+Write-Host "  查看状态: " -NoNewline; Write-ColorOutput "$cmdPrefix ps" "Gray"
+Write-Host "  查看日志: " -NoNewline; Write-ColorOutput "$cmdPrefix logs -f <服务名>" "Gray"
 Write-Host "  回滚版本: " -NoNewline; Write-ColorOutput ".\rollback.ps1 -Environment $Environment" "Gray"
 Write-Host ""
 Write-ColorOutput "========================================" "Green"

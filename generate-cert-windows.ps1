@@ -82,10 +82,18 @@ try {
 # 验证证书
 Write-Host "验证证书..." -ForegroundColor Yellow
 if (Test-Path $certFile) {
-    $certInfo = Get-PfxCertificate -FilePath $certFile -Password (ConvertTo-SecureString -String $certPassword -AsPlainText -Force)
-    Write-Host "✅ 证书验证成功" -ForegroundColor Green
-    Write-Host "  主题: $($certInfo.Subject)" -ForegroundColor Gray
-    Write-Host "  有效期: $($certInfo.NotBefore) 至 $($certInfo.NotAfter)" -ForegroundColor Gray
+    try {
+        # Use Get-PfxData to read the pfx with password and extract certificate info
+        $securePwd = ConvertTo-SecureString -String $certPassword -AsPlainText -Force
+        $pfxData = Get-PfxData -FilePath $certFile -Password $securePwd
+        $certInfo = $pfxData.EndEntityCertificates[0]
+        Write-Host "✅ 证书验证成功" -ForegroundColor Green
+        Write-Host "  主题: $($certInfo.Subject)" -ForegroundColor Gray
+        Write-Host "  有效期: $($certInfo.NotBefore) 至 $($certInfo.NotAfter)" -ForegroundColor Gray
+    } catch {
+        Write-Host "❌ 无法读取证书: $_" -ForegroundColor Red
+        exit 1
+    }
 } else {
     Write-Host "❌ 证书文件不存在" -ForegroundColor Red
     exit 1

@@ -81,14 +81,46 @@ function Get-EnvValue {
 # ========================================
 # 检测 Docker Compose 命令
 # ========================================
-$DockerCompose = ""
-if (Get-Command docker -ErrorAction SilentlyContinue) {
-    if (docker compose version 2>$null) {
-        $DockerCompose = "docker compose"
+function Get-DockerCompose {
+    try { docker compose version > $null 2>&1; if ($LASTEXITCODE -eq 0) { return @('docker','compose') } } catch {}
+    try { docker-compose version > $null 2>&1; if ($LASTEXITCODE -eq 0) { return @('docker-compose') } } catch {}
+    return $null
+}
+
+$DockerCompose = Get-DockerCompose
+
+function Invoke-DockerCompose {
+    param([string[]]$Arguments)
+    if (-not $DockerCompose) { Write-Error "Docker Compose command not found"; return $null }
+
+    $exe = $DockerCompose[0]
+    $argList = @()
+    if ($DockerCompose.Count -gt 1) { $argList += $DockerCompose[1..($DockerCompose.Count-1)] }
+    if ($Arguments) { $argList += $Arguments }
+
+    # Create unique temp files for stdout/stderr to avoid collisions
+    $tempDir = [System.IO.Path]::GetTempPath()
+    $outFile = Join-Path $tempDir ([System.Guid]::NewGuid().ToString() + ".out")
+    $errFile = Join-Path $tempDir ([System.Guid]::NewGuid().ToString() + ".err")
+    New-Item -Path $outFile -ItemType File -Force | Out-Null
+    New-Item -Path $errFile -ItemType File -Force | Out-Null
+    try {
+        $proc = Start-Process -FilePath $exe -ArgumentList $argList -NoNewWindow -RedirectStandardOutput $outFile -RedirectStandardError $errFile -Wait -PassThru
+        $Global:LastDockerComposeExitCode = $proc.ExitCode
+        $stdout = ""
+        $stderr = ""
+        if (Test-Path $outFile) { $stdout = Get-Content $outFile -Raw }
+        if (Test-Path $errFile) { $stderr = Get-Content $errFile -Raw }
+        if ($stdout -and $stderr) { $result = "$stdout`n$stderr" } elseif ($stdout) { $result = $stdout } else { $result = $stderr }
+    } catch {
+        Write-Error "Failed to execute Docker Compose: $_"
+        $Global:LastDockerComposeExitCode = 1
+        $result = $null
+    } finally {
+        Remove-Item $outFile,$errFile -ErrorAction SilentlyContinue
     }
-    elseif (Get-Command docker-compose -ErrorAction SilentlyContinue) {
-        $DockerCompose = "docker-compose"
-    }
+
+    return $result
 }
 
 # 备份目录
@@ -124,7 +156,7 @@ function Show-Backups {
                 if (Test-Path $latestFile) {
                     $latest = Get-Content $latestFile
                     if ($backup.Name -match $latest) {
-                        $latestMarker = " " + (Write-ColorOutput "(最新)" "Green" -PassThru)
+                        $latestMarker = " (最新)"
                     }
                 }
                 
@@ -136,7 +168,7 @@ function Show-Backups {
                 else { Write-Host "" }
                 
                 # 显示包含的服务
-                $services = Get-ChildItem "$($backup.FullName)\*.tar.gz" -ErrorAction SilentlyContinue | ForEach-Object { $_.BaseName }
+                    $services = Get-ChildItem "$($backup.FullName)\*.tar*" -ErrorAction SilentlyContinue | ForEach-Object { $_.BaseName }
                 if ($services) {
                     Write-Host "    服务: " -NoNewline; Write-ColorOutput ($services -join ", ") "Gray"
                 } else {
@@ -235,7 +267,7 @@ Write-Success "找到备份: $(Split-Path $BackupPath -Leaf)"
 
 # 列出备份中的服务
 Write-Host "  备份中的服务:" -ForegroundColor Gray
-$backupServices = Get-ChildItem "$BackupPath\*.tar.gz" -ErrorAction SilentlyContinue | ForEach-Object { $_.BaseName }
+$backupServices = Get-ChildItem "$BackupPath\*.tar*" -ErrorAction SilentlyContinue | ForEach-Object { $_.BaseName }
 if ($backupServices) {
     foreach ($svc in $backupServices) {
         Write-Host "    - $svc" -ForegroundColor Gray
@@ -293,21 +325,37 @@ Write-Step "[3/5] 加载备份镜像..."
 if ($Services.Count -gt 0) {
     # 仅加载指定服务的镜像
     foreach ($service in $Services) {
-        $imageFile = Join-Path $BackupPath "${service}.tar.gz"
-        if (Test-Path $imageFile) {
+        $tarFile = Join-Path $BackupPath ("${service}.tar")
+        $tgzFile = Join-Path $BackupPath ("${service}.tar.gz")
+        if (Test-Path $tarFile) {
             Write-Host "  加载: $service" -ForegroundColor Gray
-            & gzip -dc $imageFile | docker load
+            docker load -i $tarFile
+        } elseif (Test-Path $tgzFile) {
+            if (Get-Command gzip -ErrorAction SilentlyContinue) {
+                Write-Host "  加载: $service (gz)" -ForegroundColor Gray
+                & gzip -dc $tgzFile | docker load
+            } else {
+                Write-Error "无法加载 ${tgzFile}，系统缺少 gzip，请安装或解压后手动加载"
+            }
         } else {
             Write-Warning "服务 $service 的备份不存在"
         }
     }
 } else {
-    # 加载所有备份的镜像
-    $imageFiles = Get-ChildItem "$BackupPath\*.tar.gz" -ErrorAction SilentlyContinue
+    # 加载所有备份的镜像 (.tar 优先)
+    $imageFiles = @(Get-ChildItem "$BackupPath\*.tar" -ErrorAction SilentlyContinue) + @(Get-ChildItem "$BackupPath\*.tar.gz" -ErrorAction SilentlyContinue)
     foreach ($imageFile in $imageFiles) {
         $service = $imageFile.BaseName
         Write-Host "  加载: $service" -ForegroundColor Gray
-        & gzip -dc $imageFile.FullName | docker load
+        if ($imageFile.Extension -ieq ".tar") {
+            docker load -i $imageFile.FullName
+        } elseif ($imageFile.Extension -ieq ".gz") {
+            if (Get-Command gzip -ErrorAction SilentlyContinue) {
+                & gzip -dc $imageFile.FullName | docker load
+            } else {
+                Write-Error "无法加载 ${imageFile.FullName}，系统缺少 gzip，请安装或解压后手动加载"
+            }
+        }
     }
 }
 
@@ -322,14 +370,14 @@ Write-Step "[4/5] 重启服务..."
 if ($Services.Count -gt 0) {
     foreach ($service in $Services) {
         Write-Info "重启 $service..."
-        & $DockerCompose stop $service
-        & $DockerCompose rm -f $service
-        & $DockerCompose up -d $service
+        Invoke-DockerCompose -Arguments @('stop',$service)
+        Invoke-DockerCompose -Arguments @('rm','-f',$service)
+        Invoke-DockerCompose -Arguments @('up','-d',$service)
     }
 } else {
     Write-Info "重启所有服务..."
-    & $DockerCompose down
-    & $DockerCompose up -d
+    Invoke-DockerCompose -Arguments @('down') | Out-Null
+    Invoke-DockerCompose -Arguments @('up','-d') | Out-Null
 }
 
 # ========================================
@@ -344,22 +392,35 @@ Start-Sleep -Seconds 10
 if ($Services.Count -gt 0) {
     $checkServices = $Services
 } else {
-    $checkServices = & $DockerCompose ps --services
+    $rawServices = Invoke-DockerCompose -Arguments @('ps','--services')
+    $checkServices = @()
+    if ($rawServices) {
+        $rawServices -split "`n" | ForEach-Object {
+            $line = $_.Trim()
+            if ($line -and ($line -match '^[\w\-.]+$')) { $checkServices += $line }
+        }
+    }
 }
 
 $failedServices = @()
 foreach ($service in $checkServices) {
-    $status = & $DockerCompose ps $service --format "{{.State}}" 2>$null
-    
-    if ($status -eq "running") {
-        Write-Success "$service: $status"
+    $rawStatus = Invoke-DockerCompose -Arguments @('ps',$service,'--format','{{.State}}')
+    $status = $null
+    if ($rawStatus) {
+        $lines = $rawStatus -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+        $known = $lines | Where-Object { $_ -match '^(running|exited|paused|restarting|created)$' }
+        if ($known.Count -gt 0) { $status = $known[0] } elseif ($lines.Count -gt 0) { $status = $lines[-1] }
+    }
+
+    if ($status -eq 'running') {
+        Write-Success "$($service): $($status)"
     } else {
-        Write-Error "$service: $status"
+        Write-Error "$($service): $($status)"
         $failedServices += $service
         
         # 显示失败的服务日志
         Write-Host "    最近日志:" -ForegroundColor Gray
-        & $DockerCompose logs --tail=20 $service 2>&1 | ForEach-Object { Write-Host "      $_" -ForegroundColor Gray }
+        Invoke-DockerCompose -Arguments @('logs','--tail=20',$service) | ForEach-Object { Write-Host "      $_" -ForegroundColor Gray }
     }
 }
 
@@ -397,8 +458,16 @@ if ($failedServices.Count -gt 0) {
     Write-Host ""
     
     Write-ColorOutput "常用命令：" "Cyan"
-    Write-Host "  查看状态: " -NoNewline; Write-ColorOutput "$DockerCompose ps" "Gray"
-    Write-Host "  查看日志: " -NoNewline; Write-ColorOutput "$DockerCompose logs -f [服务名]" "Gray"
+    if ($DockerCompose -and $DockerCompose.Count -gt 1) {
+        $cmdPrefix = "$($DockerCompose[0]) $($DockerCompose[1..($DockerCompose.Count-1)] -join ' ')"
+    } elseif ($DockerCompose) {
+        $cmdPrefix = $DockerCompose[0]
+    } else {
+        $cmdPrefix = 'docker compose'
+    }
+
+    Write-Host "  查看状态: " -NoNewline; Write-ColorOutput "$cmdPrefix ps" "Gray"
+    Write-Host "  查看日志: " -NoNewline; Write-ColorOutput "$cmdPrefix logs -f <服务名>" "Gray"
     Write-Host "  查看备份: " -NoNewline; Write-ColorOutput ".\rollback.ps1 -List" "Gray"
     Write-Host ""
     Write-ColorOutput "========================================" "Green"
