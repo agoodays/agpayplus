@@ -1,31 +1,72 @@
 # ========================================
 # AgPay+ Payment API Dockerfile
 # ========================================
-# 多阶段构建：
-# 1. cashier-build - 构建收银台前端
-# 2. base - 基础运行时环境
-# 3. build - 构建 .NET 后端
-# 4. publish - 发布 .NET 应用
-# 5. final - 最终镜像（后端 + 前端）
+# 多阶段构建，支持可选的 cashier 构建
+# ========================================
+# 构建参数：
+# BUILD_CASHIER=true  - 构建新的 cashier
+# BUILD_CASHIER=false - 跳过 cashier 构建（默认）
+# ========================================
+# 使用方法（必须在项目根目录执行）：
+#
+# 推荐方式 1：使用 docker-compose（自动处理路径）
+#   docker compose build payment-api                             # 不构建 cashier
+#   docker compose build --build-arg BUILD_CASHIER=true payment-api  # 构建 cashier
+#
+# 推荐方式 2：使用部署脚本
+#   .\deploy.ps1 -Environment dev                    # Windows，不构建 cashier
+#   .\deploy.ps1 -Environment dev -BuildCashier      # Windows，构建 cashier
+#   ./deploy.sh -e dev                               # Linux，不构建 cashier
+#   ./deploy.sh -e dev -b                            # Linux，构建 cashier
+#
+# 直接使用 docker build（需指定 Dockerfile 路径）：
+#   cd <项目根目录>
+#   docker build -f aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile -t payment-api .
+#   docker build --build-arg BUILD_CASHIER=true -f aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile -t payment-api .
 # ========================================
 
+# 构建参数
+ARG BUILD_CASHIER=false
+
 # ========================================
-# 阶段 1: 构建收银台前端 (Cashier)
+# 阶段 1: 构建收银台前端 (Cashier) - 可选
 # ========================================
-FROM node:16-alpine AS cashier-build
+FROM node:16-alpine AS cashier-builder
+ARG BUILD_CASHIER
 WORKDIR /cashier
 
-# 复制 package.json 和 package-lock.json
+# 使用条件复制和构建
+# 如果 BUILD_CASHIER=false，创建空目录
+RUN echo "BUILD_CASHIER=$BUILD_CASHIER"
+
+# 设置 npm 镜像源和超时时间
+RUN npm config set registry https://registry.npmmirror.com && \
+    npm config set timeout 120000 && \
+    npm config set fetch-timeout 120000 && \
+    npm config set fetch-retries 3
+
+# 复制 cashier package.json（如果不存在会失败，这是预期行为）
 COPY ant-design-vue/agpay-ui-cashier/package*.json ./
 
-# 安装依赖
-RUN npm install --registry=https://registry.npmmirror.com
+# 条件安装依赖
+RUN if [ "$BUILD_CASHIER" = "true" ]; then \
+        echo "🔨 Building cashier frontend..."; \
+        npm install; \
+    else \
+        echo "⏭️  Skipping cashier npm install"; \
+    fi
 
-# 复制源代码
+# 复制 cashier 源代码
 COPY ant-design-vue/agpay-ui-cashier/. .
 
-# 构建生产版本
-RUN npm run build
+# 条件构建或创建空目录
+RUN if [ "$BUILD_CASHIER" = "true" ]; then \
+        npm run build; \
+        echo "✅ Cashier build completed"; \
+    else \
+        echo "ℹ️  Skipping cashier build, creating empty dist"; \
+        mkdir -p /cashier/dist; \
+    fi
 
 # ========================================
 # 阶段 2: 基础运行时环境
@@ -90,6 +131,7 @@ RUN dotnet publish "AGooday.AgPay.Payment.Api.csproj" -c $BUILD_CONFIGURATION -o
 # 阶段 5: 最终镜像（整合后端 + 前端）
 # ========================================
 FROM base AS final
+ARG BUILD_CASHIER
 WORKDIR /app
 
 # 创建日志和上传目录
@@ -101,7 +143,23 @@ RUN mkdir -p /app/agpayplus/logs && \
 # 复制后端应用
 COPY --from=publish /app/publish .
 
-# 复制收银台前端到 wwwroot/cashier
-COPY --from=cashier-build /cashier/dist ./wwwroot/cashier
+# 条件复制 cashier
+# 如果 BUILD_CASHIER=true，从 cashier-builder 复制
+# 如果 BUILD_CASHIER=false，cashier 应该已经存在于 wwwroot/cashier 中
+RUN if [ "$BUILD_CASHIER" = "true" ]; then \
+        echo "📦 Copying newly built cashier"; \
+    else \
+        echo "📦 Using existing cashier from publish"; \
+    fi
+
+# 复制 cashier（仅在构建时）
+COPY --from=cashier-builder /cashier/dist ./wwwroot/cashier
+
+# 显示构建信息
+RUN echo "========================================" && \
+    echo "AgPay+ Payment API" && \
+    echo "BUILD_CASHIER: $BUILD_CASHIER" && \
+    echo "========================================" && \
+    ls -la ./wwwroot/cashier/ || echo "No cashier directory"
 
 ENTRYPOINT ["dotnet", "AGooday.AgPay.Payment.Api.dll"]
