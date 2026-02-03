@@ -135,10 +135,10 @@
 
 ```bash
 # 单个服务
-./update.sh --services manager-api
+./update.sh --services agpay-manager-api
 
 # 多个服务
-./update.sh --services "manager-api agent-api merchant-api"
+./update.sh --services "agpay-manager-api agpay-agent-api agpay-merchant-api"
 
 # 所有服务
 ./update.sh
@@ -157,17 +157,17 @@
 ./rollback.sh --backup 20240315_143022
 
 # 回滚指定服务
-./rollback.sh --services "manager-api agent-api"
+./rollback.sh --services "agpay-manager-api agpay-agent-api"
 ```
 
 ### 4. Cashier 管理
 
 ```bash
 # 不构建 cashier（默认，快速）
-./update.sh --services payment-api
+./update.sh --services agpay-payment-api
 
 # 构建 cashier（有变更时）
-./update.sh --services payment-api --build-cashier
+./update.sh --services agpay-payment-api --build-cashier
 
 # 或在环境配置中设置
 BUILD_CASHIER=true
@@ -178,7 +178,7 @@ BUILD_CASHIER=true
 更新失败时自动回滚：
 
 ```bash
-./update.sh --services payment-api
+./update.sh --services agpay-payment-api
 
 # 如果健康检查失败，自动执行：
 # 1. 停止失败的服务
@@ -217,7 +217,7 @@ BUILD_CASHIER=true
 
 ```
 1. 执行更新
-   └─ ./update.sh --services manager-api
+   └─ ./update.sh --services agpay-manager-api
       ├─ [1/7] 检查 Docker 环境
       ├─ [2/7] 检查现有部署
       ├─ [3/7] 备份当前部署
@@ -267,19 +267,19 @@ vi .env  # 修改 IPORDOMAIN、MYSQL_PASSWORD 等
 ### 场景 2: 更新单个 API
 
 ```bash
-./update.sh --services manager-api
+./update.sh --services agpay-manager-api
 ```
 
 ### 场景 3: 更新运营平台（前后端）
 
 ```bash
-./update.sh --services "ui-manager manager-api"
+./update.sh --services "agpay-ui-manager agpay-manager-api"
 ```
 
 ### 场景 4: 更新支付网关并重建 Cashier
 
 ```bash
-./update.sh --services payment-api --build-cashier
+./update.sh --services agpay-payment-api --build-cashier
 ```
 
 ### 场景 5: 更新失败，紧急回滚
@@ -372,7 +372,7 @@ vi .env  # 修改 IPORDOMAIN、MYSQL_PASSWORD 等
 
 ### 第二步：熟悉更新和回滚
 
-1. 尝试更新单个服务：`./update.sh --services manager-api`
+1. 尝试更新单个服务：`./update.sh --services agpay-manager-api`
 2. 查看备份列表：`./rollback.sh --list`
 3. 尝试回滚：`./rollback.sh`
 

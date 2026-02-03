@@ -12,8 +12,8 @@
 # ./deploy.sh                              # 默认生产环境，部署所有服务
 # ./deploy.sh --env dev                    # 开发环境
 # ./deploy.sh --env staging                # 预发布环境
-# ./deploy.sh --services manager-api       # 仅更新指定服务
-# ./deploy.sh --services "manager-api agent-api"  # 更新多个服务
+# ./deploy.sh --services agpay-manager-api       # 仅更新指定服务
+# ./deploy.sh --services "agpay-manager-api agpay-agent-api"  # 更新多个服务
 # ./deploy.sh --build-cashier              # 强制构建 cashier
 # ./deploy.sh --skip-backup                # 跳过备份（首次部署）
 # ========================================
@@ -69,8 +69,8 @@ ${GREEN}使用方法：${NC}
 ${GREEN}选项：${NC}
   ${YELLOW}--env <环境>${NC}              指定环境：dev, staging, production (默认: production)
   ${YELLOW}--services <服务列表>${NC}     指定要部署的服务（用引号包含多个服务，空格分隔）
-                              可选值：ui-manager, ui-agent, ui-merchant,
-                                     manager-api, agent-api, merchant-api, payment-api
+                              可选值：agpay-ui-manager, agpay-ui-agent, agpay-ui-merchant,
+                                     agpay-manager-api, agpay-agent-api, agpay-merchant-api, agpay-payment-api
   ${YELLOW}--build-cashier${NC}          强制构建 cashier（收银台）
   ${YELLOW}--skip-backup${NC}            跳过备份（首次部署时使用）
   ${YELLOW}--skip-cert${NC}              跳过证书生成
@@ -84,14 +84,14 @@ ${GREEN}示例：${NC}
   ${GRAY}# 开发环境部署（构建 cashier）${NC}
   $0 --env dev --build-cashier
 
-  ${GRAY}# 仅更新 manager-api${NC}
-  $0 --services manager-api
+  ${GRAY}# 仅更新 agpay-manager-api${NC}
+  $0 --services agpay-manager-api
 
   ${GRAY}# 更新多个 API 服务${NC}
-  $0 --services "manager-api agent-api merchant-api"
+  $0 --services "agpay-manager-api agpay-agent-api agpay-merchant-api"
 
   ${GRAY}# 预发布环境，更新所有前端${NC}
-  $0 --env staging --services "ui-manager ui-agent ui-merchant"
+  $0 --env staging --services "agpay-ui-manager agpay-ui-agent agpay-ui-merchant"
 
 ${GREEN}回滚：${NC}
   如果部署失败，脚本会自动回滚到上一版本

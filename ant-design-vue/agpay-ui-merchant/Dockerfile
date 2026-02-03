@@ -6,7 +6,7 @@
 # 使用方法：
 #
 # 推荐方式 1：使用 docker-compose（自动处理 context）
-#   docker compose build ui-merchant
+#   docker compose build agpay-ui-merchant
 #
 # 推荐方式 2：使用部署脚本
 #   .\deploy.ps1 -Environment dev          # Windows
@@ -14,7 +14,7 @@
 #
 # 直接使用 docker build（context 是 ant-design-vue 目录）：
 #   cd <项目根目录>
-#   docker build -f ant-design-vue/agpay-ui-merchant/Dockerfile -t ui-merchant ./ant-design-vue
+#   docker build -f ant-design-vue/agpay-ui-merchant/Dockerfile -t agpay-ui-merchant ./ant-design-vue
 # ========================================
 
 # 构建阶段

@@ -3,13 +3,13 @@
 version: '3.8'
 
 services:
-  ui-manager:
+  agpay-ui-manager:
     build:
       context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: agpay-ui-manager/Dockerfile # 指定Dockerfile相对于新的context的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
-        com.docker.compose.service: "ui-manager"
+        com.docker.compose.service: "agpay-ui-manager"
         app.name: "AgPay Manager UI"
         app.component: "frontend"
     image: ${IMAGE_PREFIX:-agpay}-ui-manager:${IMAGE_TAG:-latest}
@@ -22,15 +22,15 @@ services:
       # - VUE_APP_BASE_URL=/
       - VUE_APP_API_BASE_URL=https://${IPORDOMAIN}:9817 # 更新为实际生产服务器IP或域名
     networks:
-      - app-network
+      - agpay-network
 
-  ui-agent:
+  agpay-ui-agent:
     build:
       context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: agpay-ui-agent/Dockerfile # 指定Dockerfile相对于新的context的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
-        com.docker.compose.service: "ui-agent"
+        com.docker.compose.service: "agpay-ui-agent"
         app.name: "AgPay Agent UI"
         app.component: "frontend"
     image: ${IMAGE_PREFIX:-agpay}-ui-agent:${IMAGE_TAG:-latest}
@@ -43,15 +43,15 @@ services:
       # - VUE_APP_BASE_URL=/
       - VUE_APP_API_BASE_URL=https://${IPORDOMAIN}:9816 # 更新为实际生产服务器IP或域名
     networks:
-      - app-network
+      - agpay-network
 
-  ui-merchant:
+  agpay-ui-merchant:
     build:
       context: ./ant-design-vue # 设置构建上下文为包含所有需要的源码的目录
       dockerfile: agpay-ui-merchant/Dockerfile # 指定Dockerfile相对于新的context的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
-        com.docker.compose.service: "ui-merchant"
+        com.docker.compose.service: "agpay-ui-merchant"
         app.name: "AgPay Merchant UI"
         app.component: "frontend"
     image: ${IMAGE_PREFIX:-agpay}-ui-merchant:${IMAGE_TAG:-latest}
@@ -61,15 +61,15 @@ services:
     environment:
       - VUE_APP_API_BASE_URL=https://${IPORDOMAIN}:9818 # 更新为实际生产服务器IP或域名
     networks:
-      - app-network
+      - agpay-network
 
-  manager-api:
+  agpay-manager-api:
     build:
       context: ./aspnet-core/src # 设置构建上下文为后端源码目录
       dockerfile: AGooday.AgPay.Manager.Api/Dockerfile # 指定Dockerfile相对于构建上下文的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
-        com.docker.compose.service: "manager-api"
+        com.docker.compose.service: "agpay-manager-api"
         app.name: "AgPay Manager API"
         app.component: "backend"
     image: ${IMAGE_PREFIX:-agpay}-manager-api:${IMAGE_TAG:-latest}
@@ -118,15 +118,15 @@ services:
       rabbitmq:
         condition: service_healthy
     networks:
-      - app-network
+      - agpay-network
 
-  agent-api:
+  agpay-agent-api:
     build:
       context: ./aspnet-core/src # 设置构建上下文为后端源码目录
       dockerfile: AGooday.AgPay.Agent.Api/Dockerfile # 指定Dockerfile相对于构建上下文的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
-        com.docker.compose.service: "agent-api"
+        com.docker.compose.service: "agpay-agent-api"
         app.name: "AgPay Agent API"
         app.component: "backend"
     image: ${IMAGE_PREFIX:-agpay}-agent-api:${IMAGE_TAG:-latest}
@@ -175,15 +175,15 @@ services:
       rabbitmq:
         condition: service_healthy
     networks:
-      - app-network
+      - agpay-network
 
-  merchant-api:
+  agpay-merchant-api:
     build:
       context: ./aspnet-core/src # 设置构建上下文为后端源码目录
       dockerfile: AGooday.AgPay.Merchant.Api/Dockerfile # 指定Dockerfile相对于构建上下文的路径
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
-        com.docker.compose.service: "merchant-api"
+        com.docker.compose.service: "agpay-merchant-api"
         app.name: "AgPay Merchant API"
         app.component: "backend"
     image: ${IMAGE_PREFIX:-agpay}-merchant-api:${IMAGE_TAG:-latest}
@@ -232,9 +232,9 @@ services:
       rabbitmq:
         condition: service_healthy
     networks:
-      - app-network
+      - agpay-network
 
-  payment-api:
+  agpay-payment-api:
     build:
       context: . # 设置构建上下文为项目根目录（需要访问 ant-design-vue/agpay-ui-cashier）
       dockerfile: aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile # 指定Dockerfile相对于项目根目录的路径
@@ -242,7 +242,7 @@ services:
         BUILD_CASHIER: ${BUILD_CASHIER:-false} # 是否构建 cashier，默认 false
       labels:
         com.docker.compose.project: "${COMPOSE_PROJECT_NAME:-agpayplus}"
-        com.docker.compose.service: "payment-api"
+        com.docker.compose.service: "agpay-payment-api"
         app.name: "AgPay Payment API"
         app.component: "backend"
     image: ${IMAGE_PREFIX:-agpay}-payment-api:${IMAGE_TAG:-latest}
@@ -281,7 +281,7 @@ services:
       rabbitmq:
         condition: service_healthy
     networks:
-      - app-network
+      - agpay-network
 
   seq:
     image: datalust/seq:latest
@@ -293,7 +293,7 @@ services:
     volumes:
       - ${DATA_PATH_HOST}/seq:/data
     networks:
-      - app-network
+      - agpay-network
 
   # ========================================
   # MySQL 数据库服务（可选 - 仅用于开发/测试）
@@ -332,7 +332,7 @@ services:
   #     timeout: 5s
   #     retries: 5
   #   networks:
-  #     - app-network
+  #     - agpay-network
 
   redis:
     image: redis:latest
@@ -347,7 +347,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - app-network
+      - agpay-network
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -374,10 +374,10 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - app-network
+      - agpay-network
 
 networks:
-  app-network:
+  agpay-network:
     driver: bridge
 
 # ========================================

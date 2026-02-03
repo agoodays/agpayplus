@@ -6,7 +6,7 @@
 # 使用方法：
 #
 # 推荐方式 1：使用 docker-compose（自动处理 context）
-#   docker compose build ui-manager
+#   docker compose build agpay-ui-manager
 #
 # 推荐方式 2：使用部署脚本
 #   .\deploy.ps1 -Environment dev          # Windows
@@ -14,7 +14,7 @@
 #
 # 直接使用 docker build（context 是 ant-design-vue 目录）：
 #   cd <项目根目录>
-#   docker build -f ant-design-vue/agpay-ui-manager/Dockerfile -t ui-manager ./ant-design-vue
+#   docker build -f ant-design-vue/agpay-ui-manager/Dockerfile -t agpay-ui-manager ./ant-design-vue
 # ========================================
 
 # 构建阶段

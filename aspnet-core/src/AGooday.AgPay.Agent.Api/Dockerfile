@@ -6,7 +6,7 @@
 # 使用方法：
 #
 # 推荐方式 1：使用 docker-compose（自动处理 context）
-#   docker compose build agent-api
+#   docker compose build agpay-agent-api
 #
 # 推荐方式 2：使用部署脚本
 #   .\deploy.ps1 -Environment dev          # Windows
@@ -14,7 +14,7 @@
 #
 # 直接使用 docker build（context 是 aspnet-core/src 目录）：
 #   cd <项目根目录>
-#   docker build -f aspnet-core/src/AGooday.AgPay.Agent.Api/Dockerfile -t agent-api ./aspnet-core/src
+#   docker build -f aspnet-core/src/AGooday.AgPay.Agent.Api/Dockerfile -t agpay-agent-api ./aspnet-core/src
 # ========================================
 
 # 此阶段用于在快速模式(默认为调试配置)下从 VS 运行时

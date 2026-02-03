@@ -26,12 +26,12 @@ vi .env  # 修改 IPORDOMAIN 等配置
 
 ```bash
 # 更新单个服务
-./update.sh --services manager-api  # Linux/macOS
-.\update.ps1 -Services "manager-api"  # Windows
+./update.sh --services agpay-manager-api  # Linux/macOS
+.\update.ps1 -Services "agpay-manager-api"  # Windows
 
 # 更新多个服务
-./update.sh --services "manager-api agent-api"  # Linux/macOS
-.\update.ps1 -Services "manager-api","agent-api"  # Windows
+./update.sh --services "agpay-manager-api agpay-agent-api"  # Linux/macOS
+.\update.ps1 -Services "agpay-manager-api","agpay-agent-api"  # Windows
 ```
 
 ### 版本回滚
@@ -109,9 +109,9 @@ vi .env  # 修改 IPORDOMAIN 等配置
 支持单个或多个服务更新：
 
 ```bash
-./update.sh --services manager-api                        # 单个服务
-./update.sh --services "manager-api agent-api"            # 多个服务
-./update.sh --services "ui-manager ui-agent ui-merchant"  # 所有前端
+./update.sh --services agpay-manager-api                        # 单个服务
+./update.sh --services "agpay-manager-api agpay-agent-api"            # 多个服务
+./update.sh --services "agpay-ui-manager agpay-ui-agent agpay-ui-merchant"  # 所有前端
 ```
 
 ### ✅ 完整备份回滚
@@ -130,10 +130,10 @@ vi .env  # 修改 IPORDOMAIN 等配置
 
 ```bash
 # 不构建（默认，推荐）
-./update.sh --services payment-api
+./update.sh --services agpay-payment-api
 
 # 强制构建（有变更时）
-./update.sh --services payment-api --build-cashier
+./update.sh --services agpay-payment-api --build-cashier
 ```
 
 ### ✅ 自动健康检查和回滚
@@ -141,7 +141,7 @@ vi .env  # 修改 IPORDOMAIN 等配置
 更新失败自动回滚，无需人工干预：
 
 ```bash
-./update.sh --services payment-api
+./update.sh --services agpay-payment-api
 
 # 如果失败，脚本会自动：
 # 1. 检测服务状态
@@ -197,7 +197,7 @@ vi .env  # 修改 IPORDOMAIN 等配置
 ./deploy.sh --env production
 
 # 指定服务部署
-./deploy.sh --services "manager-api agent-api"
+./deploy.sh --services "agpay-manager-api agpay-agent-api"
 
 # 强制部署（跳过确认）
 ./deploy.sh --force
@@ -210,13 +210,13 @@ vi .env  # 修改 IPORDOMAIN 等配置
 ./update.sh
 
 # 更新单个服务
-./update.sh --services manager-api
+./update.sh --services agpay-manager-api
 
 # 更新多个服务
-./update.sh --services "manager-api agent-api merchant-api"
+./update.sh --services "agpay-manager-api agpay-agent-api agpay-merchant-api"
 
-# 更新 payment-api 并构建 cashier
-./update.sh --services payment-api --build-cashier
+# 更新 agpay-payment-api 并构建 cashier
+./update.sh --services agpay-payment-api --build-cashier
 ```
 
 ### 回滚相关
@@ -232,7 +232,7 @@ vi .env  # 修改 IPORDOMAIN 等配置
 ./rollback.sh --backup 20240315_143022
 
 # 回滚指定服务
-./rollback.sh --services "manager-api agent-api"
+./rollback.sh --services "agpay-manager-api agpay-agent-api"
 ```
 
 ### 查看状态
@@ -245,23 +245,23 @@ docker compose ps
 docker compose logs -f
 
 # 查看日志（指定服务）
-docker compose logs -f manager-api
+docker compose logs -f agpay-manager-api
 
 # 查看最近 100 行日志
-docker compose logs --tail=100 -f manager-api
+docker compose logs --tail=100 -f agpay-manager-api
 ```
 
 ### 服务管理
 
 ```bash
 # 重启服务
-docker compose restart manager-api
+docker compose restart agpay-manager-api
 
 # 停止服务
-docker compose stop manager-api
+docker compose stop agpay-manager-api
 
 # 启动服务
-docker compose start manager-api
+docker compose start agpay-manager-api
 
 # 删除服务
 docker compose down

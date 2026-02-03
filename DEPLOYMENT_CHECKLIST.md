@@ -286,13 +286,13 @@ cp .env.production .env
   ```bash
   docker compose config --services
   # 预期输出：
-  # ui-manager
-  # ui-agent
-  # ui-merchant
-  # manager-api
-  # agent-api
-  # merchant-api
-  # payment-api
+  # agpay-ui-manager
+  # agpay-ui-agent
+  # agpay-ui-merchant
+  # agpay-manager-api
+  # agpay-agent-api
+  # agpay-merchant-api
+  # agpay-payment-api
   # redis
   # rabbitmq
   ```

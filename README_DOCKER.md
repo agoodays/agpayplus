@@ -113,42 +113,42 @@ DATA_PATH_HOST=E:/app/agpayplus         # Windows
 **Windows:**
 ```powershell
 # 更新运营平台前后端
-.\update.ps1 -Services "ui-manager,manager-api"
+.\update.ps1 -Services "agpay-ui-manager,agpay-manager-api"
 
 # 更新所有前端
-.\update.ps1 -Services "ui-manager,ui-agent,ui-merchant"
+.\update.ps1 -Services "agpay-ui-manager,agpay-ui-agent,agpay-ui-merchant"
 
 # 更新支付网关（包含收银台前端）
-.\update.ps1 -Services "payment-api"
+.\update.ps1 -Services "agpay-payment-api"
 
 # 更新支付网关并重新构建 Cashier
-.\update.ps1 -Services "payment-api" -BuildCashier
+.\update.ps1 -Services "agpay-payment-api" -BuildCashier
 ```
 
 **Linux/macOS:**
 ```bash
 # 更新运营平台前后端
-./update.sh --services "ui-manager,manager-api"
+./update.sh --services "agpay-ui-manager,agpay-manager-api"
 
 # 更新所有前端
-./update.sh --services "ui-manager,ui-agent,ui-merchant"
+./update.sh --services "agpay-ui-manager,agpay-ui-agent,agpay-ui-merchant"
 
 # 更新支付网关并重新构建 Cashier
-./update.sh --services "payment-api" --build-cashier
+./update.sh --services "agpay-payment-api" --build-cashier
 ```
 
 ### 可用服务列表
 
-- `ui-manager` - 运营平台前端
-- `ui-agent` - 代理商系统前端
-- `ui-merchant` - 商户系统前端
-- `manager-api` - 运营平台后端
-- `agent-api` - 代理商系统后端
-- `merchant-api` - 商户系统后端
-- `payment-api` - 支付网关后端（包含收银台前端）
+- `agpay-ui-manager` - 运营平台前端
+- `agpay-ui-agent` - 代理商系统前端
+- `agpay-ui-merchant` - 商户系统前端
+- `agpay-manager-api` - 运营平台后端
+- `agpay-agent-api` - 代理商系统后端
+- `agpay-merchant-api` - 商户系统后端
+- `agpay-payment-api` - 支付网关后端（包含收银台前端）
 
 **注意**：
-- 收银台（cashier）前端已集成到 `payment-api` 服务中
+- 收银台（cashier）前端已集成到 `agpay-payment-api` 服务中
 - 通过 `/cashier` 路径访问
 - 默认不重新构建 cashier（节省时间）
 - 如果 cashier 有变更，使用 `--build-cashier` 参数
@@ -195,12 +195,12 @@ DATA_PATH_HOST=E:/app/agpayplus         # Windows
 
 **Windows:**
 ```powershell
-.\rollback.ps1 -Services "manager-api,agent-api"
+.\rollback.ps1 -Services "agpay-manager-api,agpay-agent-api"
 ```
 
 **Linux/macOS:**
 ```bash
-./rollback.sh --services "manager-api,agent-api"
+./rollback.sh --services "agpay-manager-api,agpay-agent-api"
 ```
 
 ## 📦 常用命令

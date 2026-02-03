@@ -11,7 +11,7 @@
 # 使用方法：
 # ./rollback.sh                            # 回滚所有服务（生产环境）
 # ./rollback.sh --env development          # 回滚开发环境
-# ./rollback.sh --services manager-api     # 仅回滚指定服务
+# ./rollback.sh --services agpay-manager-api     # 仅回滚指定服务
 # ./rollback.sh --backup 20240101_120000   # 回滚到指定备份
 # ./rollback.sh --list                     # 列出所有备份
 # ========================================
@@ -79,7 +79,7 @@ ${GREEN}示例：${NC}
   $0
 
   ${GRAY}# 回滚指定服务${NC}
-  $0 --services manager-api
+  $0 --services agpay-manager-api
 
   ${GRAY}# 回滚到指定备份${NC}
   $0 --backup 20240315_143022
@@ -88,7 +88,7 @@ ${GREEN}示例：${NC}
   $0 --list
 
   ${GRAY}# 开发环境回滚${NC}
-  $0 --env development --services "ui-manager ui-agent"
+  $0 --env development --services "agpay-ui-manager agpay-ui-agent"
 
 EOF
 }

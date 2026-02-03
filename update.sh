@@ -11,8 +11,8 @@
 # 使用方法：
 # ./update.sh                              # 更新所有服务（生产环境）
 # ./update.sh --env development            # 更新所有服务（开发环境）
-# ./update.sh --services manager-api       # 仅更新 manager-api
-# ./update.sh --services "manager-api agent-api"  # 更新多个服务
+# ./update.sh --services agpay-manager-api       # 仅更新 agpay-manager-api
+# ./update.sh --services "agpay-manager-api agpay-agent-api"  # 更新多个服务
 # ./update.sh --build-cashier              # 强制构建 cashier
 # ========================================
 
@@ -70,9 +70,9 @@ ${GREEN}使用方法：${NC}
 ${GREEN}选项：${NC}
   ${YELLOW}--env <环境>${NC}              指定环境：development, staging, production (默认: production)
   ${YELLOW}--services <服务列表>${NC}     指定要更新的服务（用引号包含多个服务，空格分隔）
-                              可选值：ui-manager, ui-agent, ui-merchant,
-                                     manager-api, agent-api, merchant-api, payment-api
-  ${YELLOW}--build-cashier${NC}          强制构建 cashier（仅影响 payment-api）
+                              可选值：agpay-ui-manager, agpay-ui-agent, agpay-ui-merchant,
+                                     agpay-manager-api, agpay-agent-api, agpay-merchant-api, agpay-payment-api
+  ${YELLOW}--build-cashier${NC}          强制构建 cashier（仅影响 agpay-payment-api）
   ${YELLOW}--force${NC}                  强制更新（跳过确认）
   ${YELLOW}--help${NC}                   显示此帮助信息
 
@@ -80,17 +80,17 @@ ${GREEN}示例：${NC}
   ${GRAY}# 更新所有服务${NC}
   $0
 
-  ${GRAY}# 更新 manager-api${NC}
-  $0 --services manager-api
+  ${GRAY}# 更新 agpay-manager-api${NC}
+  $0 --services agpay-manager-api
 
   ${GRAY}# 更新多个服务${NC}
-  $0 --services "manager-api agent-api"
+  $0 --services "agpay-manager-api agpay-agent-api"
 
-  ${GRAY}# 更新 payment-api 并重新构建 cashier${NC}
-  $0 --services payment-api --build-cashier
+  ${GRAY}# 更新 agpay-payment-api 并重新构建 cashier${NC}
+  $0 --services agpay-payment-api --build-cashier
 
   ${GRAY}# 开发环境更新${NC}
-  $0 --env development --services "ui-manager ui-agent"
+  $0 --env development --services "agpay-ui-manager agpay-ui-agent"
 
 ${GREEN}回滚：${NC}
   如果更新失败，脚本会自动回滚

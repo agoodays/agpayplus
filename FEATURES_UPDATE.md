@@ -45,10 +45,10 @@
 
 ```bash
 # 更新单个服务
-./update.sh --services manager-api
+./update.sh --services agpay-manager-api
 
 # 更新多个服务
-./update.sh --services "manager-api agent-api"
+./update.sh --services "agpay-manager-api agpay-agent-api"
 ```
 
 ### ✅ 4. 完整回滚功能
@@ -77,13 +77,13 @@ Cashier（收银台）构建可选，节省构建时间：
 **默认模式（推荐）**: 使用现有 cashier
 ```bash
 BUILD_CASHIER=false
-./update.sh --services payment-api
+./update.sh --services agpay-payment-api
 ```
 
 **构建模式**: 重新构建 cashier
 ```bash
 BUILD_CASHIER=true
-./update.sh --services payment-api --build-cashier
+./update.sh --services agpay-payment-api --build-cashier
 ```
 
 ### ✅ 6. 自动备份管理
@@ -178,12 +178,12 @@ vi .env  # 修改 IPORDOMAIN 等配置
 
 ```bash
 # 更新单个服务
-./update.sh --services manager-api  # Linux
-.\update.ps1 -Services "manager-api"  # Windows
+./update.sh --services agpay-manager-api  # Linux
+.\update.ps1 -Services "agpay-manager-api"  # Windows
 
 # 更新多个服务
-./update.sh --services "manager-api agent-api"  # Linux
-.\update.ps1 -Services "manager-api","agent-api"  # Windows
+./update.sh --services "agpay-manager-api agpay-agent-api"  # Linux
+.\update.ps1 -Services "agpay-manager-api","agpay-agent-api"  # Windows
 ```
 
 ### 3. 版本回滚
@@ -235,10 +235,10 @@ Copy-Item .env.production .env; `
 
 ```bash
 # Linux
-./update.sh --services "ui-manager manager-api"
+./update.sh --services "agpay-ui-manager agpay-manager-api"
 
 # Windows
-.\update.ps1 -Services "ui-manager","manager-api"
+.\update.ps1 -Services "agpay-ui-manager","agpay-manager-api"
 ```
 
 ### 场景 3: 更新失败自动回滚
@@ -246,13 +246,13 @@ Copy-Item .env.production .env; `
 更新脚本会自动检测服务健康状态，失败时自动回滚：
 
 ```bash
-./update.sh --services payment-api
+./update.sh --services agpay-payment-api
 
 # 输出示例：
 # [6/7] 更新服务...
-#   ✅ payment-api 更新成功
+#   ✅ agpay-payment-api 更新成功
 # [7/7] 健康检查...
-#   ❌ payment-api: exited
+#   ❌ agpay-payment-api: exited
 #   
 # 开始自动回滚...
 # [1/5] 检查备份...
@@ -278,13 +278,13 @@ Copy-Item .env.production .env; `
 
 ```bash
 # 1. 先更新一个服务
-./update.sh --services manager-api
+./update.sh --services agpay-manager-api
 
 # 2. 观察运行状况
-docker compose logs -f manager-api
+docker compose logs -f agpay-manager-api
 
 # 3. 确认无问题后更新其他服务
-./update.sh --services "agent-api merchant-api payment-api"
+./update.sh --services "agpay-agent-api agpay-merchant-api agpay-payment-api"
 ```
 
 ---
@@ -402,7 +402,7 @@ BUILD_CASHIER=false
 仅更新必要的服务：
 
 ```bash
-./update.sh --services manager-api  # 仅更新一个服务
+./update.sh --services agpay-manager-api  # 仅更新一个服务
 ```
 
 ### 3. 并行构建
@@ -486,7 +486,7 @@ Get-Help .\rollback.ps1 -Full
 
 1. 阅读 [QUICK_REFERENCE.md](./QUICK_REFERENCE.md)
 2. 使用开发环境测试：`./deploy.sh --env development --skip-backup`
-3. 尝试更新服务：`./update.sh --services manager-api`
+3. 尝试更新服务：`./update.sh --services agpay-manager-api`
 4. 尝试回滚：`./rollback.sh --list` 和 `./rollback.sh`
 
 ### 进阶使用

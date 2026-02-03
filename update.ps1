@@ -10,8 +10,8 @@
 # 使用方法：
 # .\update.ps1                              # 更新所有服务（生产环境）
 # .\update.ps1 -Environment development     # 更新所有服务（开发环境）
-# .\update.ps1 -Services "manager-api"      # 仅更新 manager-api
-# .\update.ps1 -Services "manager-api","agent-api"  # 更新多个服务
+# .\update.ps1 -Services "agpay-manager-api"      # 仅更新 agpay-manager-api
+# .\update.ps1 -Services "agpay-manager-api","agpay-agent-api"  # 更新多个服务
 # .\update.ps1 -BuildCashier                # 强制构建 cashier
 # ========================================
 
@@ -146,14 +146,14 @@ function Show-Help {
     Write-ColorOutput "  # 更新所有服务" "Gray"
     Write-Host "  .\update.ps1"
     Write-Host ""
-    Write-ColorOutput "  # 更新 manager-api" "Gray"
-    Write-Host "  .\update.ps1 -Services `"manager-api`""
+    Write-ColorOutput "  # 更新 agpay-manager-api" "Gray"
+    Write-Host "  .\update.ps1 -Services `"agpay-manager-api`""
     Write-Host ""
     Write-ColorOutput "  # 更新多个服务" "Gray"
-    Write-Host "  .\update.ps1 -Services `"manager-api`",`"agent-api`""
+    Write-Host "  .\update.ps1 -Services `"agpay-manager-api`",`"agpay-agent-api`""
     Write-Host ""
-    Write-ColorOutput "  # 更新 payment-api 并重新构建 cashier" "Gray"
-    Write-Host "  .\update.ps1 -Services `"payment-api`" -BuildCashier"
+    Write-ColorOutput "  # 更新 agpay-payment-api 并重新构建 cashier" "Gray"
+    Write-Host "  .\update.ps1 -Services `"agpay-payment-api`" -BuildCashier"
     Write-Host ""
 }
 

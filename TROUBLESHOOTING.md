@@ -147,10 +147,10 @@ sudo lsof -ti:8817 | xargs sudo kill -9
 
 ```bash
 # 查看容器日志
-docker compose logs manager-api
+docker compose logs agpay-manager-api
 
 # 查看最近的日志
-docker compose logs --tail=100 -f manager-api
+docker compose logs --tail=100 -f agpay-manager-api
 
 # 检查容器状态
 docker compose ps -a
@@ -280,13 +280,13 @@ ls -la .backup/
 
 ```bash
 # 1. 使用更新脚本
-./update.sh --services "manager-api"
+./update.sh --services "agpay-manager-api"
 
 # 2. 如果自动回滚失败，手动回滚
 ./rollback.sh
 
 # 3. 查看日志排查问题
-docker compose logs manager-api
+docker compose logs agpay-manager-api
 
 # 4. 修复问题后重新更新
 ```
@@ -353,7 +353,7 @@ docker compose down
 docker compose up -d
 
 # 3. 验证环境变量
-docker exec manager-api env | grep MYSQL
+docker exec agpay-manager-api env | grep MYSQL
 ```
 
 ---
@@ -368,8 +368,8 @@ docker network ls
 docker network inspect agpayplus_default
 
 # 测试服务连接
-docker exec manager-api ping mysql
-docker exec manager-api nc -zv mysql 3306
+docker exec agpay-manager-api ping mysql
+docker exec agpay-manager-api nc -zv mysql 3306
 
 # 重建网络
 docker compose down
@@ -394,7 +394,7 @@ docker compose ps -a
 docker compose logs -f
 
 # 特定服务
-docker compose logs -f manager-api
+docker compose logs -f agpay-manager-api
 
 # 最近100行
 docker compose logs --tail=100 -f
@@ -404,10 +404,10 @@ docker compose logs --tail=100 -f
 
 ```bash
 # 进入容器 Shell
-docker exec -it manager-api /bin/bash
+docker exec -it agpay-manager-api /bin/bash
 
 # 执行命令
-docker exec manager-api ls -la /app
+docker exec agpay-manager-api ls -la /app
 ```
 
 ### 检查资源使用
@@ -417,7 +417,7 @@ docker exec manager-api ls -la /app
 docker stats
 
 # 查看详细信息
-docker inspect manager-api
+docker inspect agpay-manager-api
 ```
 
 ---

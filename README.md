@@ -303,15 +303,15 @@ AgPay+ 采用微服务架构，基于 Docker Compose 进行容器编排：
 #### 服务组成
 
 **前端服务（3个）**
-- **ui-manager** (8817) - 运营平台前端
-- **ui-agent** (8816) - 代理商系统前端
-- **ui-merchant** (8818) - 商户系统前端
+- **agpay-ui-manager** (8817) - 运营平台前端
+- **agpay-ui-agent** (8816) - 代理商系统前端
+- **agpay-ui-merchant** (8818) - 商户系统前端
 
 **后端服务（4个）**
-- **manager-api** (9817/5817) - 运营平台 API
-- **agent-api** (9816/5816) - 代理商 API
-- **merchant-api** (9818/5818) - 商户 API
-- **payment-api** (9819/5819) - 支付网关 API + 收银台
+- **agpay-manager-api** (9817/5817) - 运营平台 API
+- **agpay-agent-api** (9816/5816) - 代理商 API
+- **agpay-merchant-api** (9818/5818) - 商户 API
+- **agpay-payment-api** (9819/5819) - 支付网关 API + 收银台
 
 **基础设施（2个）**
 - **redis** (6379) - 缓存服务
@@ -328,15 +328,15 @@ AgPay+ 采用微服务架构，基于 Docker Compose 进行容器编排：
 ├─ Docker Compose 容器编排
 │  │
 │  ├─ 前端服务 (Nginx)
-│  │  ├─ ui-manager    :8817
-│  │  ├─ ui-agent      :8816
-│  │  └─ ui-merchant   :8818
+│  │  ├─ agpay-ui-manager    :8817
+│  │  ├─ agpay-ui-agent      :8816
+│  │  └─ agpay-ui-merchant   :8818
 │  │
 │  ├─ 后端服务 (.NET 9)
-│  │  ├─ manager-api   :9817
-│  │  ├─ agent-api     :9816
-│  │  ├─ merchant-api  :9818
-│  │  └─ payment-api   :9819 (含收银台)
+│  │  ├─ agpay-manager-api   :9817
+│  │  ├─ agpay-agent-api     :9816
+│  │  ├─ agpay-merchant-api  :9818
+│  │  └─ agpay-payment-api   :9819 (含收银台)
 │  │
 │  └─ 基础设施
 │     ├─ redis         :6379
@@ -475,12 +475,12 @@ docker compose down -v  # 同时删除数据卷
 ./update.sh         # Linux/macOS
 
 # 更新指定服务
-./update.ps1 -Services "payment-api"                      # Windows
-./update.sh --services "payment-api,manager-api"          # Linux/macOS
+./update.ps1 -Services "agpay-payment-api"                      # Windows
+./update.sh --services "agpay-payment-api,agpay-manager-api"          # Linux/macOS
 
 # 强制重新构建
-./update.ps1 -Services "payment-api" -Force               # Windows
-./update.sh --services "payment-api" --force              # Linux/macOS
+./update.ps1 -Services "agpay-payment-api" -Force               # Windows
+./update.sh --services "agpay-payment-api" --force              # Linux/macOS
 ```
 
 #### 手动更新
@@ -523,10 +523,10 @@ docker compose up -d [service_name]
 docker compose logs -f
 
 # 查看特定服务日志
-docker compose logs -f payment-api
+docker compose logs -f agpay-payment-api
 
 # 查看最近 100 行日志
-docker compose logs --tail=100 payment-api
+docker compose logs --tail=100 agpay-payment-api
 ```
 
 #### 进入容器
@@ -565,7 +565,7 @@ docker compose up -d
 ### Docker
 ```
 # 创建网络
-docker network create agpay-plus-network
+docker network create agpay-network
 
 # Docker安装Redis
 # Docker搜索redis镜像 命令：docker search <镜像名称>
@@ -575,40 +575,40 @@ docker search redis
 docker pull redis
 
 # 运行 redis 容器
-docker run -d --name agpay-plus-redis -p 6379:6379 --network agpay-plus-network redis
+docker run -d --name agpay-redis -p 6379:6379 --network agpay-network redis
 
 # Docker安装RabbitMQ
 # 拉去镜像
 docker pull rabbitmq:management
 
 # 运行 rabbitmq 容器
-docker run -d --hostname agpay-plus-rabbitmq --name agpay-plus-rabbitmq --network agpay-plus-network -p 15672:15672 -p 5672:5672 rabbitmq:3-management
+docker run -d --hostname agpay-rabbitmq --name agpay-rabbitmq --network agpay-network -p 15672:15672 -p 5672:5672 rabbitmq:3-management
 
 # 根据 RabbitMQ 版本下载「rabbitmq_delayed_message_exchange」插件 https://www.rabbitmq.com/community-plugins.html
 # 将刚下载的插件拷贝到容器内的 plugins 目录下
 # Window
-docker cp E:\agoodays\agpayplus\aspnet-core\docs\rabbitmq_plugin\rabbitmq_delayed_message_exchange-3.13.0.ez agpay-plus-rabbitmq:/plugins
+docker cp E:\agoodays\agpayplus\aspnet-core\docs\rabbitmq_plugin\rabbitmq_delayed_message_exchange-3.13.0.ez agpay-rabbitmq:/plugins
 # Linux
-docker cp /root/agpayplus/aspnet-core/docs/rabbitmq_plugin/rabbitmq_delayed_message_exchange-3.13.0.ez agpay-plus-rabbitmq:/plugins/
+docker cp /root/agpayplus/aspnet-core/docs/rabbitmq_plugin/rabbitmq_delayed_message_exchange-3.13.0.ez agpay-rabbitmq:/plugins/
 
 # 进入rabbitmq命令
-docker exec -it agpay-plus-rabbitmq /bin/bash
+docker exec -it agpay-rabbitmq /bin/bash
 
 # 查看插件列表
-root@agpay-plus-rabbitmq:/# rabbitmq-plugins list
+root@agpay-rabbitmq:/# rabbitmq-plugins list
 
 # 查看插件是否存在
-root@agpay-plus-rabbitmq:/# cd plugins
-root@agpay-plus-rabbitmq:/plugins# ls |grep delay
-root@agpay-plus-rabbitmq:/plugins# cd ../
+root@agpay-rabbitmq:/# cd plugins
+root@agpay-rabbitmq:/plugins# ls |grep delay
+root@agpay-rabbitmq:/plugins# cd ../
 # Enable 插件
-root@agpay-plus-rabbitmq:/# rabbitmq-plugins enable rabbitmq_delayed_message_exchange
+root@agpay-rabbitmq:/# rabbitmq-plugins enable rabbitmq_delayed_message_exchange
 
 # 退出容器
-root@agpay-plus-rabbitmq:/# exit
+root@agpay-rabbitmq:/# exit
 
 # 重启 RabbitMQ
-docker restart agpay-plus-rabbitmq
+docker restart agpay-rabbitmq
 
 # 手动拉取镜像
 docker pull mcr.microsoft.com/dotnet/sdk:9.0
@@ -616,14 +616,21 @@ docker pull mcr.microsoft.com/dotnet/aspnet:9.0
 
 # 构建并运行后端容器
 # 构建 Docker 镜像
-cd agpayplus/aspnet-core/src
-agpayplus\aspnet-core\src> docker build --no-cache -t agpay-plus-manager-api -f ./AGooday.AgPay.Manager.Api/Dockerfile .
-agpayplus\aspnet-core\src> docker build --no-cache -t agpay-plus-agent-api -f ./AGooday.AgPay.Agent.Api/Dockerfile .
-agpayplus\aspnet-core\src> docker build --no-cache -t agpay-plus-merchant-api -f ./AGooday.AgPay.Merchant.Api/Dockerfile .
-agpayplus\aspnet-core\src> docker build --no-cache -t agpay-plus-payment-api -f ./AGooday.AgPay.Payment.Api/Dockerfile .
+cd agpayplus 
+agpayplus> docker build --no-cache -f aspnet-core/src/AGooday.AgPay.Manager.Api/Dockerfile -t agpay-manager-api ./aspnet-core/src
+agpayplus> docker build --no-cache -f aspnet-core/src/AGooday.AgPay.Agent.Api/Dockerfile -t agpay-agent-api ./aspnet-core/src
+agpayplus> docker build --no-cache -f aspnet-core/src/AGooday.AgPay.Merchant.Api/Dockerfile -t agpay-merchant-api ./aspnet-core/src
+agpayplus> docker build --no-cache -f aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile -t agpay-payment-api .
 
-# 将运行的容器连接到指定的网络，运行 docker network inspect agpay-plus-network 命令查看容器是否连接到了该网络
-docker network connect agpay-plus-network agpay-plus-manager-api
+agpayplus> docker build --no-cache -t agpay-payment-api -f ./aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile .
+
+cd agpayplus/aspnet-core/src
+agpayplus\aspnet-core\src> docker build --no-cache -t agpay-manager-api -f ./AGooday.AgPay.Manager.Api/Dockerfile .
+agpayplus\aspnet-core\src> docker build --no-cache -t agpay-agent-api -f ./AGooday.AgPay.Agent.Api/Dockerfile .
+agpayplus\aspnet-core\src> docker build --no-cache -t agpay-merchant-api -f ./AGooday.AgPay.Merchant.Api/Dockerfile .
+
+# 将运行的容器连接到指定的网络，运行 docker network inspect agpay-network 命令查看容器是否连接到了该网络
+docker network connect agpay-network agpay-manager-api
 
 # 生成证书并配置本地计算机
 # https://learn.microsoft.com/zh-cn/aspnet/core/security/docker-https?view=aspnetcore-9.0
@@ -641,26 +648,26 @@ dotnet dev-certs https -ep ~/.aspnet/https/agpayplusapi.pfx -p 123456
 dotnet dev-certs https --trust
 
 # 运行容器
-# docker run -d --name agpay-plus-manager-api -p 9817:9817 --network agpay-plus-network agpay-plus-manager-api
+# docker run -d --name agpay-manager-api -p 9817:9817 --network agpay-network agpay-manager-api
 # 使用为 HTTPS 配置的 ASP.NET Core 运行容器镜像
-# docker run --rm -it -d --name agpay-plus-manager-api --network agpay-plus-network -p 5817:5817 -p 9817:9817 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9817 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
-# docker run --rm -it -d --name agpay-plus-agent-api --network agpay-plus-network -p 5816:5816 -p 9816:9816 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9816 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-agent-api
-# docker run --rm -it -d --name agpay-plus-merchant-api --network agpay-plus-network -p 5818:5818 -p 9818:9818 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9818 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-merchant-api
-# docker run --rm -it -d --name agpay-plus-payment-api --network agpay-plus-network -p 5819:5819 -p 9819:9819 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9819 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-payment-api
+# docker run --rm -it -d --name agpay-manager-api --network agpay-network -p 5817:5817 -p 9817:9817 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9817 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-manager-api
+# docker run --rm -it -d --name agpay-agent-api --network agpay-network -p 5816:5816 -p 9816:9816 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9816 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-agent-api
+# docker run --rm -it -d --name agpay-merchant-api --network agpay-network -p 5818:5818 -p 9818:9818 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9818 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-merchant-api
+# docker run --rm -it -d --name agpay-payment-api --network agpay-network -p 5819:5819 -p 9819:9819 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=9819 -e ASPNETCORE_Kestrel__Certificates__Default__Password="123456" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/agpayplusapi.pfx -v $env:USERPROFILE\.aspnet\https:/https/ agpay-payment-api
 # Window
-docker run -d --name agpay-plus-manager-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5817:5817 -p 9817:9817 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-manager-api
-docker run -d --name agpay-plus-agent-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5816:5816 -p 9816:9816 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-agent-api
-docker run -d --name agpay-plus-merchant-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5818:5818 -p 9818:9818 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-merchant-api
-docker run -d --name agpay-plus-payment-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5819:5819 -p 9819:9819 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-plus-payment-api
+docker run -d --name agpay-manager-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-network -p 5817:5817 -p 9817:9817 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-manager-api
+docker run -d --name agpay-agent-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-network -p 5816:5816 -p 9816:9816 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-agent-api
+docker run -d --name agpay-merchant-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-network -p 5818:5818 -p 9818:9818 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-merchant-api
+docker run -d --name agpay-payment-api -v /e/app/agpayplus/logs:/app/agpayplus/logs -v /e/app/agpayplus/upload:/app/agpayplus/upload --network agpay-network -p 5819:5819 -p 9819:9819 -v $env:USERPROFILE\.aspnet\https:/https/ agpay-payment-api
 # Linux
-docker run -d --name agpay-plus-manager-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5817:5817 -p 9817:9817 -v ${HOME}/.aspnet/https:/https/ agpay-plus-manager-api
-docker run -d --name agpay-plus-agent-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5816:5816 -p 9816:9816 -v ${HOME}/.aspnet/https:/https/ agpay-plus-agent-api
-docker run -d --name agpay-plus-merchant-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5818:5818 -p 9818:9818 -v ${HOME}/.aspnet/https:/https/ agpay-plus-merchant-api
-docker run -d --name agpay-plus-payment-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-plus-network -p 5819:5819 -p 9819:9819 -v ${HOME}/.aspnet/https:/https/ agpay-plus-payment-api
+docker run -d --name agpay-manager-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-network -p 5817:5817 -p 9817:9817 -v ${HOME}/.aspnet/https:/https/ agpay-manager-api
+docker run -d --name agpay-agent-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-network -p 5816:5816 -p 9816:9816 -v ${HOME}/.aspnet/https:/https/ agpay-agent-api
+docker run -d --name agpay-merchant-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-network -p 5818:5818 -p 9818:9818 -v ${HOME}/.aspnet/https:/https/ agpay-merchant-api
+docker run -d --name agpay-payment-api -v /app/agpayplus/logs:/app/agpayplus/logs -v /app/agpayplus/upload:/app/agpayplus/upload --network agpay-network -p 5819:5819 -p 9819:9819 -v ${HOME}/.aspnet/https:/https/ agpay-payment-api
 
-# 停止并删除当前正在运行的 agpay-plus-manager-api 容器：
-docker stop agpay-plus-manager-api
-docker rm agpay-plus-manager-api
+# 停止并删除当前正在运行的 agpay-manager-api 容器：
+docker stop agpay-manager-api
+docker rm agpay-manager-api
 
 # 构建并运行前端容器
 # 直接拉取所需的基础镜像
@@ -668,15 +675,20 @@ docker pull node:16-alpine
 docker pull nginx:stable-alpine
 
 # 构建 Docker 镜像
+cd agpayplus
+agpayplus> docker build --no-cache -f ant-design-vue/agpay-ui-manager/Dockerfile -t agpay-ui-manager ./ant-design-vue
+agpayplus> docker build --no-cache -f ant-design-vue/agpay-ui-agent/Dockerfile -t agpay-ui-agent ./ant-design-vue
+agpayplus> docker build --no-cache -f ant-design-vue/agpay-ui-merchant/Dockerfile -t agpay-ui-merchant ./ant-design-vue
+
 cd agpayplus/ant-design-vue
 agpayplus\ant-design-vue> docker build --no-cache -t agpay-ui-manager -f ./agpay-ui-manager/Dockerfile .
 agpayplus\ant-design-vue> docker build --no-cache -t agpay-ui-agent -f ./agpay-ui-agent/Dockerfile .
 agpayplus\ant-design-vue> docker build --no-cache -t agpay-ui-merchant -f ./agpay-ui-merchant/Dockerfile .
 
 # 运行容器
-docker run -d --name agpay-ui-manager -p 8817:80 --network agpay-plus-network agpay-ui-manager
-docker run -d --name agpay-ui-agent -p 8816:80 --network agpay-plus-network agpay-ui-agent
-docker run -d --name agpay-ui-merchant -p 8818:80 --network agpay-plus-network agpay-ui-merchant
+docker run -d --name agpay-ui-manager -p 8817:80 --network agpay-network agpay-ui-manager
+docker run -d --name agpay-ui-agent -p 8816:80 --network agpay-network agpay-ui-agent
+docker run -d --name agpay-ui-merchant -p 8818:80 --network agpay-network agpay-ui-merchant
 ```
 
 ### Docker Compose

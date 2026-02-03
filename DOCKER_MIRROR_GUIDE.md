@@ -145,7 +145,7 @@ WORKDIR /src
 
 ```yaml
 services:
-  agent-api:
+  agpay-agent-api:
     build:
       context: ./aspnet-core/src
       dockerfile: AGooday.AgPay.Agent.Api/Dockerfile.cn  # 使用中国版 Dockerfile

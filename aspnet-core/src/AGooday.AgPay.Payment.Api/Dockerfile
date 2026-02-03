@@ -10,8 +10,8 @@
 # 使用方法（必须在项目根目录执行）：
 #
 # 推荐方式 1：使用 docker-compose（自动处理路径）
-#   docker compose build payment-api                             # 不构建 cashier
-#   docker compose build --build-arg BUILD_CASHIER=true payment-api  # 构建 cashier
+#   docker compose build agpay-payment-api                             # 不构建 cashier
+#   docker compose build --build-arg BUILD_CASHIER=true agpay-payment-api  # 构建 cashier
 #
 # 推荐方式 2：使用部署脚本
 #   .\deploy.ps1 -Environment dev                    # Windows，不构建 cashier
@@ -21,8 +21,8 @@
 #
 # 直接使用 docker build（需指定 Dockerfile 路径）：
 #   cd <项目根目录>
-#   docker build -f aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile -t payment-api .
-#   docker build --build-arg BUILD_CASHIER=true -f aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile -t payment-api .
+#   docker build -f aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile -t agpay-payment-api .
+#   docker build --build-arg BUILD_CASHIER=true -f aspnet-core/src/AGooday.AgPay.Payment.Api/Dockerfile -t agpay-payment-api .
 # ========================================
 
 # 构建参数

@@ -24,12 +24,12 @@
 .\update.ps1                              # Windows
 
 # 更新单个服务
-./update.sh --services manager-api        # Linux
-.\update.ps1 -Services "manager-api"      # Windows
+./update.sh --services agpay-manager-api        # Linux
+.\update.ps1 -Services "agpay-manager-api"      # Windows
 
 # 更新多个服务
-./update.sh --services "manager-api agent-api"              # Linux
-.\update.ps1 -Services "manager-api","agent-api"            # Windows
+./update.sh --services "agpay-manager-api agpay-agent-api"              # Linux
+.\update.ps1 -Services "agpay-manager-api","agpay-agent-api"            # Windows
 ```
 
 ### 回滚
@@ -54,13 +54,13 @@
 
 | 服务名 | 说明 | 端口 |
 |-------|------|------|
-| `ui-manager` | 运营平台前端 | 8817 |
-| `ui-agent` | 代理商系统前端 | 8816 |
-| `ui-merchant` | 商户系统前端 | 8818 |
-| `manager-api` | 运营平台 API | 5817/9817 |
-| `agent-api` | 代理商系统 API | 5816/9816 |
-| `merchant-api` | 商户系统 API | 5818/9818 |
-| `payment-api` | 支付网关 API | 5819/9819 |
+| `agpay-ui-manager` | 运营平台前端 | 8817 |
+| `agpay-ui-agent` | 代理商系统前端 | 8816 |
+| `agpay-ui-merchant` | 商户系统前端 | 8818 |
+| `agpay-manager-api` | 运营平台 API | 5817/9817 |
+| `agpay-agent-api` | 代理商系统 API | 5816/9816 |
+| `agpay-merchant-api` | 商户系统 API | 5818/9818 |
+| `agpay-payment-api` | 支付网关 API | 5819/9819 |
 
 ---
 
@@ -80,50 +80,50 @@
 
 ```bash
 # Linux
-./update.sh --services "ui-manager manager-api"
+./update.sh --services "agpay-ui-manager agpay-manager-api"
 
 # Windows
-.\update.ps1 -Services "ui-manager","manager-api"
+.\update.ps1 -Services "agpay-ui-manager","agpay-manager-api"
 ```
 
 ### 场景 2: 更新所有 API
 
 ```bash
 # Linux
-./update.sh --services "manager-api agent-api merchant-api payment-api"
+./update.sh --services "agpay-manager-api agpay-agent-api agpay-merchant-api agpay-payment-api"
 
 # Windows
-.\update.ps1 -Services "manager-api","agent-api","merchant-api","payment-api"
+.\update.ps1 -Services "agpay-manager-api","agpay-agent-api","agpay-merchant-api","agpay-payment-api"
 ```
 
 ### 场景 3: 更新所有前端
 
 ```bash
 # Linux
-./update.sh --services "ui-manager ui-agent ui-merchant"
+./update.sh --services "agpay-ui-manager agpay-ui-agent agpay-ui-merchant"
 
 # Windows
-.\update.ps1 -Services "ui-manager","ui-agent","ui-merchant"
+.\update.ps1 -Services "agpay-ui-manager","agpay-ui-agent","agpay-ui-merchant"
 ```
 
 ### 场景 4: 更新支付网关（含 Cashier）
 
 ```bash
 # Linux
-./update.sh --services payment-api --build-cashier
+./update.sh --services agpay-payment-api --build-cashier
 
 # Windows
-.\update.ps1 -Services "payment-api" -BuildCashier
+.\update.ps1 -Services "agpay-payment-api" -BuildCashier
 ```
 
 ### 场景 5: 开发环境快速更新
 
 ```bash
 # Linux
-./update.sh --env development --services "ui-manager" --force
+./update.sh --env development --services "agpay-ui-manager" --force
 
 # Windows
-.\update.ps1 -Environment development -Services "ui-manager" -Force
+.\update.ps1 -Environment development -Services "agpay-ui-manager" -Force
 ```
 
 ---
@@ -143,17 +143,17 @@ docker compose ps
 docker compose logs -f
 
 # 特定服务
-docker compose logs -f manager-api
+docker compose logs -f agpay-manager-api
 
 # 最近 100 行
-docker compose logs --tail=100 -f manager-api
+docker compose logs --tail=100 -f agpay-manager-api
 ```
 
 ### 重启服务
 
 ```bash
 # 单个服务
-docker compose restart manager-api
+docker compose restart agpay-manager-api
 
 # 所有服务
 docker compose restart
@@ -163,7 +163,7 @@ docker compose restart
 
 ```bash
 # 单个服务
-docker compose stop manager-api
+docker compose stop agpay-manager-api
 
 # 所有服务
 docker compose stop
@@ -364,10 +364,10 @@ docker system df
 
 ```bash
 # 重启所有 API 服务
-docker compose restart manager-api agent-api merchant-api payment-api
+docker compose restart agpay-manager-api agpay-agent-api agpay-merchant-api agpay-payment-api
 
 # 查看所有 API 日志
-docker compose logs -f manager-api agent-api merchant-api payment-api
+docker compose logs -f agpay-manager-api agpay-agent-api merchant-api agpay-payment-api
 ```
 
 ---
@@ -415,10 +415,10 @@ Copy-Item .env.production .env; `
 
 ```bash
 # Linux
-./update.sh --services manager-api && docker compose logs -f manager-api
+./update.sh --services agpay-manager-api && docker compose logs -f agpay-manager-api
 
 # Windows
-.\update.ps1 -Services "manager-api"; docker compose logs -f manager-api
+.\update.ps1 -Services "agpay-manager-api"; docker compose logs -f agpay-manager-api
 ```
 
 ### 完整重置和重新部署

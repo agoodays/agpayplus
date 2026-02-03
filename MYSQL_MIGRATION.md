@@ -117,7 +117,7 @@ docker compose up -d
 
 # 检查服务状态
 docker compose ps
-docker compose logs -f manager-api
+docker compose logs -f agpay-manager-api
 ```
 
 ---
@@ -193,8 +193,8 @@ docker exec <mysql-container-name> mysql \
 
 ```bash
 # 检查 API 服务日志
-docker compose logs manager-api | grep -i mysql
-docker compose logs manager-api | grep -i "database"
+docker compose logs agpay-manager-api | grep -i mysql
+docker compose logs agpay-manager-api | grep -i "database"
 
 # 测试 API 接口
 curl -k https://localhost:9817/api/health
@@ -338,7 +338,7 @@ docker compose up -d db
 docker exec <mysql-container> mysqladmin -u root -p<password> ping
 
 # 检查网络连通性
-docker compose exec manager-api ping db
+docker compose exec agpay-manager-api ping db
 
 # 验证连接字符串
 docker compose config | grep ConnectionStrings

@@ -10,7 +10,7 @@
 # 使用方法：
 # .\rollback.ps1                            # 回滚所有服务（生产环境）
 # .\rollback.ps1 -Environment development   # 回滚开发环境
-# .\rollback.ps1 -Services "manager-api"    # 仅回滚指定服务
+# .\rollback.ps1 -Services "agpay-manager-api"    # 仅回滚指定服务
 # .\rollback.ps1 -Backup "20240101_120000"  # 回滚到指定备份
 # .\rollback.ps1 -List                      # 列出所有备份
 # ========================================

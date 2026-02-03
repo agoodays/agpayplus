@@ -11,8 +11,8 @@
 # .\deploy.ps1                              # 默认生产环境，部署所有服务
 # .\deploy.ps1 -Environment dev             # 开发环境
 # .\deploy.ps1 -Environment staging         # 预发布环境
-# .\deploy.ps1 -Services "manager-api"      # 仅更新指定服务
-# .\deploy.ps1 -Services "manager-api","agent-api"  # 更新多个服务
+# .\deploy.ps1 -Services "agpay-manager-api"      # 仅更新指定服务
+# .\deploy.ps1 -Services "agpay-manager-api","agpay-agent-api"  # 更新多个服务
 # .\deploy.ps1 -BuildCashier                # 强制构建 cashier
 # .\deploy.ps1 -SkipBackup                  # 跳过备份（首次部署）
 # ========================================
@@ -92,11 +92,11 @@ function Show-Help {
     Write-ColorOutput "  # 开发环境部署（构建 cashier）" "Gray"
     Write-Host "  .\deploy.ps1 -Environment dev -BuildCashier"
     Write-Host ""
-    Write-ColorOutput "  # 仅更新 manager-api" "Gray"
-    Write-Host "  .\deploy.ps1 -Services `"manager-api`""
+    Write-ColorOutput "  # 仅更新 agpay-manager-api" "Gray"
+    Write-Host "  .\deploy.ps1 -Services `"agpay-manager-api`""
     Write-Host ""
     Write-ColorOutput "  # 更新多个服务" "Gray"
-    Write-Host "  .\deploy.ps1 -Services `"manager-api`",`"agent-api`""
+    Write-Host "  .\deploy.ps1 -Services `"agpay-manager-api`",`"agpay-agent-api`""
     Write-Host ""
 }
 

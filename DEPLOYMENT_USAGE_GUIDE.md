@@ -216,13 +216,13 @@ BUILD_CASHIER=false
 
 | 服务名 | 说明 | 访问端口 |
 |-------|------|----------|
-| `ui-manager` | 运营平台前端 | 8817 |
-| `ui-agent` | 代理商前端 | 8816 |
-| `ui-merchant` | 商户前端 | 8818 |
-| `manager-api` | 运营平台 API | 9817 |
-| `agent-api` | 代理商 API | 9816 |
-| `merchant-api` | 商户 API | 9818 |
-| `payment-api` | 支付网关 | 9819 |
+| `agpay-ui-manager` | 运营平台前端 | 8817 |
+| `agpay-ui-agent` | 代理商前端 | 8816 |
+| `agpay-ui-merchant` | 商户前端 | 8818 |
+| `agpay-manager-api` | 运营平台 API | 9817 |
+| `agpay-agent-api` | 代理商 API | 9816 |
+| `agpay-merchant-api` | 商户 API | 9818 |
+| `agpay-payment-api` | 支付网关 | 9819 |
 
 ### 4.3 部署示例
 
@@ -250,20 +250,20 @@ BUILD_CASHIER=false
 
 ```bash
 # Linux
-./deploy.sh --services "ui-manager manager-api"
+./deploy.sh --services "agpay-ui-manager agpay-manager-api"
 
 # Windows
-.\deploy.ps1 -Services "ui-manager","manager-api"
+.\deploy.ps1 -Services "agpay-ui-manager","agpay-manager-api"
 ```
 
 #### 示例 4: 更新多个服务
 
 ```bash
 # Linux
-./deploy.sh --services "manager-api agent-api merchant-api"
+./deploy.sh --services "agpay-manager-api agpay-agent-api agpay-merchant-api"
 
 # Windows
-.\deploy.ps1 -Services "manager-api","agent-api","merchant-api"
+.\deploy.ps1 -Services "agpay-manager-api","agpay-agent-api","agpay-merchant-api"
 ```
 
 ### 4.4 部署步骤
@@ -356,30 +356,30 @@ BUILD_CASHIER=false
 
 ```bash
 # Linux
-./update.sh --services manager-api
+./update.sh --services agpay-manager-api
 
 # Windows
-.\update.ps1 -Services "manager-api"
+.\update.ps1 -Services "agpay-manager-api"
 ```
 
 #### 示例 3: 更新多个服务
 
 ```bash
 # Linux
-./update.sh --services "manager-api agent-api"
+./update.sh --services "agpay-manager-api agpay-agent-api"
 
 # Windows
-.\update.ps1 -Services "manager-api","agent-api"
+.\update.ps1 -Services "agpay-manager-api","agpay-agent-api"
 ```
 
 #### 示例 4: 更新支付网关并构建 cashier
 
 ```bash
 # Linux
-./update.sh --services payment-api --build-cashier
+./update.sh --services agpay-payment-api --build-cashier
 
 # Windows
-.\update.ps1 -Services "payment-api" -BuildCashier
+.\update.ps1 -Services "agpay-payment-api" -BuildCashier
 ```
 
 ### 5.3 更新步骤
@@ -454,13 +454,13 @@ BUILD_CASHIER=false
 
 production 环境:
   20240315_143022  [1.2 GB] (最新)
-    服务: manager-api agent-api merchant-api payment-api
+    服务: agpay-manager-api agpay-agent-api agpay-merchant-api agpay-payment-api
   20240315_120530  [1.2 GB]
-    服务: manager-api agent-api merchant-api payment-api
+    服务: agpay-manager-api agpay-agent-api agpay-merchant-api agpay-payment-api
 
 development 环境:
   20240315_140000  [800 MB] (最新)
-    服务: ui-manager ui-agent
+    服务: agpay-ui-manager agpay-ui-agent
 ```
 
 #### 示例 2: 回滚到最新备份
@@ -477,10 +477,10 @@ development 环境:
 
 ```bash
 # Linux
-./rollback.sh --services manager-api
+./rollback.sh --services agpay-manager-api
 
 # Windows
-.\rollback.ps1 -Services "manager-api"
+.\rollback.ps1 -Services "agpay-manager-api"
 ```
 
 #### 示例 4: 回滚到指定版本
@@ -522,8 +522,8 @@ development 环境:
 ```
 .backup/
 ├── production_update_20240315_143022/
-│   ├── manager-api.tar.gz
-│   ├── agent-api.tar.gz
+│   ├── agpay-manager-api.tar.gz
+│   ├── agpay-agent-api.tar.gz
 │   ├── containers.json
 │   ├── images.json
 │   ├── .env.backup
@@ -575,10 +575,10 @@ BUILD_CASHIER=true
 **方式 2**: 命令行
 ```bash
 # Linux
-./deploy.sh --services payment-api --build-cashier
+./deploy.sh --services agpay-payment-api --build-cashier
 
 # Windows
-.\deploy.ps1 -Services "payment-api" -BuildCashier
+.\deploy.ps1 -Services "agpay-payment-api" -BuildCashier
 ```
 
 ### 7.3 访问地址
@@ -607,13 +607,13 @@ vi .env
 ### 场景 2: 日常更新单服务
 
 ```bash
-./update.sh --services manager-api
+./update.sh --services agpay-manager-api
 ```
 
 ### 场景 3: 更新多服务
 
 ```bash
-./update.sh --services "ui-manager manager-api"
+./update.sh --services "agpay-ui-manager agpay-manager-api"
 ```
 
 ### 场景 4: 紧急回滚
@@ -629,26 +629,26 @@ vi .env
 ### 场景 5: 开发环境频繁更新
 
 ```bash
-./update.sh --env development --services "ui-manager ui-agent ui-merchant"
+./update.sh --env development --services "agpay-ui-manager agpay-ui-agent agpay-ui-merchant"
 ```
 
 ### 场景 6: 更新支付网关
 
 ```bash
-./update.sh --services payment-api --build-cashier
+./update.sh --services agpay-payment-api --build-cashier
 ```
 
 ### 场景 7: 灰度发布
 
 ```bash
 # 1. 先更新一个服务
-./update.sh --services manager-api
+./update.sh --services agpay-manager-api
 
 # 2. 观察运行
-docker compose logs -f manager-api
+docker compose logs -f agpay-manager-api
 
 # 3. 确认后更新其他
-./update.sh --services "agent-api merchant-api payment-api"
+./update.sh --services "agpay-agent-api agpay-merchant-api agpay-payment-api"
 ```
 
 ---
@@ -804,10 +804,10 @@ A: 不需要，首次部署失败只需清理失败资源并重试。
 docker compose logs -f
 
 # 特定服务
-docker compose logs -f manager-api
+docker compose logs -f agpay-manager-api
 
 # 最近 100 行
-docker compose logs --tail=100 -f manager-api
+docker compose logs --tail=100 -f agpay-manager-api
 ```
 
 ### 9.2 查看状态
@@ -824,7 +824,7 @@ docker compose ps -a
 
 ```bash
 # 单个服务
-docker compose restart manager-api
+docker compose restart agpay-manager-api
 
 # 所有服务
 docker compose restart
