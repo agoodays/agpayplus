@@ -13,10 +13,15 @@
 # .\update.ps1 -Services "agpay-manager-api"      # 仅更新 agpay-manager-api
 # .\update.ps1 -Services "agpay-manager-api","agpay-agent-api"  # 更新多个服务
 # .\update.ps1 -BuildCashier                # 强制构建 cashier
+# .\update.ps1 --Help                       # 查看帮助
 # ========================================
 
 [CmdletBinding()]
 param(
+    [Parameter(HelpMessage="显示帮助信息")]
+    [Alias("?", "h")]
+    [switch]$Help,
+    
     [Parameter(HelpMessage="环境: development, staging, production")]
     [ValidateSet("development", "staging", "production")]
     [string]$Environment = "production",
@@ -48,6 +53,44 @@ function Write-Warning { param([string]$msg) Write-ColorOutput "  ⚠️  $msg" 
 function Write-Info { param([string]$msg) Write-ColorOutput "  ℹ️  $msg" "Cyan" }
 function Write-Step { param([string]$msg) Write-ColorOutput $msg "Yellow" }
 function Write-Header { param([string]$msg) Write-ColorOutput $msg "Cyan" }
+
+# ========================================
+# 帮助信息
+# ========================================
+function Show-Help {
+    Write-Header "========================================"
+    Write-Header "  AgPay+ 服务更新脚本 (Windows)"
+    Write-Header "========================================"
+    Write-Host ""
+    Write-ColorOutput "功能：" "Green"
+    Write-Host "  • 支持指定服务更新"
+    Write-Host "  • 自动备份、支持回滚"
+    Write-Host "  • 多环境支持"
+    Write-Host "  • 健康检查和自动回滚"
+    Write-Host ""
+    Write-ColorOutput "使用方法：" "Green"
+    Write-Host "  .\update.ps1 [参数]"
+    Write-Host ""
+    Write-ColorOutput "参数：" "Green"
+    Write-ColorOutput "  -Environment <环境>      " "Yellow"; Write-Host "  指定环境（默认: production）"
+    Write-ColorOutput "  -Services <服务列表>      " "Yellow"; Write-Host "  指定要更新的服务"
+    Write-ColorOutput "  -BuildCashier            " "Yellow"; Write-Host "  强制构建 cashier"
+    Write-ColorOutput "  -Force                   " "Yellow"; Write-Host "  强制更新，跳过确认"
+    Write-Host ""
+    Write-ColorOutput "示例：" "Green"
+    Write-ColorOutput "  # 更新所有服务（生产环境）" "Gray"
+    Write-Host "  .\update.ps1"
+    Write-Host ""
+    Write-ColorOutput "  # 更新开发环境" "Gray"
+    Write-Host "  .\update.ps1 -Environment development"
+    Write-Host ""
+    Write-ColorOutput "  # 仅更新 agpay-manager-api" "Gray"
+    Write-Host "  .\update.ps1 -Services `"agpay-manager-api`""
+    Write-Host ""
+    Write-ColorOutput "  # 更新多个服务并构建 cashier" "Gray"
+    Write-Host "  .\update.ps1 -Services `"agpay-manager-api`",`"agpay-payment-api`" -BuildCashier"
+    Write-Host ""
+}
 
 # ========================================
 # .env 文件解析函数
@@ -120,41 +163,13 @@ $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $BackupPath = Join-Path $BackupDir "${Environment}_update_${Timestamp}"
 
 # ========================================
-# 显示帮助
+# 主程序开始
 # ========================================
-function Show-Help {
-    Write-Header "========================================"
-    Write-Header "  AgPay+ 服务更新脚本 (Windows)"
-    Write-Header "========================================"
-    Write-Host ""
-    Write-ColorOutput "功能：" "Green"
-    Write-Host "  • 指定服务更新"
-    Write-Host "  • 自动备份、支持回滚"
-    Write-Host "  • 多环境支持"
-    Write-Host "  • 健康检查和自动回滚"
-    Write-Host ""
-    Write-ColorOutput "使用方法：" "Green"
-    Write-Host "  .\update.ps1 [参数]"
-    Write-Host ""
-    Write-ColorOutput "参数：" "Green"
-    Write-ColorOutput "  -Environment <环境>      " "Yellow"; Write-Host "  指定环境（默认: production）"
-    Write-ColorOutput "  -Services <服务列表>      " "Yellow"; Write-Host "  指定要更新的服务"
-    Write-ColorOutput "  -BuildCashier            " "Yellow"; Write-Host "  强制构建 cashier"
-    Write-ColorOutput "  -Force                   " "Yellow"; Write-Host "  强制更新，跳过确认"
-    Write-Host ""
-    Write-ColorOutput "示例：" "Green"
-    Write-ColorOutput "  # 更新所有服务" "Gray"
-    Write-Host "  .\update.ps1"
-    Write-Host ""
-    Write-ColorOutput "  # 更新 agpay-manager-api" "Gray"
-    Write-Host "  .\update.ps1 -Services `"agpay-manager-api`""
-    Write-Host ""
-    Write-ColorOutput "  # 更新多个服务" "Gray"
-    Write-Host "  .\update.ps1 -Services `"agpay-manager-api`",`"agpay-agent-api`""
-    Write-Host ""
-    Write-ColorOutput "  # 更新 agpay-payment-api 并重新构建 cashier" "Gray"
-    Write-Host "  .\update.ps1 -Services `"agpay-payment-api`" -BuildCashier"
-    Write-Host ""
+
+# 显示帮助信息
+if ($Help) {
+    Show-Help
+    exit 0
 }
 
 # ========================================

@@ -13,10 +13,15 @@
 # .\rollback.ps1 -Services "agpay-manager-api"    # 仅回滚指定服务
 # .\rollback.ps1 -Backup "20240101_120000"  # 回滚到指定备份
 # .\rollback.ps1 -List                      # 列出所有备份
+# .\rollback.ps1 --Help                       # 查看帮助
 # ========================================
 
 [CmdletBinding()]
 param(
+    [Parameter(HelpMessage="显示帮助信息")]
+    [Alias("?", "h")]
+    [switch]$Help,
+    
     [Parameter(HelpMessage="环境: development, staging, production")]
     [ValidateSet("development", "staging", "production")]
     [string]$Environment = "production",
@@ -51,6 +56,48 @@ function Write-Warning { param([string]$msg) Write-ColorOutput "  ⚠️  $msg" 
 function Write-Info { param([string]$msg) Write-ColorOutput "  ℹ️  $msg" "Cyan" }
 function Write-Step { param([string]$msg) Write-ColorOutput $msg "Yellow" }
 function Write-Header { param([string]$msg) Write-ColorOutput $msg "Cyan" }
+
+# ========================================
+# 帮助信息
+# ========================================
+function Show-Help {
+    Write-Header "========================================"
+    Write-Header "  AgPay+ 回滚脚本 (Windows)"
+    Write-Header "========================================"
+    Write-Host ""
+    Write-ColorOutput "功能：" "Green"
+    Write-Host "  • 回滚到上一个备份版本"
+    Write-Host "  • 支持指定服务回滚"
+    Write-Host "  • 支持指定备份版本"
+    Write-Host "  • 多环境支持"
+    Write-Host ""
+    Write-ColorOutput "使用方法：" "Green"
+    Write-Host "  .\rollback.ps1 [参数]"
+    Write-Host ""
+    Write-ColorOutput "参数：" "Green"
+    Write-ColorOutput "  -Environment <环境>      " "Yellow"; Write-Host "  指定环境（默认: production）"
+    Write-ColorOutput "  -Services <服务列表>      " "Yellow"; Write-Host "  指定要回滚的服务"
+    Write-ColorOutput "  -Backup <版本>           " "Yellow"; Write-Host "  指定备份版本（时间戳格式）"
+    Write-ColorOutput "  -List                    " "Yellow"; Write-Host "  列出所有可用备份"
+    Write-ColorOutput "  -Auto                    " "Yellow"; Write-Host "  自动模式（不需要确认）"
+    Write-Host ""
+    Write-ColorOutput "示例：" "Green"
+    Write-ColorOutput "  # 列出所有备份" "Gray"
+    Write-Host "  .\rollback.ps1 -List"
+    Write-Host ""
+    Write-ColorOutput "  # 回滚所有服务到最新备份" "Gray"
+    Write-Host "  .\rollback.ps1"
+    Write-Host ""
+    Write-ColorOutput "  # 回滚指定服务" "Gray"
+    Write-Host "  .\rollback.ps1 -Services `"agpay-manager-api`""
+    Write-Host ""
+    Write-ColorOutput "  # 回滚到指定备份版本" "Gray"
+    Write-Host "  .\rollback.ps1 -Backup `"20240101_120000`""
+    Write-Host ""
+    Write-ColorOutput "  # 自动回滚（部署失败时使用）" "Gray"
+    Write-Host "  .\rollback.ps1 -Auto -Services `"agpay-manager-api`""
+    Write-Host ""
+}
 
 # ========================================
 # .env 文件解析函数
@@ -125,6 +172,16 @@ function Invoke-DockerCompose {
 
 # 备份目录
 $BackupDir = Join-Path $ScriptDir ".backup"
+
+# ========================================
+# 主程序开始
+# ========================================
+
+# 显示帮助信息
+if ($Help) {
+    Show-Help
+    exit 0
+}
 
 # ========================================
 # 列出备份

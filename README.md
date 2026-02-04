@@ -177,7 +177,6 @@ agpayplus/
 ├── .env.development
 ├── .env.staging
 ├── .env.production
-├── docker-compose-app.yml
 └── docker-compose.yml
 ```
 
@@ -476,7 +475,7 @@ docker compose down -v  # 同时删除数据卷
 
 # 更新指定服务
 ./update.ps1 -Services "agpay-payment-api"                      # Windows
-./update.sh --services "agpay-payment-api,agpay-manager-api"          # Linux/macOS
+./update.sh --services "agpay-payment-api agpay-manager-api"    # Linux/macOS
 
 # 强制重新构建
 ./update.ps1 -Services "agpay-payment-api" -Force               # Windows
@@ -693,20 +692,84 @@ docker run -d --name agpay-ui-merchant -p 8818:80 --network agpay-network agpay-
 
 ### Docker Compose
 
-**推荐使用上面的自动化部署脚本，以下为手动命令参考：**
+**推荐使用自动化部署脚本，以下为手动命令参考：**
 
 ```bash
-# 构建并启动服务
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up
+# 选择并复制环境配置
+agpayplus> cp .env.production .env      # 生产环境
+# agpayplus> cp .env.development .env   # 开发环境
+# agpayplus> cp .env.staging .env       # 预发布环境
+
+# 编辑配置
+agpayplus> vim .env  # 修改 MySQL 密码、域名等
+
+# 直接启动（自动使用 docker-compose.yml 和 .env）
+agpayplus> docker compose up -d
+
+# 停止所有服务
+agpayplus> docker compose stop
+
+# 重启服务
+agpayplus> docker compose restart
+
+# 停止并删除容器
+agpayplus> docker compose down
+
+# 查看状态
+agpayplus> docker compose ps
+
+# 查看日志
+agpayplus> docker compose logs -f
+
+# 更新并重启
+agpayplus> docker compose pull
+agpayplus> docker compose up -d --build
+
+# 启动指定服务
+agpayplus> docker compose up -d agpay-payment-api
+
+# 停止指定服务
+agpayplus> docker compose stop agpay-payment-api
+
+# 重启指定服务
+agpayplus> docker compose restart agpay-payment-api
+
+# 查看指定服务日志
+agpayplus> docker compose logs -f agpay-payment-api
+
+# 重新构建指定服务
+agpayplus> docker compose build agpay-payment-api
+agpayplus> docker compose up -d agpay-payment-api
+
+# ⚙️ 高级用法
+# 使用特定配置文件和指定不同环境文件构建并启动服务
+agpayplus> docker compose -f <yml配置文件> --env-file <env文件> up
 # 使用应用服务配置文件部署 -d 参数可以在后台运行服务
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up -d
+agpayplus> docker compose -f <yml配置文件> --env-file <env文件> up -d
 
 # 检查容器状态
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app ps
+agpayplus> docker compose -f <yml配置文件> --env-file <env文件> ps
 
 # 重新构建并启动服务
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app build
-agpayplus> docker-compose -f docker-compose-app.yml --env-file .env.app up -d
+agpayplus> docker compose -f <yml配置文件> --env-file <env文件> build
+agpayplus> docker compose -f <yml配置文件> --env-file <env文件> up -d
+
+#覆盖配置文件
+# 使用额外的配置文件覆盖
+agpayplus> docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+
+# 仅使用特定配置文件
+agpayplus> docker compose -f docker-compose.prod.yml up -d
+
+#多环境同时运行
+# 开发环境
+agpayplus> docker compose -p agpay-dev --env-file .env.development up -d
+
+# 预发布环境
+agpayplus> docker compose -p agpay-staging --env-file .env.staging up -d
+
+# 生产环境
+agpayplus> docker compose -p agpay-prod --env-file .env.production up -d
 ```
 
 </details>

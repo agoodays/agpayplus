@@ -14,6 +14,7 @@
 # ./rollback.sh --services agpay-manager-api     # 仅回滚指定服务
 # ./rollback.sh --backup 20240101_120000   # 回滚到指定备份
 # ./rollback.sh --list                     # 列出所有备份
+# ./rollback.sh --help                     # 查看帮助
 # ========================================
 
 set -e
@@ -54,7 +55,7 @@ fi
 show_help() {
     cat << EOF
 ${CYAN}========================================
-  AgPay+ 回滚脚本
+  AgPay+ 回滚脚本 (Linux/macOS)
 ========================================${NC}
 
 ${GREEN}功能：${NC}
@@ -67,21 +68,31 @@ ${GREEN}使用方法：${NC}
   $0 [选项]
 
 ${GREEN}选项：${NC}
-  ${YELLOW}--env <环境>${NC}              指定环境：development, staging, production (默认: production)
-  ${YELLOW}--services <服务列表>${NC}     指定要回滚的服务（用引号包含多个服务，空格分隔）
-  ${YELLOW}--backup <版本>${NC}           指定要回滚的备份版本（格式: YYYYMMDD_HHMMSS）
-  ${YELLOW}--list${NC}                    列出所有可用备份
-  ${YELLOW}--auto${NC}                    自动模式（不需要确认）
-  ${YELLOW}--help${NC}                    显示此帮助信息
+  ${YELLOW}-e, --env <环境>${NC}           指定环境 (development/staging/production)
+                               默认: production
+  ${YELLOW}-s, --services <服务>${NC}     指定要回滚的服务（空格分隔）
+                               示例: "agpay-manager-api agpay-agent-api"
+  ${YELLOW}--backup <版本>${NC}            指定要回滚的备份版本
+                               格式: YYYYMMDD_HHMMSS
+                               示例: 20240315_143022
+  ${YELLOW}--list${NC}                     列出所有可用备份
+  ${YELLOW}--auto${NC}                     自动模式（不需要确认，用于自动回滚）
+  ${YELLOW}-h, --help${NC}                显示此帮助信息
 
 ${GREEN}示例：${NC}
+  ${GRAY}# 列出所有可用备份${NC}
+  $0 --list
+
   ${GRAY}# 回滚所有服务到最新备份${NC}
   $0
 
   ${GRAY}# 回滚指定服务${NC}
   $0 --services agpay-manager-api
 
-  ${GRAY}# 回滚到指定备份${NC}
+  ${GRAY}# 回滚多个服务${NC}
+  $0 --services "agpay-ui-manager agpay-manager-api"
+
+  ${GRAY}# 回滚到指定备份版本${NC}
   $0 --backup 20240315_143022
 
   ${GRAY}# 列出所有备份${NC}
@@ -89,6 +100,27 @@ ${GREEN}示例：${NC}
 
   ${GRAY}# 开发环境回滚${NC}
   $0 --env development --services "agpay-ui-manager agpay-ui-agent"
+
+  ${GRAY}# 自动回滚（部署失败时使用）${NC}
+  $0 --auto --services agpay-manager-api
+
+${CYAN}回滚流程：${NC}
+  ${GRAY}1. 查找备份版本${NC}
+  ${GRAY}2. 恢复环境配置${NC}
+  ${GRAY}3. 加载备份镜像${NC}
+  ${GRAY}4. 重启服务${NC}
+  ${GRAY}5. 健康检查${NC}
+
+${CYAN}备份说明：${NC}
+  ${GRAY}• 备份存储在 .backup 目录${NC}
+  ${GRAY}• 每次部署/更新会自动创建备份${NC}
+  ${GRAY}• 自动保留最近 5 个备份${NC}
+  ${GRAY}• 使用 --list 查看所有备份${NC}
+
+${CYAN}注意事项：${NC}
+  ${GRAY}• 回滚会覆盖当前运行的服务${NC}
+  ${GRAY}• 确认备份版本存在后再执行回滚${NC}
+  ${GRAY}• 建议先使用 --list 查看可用备份${NC}
 
 EOF
 }

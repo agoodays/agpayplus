@@ -128,10 +128,10 @@ DATA_PATH_HOST=E:/app/agpayplus         # Windows
 **Linux/macOS:**
 ```bash
 # 更新运营平台前后端
-./update.sh --services "agpay-ui-manager,agpay-manager-api"
+./update.sh --services "agpay-ui-manager agpay-manager-api"
 
 # 更新所有前端
-./update.sh --services "agpay-ui-manager,agpay-ui-agent,agpay-ui-merchant"
+./update.sh --services "agpay-ui-manager agpay-ui-agent agpay-ui-merchant"
 
 # 更新支付网关并重新构建 Cashier
 ./update.sh --services "agpay-payment-api" --build-cashier
@@ -200,7 +200,7 @@ DATA_PATH_HOST=E:/app/agpayplus         # Windows
 
 **Linux/macOS:**
 ```bash
-./rollback.sh --services "agpay-manager-api,agpay-agent-api"
+./rollback.sh --services "agpay-manager-api agpay-agent-api"
 ```
 
 ## 📦 常用命令

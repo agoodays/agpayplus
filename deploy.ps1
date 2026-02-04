@@ -15,10 +15,15 @@
 # .\deploy.ps1 -Services "agpay-manager-api","agpay-agent-api"  # 更新多个服务
 # .\deploy.ps1 -BuildCashier                # 强制构建 cashier
 # .\deploy.ps1 -SkipBackup                  # 跳过备份（首次部署）
+# .\deploy.ps1 --Help                       # 查看帮助
 # ========================================
 
 [CmdletBinding()]
 param(
+    [Parameter(HelpMessage="显示帮助信息")]
+    [Alias("?", "h")]
+    [switch]$Help,
+    
     [Parameter(HelpMessage="环境: development, staging, production")]
     [ValidateSet("development", "staging", "production", "dev", "prod")]
     [string]$Environment = "production",
@@ -203,6 +208,12 @@ function Invoke-DockerCompose {
 # ========================================
 # 主程序开始
 # ========================================
+
+# 显示帮助信息
+if ($Help) {
+    Show-Help
+    exit 0
+}
 
 # 环境名称标准化
 if ($Environment -eq "dev") { $Environment = "development" }

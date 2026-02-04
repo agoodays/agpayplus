@@ -16,6 +16,7 @@
 # ./deploy.sh --services "agpay-manager-api agpay-agent-api"  # 更新多个服务
 # ./deploy.sh --build-cashier              # 强制构建 cashier
 # ./deploy.sh --skip-backup                # 跳过备份（首次部署）
+# ./deploy.sh --help                       # 查看帮助
 # ========================================
 
 set -e
@@ -40,6 +41,66 @@ BLUE='\033[0;34m'
 GRAY='\033[0;37m'
 NC='\033[0m' # No Color
 
+# ========================================
+# 帮助信息
+# ========================================
+show_help() {
+    cat << EOF
+${CYAN}========================================
+  AgPay+ 统一部署脚本 (Linux/macOS)
+========================================${NC}
+
+${GREEN}功能：${NC}
+  • 首次部署：自动初始化环境
+  • 更新部署：自动备份、支持回滚
+  • 多环境支持：development/staging/production
+  • 指定服务更新
+
+${GREEN}使用方法：${NC}
+  $0 [选项]
+
+${GREEN}选项：${NC}
+  ${YELLOW}-e, --env <环境>${NC}           指定环境 (development/staging/production)
+                               默认: production
+  ${YELLOW}-s, --services <服务>${NC}     指定要部署的服务（空格分隔）
+                               可选值：agpay-ui-manager, agpay-ui-agent, agpay-ui-merchant,
+                                     agpay-manager-api, agpay-agent-api, agpay-merchant-api, agpay-payment-api
+                               示例: "agpay-manager-api agpay-agent-api"
+  ${YELLOW}-b, --build-cashier${NC}       强制构建 cashier（收银台）
+  ${YELLOW}--skip-backup${NC}             跳过备份（首次部署时使用）
+  ${YELLOW}--skip-cert${NC}               跳过 SSL 证书生成
+  ${YELLOW}-f, --force${NC}               强制部署，跳过确认提示
+  ${YELLOW}-h, --help${NC}                显示此帮助信息
+
+${GREEN}示例：${NC}
+  ${GRAY}# 首次生产环境部署（跳过备份）${NC}
+  $0 --env production --skip-backup
+
+  ${GRAY}# 开发环境部署并构建 cashier${NC}
+  $0 --env development --build-cashier
+
+  ${GRAY}# 仅部署指定服务${NC}
+  $0 --services agpay-manager-api
+
+  ${GRAY}# 部署多个服务${NC}
+  $0 --services "agpay-ui-manager agpay-manager-api"
+
+  ${GRAY}# 强制部署（无确认提示）${NC}
+  $0 --force
+
+${CYAN}环境说明：${NC}
+  ${GRAY}• development  - 开发环境（配置文件: .env.development）${NC}
+  ${GRAY}• staging      - 预发布环境（配置文件: .env.staging）${NC}
+  ${GRAY}• production   - 生产环境（配置文件: .env.production）${NC}
+
+${CYAN}注意事项：${NC}
+  ${GRAY}• 首次部署请使用 --skip-backup 参数${NC}
+  ${GRAY}• 确保 Docker 和 Docker Compose 已安装${NC}
+  ${GRAY}• 部署前请检查 .env 配置文件${NC}
+
+EOF
+}
+
 # 检测 Docker Compose 命令
 DOCKER_COMPOSE=""
 if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; then
@@ -47,58 +108,6 @@ if command -v docker &> /dev/null && docker compose version &> /dev/null 2>&1; t
 elif command -v docker-compose &> /dev/null; then
     DOCKER_COMPOSE="docker-compose"
 fi
-
-# ========================================
-# 帮助信息
-# ========================================
-show_help() {
-    cat << EOF
-${CYAN}========================================
-  AgPay+ 统一部署脚本
-========================================${NC}
-
-${GREEN}功能：${NC}
-  • 首次部署：自动初始化环境
-  • 更新部署：自动备份、支持回滚
-  • 多环境支持：dev/staging/production
-  • 指定服务更新
-
-${GREEN}使用方法：${NC}
-  $0 [选项]
-
-${GREEN}选项：${NC}
-  ${YELLOW}--env <环境>${NC}              指定环境：dev, staging, production (默认: production)
-  ${YELLOW}--services <服务列表>${NC}     指定要部署的服务（用引号包含多个服务，空格分隔）
-                              可选值：agpay-ui-manager, agpay-ui-agent, agpay-ui-merchant,
-                                     agpay-manager-api, agpay-agent-api, agpay-merchant-api, agpay-payment-api
-  ${YELLOW}--build-cashier${NC}          强制构建 cashier（收银台）
-  ${YELLOW}--skip-backup${NC}            跳过备份（首次部署时使用）
-  ${YELLOW}--skip-cert${NC}              跳过证书生成
-  ${YELLOW}--force${NC}                  强制部署（跳过确认）
-  ${YELLOW}--help${NC}                   显示此帮助信息
-
-${GREEN}示例：${NC}
-  ${GRAY}# 首次生产环境部署${NC}
-  $0 --env production --skip-backup
-
-  ${GRAY}# 开发环境部署（构建 cashier）${NC}
-  $0 --env dev --build-cashier
-
-  ${GRAY}# 仅更新 agpay-manager-api${NC}
-  $0 --services agpay-manager-api
-
-  ${GRAY}# 更新多个 API 服务${NC}
-  $0 --services "agpay-manager-api agpay-agent-api agpay-merchant-api"
-
-  ${GRAY}# 预发布环境，更新所有前端${NC}
-  $0 --env staging --services "agpay-ui-manager agpay-ui-agent agpay-ui-merchant"
-
-${GREEN}回滚：${NC}
-  如果部署失败，脚本会自动回滚到上一版本
-  手动回滚：./rollback.sh
-
-EOF
-}
 
 # ========================================
 # .env 文件解析函数

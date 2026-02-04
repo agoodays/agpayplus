@@ -2,10 +2,63 @@
 # AgPay+ Windows SSL 证书生成脚本
 # ========================================
 # 功能：生成自签名开发证书
-# 使用：.\generate-cert-windows.ps1
+# .\generate-cert-windows.ps1
+# .\generate-cert-windows.ps1 -Help 查看帮助
 # ========================================
 
+[CmdletBinding()]
+param(
+    [Parameter(HelpMessage="显示帮助信息")]
+    [Alias("?", "h")]
+    [switch]$Help,
+    
+    [Parameter(HelpMessage="证书名称")]
+    [string]$CertName = "agpayplusapi",
+    
+    [Parameter(HelpMessage="证书密码")]
+    [string]$CertPassword = "123456",
+    
+    [Parameter(HelpMessage="证书路径")]
+    [string]$CertPath = "$env:USERPROFILE\.aspnet\https"
+)
+
 $ErrorActionPreference = "Stop"
+
+# ========================================
+# 帮助信息
+# ========================================
+function Show-Help {
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host "  SSL 证书生成工具" -ForegroundColor Cyan
+    Write-Host "========================================" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "功能：" -ForegroundColor Green
+    Write-Host "  • 生成自签名开发证书"
+    Write-Host "  • 自动添加到系统信任列表"
+    Write-Host "  • 支持自定义证书参数"
+    Write-Host ""
+    Write-Host "使用方法：" -ForegroundColor Green
+    Write-Host "  .\generate-cert-windows.ps1 [参数]"
+    Write-Host ""
+    Write-Host "参数：" -ForegroundColor Green
+    Write-Host "  -CertName <名称>         证书名称（默认: agpayplusapi）" -ForegroundColor Yellow
+    Write-Host "  -CertPassword <密码>     证书密码（默认: 123456）" -ForegroundColor Yellow
+    Write-Host "  -CertPath <路径>         证书保存路径" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "示例：" -ForegroundColor Green
+    Write-Host "  # 使用默认参数生成证书" -ForegroundColor Gray
+    Write-Host "  .\generate-cert-windows.ps1"
+    Write-Host ""
+    Write-Host "  # 自定义证书参数" -ForegroundColor Gray
+    Write-Host "  .\generate-cert-windows.ps1 -CertName `"mycert`" -CertPassword `"mypassword`""
+    Write-Host ""
+}
+
+# 显示帮助信息
+if ($Help) {
+    Show-Help
+    exit 0
+}
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  SSL 证书生成工具" -ForegroundColor Cyan
@@ -13,15 +66,12 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # 证书配置
-$certName = "agpayplusapi"
-$certPassword = "123456"
-$certPath = "$env:USERPROFILE\.aspnet\https"
-$certFile = "$certPath\$certName.pfx"
+$certFile = "$CertPath\$CertName.pfx"
 
 # 创建证书目录
-if (-not (Test-Path $certPath)) {
-    New-Item -ItemType Directory -Path $certPath -Force | Out-Null
-    Write-Host "✅ 创建证书目录: $certPath" -ForegroundColor Green
+if (-not (Test-Path $CertPath)) {
+    New-Item -ItemType Directory -Path $CertPath -Force | Out-Null
+    Write-Host "✅ 创建证书目录: $CertPath" -ForegroundColor Green
 }
 
 # 检查是否已存在证书
@@ -51,7 +101,7 @@ try {
     
     # 生成新的开发证书
     Write-Host "生成新证书..." -ForegroundColor Gray
-    dotnet dev-certs https -ep $certFile -p $certPassword --trust
+    dotnet dev-certs https -ep $certFile -p $CertPassword --trust
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "`n========================================" -ForegroundColor Cyan
@@ -60,8 +110,8 @@ try {
         Write-Host ""
         Write-Host "证书信息：" -ForegroundColor Cyan
         Write-Host "  文件路径: $certFile" -ForegroundColor White
-        Write-Host "  证书密码: $certPassword" -ForegroundColor White
-        Write-Host "  证书名称: $certName" -ForegroundColor White
+        Write-Host "  证书密码: $CertPassword" -ForegroundColor White
+        Write-Host "  证书名称: $CertName" -ForegroundColor White
         Write-Host ""
         Write-Host "注意：此证书已自动添加到系统信任列表" -ForegroundColor Yellow
         Write-Host ""

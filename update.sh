@@ -14,6 +14,7 @@
 # ./update.sh --services agpay-manager-api       # 仅更新 agpay-manager-api
 # ./update.sh --services "agpay-manager-api agpay-agent-api"  # 更新多个服务
 # ./update.sh --build-cashier              # 强制构建 cashier
+# ./update.sh --help                       # 查看帮助
 # ========================================
 
 set -e
@@ -55,46 +56,59 @@ fi
 show_help() {
     cat << EOF
 ${CYAN}========================================
-  AgPay+ 服务更新脚本
+  AgPay+ 服务更新脚本 (Linux/macOS)
 ========================================${NC}
 
 ${GREEN}功能：${NC}
-  • 指定服务更新
+  • 支持指定服务更新
   • 自动备份、支持回滚
-  • 多环境支持
+  • 多环境支持：development/staging/production
   • 健康检查和自动回滚
 
 ${GREEN}使用方法：${NC}
   $0 [选项]
 
 ${GREEN}选项：${NC}
-  ${YELLOW}--env <环境>${NC}              指定环境：development, staging, production (默认: production)
-  ${YELLOW}--services <服务列表>${NC}     指定要更新的服务（用引号包含多个服务，空格分隔）
-                              可选值：agpay-ui-manager, agpay-ui-agent, agpay-ui-merchant,
-                                     agpay-manager-api, agpay-agent-api, agpay-merchant-api, agpay-payment-api
-  ${YELLOW}--build-cashier${NC}          强制构建 cashier（仅影响 agpay-payment-api）
-  ${YELLOW}--force${NC}                  强制更新（跳过确认）
-  ${YELLOW}--help${NC}                   显示此帮助信息
+  ${YELLOW}-e, --env <环境>${NC}           指定环境 (development/staging/production)
+                               默认: production
+  ${YELLOW}-s, --services <服务>${NC}     指定要更新的服务（空格分隔）
+                               示例: "agpay-manager-api agpay-agent-api"
+  ${YELLOW}-b, --build-cashier${NC}       强制重新构建 cashier（收银台）
+  ${YELLOW}-f, --force${NC}               强制更新，跳过确认提示
+  ${YELLOW}-h, --help${NC}                显示此帮助信息
 
 ${GREEN}示例：${NC}
-  ${GRAY}# 更新所有服务${NC}
+  ${GRAY}# 更新所有服务（生产环境）${NC}
   $0
 
-  ${GRAY}# 更新 agpay-manager-api${NC}
+  ${GRAY}# 更新开发环境的所有服务${NC}
+  $0 --env development --services "agpay-ui-manager agpay-ui-agent"
+
+  ${GRAY}# 仅更新指定服务${NC}
   $0 --services agpay-manager-api
 
   ${GRAY}# 更新多个服务${NC}
-  $0 --services "agpay-manager-api agpay-agent-api"
+  $0 --services "agpay-ui-manager agpay-manager-api"
 
-  ${GRAY}# 更新 agpay-payment-api 并重新构建 cashier${NC}
+  ${GRAY}# 更新 Payment API 并重新构建 cashier${NC}
   $0 --services agpay-payment-api --build-cashier
 
-  ${GRAY}# 开发环境更新${NC}
-  $0 --env development --services "agpay-ui-manager agpay-ui-agent"
+  ${GRAY}# 强制更新（无确认提示）${NC}
+  $0 --force
 
-${GREEN}回滚：${NC}
-  如果更新失败，脚本会自动回滚
-  手动回滚：./rollback.sh --env ${ENVIRONMENT}
+${CYAN}更新流程：${NC}
+  ${GRAY}1. 检查现有部署${NC}
+  ${GRAY}2. 备份当前版本${NC}
+  ${GRAY}3. 构建新镜像${NC}
+  ${GRAY}4. 停止旧服务${NC}
+  ${GRAY}5. 启动新服务${NC}
+  ${GRAY}6. 健康检查${NC}
+  ${GRAY}7. 失败自动回滚${NC}
+
+${CYAN}注意事项：${NC}
+  ${GRAY}• 更新前会自动备份当前版本${NC}
+  ${GRAY}• 更新失败会自动回滚${NC}
+  ${GRAY}• 手动回滚: ./rollback.sh${NC}
 
 EOF
 }
