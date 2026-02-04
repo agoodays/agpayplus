@@ -1,5 +1,7 @@
 ﻿using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Utils;
+using AGooday.AgPay.Components.MQ.Models;
+using AGooday.AgPay.Components.MQ.Vender;
 using AGooday.AgPay.Domain.Commands.SysUsers;
 using AGooday.AgPay.Domain.Core.Bus;
 using AGooday.AgPay.Domain.Core.Notifications;
@@ -31,6 +33,7 @@ namespace AGooday.AgPay.Domain.CommandHandlers
         private readonly IMapper _mapper;
 
         // 注入总线
+        private readonly IMQSender _mqSender;
         private readonly IMediatorHandler Bus;
         private readonly IMemoryCache Cache;
 
@@ -230,6 +233,9 @@ namespace AGooday.AgPay.Domain.CommandHandlers
                     return;
                 }
                 await CommitTransactionAsync();
+
+                // 推送mq删除redis用户缓存
+                await _mqSender.SendAsync(CleanLoginAuthCacheMQ.Build(CS.SYS_TYPE.MCH, [sysUser.SysUserId]));
             }
             catch (Exception e)
             {

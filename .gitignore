@@ -362,6 +362,9 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# [备份]
+.backup/
+
 # ################################################  前端  ###################
 # [npm包管理依赖]
 node_modules/

@@ -1,5 +1,6 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Base.Api.Models;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Exceptions;
@@ -13,7 +14,6 @@ using AGooday.AgPay.Components.Third.RQRS.PayOrder.PayWay;
 using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Components.Third.Utils;
 using AGooday.AgPay.Payment.Api.Controllers.PayOrder;
-using AGooday.AgPay.Payment.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 
@@ -85,19 +85,12 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
         {
             string wayCode = await this.GetWayCodeAsync();
 #if DEBUG
-            string channelUserId;
-            switch (wayCode)
+            string channelUserId = wayCode switch
             {
-                case CS.PAY_WAY_CODE.ALI_JSAPI:
-                    channelUserId = "2088612672407456";
-                    break;
-                case CS.PAY_WAY_CODE.WX_JSAPI:
-                    channelUserId = "oo_BZ0p305z0ZmW-eBvuuRbHrumw";
-                    break;
-                default:
-                    channelUserId = string.Empty;
-                    break;
-            }
+                CS.PAY_WAY_CODE.ALI_JSAPI => "2088612672407456",
+                CS.PAY_WAY_CODE.WX_JSAPI => "oo_BZ0p305z0ZmW-eBvuuRbHrumw",
+                _ => string.Empty,
+            };
             return ApiRes.Ok(channelUserId);
 #endif
 
@@ -155,7 +148,7 @@ namespace AGooday.AgPay.Payment.Api.Controllers.Qr
 
             string wayCode = await this.GetWayCodeAsync();
 
-            ApiRes apiRes = null;
+            ApiRes apiRes;
             if (wayCode.Equals(CS.PAY_WAY_CODE.ALI_JSAPI))
             {
                 apiRes = await this.PackageAlipayPayPackageAsync(payOrder);

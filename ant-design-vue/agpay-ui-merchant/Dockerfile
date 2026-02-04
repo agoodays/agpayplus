@@ -1,4 +1,22 @@
-# Dockerfile in ant-design-vue/agpay-ui-merchant/
+# ========================================
+# AgPay+ Merchant UI Dockerfile
+# ========================================
+# 多阶段构建：前端构建 + Nginx 部署
+# ========================================
+# 使用方法：
+#
+# 推荐方式 1：使用 docker-compose（自动处理 context）
+#   docker compose build agpay-ui-merchant
+#
+# 推荐方式 2：使用部署脚本
+#   .\deploy.ps1 -Environment dev          # Windows
+#   ./deploy.sh -e dev                     # Linux
+#
+# 直接使用 docker build（context 是 ant-design-vue 目录）：
+#   cd <项目根目录>
+#   docker build -f ant-design-vue/agpay-ui-merchant/Dockerfile -t agpay-ui-merchant ./ant-design-vue
+# ========================================
+
 # 构建阶段
 # 使用 Node 16 镜像构建
 FROM node:16-alpine AS build-stage
@@ -7,7 +25,9 @@ WORKDIR /app
 
 # 设置 npm 镜像和超时时间
 RUN npm config set registry https://registry.npmmirror.com && \
-    npm config set timeout 60000
+    npm config set timeout 120000 && \
+    npm config set fetch-timeout 120000 && \
+    npm config set fetch-retries 3
 
 # 复制 package.json 和 package-lock.json
 COPY agpay-ui-merchant/package*.json ./

@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading;
 using AGooday.AgPay.Common.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;

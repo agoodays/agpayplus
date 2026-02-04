@@ -1,4 +1,21 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# ========================================
+# AgPay+ Manager API Dockerfile
+# ========================================
+# 多阶段构建：.NET 后端构建 + 运行时部署
+# ========================================
+# 使用方法：
+#
+# 推荐方式 1：使用 docker-compose（自动处理 context）
+#   docker compose build agpay-manager-api
+#
+# 推荐方式 2：使用部署脚本
+#   .\deploy.ps1 -Environment dev          # Windows
+#   ./deploy.sh -e dev                     # Linux
+#
+# 直接使用 docker build（context 是 aspnet-core/src 目录）：
+#   cd <项目根目录>
+#   docker build -f aspnet-core/src/AGooday.AgPay.Manager.Api/Dockerfile -t agpay-manager-api ./aspnet-core/src
+# ========================================
 
 # 使用 .NET SDK 镜像作为构建阶段
 # 基础镜像：mcr.microsoft.com/dotnet/aspnet:9.0
@@ -37,11 +54,13 @@ WORKDIR /src
 COPY ["AGooday.AgPay.Manager.Api/AGooday.AgPay.Manager.Api.csproj", "AGooday.AgPay.Manager.Api/"]
 COPY ["AGooday.AgPay.AopSdk/AGooday.AgPay.AopSdk.csproj", "AGooday.AgPay.AopSdk/"]
 COPY ["AGooday.AgPay.Application/AGooday.AgPay.Application.csproj", "AGooday.AgPay.Application/"]
+COPY ["AGooday.AgPay.Base.Api/AGooday.AgPay.Base.Api.csproj", "AGooday.AgPay.Base.Api/"]
 COPY ["AGooday.AgPay.Infrastructure/AGooday.AgPay.Infrastructure.csproj", "AGooday.AgPay.Infrastructure/"]
 COPY ["AGooday.AgPay.Domain/AGooday.AgPay.Domain.csproj", "AGooday.AgPay.Domain/"]
 COPY ["AGooday.AgPay.Common/AGooday.AgPay.Common.csproj", "AGooday.AgPay.Common/"]
 COPY ["AGooday.AgPay.Components.MQ/AGooday.AgPay.Components.MQ.csproj", "AGooday.AgPay.Components.MQ/"]
 COPY ["AGooday.AgPay.Domain.Core/AGooday.AgPay.Domain.Core.csproj", "AGooday.AgPay.Domain.Core/"]
+COPY ["AGooday.AgPay.Logging.Serilog/AGooday.AgPay.Logging.Serilog.csproj", "AGooday.AgPay.Logging.Serilog/"]
 COPY ["AGooday.AgPay.Notice.Email/AGooday.AgPay.Notice.Email.csproj", "AGooday.AgPay.Notice.Email/"]
 COPY ["AGooday.AgPay.Notice.Core/AGooday.AgPay.Notice.Core.csproj", "AGooday.AgPay.Notice.Core/"]
 COPY ["AGooday.AgPay.Components.Cache/AGooday.AgPay.Components.Cache.csproj", "AGooday.AgPay.Components.Cache/"]

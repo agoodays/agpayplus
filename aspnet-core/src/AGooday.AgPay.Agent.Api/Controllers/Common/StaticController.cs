@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Web;
-using AGooday.AgPay.Agent.Api.Attributes;
+using AGooday.AgPay.Base.Api.Attributes;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.OSS.Config;
 using Microsoft.AspNetCore.Authorization;

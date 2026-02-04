@@ -1,10 +1,16 @@
-﻿using AGooday.AgPay.Common.Models;
+﻿using AGooday.AgPay.Base.Api.Authorization;
+using AGooday.AgPay.Base.Api.Extensions;
+using AGooday.AgPay.Base.Api.Extensions.AuthContext;
+using AGooday.AgPay.Base.Api.Filter;
+using AGooday.AgPay.Base.Api.Middlewares;
+using AGooday.AgPay.Base.Api.Models;
+using AGooday.AgPay.Base.Api.MQ;
+using AGooday.AgPay.Base.Api.OpLog;
+using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Common.Utils;
 using AGooday.AgPay.Components.Cache.Extensions;
 using AGooday.AgPay.Components.Cache.Options;
 using AGooday.AgPay.Components.MQ.Models;
-using AGooday.AgPay.Components.MQ.Vender;
-using AGooday.AgPay.Components.MQ.Vender.RabbitMQ;
 using AGooday.AgPay.Components.MQ.Vender.RabbitMQ.Receive;
 using AGooday.AgPay.Components.OCR.Controllers;
 using AGooday.AgPay.Components.OCR.Extensions;
@@ -12,13 +18,8 @@ using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Components.SMS.Extensions;
-using AGooday.AgPay.Manager.Api.Authorization;
+using AGooday.AgPay.Logging.Serilog;
 using AGooday.AgPay.Manager.Api.Extensions;
-using AGooday.AgPay.Manager.Api.Extensions.AuthContext;
-using AGooday.AgPay.Manager.Api.Filter;
-using AGooday.AgPay.Manager.Api.Middlewares;
-using AGooday.AgPay.Manager.Api.Models;
-using AGooday.AgPay.Manager.Api.MQ;
 using AGooday.AgPay.Manager.Api.OpLog;
 using AGooday.AgPay.Manager.Api.WebSockets;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -48,13 +49,12 @@ services.AddSingleton(new Appsettings(builder.Configuration));
 //用户信息
 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-//// 注入日志
-//services.AddLogging(config =>
-//{
-//    //Microsoft.Extensions.Logging.Log4Net.AspNetCore
-//    config.AddLog4Net();
-//});
-services.AddSingleton<ILoggerProvider, Log4NetLoggerProvider>();
+// 构建 Logger 配置
+builder.Host.UseAgSerilog(builder.Configuration, options =>
+{
+    options.SystemName ??= typeof(Program).Assembly.GetName().Name ?? "Manager";
+    options.Version ??= typeof(Program).Assembly.GetName().Version?.ToString() ?? "1.0.0";
+});
 
 services.AddScoped<IOpLogHandler, OpLogHandler>();
 
@@ -151,6 +151,7 @@ services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = JwtBearerDefaults.AuthenticationScheme,
     });
+    options.OperationFilter<SwaggerSecurityScheme>();
 
     /**
      * 修改项目文件 .csproj
@@ -163,7 +164,6 @@ services.AddSwaggerGen(options =>
      * 配置 Swagger 注释路径
      * var xmlFilename = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
      * options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
-     * options.OperationFilter<SwaggerSecurityScheme>();
      * **/
 
     //注册全局认证（所有的接口都可以使用认证）
@@ -200,38 +200,17 @@ NativeInjectorBootStrapper.RegisterServices(services);
 services.AddNotice(builder.Configuration);
 
 #region RabbitMQ
-services.AddTransient<RabbitMQSender>();
-services.AddSingleton<IMQSenderFactory, MQSenderFactory>();
-services.AddSingleton<IMQSender>(provider =>
-{
-    var factory = provider.GetRequiredService<IMQSenderFactory>();
-    return factory.CreateSender();
-});
-
-// 动态注册 Receiver
-var receiverTypes = new[]
-{
-    typeof(ResetAppConfigRabbitMQReceiver)
-};
-
-foreach (var type in receiverTypes)
-{
-    services.AddSingleton(typeof(IMQMsgReceiver), type);
-}
-
-var specificReceiverTypes = new[]
-{
-    (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver))
-};
-
-foreach (var (serviceType, implementationType) in specificReceiverTypes)
-{
-    services.AddSingleton(serviceType, implementationType);
-}
-//services.AddSingleton<IMQMsgReceiver, ResetAppConfigRabbitMQReceiver>();
-//services.AddSingleton<ResetAppConfigMQ.IMQReceiver, ResetAppConfigMQReceiver>();
-// 注册 HostedService
-services.AddHostedService<MQReceiverHostedService>();
+// 注册 RabbitMQ 服务并动态注册 Receiver
+services.AddRabbitMQServices(
+    rabbitMQReceiverTypes: new[]
+    {
+        typeof(ResetAppConfigRabbitMQReceiver)
+    },
+    specificReceiverTypes: new[]
+    {
+        (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver))
+    }
+);
 #endregion
 
 #region OSS
@@ -268,6 +247,9 @@ services.AddSingleton<WsChannelUserIdServer>();
 // 绑定配置
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
+// 注册统一健康检查
+services.AddAppHealthChecks();
+
 var app = builder.Build();
 
 // 读取配置
@@ -280,7 +262,7 @@ app.UseWebSockets(new WebSocketOptions
 });
 
 // 自定义中间件
-app.UseNdc();
+app.UseAgSerilogRequestContext();
 app.UseCalculateExecutionTime();
 app.UseRequestResponseLogging();
 
@@ -325,5 +307,8 @@ app.UseExceptionHandling();
 
 // 路由映射
 app.MapControllers();
+
+// 映射标准健康检查端点
+app.MapStandardHealthChecks();
 
 app.Run();

@@ -12,7 +12,7 @@ namespace AGooday.AgPay.Components.MQ.Models
         /// <summary>
         /// 【！重要配置项！】 定义MQ名称
         /// </summary>
-        public static readonly string MQ_NAME = "BROADCAST_RESET_ISV_MCH_APP_INFO_CONFIG";
+        public static readonly string MQ_NAME = "BROADCAST_RESET_ISV_AGENT_MCH_APP_INFO_CONFIG";
         public static readonly MQSendTypeEnum MQ_TYPE = MQSendTypeEnum.BROADCAST;
 
         // 重置类型 （枚举类型，无法json反序列化）

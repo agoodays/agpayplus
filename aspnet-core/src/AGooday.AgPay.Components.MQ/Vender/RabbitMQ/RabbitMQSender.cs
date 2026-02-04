@@ -31,6 +31,8 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
         // 消息处理任务跟踪
         private readonly ConcurrentBag<Task> _pendingTasks = new();
         private readonly CancellationTokenSource _cts = new();
+        // Protect send infrastructure initialization
+        private readonly SemaphoreSlim _sendInitSemaphore = new(1, 1);
 
         public RabbitMQSender(
             IOptions<RabbitMQConfig> config,
@@ -43,24 +45,103 @@ namespace AGooday.AgPay.Components.MQ.Vender.RabbitMQ
             // 不在构造函数中直接初始化连接，延迟到首次发送时
         }
 
-        private async Task EnsureSendInfrastructureAsync()
+        /// <summary>
+        /// 检查 RabbitMQ 可用性：尝试建立短连接并立刻关闭
+        /// </summary>
+        public async Task<bool> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
+            // Use a lightweight factory for health check (does not affect instance connections)
+            var factory = CreateConnectionFactory(forHealth: true);
+
+            // Respect provided cancellation token and apply a short timeout as a safeguard
+            using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            linkedCts.CancelAfter(TimeSpan.FromSeconds(3));
+
+            try
+            {
+                var connectTask = factory.CreateConnectionAsync();
+                using var conn = await connectTask.WaitAsync(linkedCts.Token);
+                if (conn != null && conn.IsOpen)
+                {
+                    try
+                    {
+                        await conn.CloseAsync();
+                    }
+                    catch (Exception closeEx)
+                    {
+                        _logger.LogDebug(closeEx, "关闭用于健康检查的 RabbitMQ 连接时发生错误（可忽略）");
+                    }
+
+                    return true;
+                }
+
+                _logger.LogWarning("RabbitMQ 健康检查：连接已建立但未打开");
+                return false;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                _logger.LogWarning("RabbitMQ 健康检查已被取消");
+                return false;
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.LogWarning("RabbitMQ 健康检查超时");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "RabbitMQ 健康检查失败");
+                return false;
+            }
+        }
+
+        private async Task EnsureSendInfrastructureAsync(CancellationToken cancellationToken = default)
+        {
+            // Fast-path check without locking
             if (_sendConnection != null && _sendChannel != null && _sendConnection.IsOpen && _sendChannel.IsOpen)
                 return;
 
+            await _sendInitSemaphore.WaitAsync(cancellationToken);
+            try
+            {
+                // Recheck under lock
+                if (_sendConnection != null && _sendChannel != null && _sendConnection.IsOpen && _sendChannel.IsOpen)
+                    return;
+
+                var factory = CreateConnectionFactory(forHealth: false);
+
+                _sendConnection = await factory.CreateConnectionAsync();
+                _sendChannel = await _sendConnection.CreateChannelAsync();
+                _logger.LogInformation("RabbitMQ 发送基础设施初始化完成");
+            }
+            finally
+            {
+                _sendInitSemaphore.Release();
+            }
+        }
+
+        private ConnectionFactory CreateConnectionFactory(bool forHealth)
+        {
             var factory = new ConnectionFactory
             {
                 HostName = _config.MQ.HostName,
                 UserName = _config.MQ.UserName,
                 Password = _config.MQ.Password,
                 Port = _config.MQ.Port.Value,
-                AutomaticRecoveryEnabled = true,
-                NetworkRecoveryInterval = TimeSpan.FromSeconds(10),
             };
 
-            _sendConnection = await factory.CreateConnectionAsync();
-            _sendChannel = await _sendConnection.CreateChannelAsync();
-            _logger.LogInformation("RabbitMQ 发送基础设施初始化完成");
+            if (forHealth)
+            {
+                factory.RequestedConnectionTimeout = TimeSpan.FromSeconds(2);
+                factory.AutomaticRecoveryEnabled = false;
+            }
+            else
+            {
+                factory.AutomaticRecoveryEnabled = true;
+                factory.NetworkRecoveryInterval = TimeSpan.FromSeconds(10);
+            }
+
+            return factory;
         }
 
         public async Task SendAsync(AbstractMQ mqModel)

@@ -1,11 +1,12 @@
 ﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Permissions;
+using AGooday.AgPay.Base.Api.Attributes;
+using AGooday.AgPay.Base.Api.Authorization;
+using AGooday.AgPay.Base.Api.Controllers;
+using AGooday.AgPay.Base.Api.Models;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Components.Cache.Services;
-using AGooday.AgPay.Merchant.Api.Attributes;
-using AGooday.AgPay.Merchant.Api.Authorization;
-using AGooday.AgPay.Merchant.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

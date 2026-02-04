@@ -1,8 +1,9 @@
-﻿using AGooday.AgPay.Agent.Api.Attributes;
-using AGooday.AgPay.Agent.Api.Extensions;
-using AGooday.AgPay.Agent.Api.Models;
-using AGooday.AgPay.Application.DataTransfer;
+﻿using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Base.Api.Attributes;
+using AGooday.AgPay.Base.Api.Controllers;
+using AGooday.AgPay.Base.Api.Extensions;
+using AGooday.AgPay.Base.Api.Models;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Exceptions;
 using AGooday.AgPay.Common.Models;

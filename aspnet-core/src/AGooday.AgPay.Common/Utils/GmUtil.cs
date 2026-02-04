@@ -27,7 +27,6 @@ namespace AGooday.AgPay.Common.Utils
     /// </summary>
     public class GmUtil
     {
-        //private static readonly ILog log = LogManager.GetLogger(typeof(GmUtil));
         private static X9ECParameters X9EC_PARAMS = GMNamedCurves.GetByName("sm2p256v1");
         private static ECDomainParameters ECDOMAIN_PARAMS = new ECDomainParameters(X9EC_PARAMS.Curve, X9EC_PARAMS.G, X9EC_PARAMS.N);
         private static readonly byte[] DEFAULT_UID = new byte[] { 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38 };// 默认值：1234567812345678
@@ -63,7 +62,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("SignSm3WithSm2Asn1Rs error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("SignSm3WithSm2Asn1Rs error: " + e.Message, e);
                 return null;
             }
         }
@@ -102,7 +101,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("VerifySm3WithSm2Asn1Rs error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("VerifySm3WithSm2Asn1Rs error: " + e.Message, e);
                 return false;
             }
         }
@@ -177,7 +176,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("Sm2EncryptOld error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("Sm2EncryptOld error: " + e.Message, e);
                 return null;
             }
         }
@@ -198,7 +197,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("Sm2DecryptOld error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("Sm2DecryptOld error: " + e.Message, e);
                 return null;
             }
         }
@@ -219,7 +218,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("Sm3 error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("Sm3 error: " + e.Message, e);
                 return null;
             }
         }
@@ -282,7 +281,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (IOException e)
             {
-                //log.Error("RsPlainByteArrayToAsn1 error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("RsPlainByteArrayToAsn1 error: " + e.Message, e);
                 return null;
             }
         }
@@ -297,7 +296,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("generateKeyPair error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("generateKeyPair error: " + e.Message, e);
                 return null;
             }
         }
@@ -325,7 +324,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error(file.Name + "读取失败，异常：" + e);
+                //LogUtil<GmUtil>.Error(file.Name + "读取失败，异常：" + e);
             }
             finally
             {
@@ -397,7 +396,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("KDF error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("KDF error: " + e.Message, e);
             }
             return null;
         }
@@ -417,7 +416,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("Sm4DecryptCBC error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("Sm4DecryptCBC error: " + e.Message, e);
                 return null;
             }
         }
@@ -437,7 +436,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("Sm4EncryptCBC error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("Sm4EncryptCBC error: " + e.Message, e);
                 return null;
             }
         }
@@ -457,7 +456,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("Sm4EncryptECB error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("Sm4EncryptECB error: " + e.Message, e);
                 return null;
             }
         }
@@ -476,7 +475,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("Sm4DecryptECB error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("Sm4DecryptECB error: " + e.Message, e);
                 return null;
             }
         }
@@ -498,7 +497,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (IOException e)
             {
-                //log.Error("readSm2File error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("readSm2File error: " + e.Message, e);
                 return null;
             }
         }
@@ -537,7 +536,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("readSm2File error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("readSm2File error: " + e.Message, e);
                 return null;
             }
         }
@@ -560,7 +559,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("ReadSm2X509Cert error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("ReadSm2X509Cert error: " + e.Message, e);
                 return null;
             }
         }
@@ -578,7 +577,7 @@ namespace AGooday.AgPay.Common.Utils
             }
             catch (Exception e)
             {
-                //log.Error("ZeroIv error: " + e.Message, e);
+                //LogUtil<GmUtil>.Error("ZeroIv error: " + e.Message, e);
                 return null;
             }
         }
@@ -586,49 +585,49 @@ namespace AGooday.AgPay.Common.Utils
         public void UtilTest()
         {
             // 随便看看
-            //log.Info("GMNamedCurves: ");
+            //LogUtil<GmUtil>.Info("GMNamedCurves: ");
             foreach (string e in GMNamedCurves.Names)
             {
-                //log.Info(e);
+                //LogUtil<GmUtil>.Info(e);
             }
-            //log.Info("sm2p256v1 n:" + x9ECParameters.N);
-            //log.Info("sm2p256v1 nHex:" + Hex.ToHexString(x9ECParameters.N.ToByteArray()));
+            //LogUtil<GmUtil>.Info("sm2p256v1 n:" + x9ECParameters.N);
+            //LogUtil<GmUtil>.Info("sm2p256v1 nHex:" + Hex.ToHexString(x9ECParameters.N.ToByteArray()));
 
             // 生成公私钥对 ---------------------
             AsymmetricCipherKeyPair kp = GmUtil.GenerateKeyPair();
-            //log.Info("private key d: " + ((ECPrivateKeyParameters)kp.Private).D);
-            //log.Info("public key q:" + ((ECPublicKeyParameters)kp.Public).Q); //{x, y, zs...}
+            //LogUtil<GmUtil>.Info("private key d: " + ((ECPrivateKeyParameters)kp.Private).D);
+            //LogUtil<GmUtil>.Info("public key q:" + ((ECPublicKeyParameters)kp.Public).Q); //{x, y, zs...}
 
             //签名验签
             byte[] msg = Encoding.UTF8.GetBytes("message digest");
             byte[] userId = Encoding.UTF8.GetBytes("userId");
             byte[] sig = SignSm3WithSm2(msg, userId, kp.Private);
-            //log.Info("testSignSm3WithSm2: " + Hex.ToHexString(sig));
-            //log.Info("testVerifySm3WithSm2: " + VerifySm3WithSm2(msg, userId, sig, kp.Public));
+            //LogUtil<GmUtil>.Info("testSignSm3WithSm2: " + Hex.ToHexString(sig));
+            //LogUtil<GmUtil>.Info("testVerifySm3WithSm2: " + VerifySm3WithSm2(msg, userId, sig, kp.Public));
 
             // 由d生成私钥 ---------------------
             BigInteger d = new BigInteger("097b5230ef27c7df0fa768289d13ad4e8a96266f0fcb8de40d5942af4293a54a", 16);
             ECPrivateKeyParameters bcecPrivateKey = GetPrivatekeyFromD(d);
-            //log.Info("testGetFromD: " + bcecPrivateKey.D.ToString(16));
+            //LogUtil<GmUtil>.Info("testGetFromD: " + bcecPrivateKey.D.ToString(16));
 
             //公钥X坐标PublicKeyXHex: 59cf9940ea0809a97b1cbffbb3e9d96d0fe842c1335418280bfc51dd4e08a5d4
             //公钥Y坐标PublicKeyYHex: 9a7f77c578644050e09a9adc4245d1e6eba97554bc8ffd4fe15a78f37f891ff8
             AsymmetricKeyParameter publicKey = GetPublickeyFromX509File(new FileInfo("d:/certs/69629141652.cer"));
-            //log.Info(publicKey);
+            //LogUtil<GmUtil>.Info(publicKey);
             AsymmetricKeyParameter publicKey1 = GetPublickeyFromXY(new BigInteger("59cf9940ea0809a97b1cbffbb3e9d96d0fe842c1335418280bfc51dd4e08a5d4", 16), new BigInteger("9a7f77c578644050e09a9adc4245d1e6eba97554bc8ffd4fe15a78f37f891ff8", 16));
-            //log.Info("testReadFromX509File: " + ((ECPublicKeyParameters)publicKey).Q);
-            //log.Info("testGetFromXY: " + ((ECPublicKeyParameters)publicKey1).Q);
-            //log.Info("testPubKey: " + publicKey.Equals(publicKey1));
-            //log.Info("testPubKey: " + ((ECPublicKeyParameters)publicKey).Q.Equals(((ECPublicKeyParameters)publicKey1).Q));
+            //LogUtil<GmUtil>.Info("testReadFromX509File: " + ((ECPublicKeyParameters)publicKey).Q);
+            //LogUtil<GmUtil>.Info("testGetFromXY: " + ((ECPublicKeyParameters)publicKey1).Q);
+            //LogUtil<GmUtil>.Info("testPubKey: " + publicKey.Equals(publicKey1));
+            //LogUtil<GmUtil>.Info("testPubKey: " + ((ECPublicKeyParameters)publicKey).Q.Equals(((ECPublicKeyParameters)publicKey1).Q));
 
             // sm2 encrypt and decrypt test ---------------------
             AsymmetricCipherKeyPair kp2 = GenerateKeyPair();
             AsymmetricKeyParameter publicKey2 = kp2.Public;
             AsymmetricKeyParameter privateKey2 = kp2.Private;
             byte[] bs = Sm2Encrypt(Encoding.UTF8.GetBytes("s"), publicKey2);
-            //log.Info("testSm2Enc dec: " + Hex.ToHexString(bs));
+            //LogUtil<GmUtil>.Info("testSm2Enc dec: " + Hex.ToHexString(bs));
             bs = Sm2Decrypt(bs, privateKey2);
-            //log.Info("testSm2Enc dec: " + Encoding.UTF8.GetString(bs));
+            //LogUtil<GmUtil>.Info("testSm2Enc dec: " + Encoding.UTF8.GetString(bs));
 
             // sm4 encrypt and decrypt test ---------------------
             //0123456789abcdeffedcba9876543210 + 0123456789abcdeffedcba9876543210 -> 681edf34d206965e86b3e94f536e4246
@@ -636,29 +635,29 @@ namespace AGooday.AgPay.Common.Utils
             byte[] key = Hex.Decode("0123456789abcdeffedcba9876543210");
             byte[] cipher = Hex.Decode("595298c7c6fd271f0402f804c33d3f66");
             bs = Sm4EncryptECB(key, plain, GmUtil.SM4_ECB_NOPADDING);
-            //log.Info("testSm4EncEcb: " + Hex.ToHexString(bs));
+            //LogUtil<GmUtil>.Info("testSm4EncEcb: " + Hex.ToHexString(bs));
             bs = Sm4DecryptECB(key, bs, GmUtil.SM4_ECB_NOPADDING);
-            //log.Info("testSm4DecEcb: " + Hex.ToHexString(bs));
+            //LogUtil<GmUtil>.Info("testSm4DecEcb: " + Hex.ToHexString(bs));
 
             //读.sm2文件
             String sm2 = "MIIDHQIBATBHBgoqgRzPVQYBBAIBBgcqgRzPVQFoBDDW5/I9kZhObxXE9Vh1CzHdZhIhxn+3byBU\nUrzmGRKbDRMgI3hJKdvpqWkM5G4LNcIwggLNBgoqgRzPVQYBBAIBBIICvTCCArkwggJdoAMCAQIC\nBRA2QSlgMAwGCCqBHM9VAYN1BQAwXDELMAkGA1UEBhMCQ04xMDAuBgNVBAoMJ0NoaW5hIEZpbmFu\nY2lhbCBDZXJ0aWZpY2F0aW9uIEF1dGhvcml0eTEbMBkGA1UEAwwSQ0ZDQSBURVNUIFNNMiBPQ0Ex\nMB4XDTE4MTEyNjEwMTQxNVoXDTIwMTEyNjEwMTQxNVowcjELMAkGA1UEBhMCY24xEjAQBgNVBAoM\nCUNGQ0EgT0NBMTEOMAwGA1UECwwFQ1VQUkExFDASBgNVBAsMC0VudGVycHJpc2VzMSkwJwYDVQQD\nDCAwNDFAWnRlc3RAMDAwMTAwMDA6U0lHTkAwMDAwMDAwMTBZMBMGByqGSM49AgEGCCqBHM9VAYIt\nA0IABDRNKhvnjaMUShsM4MJ330WhyOwpZEHoAGfqxFGX+rcL9x069dyrmiF3+2ezwSNh1/6YqfFZ\nX9koM9zE5RG4USmjgfMwgfAwHwYDVR0jBBgwFoAUa/4Y2o9COqa4bbMuiIM6NKLBMOEwSAYDVR0g\nBEEwPzA9BghggRyG7yoBATAxMC8GCCsGAQUFBwIBFiNodHRwOi8vd3d3LmNmY2EuY29tLmNuL3Vz\nL3VzLTE0Lmh0bTA4BgNVHR8EMTAvMC2gK6AphidodHRwOi8vdWNybC5jZmNhLmNvbS5jbi9TTTIv\nY3JsNDI4NS5jcmwwCwYDVR0PBAQDAgPoMB0GA1UdDgQWBBREhx9VlDdMIdIbhAxKnGhPx8FcHDAd\nBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwDAYIKoEcz1UBg3UFAANIADBFAiEAgWvQi3h6\niW4jgF4huuXfhWInJmTTYr2EIAdG8V4M8fYCIBixygdmfPL9szcK2pzCYmIb6CBzo5SMv50Odycc\nVfY6";
             bs = Convert.FromBase64String(sm2);
             String pwd = "cfca1234";
             GmUtil.Sm2Cert sm2Cert = GmUtil.ReadSm2File(bs, pwd);
-            //log.Info("testReadSm2File, pubkey: " + ((ECPublicKeyParameters)sm2Cert.publicKey).Q.ToString());
-            //log.Info("testReadSm2File, prikey: " + Hex.ToHexString(((ECPrivateKeyParameters)sm2Cert.privateKey).D.ToByteArray()));
-            //log.Info("testReadSm2File, certId: " + sm2Cert.certId);
+            //LogUtil<GmUtil>.Info("testReadSm2File, pubkey: " + ((ECPublicKeyParameters)sm2Cert.publicKey).Q.ToString());
+            //LogUtil<GmUtil>.Info("testReadSm2File, prikey: " + Hex.ToHexString(((ECPrivateKeyParameters)sm2Cert.privateKey).D.ToByteArray()));
+            //LogUtil<GmUtil>.Info("testReadSm2File, certId: " + sm2Cert.certId);
 
             bs = Sm2Encrypt(Encoding.UTF8.GetBytes("s"), ((ECPublicKeyParameters)sm2Cert.publicKey));
-            //log.Info("testSm2Enc dec: " + Hex.ToHexString(bs));
+            //LogUtil<GmUtil>.Info("testSm2Enc dec: " + Hex.ToHexString(bs));
             bs = Sm2Decrypt(bs, ((ECPrivateKeyParameters)sm2Cert.privateKey));
-            //log.Info("testSm2Enc dec: " + Encoding.UTF8.GetString(bs));
+            //LogUtil<GmUtil>.Info("testSm2Enc dec: " + Encoding.UTF8.GetString(bs));
 
             msg = Encoding.UTF8.GetBytes("message digest");
             userId = Encoding.UTF8.GetBytes("userId");
             sig = SignSm3WithSm2(msg, userId, ((ECPrivateKeyParameters)sm2Cert.privateKey));
-            //log.Info("testSignSm3WithSm2: " + Hex.ToHexString(sig));
-            //log.Info("testVerifySm3WithSm2: " + VerifySm3WithSm2(msg, userId, sig, ((ECPublicKeyParameters)sm2Cert.publicKey)));
+            //LogUtil<GmUtil>.Info("testSignSm3WithSm2: " + Hex.ToHexString(sig));
+            //LogUtil<GmUtil>.Info("testVerifySm3WithSm2: " + VerifySm3WithSm2(msg, userId, sig, ((ECPublicKeyParameters)sm2Cert.publicKey)));
         }
 
         public void UtilTestSM2Sign()
