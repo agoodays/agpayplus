@@ -49,8 +49,8 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import moment from 'moment';
+import { ref, watch } from 'vue'
+import moment from 'moment'
 
 const props = defineProps({
   value: { type: String, default: '' },
@@ -66,96 +66,96 @@ const props = defineProps({
       { name: '自定义时间', value: 'customDateTime' }
     ]
   }
-});
+})
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change'])
 
-const dateRangeValue = ref([]);
-const dateRangeTip = ref('');
-const dateRangeTipIsShow = ref(false);
-const dateRangeOpen = ref(false);
+const dateRangeValue = ref([])
+const dateRangeTip = ref('')
+const dateRangeTipIsShow = ref(false)
+const dateRangeOpen = ref(false)
 
-const optionValue = ref('');
-const optionOriginValue = ref('');
+const optionValue = ref('')
+const optionOriginValue = ref('')
 
 const setDateRangeValue = (value, start, end) => {
   switch (value) {
     case 'today':
-      start = moment().startOf('day');
-      end = moment();
-      break;
+      start = moment().startOf('day')
+      end = moment()
+      break
     case 'yesterday':
-      start = moment().startOf('day').subtract(1, 'days');
-      end = moment().endOf('day').subtract(1, 'days');
-      break;
+      start = moment().startOf('day').subtract(1, 'days')
+      end = moment().endOf('day').subtract(1, 'days')
+      break
     case value?.startsWith('near2now'):
-      const day = +value.split('_')[1];
-      start = moment().startOf('day').subtract(day - 1, 'days');
-      end = moment().endOf('day');
-      break;
+      const day = +value.split('_')[1]
+      start = moment().startOf('day').subtract(day - 1, 'days')
+      end = moment().endOf('day')
+      break
     default:
       if (start?.length > 0 && end?.length > 0) {
-        start = moment(start);
-        end = moment(end);
+        start = moment(start)
+        end = moment(end)
       }
-      break;
+      break
   }
   if (start && end) {
-    dateRangeValue.value = [start, end];
-    dateRangeTip.value = `搜索时间： ${start.format('YYYY-MM-DD')} 00:00:00 ~ ${end.format('YYYY-MM-DD')} 23:59:59`;
+    dateRangeValue.value = [start, end]
+    dateRangeTip.value = `搜索时间： ${start.format('YYYY-MM-DD')} 00:00:00 ~ ${end.format('YYYY-MM-DD')} 23:59:59`
   } else {
-    dateRangeValue.value = [];
-    dateRangeTip.value = '';
+    dateRangeValue.value = []
+    dateRangeTip.value = ''
   }
-};
+}
 
 const handleHoverChange = (visible) => {
   if (dateRangeTip.value.length > 0) {
-    dateRangeTipIsShow.value = visible;
+    dateRangeTipIsShow.value = visible
   } else {
-    dateRangeTipIsShow.value = false;
+    dateRangeTipIsShow.value = false
   }
-};
+}
 
 const handleDateRangeOpenChange = (open) => {
-  dateRangeOpen.value = open;
-};
+  dateRangeOpen.value = open
+}
 
 const optionChange = () => {
   if (optionValue.value !== 'customDateTime') {
-    optionOriginValue.value = optionValue.value;
-    setDateRangeValue(optionValue.value);
-    emit('change', optionValue.value);
+    optionOriginValue.value = optionValue.value
+    setDateRangeValue(optionValue.value)
+    emit('change', optionValue.value)
   } else {
-    handleDateRangeOpenChange(true);
+    handleDateRangeOpenChange(true)
   }
-};
+}
 
 const onChange = (date, dateString) => {
-  const start = dateString[0]; // 开始时间
-  const end = dateString[1]; // 结束时间
+  const start = dateString[0] // 开始时间
+  const end = dateString[1] // 结束时间
   if (start.length && end.length) {
-    emit('change', `${optionValue.value}_${start} 00:00:00_${end} 23:59:59`);
+    emit('change', `${optionValue.value}_${start} 00:00:00_${end} 23:59:59`)
   } else {
-    emit('change', '');
-    handleHoverChange(false);
+    emit('change', '')
+    handleHoverChange(false)
   }
-  setDateRangeValue(null, start, end);
-};
+  setDateRangeValue(null, start, end)
+}
 
 const onClick = () => {
-  handleHoverChange(false);
-  optionValue.value = optionOriginValue.value;
-  setDateRangeValue(optionValue.value);
-  emit('change', optionValue.value);
-};
+  handleHoverChange(false)
+  optionValue.value = optionOriginValue.value
+  setDateRangeValue(optionValue.value)
+  emit('change', optionValue.value)
+}
 
 // 初始化
-const [option, startDate, endDate] = props.value.split('_');
-const _optionValue = option === 'customDateTime' ? option : props.value;
-optionValue.value = _optionValue;
-optionOriginValue.value = _optionValue === 'customDateTime' ? '' : _optionValue;
-setDateRangeValue(_optionValue, startDate, endDate);
+const [option, startDate, endDate] = props.value.split('_')
+const _optionValue = option === 'customDateTime' ? option : props.value
+optionValue.value = _optionValue
+optionOriginValue.value = _optionValue === 'customDateTime' ? '' : _optionValue
+setDateRangeValue(_optionValue, startDate, endDate)
 </script>
 
 <style scoped lang="less">

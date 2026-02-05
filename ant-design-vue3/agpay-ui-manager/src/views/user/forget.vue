@@ -42,121 +42,192 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
-import { useRoute, useRouter } from "vue-router";
-import { loginApi } from '/@/api/system/login-api';
-import { notification } from "ant-design-vue";
-import { timeFix } from "/@/utils/time-util.js";
+import { reactive, ref, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { message, notification } from 'ant-design-vue'
+import { loginApi } from '/@/api/system/login-api'
+import { timeFix } from '/@/utils/time-util.js'
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute()
+const router = useRouter()
 
-const forgetForm = ref();
-const loading = ref(false);
-const codeExpireTime = ref(0);
-const forgetErrorInfo = ref('');
+const forgetForm = ref()
+const loading = ref(false)
+const codeExpireTime = ref(0)
+const forgetErrorInfo = ref('')
 
 const forgetObject = reactive({
   phone: '',
   code: '',
   password: '',
   confirmPwd: ''
-});
+})
 
-const passwordRules = {
+const passwordRules = reactive({
   regexpRules: '',
   errTips: ''
-};
+})
 
+let timer = null
+
+/**
+ * 获取密码规则
+ */
+const fetchPasswordRules = async () => {
+  try {
+    const res = await loginApi.getPwdRulesRegexp()
+    if (res) {
+      passwordRules.regexpRules = res.regexpRules
+      passwordRules.errTips = res.errTips
+    }
+  } catch (error) {
+    console.error('获取密码规则失败:', error)
+  }
+}
+
+/**
+ * 验证新密码
+ */
 const validatePassword = async (rule, value) => {
   if (!value) {
-    return Promise.reject('请输入新密码');
+    return Promise.reject('请输入新密码')
   }
-  if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-    const regex = new RegExp(passwordRules.regexpRules);
-    const isMatch = regex.test(value);
-    if (!isMatch) {
-      return Promise.reject(passwordRules.errTips);
+  if (passwordRules.regexpRules && passwordRules.errTips) {
+    const regex = new RegExp(passwordRules.regexpRules)
+    if (!regex.test(value)) {
+      return Promise.reject(passwordRules.errTips)
     }
   }
-  return Promise.resolve();
-};
+  return Promise.resolve()
+}
 
+/**
+ * 验证确认密码
+ */
 const validateConfirmPwd = async (rule, value) => {
   if (!value) {
-    return Promise.reject('请输入确认新密码');
+    return Promise.reject('请输入确认新密码')
   }
-  if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-    const regex = new RegExp(passwordRules.regexpRules);
-    const isMatch = regex.test(value);
-    if (!isMatch) {
-      return Promise.reject(passwordRules.errTips);
+  if (passwordRules.regexpRules && passwordRules.errTips) {
+    const regex = new RegExp(passwordRules.regexpRules)
+    if (!regex.test(value)) {
+      return Promise.reject(passwordRules.errTips)
     }
   }
   if (forgetObject.password !== value) {
-    return Promise.reject('两次输入密码不一致');
+    return Promise.reject('两次输入密码不一致')
   }
-  return Promise.resolve();
-};
-
-const rules = {
-  phone: [{ required: true, pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
-  code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-  password: [{ required: false, trigger: 'blur', validator:validatePassword }], // 新密码
-  confirmPwd: [{ required: false, trigger: 'blur', validator: validateConfirmPwd}] // 确认新密码
-};
-
-let timer = null;
-
-const sendCode = () => {
-  forgetForm.value.validateFields('phone').then(() => {
-    // 获取图形验证码
-    loginApi.sendcode({ phone: forgetObject.phone, smsType: 'retrieve' }).then(res => {
-      codeExpireTime.value = 60;
-      if (timer) clearInterval(timer); // 如果多次点击则清除已有的定时器
-      // 超过60秒提示过期刷新
-      timer = setInterval(() => {
-        codeExpireTime.value--
-        if (codeExpireTime.value <= 0) {
-          clearInterval(timer)
-        }
-      }, 1000);
-    })
-  }).catch(error => {
-    console.error(error);
-  });
+  return Promise.resolve()
 }
 
-const onSubmit = () => {
-  forgetForm.value.validate().then(() => {
+// 表单验证规则
+const rules = {
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
+  ],
+  code: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+  password: [{ required: false, trigger: 'blur', validator: validatePassword }],
+  confirmPwd: [{ required: false, trigger: 'blur', validator: validateConfirmPwd }]
+}
+
+/**
+ * 发送验证码
+ */
+const sendCode = async () => {
+  try {
+    // 先验证手机号
+    await forgetForm.value.validateFields('phone')
+    
+    // 发送验证码
+    await loginApi.sendcode({ 
+      phone: forgetObject.phone, 
+      smsType: 'retrieve' 
+    })
+    
+    message.success('验证码已发送，请注意查收')
+    
+    // 开始倒计时
+    codeExpireTime.value = 60
+    if (timer) clearInterval(timer)
+    
+    timer = setInterval(() => {
+      codeExpireTime.value--
+      if (codeExpireTime.value <= 0) {
+        clearInterval(timer)
+      }
+    }, 1000)
+  } catch (error) {
+    if (error.errorFields) {
+      // 表单验证错误
+      return
+    }
+    console.error('发送验证码失败:', error)
+    message.error(error.msg || '发送验证码失败')
+  }
+}
+
+/**
+ * 提交表单
+ */
+const onSubmit = async () => {
+  try {
+    // 验证表单
+    await forgetForm.value.validate()
+    
+    loading.value = true
+    forgetErrorInfo.value = ''
+    
     const forgetParams = {
       phone: forgetObject.phone,
       code: forgetObject.code,
       confirmPwd: forgetObject.confirmPwd
     }
-    loginApi.forget(forgetParams).then((res) => {
-      retrieveSuccess(res)
-    }).catch(err => {
-      loading.value = false
-      forgetErrorInfo.value = (err.msg || JSON.stringify(err))
-    })
-  }).catch(error => {
-    console.error(error);
-  });
+    
+    await loginApi.forget(forgetParams)
+    
+    // 找回成功
+    retrieveSuccess()
+  } catch (error) {
+    if (error.errorFields) {
+      // 表单验证错误
+      return
+    }
+    console.error('找回密码失败:', error)
+    loading.value = false
+    forgetErrorInfo.value = error.msg || '找回密码失败，请重试'
+  }
 }
 
-const retrieveSuccess = res => {
-  const redirect = route.query.redirect;
-  router.push({ path: '/', query: { redirect: redirect } });
-  // 延迟 1 秒显示欢迎信息
+/**
+ * 找回成功处理
+ */
+const retrieveSuccess = () => {
+  // 跳转到登录页
+  router.push({ path: '/login' })
+  
+  // 延迟显示成功信息
   setTimeout(() => {
     notification.success({
-      message: '欢迎',
-      description: `${timeFix()}，欢迎回来`,
-    });
-  }, 1000);
-  forgetErrorInfo.value = '';
-};
+      message: '成功',
+      description: '密码重置成功，请使用新密码登录'
+    })
+  }, 500)
+  
+  forgetErrorInfo.value = ''
+}
+
+// 生命周期
+onMounted(() => {
+  fetchPasswordRules()
+})
+
+onUnmounted(() => {
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
+})
 </script>
 
 <style lang="less" scoped>

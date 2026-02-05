@@ -2,7 +2,7 @@
  *  基础API
  *
  */
-import { request, getRequest } from '/@/lib/axios';
+import { request, getRequest } from '../../lib/ag-axios'
 
 export const basicApi = {
     /**
@@ -62,4 +62,4 @@ export const basicApi = {
     getSysRSA2PublicKey : () => {
         return getRequest('/api/mchApps/sysRSA2PublicKey')
     },
-};
+}

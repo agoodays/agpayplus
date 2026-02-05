@@ -34,7 +34,7 @@ export const appDefaultConfig = {
   primaryColor: '#1677ff',
   // 紧凑
   compactFlag: false,
-};
+}
 
 /**
  * 与后端开发人员的路由名称及配置项

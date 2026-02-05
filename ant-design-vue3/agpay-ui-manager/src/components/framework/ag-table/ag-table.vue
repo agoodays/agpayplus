@@ -95,7 +95,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue'
 
 // Props
 defineProps({
@@ -118,39 +118,39 @@ defineProps({
   rowKey: { type: [String, Function], default: 'id' },
   scrollX: { type: Number, default: 500 },
   tableRowCrossColor: { type: Boolean, default: false },
-});
+})
 
 // Local state
-const allColumns = ref([]);
-const visibleColumns = ref([]);
-const apiResData = ref({ total: 0, records: [] });
-const countData = ref({});
-const iPage = ref({ pageNumber: 1, pageSize: 10 });
+const allColumns = ref([])
+const visibleColumns = ref([])
+const apiResData = ref({ total: 0, records: [] })
+const countData = ref({})
+const iPage = ref({ pageNumber: 1, pageSize: 10 })
 const pagination = ref({
   total: 0,
   current: 1,
   pageSize: 10,
   showSizeChanger: true,
   showTotal: (total) => `共${total}条`,
-});
-const countdown = ref(180);
-const enableAutoRefresh = ref(false);
-const isShowDataStatistics = ref(false);
-const showLoading = ref(false);
-const size = ref('default');
+})
+const countdown = ref(180)
+const enableAutoRefresh = ref(false)
+const isShowDataStatistics = ref(false)
+const showLoading = ref(false)
+const size = ref('default')
 
 // Computed properties
 const columnsCustomSlots = computed(() =>
   tableColumns.filter((item) => item.scopedSlots).map((item) => item.scopedSlots)
-);
+)
 const displayedColumns = computed(() =>
   allColumns.value.filter((column) => visibleColumns.value.includes(column.key))
-);
+)
 
 // Methods
 const toggleDataStatistics = () => {
-  isShowDataStatistics.value = !isShowDataStatistics.value;
-};
+  isShowDataStatistics.value = !isShowDataStatistics.value
+}
 
 const handleTableChange = (pagination, filters, sorter) => {
   iPage.value = {
@@ -159,38 +159,38 @@ const handleTableChange = (pagination, filters, sorter) => {
     sortField: sorter.columnKey,
     sortOrder: sorter.order,
     ...filters,
-  };
-  refTable();
-};
+  }
+  refTable()
+}
 
 const refTable = (isToFirst = false) => {
   if (isToFirst) {
-    iPage.value.pageNumber = 1;
-    pagination.value.current = 1;
+    iPage.value.pageNumber = 1
+    pagination.value.current = 1
   }
-  showLoading.value = true;
+  showLoading.value = true
   reqTableDataFunc({ ...iPage.value, ...searchData }).then((resData) => {
-    pagination.value.total = resData.total;
-    apiResData.value = resData;
-    showLoading.value = false;
-  });
-};
+    pagination.value.total = resData.total
+    apiResData.value = resData
+    showLoading.value = false
+  })
+}
 
 const customRow = (record, index) => {
   if (!tableRowCrossColor) {
-    return {};
+    return {}
   }
-  return { style: { 'background-color': index % 2 === 0 ? 'var(--table-row-alt-bg)' : 'var(--base-bg-color)' } };
-};
+  return { style: { 'background-color': index % 2 === 0 ? 'var(--table-row-alt-bg)' : 'var(--base-bg-color)' } }
+}
 
 // Lifecycle hooks
 onMounted(() => {
-  allColumns.value = tableColumns;
-  visibleColumns.value = tableColumns.map((column) => column.key);
+  allColumns.value = tableColumns
+  visibleColumns.value = tableColumns.map((column) => column.key)
   if (initData) {
-    refTable(true);
+    refTable(true)
   }
-});
+})
 </script>
 
 <style lang="less" scoped>

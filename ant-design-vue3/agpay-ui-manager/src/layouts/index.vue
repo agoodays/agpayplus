@@ -4,7 +4,7 @@
 </template>
 
 <script setup>
-import SideLayout from './side-layout.vue';
+import SideLayout from './side-layout.vue'
 </script>
 
 <style scoped>

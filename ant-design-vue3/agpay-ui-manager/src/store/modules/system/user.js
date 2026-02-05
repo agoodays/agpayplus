@@ -1,10 +1,9 @@
 /*
  * 登录用户
- *
+ * 
+ * 使用 pinia-plugin-persistedstate 自动持久化
  */
-import { defineStore } from 'pinia';
-import { localClear, localRead, localSave } from '/@/utils/local-util';
-import LocalStorageKeyConst from '/@/constants/local-storage-key-const';
+import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('userStore', {
   state: () => ({
@@ -22,29 +21,32 @@ export const useUserStore = defineStore('userStore', {
     telphone: '', // 手机号
     sex: '' // 性别
   }),
+  
+  // 🔥 启用持久化 - 自动保存到 localStorage
+  persist: {
+    key: 'user-store',
+    storage: localStorage,
+    paths: ['token', 'userName', 'userId', 'avatarImgPath', 'allMenuRouteTree', 'accessList', 'isAdmin', 'loginUsername', 'state', 'sysType', 'telphone', 'sex']
+  },
+  
   getters: {
+    // ✅ 简化：persist 会自动恢复 token，无需手动读取
     getToken(state) {
-      console.log('getToken - Current state:', state);
-      console.log('getToken - Current token:', state.token);
-      if (state.token) {
-        return state.token;
-      }
-      const localToken = localRead(LocalStorageKeyConst.USER_TOKEN);
-      console.log('getToken - Local token:', localToken);
-      return localToken || ''; // 确保返回一个默认值
+      return state.token || ''
     },
   },
 
   actions: {
+    // ✅ 简化：使用 $reset() 重置状态，persist 会自动清除 localStorage
     logout() {
       return new Promise((resolve) => {
-        this.token = '';
-        this.allMenuRouteTree = [];
-        localClear();
-        resolve(); // 确保返回一个 Promise
-      });
+        // 重置所有状态到初始值
+        this.$reset()
+        resolve()
+      })
     },
-    //设置登录信息
+    
+    // ✅ 简化：直接修改状态，persist 会自动保存
     setUserLoginInfo(data) {
       this.userId = data.sysUserId // 用户ID
       this.userName = data.realname // 真实姓名
@@ -59,14 +61,10 @@ export const useUserStore = defineStore('userStore', {
       this.telphone = data.telphone // 手机号
       this.sex = data.sex // 性别
     },
-    setToken(token, isSaveLocal) {
-      console.log('setToken - New token:', token);
-      this.token = token;
-      console.log('setToken - Updated state.token:', this.token);
-      if (isSaveLocal) {
-        localSave(LocalStorageKeyConst.USER_TOKEN, token || '');
-        console.log('setToken - Token saved to local storage');
-      }
+    
+    // ✅ 简化：直接修改 token，persist 会自动保存
+    setToken(token) {
+      this.token = token || ''
     },
   },
-});
+})

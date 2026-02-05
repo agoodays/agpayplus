@@ -1,41 +1,79 @@
-/*
- * 默认样式的修改
- *
+/**
+ * 主题入口文件
+ * 
+ * 包含：
+ * 1. Ant Design Vue 样式
+ * 2. Ant Design 覆盖样式
+ * 3. CSS 变量定义（运行时主题）
  */
 
+// ==================== 依赖样式 ====================
+
+// Ant Design Vue 重置样式
 @import 'ant-design-vue/dist/reset.css';
-@import 'ag-ui-style.less';
+
+// Ant Design 组件样式覆盖
 @import 'antd-overrides.less';
 
-/* 运行时主题 CSS 变量默认值（会被 themeService 覆盖） */
+// ==================== CSS 变量（运行时主题） ====================
+
+/**
+ * 运行时主题 CSS 变量默认值
+ * 
+ * 注意：
+ * - 这些变量会被 theme.js 中的 applyThemeFromConfig() 动态覆盖
+ * - 后端配置优先级高于这些默认值
+ */
 :root {
+  // 主色
   --primary-color: #1677ff;
-  --primary-color-hover: rgba(22,119,255,0.08);
-  --primary-color-weak: rgba(22,119,255,0.06);
+  --primary-color-hover: rgba(22, 119, 255, 0.08);
+  --primary-color-weak: rgba(22, 119, 255, 0.06);
+  
+  // 状态颜色
+  --success-color: #52c41a;
+  --warning-color: #faad14;
+  --error-color: #ff4d4f;
+  --info-color: #1677ff;
+  
+  // 布局
   --border-radius: 6px;
+  --border-radius-lg: 8px;
   --side-menu-width: 200px;
   --page-width: 99%;
+  
+  // 背景色
   --base-bg-color: #fff;
-  --text-color-weak: rgba(0,0,0,0.35);
-  --text-color: rgba(0,0,0,0.85);
-  --table-row-alt-bg: #FCFCFC;
-  --ant-primary-color: #1677ff;
-  --overlay-bg: #000;
-  --text-on-dark: rgba(255, 255, 255, 0.87);
-  --shadow-color: rgba(0,0,0,0.1);
-  --border-color: #e7eaf3;
-  --surface-variant: rgba(0, 0, 0, 0.03);
-  --border-dashed: rgba(0, 0, 0, 0.15);
-  --text-muted: rgba(0, 0, 0, 0.2);
   --layout-bg: #f5f5f5;
   --layout-surface: #f8f8f8;
-  --text-on-primary: #fff;
+  --table-row-alt-bg: #FCFCFC;
+  --overlay-bg: #000;
+  --surface-variant: rgba(0, 0, 0, 0.03);
+  --surface-subtle: rgba(0, 0, 0, 0.02);
+  --surface-light: rgba(0, 0, 0, 0.04);
+  --surface-lighter: rgba(0, 0, 0, 0.06);
+  --hover-bg-color: #dadada;
+  
+  // 文字颜色
+  --text-color: rgba(0, 0, 0, 0.85);
+  --text-color-weak: rgba(0, 0, 0, 0.45);
   --text-color-muted: #00000073;
   --text-color-secondary: #b3b3b3;
-  --hover-bg-color: #dadada;
+  --text-muted: rgba(0, 0, 0, 0.2);
+  --text-on-dark: rgba(255, 255, 255, 0.87);
+  --text-on-primary: #fff;
+  
+  // 边框和阴影
+  --border-color: #e7eaf3;
+  --border-dashed: rgba(0, 0, 0, 0.15);
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  
+  // Ant Design 主色
+  --ant-primary-color: #1677ff;
 }
 
-/**********************************  基础样式 **********************************/
+// ==================== 基础样式 ====================
+
 * {
   margin: 0;
   padding: 0;
@@ -60,3 +98,4 @@ body {
   width: 100%;
   height: 100%;
 }
+

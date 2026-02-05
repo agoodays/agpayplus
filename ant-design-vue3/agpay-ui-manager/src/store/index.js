@@ -1,7 +1,11 @@
-/*
- * pinia 状态管理
- *
- */
-import { createPinia } from 'pinia';
+import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 
-export const store = createPinia();
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
+export { pinia as store }
+
+// 导出所有 stores
+export { useUserStore } from './modules/system/user'
+export { useAppStore } from './modules/system/app'

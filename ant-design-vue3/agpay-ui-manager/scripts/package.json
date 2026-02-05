@@ -1,0 +1,11 @@
+﻿{
+  "name": "remove-semicolons",
+  "version": "1.0.0",
+  "description": "批量移除 JavaScript 代码中的分号",
+  "scripts": {
+    "remove-semi": "node scripts/fix-semicolons.js",
+    "remove-semi:backup": "node scripts/fix-semicolons.js --backup",
+    "check-style": "eslint --ext .js,.vue src",
+    "fix-style": "eslint --fix --ext .js,.vue src"
+  }
+}

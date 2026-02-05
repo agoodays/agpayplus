@@ -1,26 +1,56 @@
 {
   "name": "agpay-ui-manager",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint src --ext .js,.vue",
+    "lint:fix": "eslint src --ext .js,.vue --fix",
+    "format": "prettier --write \"src/**/*.{js,vue,css,less}\""
   },
   "dependencies": {
+    "@amap/amap-jsapi-loader": "^1.0.1",
+    "@ant-design/colors": "^7.0.0",
+    "@ant-design/icons-vue": "^7.0.1",
+    "@antv/data-set": "^0.11.8",
+    "@wangeditor/editor": "^5.1.23",
+    "@wangeditor/editor-for-vue": "^5.1.12",
     "ant-design-vue": "^4.2.1",
     "axios": "^1.7.4",
     "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.10",
+    "echarts": "^5.6.0",
+    "js-base64": "^3.7.5",
     "less": "^4.2.0",
     "lodash": "^4.17.21",
+    "md5": "^2.3.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
     "vue": "^3.4.27",
-    "vue-router": "^4.3.2"
+    "vue-clipboard3": "^2.0.0",
+    "vue-cropper": "^1.0.6",
+    "vue-i18n": "^9.9.1",
+    "vue-qr": "^4.0.9",
+    "vue-router": "^4.3.2",
+    "vue3-viewer": "^1.1.1"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.0.4",
-    "vite": "^6.0.7"
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-vue": "^9.20.1",
+    "prettier": "^3.2.4",
+    "rollup-plugin-visualizer": "^5.12.0",
+    "stylelint": "^16.2.1",
+    "stylelint-config-prettier": "^9.0.5",
+    "stylelint-config-standard": "^36.0.0",
+    "vite": "^6.0.7",
+    "vite-plugin-compression": "^0.5.1",
+    "vite-plugin-pwa": "^0.19.1"
   }
 }

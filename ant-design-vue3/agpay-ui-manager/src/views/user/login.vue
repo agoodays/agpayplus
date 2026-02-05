@@ -38,24 +38,24 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { notification } from "ant-design-vue";
+import { reactive, ref, onMounted, onUnmounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { notification } from 'ant-design-vue'
 import { timeFix } from '/@/utils/time-util'
-import { loginApi } from '/@/api/system/login-api';
-import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const';
-import { LOGIN_METHOD_ENUM } from '/@/constants/system/login-const.js';
-import { useUserStore } from '/@/store/modules/system/user';
+import { loginApi } from '/@/api/system/login-api'
+import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const'
+import { LOGIN_METHOD_ENUM } from '/@/constants/system/login-const.js'
+import { useUserStore } from '/@/store/modules/system/user'
 
-const route = useRoute();
-const router = useRouter();
-const userStore = useUserStore();
+const route = useRoute()
+const router = useRouter()
+const userStore = useUserStore()
 
-const loginForm = ref();
-const loading = ref(false);
-const isOverdue = ref(false);
-const vercodeImgSrc = ref('');
-const loginErrorInfo = ref('');
+const loginForm = ref()
+const loading = ref(false)
+const isOverdue = ref(false)
+const vercodeImgSrc = ref('')
+const loginErrorInfo = ref('')
 
 const loginObject = reactive({
   loginMethod: LOGIN_METHOD_ENUM.PASSWORD,
@@ -64,95 +64,125 @@ const loginObject = reactive({
   vercode: '',
   vercodeToken: '',
   isAutoLogin: false
-});
+})
 
 const rules = {
   username: [{ required: true, message: '请输入登录名/手机号', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-};
+}
 
-let timer = null;
+let timer = null
 
 // const refVercode = async () => {
-//   let res = await loginApi.getVercode();
-//   vercodeImgSrc.value = res.imageBase64Data;
+//   let res = await loginApi.getVercode()
+//   vercodeImgSrc.value = res.imageBase64Data
 //   loginObject.vercodeToken = res.vercodeToken;
 //
-//   isOverdue.value = false;
+//   isOverdue.value = false
 //   if (timer.value) clearInterval(timer.value); // 如果多次点击则清除已有的定时器
 //   // 默认超过60秒提示过期刷新
 //   timer.value = setInterval(() => {
-//     res.expireTime--;
+//     res.expireTime--
 //     if (res.expireTime <= 0) {
-//       isOverdue.value = true;
+//       isOverdue.value = true
 //       clearInterval(timer.value);
 //     }
-//   }, 1000);
+//   }, 1000)
 // }
 
-const refVercode = () => {
-  loginApi.getVercode().then(res => {
-    vercodeImgSrc.value = res.imageBase64Data;
-    loginObject.vercodeToken = res.vercodeToken;
+const refVercode = async () => {
+  try {
+    const res = await loginApi.getVercode()
+    vercodeImgSrc.value = res.imageBase64Data
+    loginObject.vercodeToken = res.vercodeToken
 
-    isOverdue.value = false;
-    if (timer) clearInterval(timer); // 如果多次点击则清除已有的定时器
-    // 默认超过60秒提示过期刷新
+    isOverdue.value = false
+    if (timer) clearInterval(timer)
+    
+    // 设置验证码过期定时器
+    let expireTime = res.expireTime
     timer = setInterval(() => {
-      res.expireTime--;
-      if (res.expireTime <= 0) {
-        isOverdue.value = true;
-        clearInterval(timer);
+      expireTime--
+      if (expireTime <= 0) {
+        isOverdue.value = true
+        clearInterval(timer)
       }
-    }, 1000);
-  }).catch(error => {
-    // 处理 Promise 的错误情况
-    console.error(error);
-    // 可以在这里进行错误处理，例如显示错误信息给用户
-  });
+    }, 1000)
+  } catch (error) {
+    console.error('获取验证码失败:', error)
+  }
 }
 
-const onFinish = values => {
-  loading.value = true // 登录按钮显示加载loading
-  loginApi.login(values).then(res => {
-    userStore.setToken(res[ACCESS_TOKEN_NAME], loginObject.isAutoLogin);
-    loginSuccess(res);
-  }).catch(error => {
-    console.error(error);
-    // 处理 Promise 的错误情况
-    // 可以在这里进行错误处理，例如显示错误信息给用户
-    loading.value = false;
-    loginErrorInfo.value = (error.msg || JSON.stringify(error));
-  });
-};
+const onFinish = async (values) => {
+  loading.value = true
+  loginErrorInfo.value = ''
+  
+  try {
+    // 合并登录参数
+    const loginParams = {
+      ...loginObject,
+      ...values
+    }
+    
+    // 调用登录 API
+    const res = await loginApi.login(loginParams)
+    
+    // 保存 Token
+    userStore.setToken(res[ACCESS_TOKEN_NAME] || res.iToken, loginObject.isAutoLogin)
+    
+    // 获取用户信息
+    const userInfo = await loginApi.getCurrentInfo()
+    userStore.setUserLoginInfo(userInfo)
+    
+    // 登录成功
+    loginSuccess(res)
+  } catch (error) {
+    console.error('登录失败:', error)
+    loginErrorInfo.value = error.msg || '登录失败，请重试'
+    // 登录失败后刷新验证码
+    refVercode()
+  } finally {
+    loading.value = false
+  }
+}
 
-const loginSuccess = res => {
-  const redirect = route.query.redirect;
-  console.log('loginSuccess', redirect);
-  // 清除验证码
-  router.push({ path: redirect || '/' });
-  // 延迟 1 秒显示欢迎信息
+const loginSuccess = (res) => {
+  const redirect = route.query.redirect
+  
+  // 跳转到重定向页面或首页
+  router.push({ path: redirect || '/' })
+  
+  // 延迟显示欢迎信息
   setTimeout(() => {
     notification.success({
       message: '欢迎',
-      // description: `<p>${timeFix()}，欢迎回来</p>${(res.lastLoginTime ? `<p>上次登录时间：${res.lastLoginTime}</p>` : '')}`,
-      description: `${timeFix()}，欢迎回来${(res.lastLoginTime ? `\n上次登录时间：${res.lastLoginTime}` : '')}`,
+      description: `${timeFix()}，欢迎回来${res.lastLoginTime ? `\n上次登录时间：${res.lastLoginTime}` : ''}`,
       style: {
         whiteSpace: 'pre-wrap'
       }
-    });
-  }, 1000);
-  loginErrorInfo.value = '';
-};
+    })
+  }, 1000)
+  
+  // 清除错误信息
+  loginErrorInfo.value = ''
+}
 
 const onFinishFailed = errorInfo => {
-  console.log('Failed:', errorInfo);
-};
+  console.log('Failed:', errorInfo)
+}
 
 // 生命周期钩子
 onMounted(() => {
   refVercode()
+})
+
+onUnmounted(() => {
+  // 清理定时器
+  if (timer) {
+    clearInterval(timer)
+    timer = null
+  }
 })
 </script>
 

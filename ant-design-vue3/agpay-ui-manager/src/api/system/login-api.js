@@ -2,9 +2,9 @@
  *  登录
  *
  */
-import { request, getRequest } from '/@/lib/axios';
-import { LOGIN_METHOD_ENUM } from '/@/constants/system/login-const';
-import { Base64 } from '/@/lib/encrypt';
+import { request, getRequest } from '../../lib/ag-axios'
+import { LOGIN_METHOD_ENUM } from '/@/constants/system/login-const'
+import { Base64 } from '/@/lib/encrypt'
 
 export const loginApi = {
     /**
@@ -53,7 +53,7 @@ export const loginApi = {
      * 获取登录信息
      */
     getCurrentInfo: () => {
-        return getRequest('/api/current/user');
+        return getRequest('/api/current/user')
     },
 
     /**
@@ -87,4 +87,4 @@ export const loginApi = {
             data: data
         }, true, true, true)
     },
-};
+}

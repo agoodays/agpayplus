@@ -6,7 +6,7 @@
 /**
  * key前缀
  */
-const KEY_PREFIX = 'agpay_mgr_';
+const KEY_PREFIX = 'agpay_mgr_'
 
 /**
  * localStorageKey集合
@@ -26,4 +26,4 @@ export default {
   HOME_QUICK_ENTRY: `${KEY_PREFIX}home_quick_entry`,
   // 通知信息已读
   NOTICE_READ: `${KEY_PREFIX}notice_read`,
-};
+}

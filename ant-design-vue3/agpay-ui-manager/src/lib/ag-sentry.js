@@ -9,9 +9,9 @@ export const agSentry = {
      */
     captureError: (error) => {
         if (error.config && error.data && error && error.headers && error.request && error.status) {
-            return;
+            return
         }
-        // Sentry.captureException(error);
-        console.error(error);
+        // Sentry.captureException(error)
+        console.error(error)
     },
-};
+}

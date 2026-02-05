@@ -12,43 +12,43 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from 'vue'
 
 // Props
 defineProps({
   msg: { type: String, default: '' },
   placeholder: { type: String, default: '' },
-});
+})
 
 // Emits
-defineEmits(['input']);
+defineEmits(['input'])
 
 // Local state
-const isActive = ref(false);
+const isActive = ref(false)
 
 // Methods
 const updateValue = (event) => {
-  emit('input', event.target.value);
-};
+  emit('input', event.target.value)
+}
 
 const handleFocus = () => {
-  isActive.value = true;
-};
+  isActive.value = true
+}
 
 const handleBlur = () => {
-  isActive.value = false;
-};
+  isActive.value = false
+}
 
 // Watch msg to handle pre-filled values
 watch(
   () => msg,
   (newValue) => {
     if (newValue) {
-      isActive.value = true;
+      isActive.value = true
     }
   },
   { immediate: true }
-);
+)
 </script>
 
 <style scoped lang="less">

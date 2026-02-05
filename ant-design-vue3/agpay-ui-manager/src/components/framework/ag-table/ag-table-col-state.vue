@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted } from 'vue'
 
 // Props
 defineProps({
@@ -23,31 +23,31 @@ defineProps({
     type: Function,
     default: (checked) => {
       return new Promise((resolve) => {
-        resolve();
-      });
+        resolve()
+      })
     },
   },
-});
+})
 
 // Local state
-const switchChecked = ref(false);
+const switchChecked = ref(false)
 
 // Watchers
 watch(
   () => state,
   (newVal) => {
-    switchChecked.value = newVal === 1;
+    switchChecked.value = newVal === 1
   }
-);
+)
 
 // Lifecycle hooks
 onMounted(() => {
-  switchChecked.value = state === 1;
-});
+  switchChecked.value = state === 1
+})
 
 // Methods
 const onChangeInner = (checked) => {
-  switchChecked.value = checked;
+  switchChecked.value = checked
 
   // 回调输出 0 和 1; 成功不需要处理，失败需要将状态变更为原始状态
   onChange(checked ? 1 : 0)
@@ -56,9 +56,9 @@ const onChangeInner = (checked) => {
     })
     .catch(() => {
       // 失败时恢复原始状态
-      switchChecked.value = !checked;
-    });
-};
+      switchChecked.value = !checked
+    })
+}
 </script>
 
 <style scoped>

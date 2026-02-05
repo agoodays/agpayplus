@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
 
 const props = defineProps({
   span: { type: Object, default: () => ({ xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 }) },
@@ -47,16 +47,16 @@ const props = defineProps({
   name: { type: String, default: '' },
   addAuthority: { type: Boolean, default: false },
   reqCardListFunc: { type: Function, default: () => () => ({}) }
-});
+})
 
-const cardList = ref([]);
+const cardList = ref([])
 
 const refCardList = async () => {
-  const resData = await props.reqCardListFunc();
-  cardList.value = resData || [];
-};
+  const resData = await props.reqCardListFunc()
+  cardList.value = resData || []
+}
 
-onMounted(refCardList);
+onMounted(refCardList)
 </script>
 
 .style-placeholder{}

@@ -3,19 +3,19 @@
  *
  */
 
-export const PAGE_SIZE = 10;
+export const PAGE_SIZE = 10
 
-export const PAGE_SIZE_OPTIONS = ['5', '10', '15', '20', '30', '40', '50', '75', '100', '150', '200', '300', '500'];
+export const PAGE_SIZE_OPTIONS = ['5', '10', '15', '20', '30', '40', '50', '75', '100', '150', '200', '300', '500']
 
 //登录页面名字
-export const PAGE_PATH_LOGIN = '/login';
+export const PAGE_PATH_LOGIN = '/login'
 
 //404页面名字
-export const PAGE_PATH_404 = '/404';
+export const PAGE_PATH_404 = '/404'
 
 export const showTableTotal = function (total) {
-  return `共${total}条`;
-};
+  return `共${total}条`
+}
 
 export const FLAG_NUMBER_ENUM = {
   TRUE: {
@@ -26,7 +26,7 @@ export const FLAG_NUMBER_ENUM = {
     value: 0,
     desc: '否',
   },
-};
+}
 
 export const GENDER_ENUM = {
   UNKNOWN: {
@@ -41,7 +41,7 @@ export const GENDER_ENUM = {
     value: 2,
     desc: '女',
   },
-};
+}
 
 export const USER_TYPE_ENUM = {
   ADMIN_EMPLOYEE: {
@@ -49,7 +49,7 @@ export const USER_TYPE_ENUM = {
     desc: '员工',
   },
 
-};
+}
 
 export const DATA_TYPE_ENUM = {
   NORMAL: {
@@ -61,5 +61,5 @@ export const DATA_TYPE_ENUM = {
     desc: '加密',
   },
 
-};
+}
 

@@ -1,4 +1,4 @@
-import CryptoJS from 'crypto-js';
+import CryptoJS from 'crypto-js'
 
 export const Base64 = {
     /**
@@ -7,7 +7,7 @@ export const Base64 = {
      * @returns {string}
      */
     encode: function (data) {
-        return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(data));
+        return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(data))
     },
     /**
      * Base64 解密
@@ -15,6 +15,6 @@ export const Base64 = {
      * @returns {*}
      */
     decode: function (data) {
-        return CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(data));
+        return CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(data))
     }
 }

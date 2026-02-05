@@ -31,12 +31,12 @@
 </template>
 
 <script setup>
-import { theme } from 'ant-design-vue';
-import dayjs from 'dayjs';
-const currentYear = dayjs().year();
+import { theme } from 'ant-design-vue'
+import dayjs from 'dayjs'
+const currentYear = dayjs().year()
 
-const { useToken } = theme;
-const { token } = useToken();
+const { useToken } = theme
+const { token } = useToken()
 // console.log(token)
 </script>
 

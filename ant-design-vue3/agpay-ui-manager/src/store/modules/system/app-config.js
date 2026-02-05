@@ -2,22 +2,22 @@
  * 项目的配置信息
  *
  */
-import { defineStore } from 'pinia';
-import { appDefaultConfig } from '/@/config/app-config';
-import localStorageKeyConst from '/@/constants/local-storage-key-const';
-import { agSentry } from '/@/lib/ag-sentry';
-import { localRead } from '/@/utils/local-util';
+import { defineStore } from 'pinia'
+import { appDefaultConfig } from '/@/config/app-config'
+import localStorageKeyConst from '/@/constants/local-storage-key-const'
+import { agSentry } from '/@/lib/ag-sentry'
+import { localRead } from '/@/utils/local-util'
 
-let state = { ...appDefaultConfig };
+let state = { ...appDefaultConfig }
 
-let appConfigStr = localRead(localStorageKeyConst.APP_CONFIG);
-let language = appDefaultConfig.language;
+let appConfigStr = localRead(localStorageKeyConst.APP_CONFIG)
+let language = appDefaultConfig.language
 if (appConfigStr) {
   try {
-    state = JSON.parse(appConfigStr);
-    language = state.language;
+    state = JSON.parse(appConfigStr)
+    language = state.language
   } catch (e) {
-    agSentry.captureError(e);
+    agSentry.captureError(e)
   }
 }
 
@@ -25,8 +25,8 @@ if (appConfigStr) {
  * 获取初始化的语言
  */
 export const getInitializedLanguage = function () {
-  return language;
-};
+  return language
+}
 
 export const useAppConfigStore = defineStore('appConfig', {
   state: () => ({
@@ -36,14 +36,14 @@ export const useAppConfigStore = defineStore('appConfig', {
   actions: {
     reset() {
       for (const k in appDefaultConfig) {
-        this[k] = appDefaultConfig[k];
+        this[k] = appDefaultConfig[k]
       }
     },
     showHelpDoc() {
-      this.helpDocFlag = true;
+      this.helpDocFlag = true
     },
     hideHelpDoc() {
-      this.helpDocFlag = false;
+      this.helpDocFlag = false
     },
   },
-});
+})

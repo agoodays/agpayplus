@@ -1,0 +1,58 @@
+﻿/**
+ * NProgress 自定义样式
+ * 覆盖默认样式以匹配项目主题
+ */
+
+/* 确保点击事件穿透 */
+#nprogress {
+  pointer-events: none;
+}
+
+/* 进度条主体 */
+#nprogress .bar {
+  background: var(--ant-primary-color);
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+}
+
+/* 进度条尾部光晕效果 */
+#nprogress .peg {
+  display: block;
+  position: absolute;
+  right: 0;
+  width: 100px;
+  height: 100%;
+  box-shadow: 0 0 10px var(--ant-primary-color), 0 0 5px var(--ant-primary-color);
+  opacity: 1;
+  transform: rotate(3deg) translate(0px, -4px);
+}
+
+/* 移除默认的旋转器（如果需要可以启用） */
+#nprogress .spinner {
+  display: none;
+}
+
+/* 如果启用旋转器，使用以下样式 */
+#nprogress .spinner-icon {
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  border: solid 2px transparent;
+  border-top-color: var(--ant-primary-color);
+  border-left-color: var(--ant-primary-color);
+  border-radius: 50%;
+  animation: nprogress-spinner 400ms linear infinite;
+}
+
+@keyframes nprogress-spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

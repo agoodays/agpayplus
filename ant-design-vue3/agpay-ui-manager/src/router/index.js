@@ -1,18 +1,140 @@
-import nProgress from 'nprogress';
-import 'nprogress/nprogress.css';
-import { createRouter, createWebHistory } from 'vue-router';
+/**
+ * 路由配置
+ * 支持生产模式和开发模式（VITE_BYPASS_LOGIN）
+ */
+import nProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+import { createRouter, createWebHistory } from 'vue-router'
 import UserLayout from '/@/layouts/user-layout.vue'
 import AgLayout from '/@/layouts/index.vue'
-import { useUserStore } from '/@/store/modules/system/user';
-// import localStorageKeyConst from '/@/constants/local-storage-key-const';
-// import { localClear, localRead } from '/@/utils/local-util';
+import { useUserStore } from '/@/store/modules/system/user'
 import { setDocumentTitle } from '../utils/dom-util'
-import { PAGE_PATH_404, PAGE_PATH_LOGIN } from '/@/constants/common-const';
-import { loginApi } from '/@/api/system/login-api';
+import { PAGE_PATH_404, PAGE_PATH_LOGIN } from '/@/constants/common-const'
+import { loginApi } from '/@/api/system/login-api'
 import { asyncRouteDefine } from '/@/config/app-config'
+import { devMenuTree, devUserInfo } from '/@/config/dev-menu-config'
+
+// ==================== 常量配置 ====================
+
+// 使用 Vite 的 glob 导入预加载所有视图组件（必须使用相对路径）
+const modules = import.meta.glob('../views/**/*.vue')
+
+// 无需登录验证的路由白名单
+const ALLOW_LIST = ['login', 'forget', 'register', 'registerResult']
+
+// 开发模式日志开关
+const DEV_LOG_ENABLED = import.meta.env.MODE === 'development'
+
+// ==================== 工具函数 ====================
+
+/**
+ * 开发模式日志
+ */
+function devLog(emoji, message, ...args) {
+  if (DEV_LOG_ENABLED) {
+    console.log(`${emoji} ${message}`, ...args)
+  }
+}
+
+/**
+ * 从菜单树中查找第一个可用的路径
+ */
+function findFirstAvailableUri(menuTree) {
+  if (!menuTree || !Array.isArray(menuTree)) return ''
+  
+  for (const item of menuTree) {
+    // 优先查找主页
+    if (item.entId === 'ENT_C_MAIN' && item.menuUri) {
+      return item.menuUri
+    }
+    
+    // 查找第一个菜单链接
+    if (item.menuUri && item.entType === 'ML') {
+      return item.menuUri
+    }
+    
+    // 递归查找子菜单
+    if (item.children) {
+      const uri = findFirstAvailableUri(item.children)
+      if (uri) return uri
+    }
+  }
+  
+  return ''
+}
+
+/**
+ * 生成路由配置
+ */
+function generateRoutes(menuTree) {
+  const routes = []
+  
+  function walk(nodes) {
+    nodes.forEach(node => {
+      // 跳过目录节点
+      if (node.entType !== 'ML') {
+        if (node.children) walk(node.children)
+        return
+      }
+      
+      const defComponent = asyncRouteDefine[node.componentName || node.entId]
+      const path = node.menuUri || defComponent?.defaultPath
+      
+      if (!path) {
+        devLog('⚠️', `跳过无路径的菜单: ${node.entName}`)
+        return
+      }
+      
+      let component = defComponent?.component
+      if (!component && node.componentName) {
+        const componentPath = `../views/${node.componentName}.vue`
+        component = modules[componentPath]
+        
+        // 调试日志
+        if (!component) {
+          devLog('❌', `组件未找到: ${componentPath}`, {
+            菜单名: node.entName,
+            组件名: node.componentName,
+            路径: path,
+            可用组件: Object.keys(modules).filter(k => k.includes('demo'))
+          })
+          component = modules['../views/exception/404.vue']
+        } else {
+          devLog('✅', `组件加载成功: ${node.entName} → ${componentPath}`)
+        }
+      }
+      
+      if (!component) {
+        devLog('⚠️', `最终未找到组件: ${node.entName}`)
+        return
+      }
+      
+      routes.push({
+        path,
+        name: node.entId,
+        component,
+        meta: {
+          title: node.entName,
+          icon: node.menuIcon || node.icon,
+          keepAlive: false
+        }
+      })
+      
+      if (node.children) walk(node.children)
+    })
+  }
+  
+  walk(menuTree)
+  return routes
+}
+
+// ==================== 路由状态 ====================
+
+let routesInitialized = false
+
+// ==================== 静态路由 ====================
 
 const routes = [
-  // 定义你的路由配置
   {
     path: '/',
     name: 'user',
@@ -23,189 +145,215 @@ const routes = [
     ]
   },
   {
-    path: '/main',
-    name: 'index',
-    component: AgLayout
-  },
-];
+    path: '/exception',
+    name: 'exception',
+    component: UserLayout,
+    children: [
+      { path: '403', name: 'exception403', component: () => import('/@/views/exception/403.vue') },
+      { path: '404', name: 'exception404', component: () => import('/@/views/exception/404.vue') },
+      { path: '500', name: 'exception500', component: () => import('/@/views/exception/500.vue') }
+    ]
+  }
+]
+
+// ==================== 创建路由实例 ====================
 
 export const router = createRouter({
   history: createWebHistory(),
   routes,
   strict: true,
-  scrollBehavior: () => ({ left: 0, top: 0 }),
-});
+  scrollBehavior: () => ({ left: 0, top: 0 })
+})
 
-const allowList = ['login', 'forget', 'register', 'registerResult'] // no redirect allowList
+// ==================== 动态路由注册 ====================
 
-// 封装跳转到指定路由的函数
-function redirectToTargetRoute (path, next) {
-  next(path === '/' ? redirectFunc() : undefined)
-}
-
-// 动态跳转路径 func
-function redirectFunc () {
-  let mainPageUri = ''
-  useUserStore().allMenuRouteTree.forEach(item => {
-    if (item.entId === 'ENT_C_MAIN') { // 当前用户是否拥有主页权限， 如果有直接跳转到该路径
-      mainPageUri = item.menuUri
-      return false
-    }
+/**
+ * 注册动态路由
+ */
+function registerDynamicRoutes(menuTree) {
+  if (routesInitialized) {
+    devLog('⚠️', '路由已初始化')
+    return
+  }
+  
+  const pageRoutes = generateRoutes(menuTree)
+  
+  if (pageRoutes.length === 0) {
+    devLog('⚠️', '没有可用的路由')
+    return
+  }
+  
+  devLog('🔨', `注册 ${pageRoutes.length} 个动态路由`)
+  
+  // 为每个页面创建带布局的路由
+  pageRoutes.forEach(route => {
+    router.addRoute({
+      path: route.path,
+      component: AgLayout,
+      children: [{
+        path: '',
+        name: route.name,
+        component: route.component,
+        meta: route.meta
+      }]
+    })
   })
-
-  if (mainPageUri) {
-    return mainPageUri
-  }
-
-  return getOneUri(useUserStore().allMenuRouteTree)
+  
+  routesInitialized = true
+  devLog('✅', '路由注册完成')
 }
 
-// 获取到第一个uri (递归查找)
-function getOneUri (item) {
-  let result = ''
-  for (let i = 0; i < item.length; i++) {
-    if (item[i].menuUri && item[i].entType === 'ML') {
-      return item[i].menuUri
-    }
+// ==================== 开发模式支持 ====================
 
-    if (item[i].children) {
-      result = getOneUri(item[i].children)
-      if (result) {
-        return result
-      }
+/**
+ * 初始化开发模式
+ */
+function initDevMode() {
+  const userStore = useUserStore()
+  
+  devLog('🚀', '开发模式初始化')
+  
+  userStore.setToken('dev-bypass-token')
+  userStore.setUserLoginInfo({
+    ...devUserInfo,
+    allMenuRouteTree: devMenuTree
+  })
+  
+  registerDynamicRoutes(devMenuTree)
+}
+
+/**
+ * 检查并恢复开发模式状态
+ */
+function checkDevModeState() {
+  const userStore = useUserStore()
+  
+  const hasUserInfo = userStore.userId && userStore.allMenuRouteTree?.length > 0
+  
+  if (!hasUserInfo) {
+    devLog('⚠️', '恢复用户信息')
+    userStore.setUserLoginInfo({
+      ...devUserInfo,
+      allMenuRouteTree: devMenuTree
+    })
+  }
+  
+  if (!routesInitialized) {
+    devLog('⚠️', '重新注册路由')
+    const menuTree = userStore.allMenuRouteTree
+    if (menuTree && menuTree.length > 0) {
+      registerDynamicRoutes(menuTree)
+      return true
     }
   }
-  return result
+  
+  return false
 }
+
+// ==================== 路由守卫 ====================
 
 router.beforeEach((to, from, next) => {
-  // 进度条开启
-  nProgress.start();
-
-  to.meta && (typeof to.meta.title !== 'undefined' && setDocumentTitle(`${to.meta.title} - ${import.meta.env.VITE_APP_TITLE}`)); // 设置浏览器标题
-
-  // 公共页面，任何时候都可以跳转
-  if (to.path === PAGE_PATH_404) {
-    next();
-    return;
+  nProgress.start()
+  
+  // 设置页面标题
+  if (to.meta?.title) {
+    setDocumentTitle(`${to.meta.title} - ${import.meta.env.VITE_APP_TITLE}`)
   }
-  // 如果在免登录页面则直接放行
-  if (allowList.includes(to.name)) {
-    // 在免登录名单，直接进入
-    next();
-    return;
+  
+  // 公共页面直接放行
+  if (to.path === PAGE_PATH_404 || ALLOW_LIST.includes(to.name)) {
+    next()
+    return
   }
-
-  // 验证登录
-  // const token = localRead(localStorageKeyConst.USER_TOKEN);
-  const token = useUserStore().getToken;
-  console.log('token', token)
-  if (!token) {
-    // localClear();
-    useUserStore().logout();
-    next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath }  });
-    return;
-  }
-
-  // 以下为包含Token的情况
-  // 如果用户信息不存在， 则重新获取 [用户登录成功 & 强制刷新浏览器时 会执行该函数]
-  if (!useUserStore().userId) {
-    // request login userInfo
-
-    loginApi.getCurrentInfo().then(bizData => {
-      useUserStore().setUserLoginInfo(bizData); // 调用vuex设置用户基本信息
-
-      // 动态添加路由
-      const menuRouterList = generator(useUserStore().allMenuRouteTree);
-      buildRoutes(menuRouterList);
-
-      // 判断是否存在路由参数 redirect
-      if (to.query.redirect) {
-        next(to.query.redirect);// 跳转到指定的路由
-      } else {
-        redirectToTargetRoute(to.path, next);
+  
+  const userStore = useUserStore()
+  const bypassLogin = import.meta.env.VITE_BYPASS_LOGIN === 'true'
+  const token = userStore.getToken
+  
+  // ========== 开发模式处理 ==========
+  if (bypassLogin) {
+    // 初始化
+    if (!token) {
+      initDevMode()
+      next({ ...to, replace: true })
+      return
+    }
+    
+    // 检查状态
+    const needReNavigate = checkDevModeState()
+    if (needReNavigate) {
+      next({ ...to, replace: true })
+      return
+    }
+    
+    // 首页重定向
+    if (to.path === '/' || to.path === '/main') {
+      const firstUri = findFirstAvailableUri(userStore.allMenuRouteTree)
+      if (firstUri) {
+        next({ path: firstUri, replace: true })
+        return
       }
-    }).catch(() => {
-      // 失败时，获取用户信息失败时，调用登出，来清空历史保留信息
-      useUserStore().logout();
-      next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath } });
-    });
-  } else {
-    redirectToTargetRoute(to.path, next);
+    }
+    
+    next()
+    return
   }
-  next();
+  
+  // ========== 生产模式处理 ==========
+  
+  // 未登录
+  if (!token) {
+    userStore.logout()
+    next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath } })
+    return
+  }
+  
+  // 获取用户信息
+  if (!userStore.userId) {
+    loginApi.getCurrentInfo()
+      .then(bizData => {
+        userStore.setUserLoginInfo(bizData)
+        registerDynamicRoutes(bizData.allMenuRouteTree)
+        
+        if (to.query.redirect) {
+          next(to.query.redirect)
+        } else if (to.path === '/') {
+          const firstUri = findFirstAvailableUri(bizData.allMenuRouteTree)
+          next({ path: firstUri || PAGE_PATH_404 })
+        } else {
+          next({ ...to, replace: true })
+        }
+      })
+      .catch(() => {
+        userStore.logout()
+        next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath } })
+      })
+    return
+  }
+  
+  // 首页重定向
+  if (to.path === '/') {
+    const firstUri = findFirstAvailableUri(userStore.allMenuRouteTree)
+    if (firstUri) {
+      next({ path: firstUri })
+    } else {
+      next()
+    }
+    return
+  }
+  
+  next()
 })
 
 router.afterEach(() => {
-  nProgress.done();
-});
+  nProgress.done()
+})
 
-/**
- * 绑定路由
- * @param menuRouterList
- */
-function buildRoutes(menuRouterList) {
-  router.addRoute({
-    path: '/',
-    meta: {},
-    component: AgLayout,
-    redirect: redirectFunc, // 根页面【/】默认跳转 地址
-    children: menuRouterList,
-  });
-}
+// ==================== 错误处理 ====================
 
-/**
- * 格式化树形结构数据 生成 vue-router 层级路由表
- *
- * @param routerMap
- * @returns {*}
- */
-const generator = (allMenuRouteTreeArray) => {
-  const menuResult = [];
+router.onError((error) => {
+  console.error('路由错误:', error)
+  nProgress.done()
+})
 
-  // 1、构建整个路由信息
-  allMenuRouteTreeArray.map(item => {
-    const defComponent = null;
-
-    // 找不到组件 || 其他菜单
-    if (!defComponent) {
-      return;
-    }
-
-    // 跳转uri
-    let path = item.menuUri || defComponent.defaultPath;
-
-    // 没有配置path, 如果为目录则允许为空， 否则不在加载此配置
-    if (!path) {
-      if (item.children && item.children.length > 0) {
-        path = `/${item.entId}`;
-      } else {
-        return; // 不再加载此配置项
-      }
-    }
-
-    const currentRouter = {
-      // 如果路由设置了 path，则作为默认 path，否则 路由地址 为默认配置
-      path: path,
-      // 路由名称，建议唯一
-      name: item.entId,
-      // 该路由对应页面的 组件 :方案2 (动态加载)
-      component: ((defComponent && defComponent.component) || (() => import(`/@/views/${item.componentName}`))),
-      // meta: 页面标题, 菜单图标, 页面权限(供指令权限用，可去掉)
-      meta: {
-        title: item.entName,
-        icon: item.menuIcon,
-        keepAlive: false
-      },
-      hidden: item.entType === 'MO' // 当其他菜单时需要隐藏显示
-    };
-    // 是否有子菜单，并递归处理
-    if (item.children && item.children.length > 0) {
-      // Recursion
-      currentRouter.children = generator(item.children);
-    }
-    menuResult.push(currentRouter);
-  });
-
-  return menuResult;
-}
+export default router
