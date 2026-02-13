@@ -58,16 +58,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [PermissionAuth(PermCode.AGENT.ENT_C_MAIN_PAY_DAY_COUNT)]
         public async Task<ApiRes> PayDayCountAsync(string queryDateRange)
         {
-            DateTime? day = DateTime.Today;
-            switch (queryDateRange)
-            {
-                case DateUtil.YESTERDAY:
-                    day = day?.AddDays(-1); break;
-                case DateUtil.TODAY:
-                default:
-                    break;
-            }
-            return ApiRes.Ok(await _payOrderService.MainPagePayDayCountAsync(null, await GetCurrentAgentNoAsync(), day));
+            return ApiRes.Ok(await _payOrderService.MainPagePayDayCountAsync(null, await GetCurrentAgentNoAsync(), queryDateRange));
         }
 
         /// <summary>
@@ -100,13 +91,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [PermissionAuth(PermCode.AGENT.ENT_C_MAIN_PAY_COUNT)]
         public async Task<ApiRes> PayCountAsync(string queryDateRange)
         {
-            DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
-            if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
-            {
-                createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
-                createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
-            }
-            return ApiRes.Ok(await _payOrderService.MainPagePayCountAsync(null, await GetCurrentAgentNoAsync(), createdStart, createdEnd));
+            return ApiRes.Ok(await _payOrderService.MainPagePayCountAsync(null, await GetCurrentAgentNoAsync(), queryDateRange));
         }
 
         /// <summary>
@@ -117,13 +102,7 @@ namespace AGooday.AgPay.Agent.Api.Controllers
         [PermissionAuth(PermCode.AGENT.ENT_C_MAIN_PAY_TYPE_COUNT)]
         public async Task<ApiRes> PayTypeCountAsync(string queryDateRange)
         {
-            DateUtil.GetQueryDateRange(queryDateRange, out string createdStart, out string createdEnd);
-            if (string.IsNullOrWhiteSpace(createdStart) && string.IsNullOrWhiteSpace(createdEnd))
-            {
-                createdStart = DateTime.Today.AddDays(-29).ToString("yyyy-MM-dd HH:mm:ss");
-                createdEnd = DateTime.Today.AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
-            }
-            return ApiRes.Ok(await _payOrderService.MainPagePayTypeCountAsync(null, await GetCurrentAgentNoAsync(), createdStart, createdEnd));
+            return ApiRes.Ok(await _payOrderService.MainPagePayTypeCountAsync(null, await GetCurrentAgentNoAsync(), queryDateRange));
         }
     }
 }

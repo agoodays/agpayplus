@@ -93,8 +93,9 @@ namespace AGooday.AgPay.Application.Interfaces
         /// </summary>
         /// <param name="mchNo"></param>
         /// <param name="agentNo"></param>
+        /// <param name="queryDateRange"></param>
         /// <returns></returns>
-        Task<JObject> MainPagePayDayCountAsync(string mchNo, string agentNo, DateTime? day);
+        Task<JObject> MainPagePayDayCountAsync(string mchNo, string agentNo, string queryDateRange);
         /// <summary>
         /// 近期交易统计
         /// </summary>
@@ -108,18 +109,16 @@ namespace AGooday.AgPay.Application.Interfaces
         /// </summary>
         /// <param name="mchNo"></param>
         /// <param name="agentNo"></param>
-        /// <param name="createdStart"></param>
-        /// <param name="createdEnd"></param>
+        /// <param name="queryDateRange"></param>
         /// <returns></returns>
-        Task<JObject> MainPagePayCountAsync(string mchNo, string agentNo, string createdStart, string createdEnd);
+        Task<JObject> MainPagePayCountAsync(string mchNo, string agentNo, string queryDateRange);
         /// <summary>
         /// 首页支付类型统计
         /// </summary>
         /// <param name="mchNo"></param>
         /// <param name="agentNo"></param>
-        /// <param name="createdStart"></param>
-        /// <param name="createdEnd"></param>
+        /// <param name="queryDateRange"></param>
         /// <returns></returns>
-        Task<IEnumerable<PayTypeCountDto>> MainPagePayTypeCountAsync(string mchNo, string agentNo, string createdStart, string createdEnd);
+        Task<IEnumerable<PayTypeCountDto>> MainPagePayTypeCountAsync(string mchNo, string agentNo, string queryDateRange);
     }
 }

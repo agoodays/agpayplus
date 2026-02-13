@@ -543,11 +543,16 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="mchNo"></param>
         /// <param name="agentNo"></param>
+        /// <param name="queryDateRange"></param>
         /// <returns></returns>
-        public async Task<JObject> MainPagePayDayCountAsync(string mchNo, string agentNo, DateTime? day)
+        public async Task<JObject> MainPagePayDayCountAsync(string mchNo, string agentNo, string queryDateRange)
         {
-            DateTime? dayStart = day;
-            DateTime? dayEnd = day?.AddDays(1).AddSeconds(-1);
+            DateTime today = DateTime.Today; // 当前日期
+            DateTime dayStart = today, dayEnd = today.AddDays(1).AddSeconds(-1);
+            var (start, end) = DateUtil.GetQueryDateRange(queryDateRange);
+            if (start.HasValue) dayStart = start.Value;
+            if (end.HasValue) dayEnd = end.Value;
+
             JObject json = new JObject();
             int allCount = 0;
             var payStats = await _payOrderRepository.GetAllAsNoTracking()
@@ -656,23 +661,15 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="mchNo"></param>
         /// <param name="agentNo"></param>
-        /// <param name="createdStart"></param>
-        /// <param name="createdEnd"></param>
+        /// <param name="queryDateRange"></param>
         /// <returns></returns>
-        public async Task<JObject> MainPagePayCountAsync(string mchNo, string agentNo, string createdStart, string createdEnd)
+        public async Task<JObject> MainPagePayCountAsync(string mchNo, string agentNo, string queryDateRange)
         {
-            int daySpace = 6; // 默认最近七天（含当天）
-            if (!DateTime.TryParse(createdStart, out DateTime dayStart) || !DateTime.TryParse(createdEnd, out DateTime dayEnd))
-            {
-                DateTime today = DateTime.Today;
-                dayStart = today.AddDays(-daySpace);
-                dayEnd = today.AddDays(1).AddSeconds(-1);
-            }
-            else
-            {
-                // 计算两时间间隔天数
-                daySpace = dayEnd.Subtract(dayStart).Days;
-            }
+            DateTime today = DateTime.Today; // 当前日期
+            DateTime dayStart = today.AddDays(-6), dayEnd = today.AddDays(1).AddSeconds(-1);
+            var (start, end) = DateUtil.GetQueryDateRange(queryDateRange);
+            if (start.HasValue) dayStart = start.Value;
+            if (end.HasValue) dayEnd = end.Value;
 
             // 查询支付的记录
             var payOrderList = await SelectPayOrderCountAsync(mchNo, agentNo, dayStart, dayEnd);
@@ -711,17 +708,16 @@ namespace AGooday.AgPay.Application.Services
         /// </summary>
         /// <param name="mchNo"></param>
         /// <param name="agentNo"></param>
-        /// <param name="createdStart"></param>
-        /// <param name="createdEnd"></param>
+        /// <param name="queryDateRange"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PayTypeCountDto>> MainPagePayTypeCountAsync(string mchNo, string agentNo, string createdStart, string createdEnd)
+        public async Task<IEnumerable<PayTypeCountDto>> MainPagePayTypeCountAsync(string mchNo, string agentNo, string queryDateRange)
         {
-            if (!DateTime.TryParse(createdStart, out DateTime dayStart) || !DateTime.TryParse(createdEnd, out DateTime dayEnd))
-            {
-                DateTime today = DateTime.Today; // 当前日期
-                dayStart = today.AddDays(-6); // 一周前日期
-                dayEnd = today.AddDays(1).AddSeconds(-1);
-            }
+            DateTime today = DateTime.Today; // 当前日期
+            DateTime dayStart = today.AddDays(-29), dayEnd= today.AddDays(1).AddSeconds(-1);
+            var (start, end) = DateUtil.GetQueryDateRange(queryDateRange);
+            if (start.HasValue) dayStart = start.Value;
+            if (end.HasValue) dayEnd = end.Value;
+
             // 统计列表
             var payCountMap = await PayTypeCountAsync(mchNo, agentNo, dayStart, dayEnd);
 
