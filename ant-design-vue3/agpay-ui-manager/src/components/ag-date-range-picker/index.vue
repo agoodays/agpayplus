@@ -1110,10 +1110,12 @@ function handleBlur() {
 
 /**
  * 清空选择
+ * @param {{silent?: boolean}} options
  */
-function clear() {
+function clear({ silent = false } = {}) {
   if (!actualShowQuickSelect.value) {
-    // 直接选择模式：清空日期
+    // 非快捷选择模式：切回自定义模式并清空日期
+    currentMode.value = 'custom'
     dateRange.value = []
   } else {
     // 快捷选择模式：重置到初始状态
@@ -1122,35 +1124,33 @@ function clear() {
     dateRange.value = []
     lastNonCustomOption.value = ''
   }
-  
+
   const emptyValue = autoValueType.value === 'array' ? [] : ''
-  emit('update:value', emptyValue)
-  emit('change', emptyValue)
+  if (!silent) {
+    emit('update:value', emptyValue)
+    emit('change', emptyValue)
+  }
 }
 
 // ============================================================
 // 暴露方法给父组件
 // ============================================================
 
-defineExpose({
-  clear
-})
-
-// ============================================================
-// 监听器
-// ============================================================
+// 暴露方法在文件后面统一声明（避免重复 defineExpose 调用）
 
 /**
- * 监听 value 变化，同步内部状态
- * 
- * 智能判断逻辑：
- * 1. 非快捷选择模式：直接设置为自定义模式
- * 2. 保持当前快捷选项模式（避免不必要的切换）
- * 3. 根据 option 设置对应模式
+ * 外部可调用：将组件值设置为指定的快捷选项或数组
+ * @param {String|Array} val - 可以是快捷选项字符串（如 'near7'）或数组 ['YYYY-MM-DD','YYYY-MM-DD']
  */
-watch(() => props.value, (newValue) => {
-  const { option, range } = parseValue(newValue)
-  
+function setValue(val, { silent = false } = {}) {
+  const { option, range } = parseValue(val)
+
+  if (!val || val === '' || (Array.isArray(val) && val.length === 0)) {
+    // 同 clear 的行为，尊重 silent 参数
+    clear({ silent })
+    return
+  }
+
   // 非快捷选择模式（包括 picker !== 'date' 的情况）
   if (!actualShowQuickSelect.value) {
     currentMode.value = 'custom'
@@ -1169,17 +1169,39 @@ watch(() => props.value, (newValue) => {
     dateRange.value = range
     return
   }
-  
-  // 根据 option 设置模式
+
   const isCustomMode = option === 'custom'
   currentMode.value = isCustomMode ? 'custom' : 'select'
   selectedOption.value = option
   dateRange.value = range
-  
-  // 保存非自定义选项值
-  if (!isCustomMode && option) {
-    lastNonCustomOption.value = option
+
+  if (!isCustomMode && option) lastNonCustomOption.value = option
+
+  // 规范化并向外同步（确保父组件也能接收到统一格式）
+  const output = formatValue(option, range)
+  if (!silent) {
+    emit('update:value', output)
+    emit('change', output)
   }
+}
+
+defineExpose({ clear, setValue })
+
+// ============================================================
+// 监听器
+// ============================================================
+
+/**
+ * 监听 value 变化，同步内部状态
+ * 
+ * 智能判断逻辑：
+ * 1. 非快捷选择模式：直接设置为自定义模式
+ * 2. 保持当前快捷选项模式（避免不必要的切换）
+ * 3. 根据 option 设置对应模式
+ */
+watch(() => props.value, (newValue) => {
+  // 统一通过 setValue({ silent: true }) 处理所有外部赋值（包含空值）以保持行为一致
+  setValue(newValue, { silent: true })
 }, { immediate: true })
 
 /**

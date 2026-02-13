@@ -270,7 +270,7 @@ function onSearch(vals) {
 
 function onReset() {
   searchForm.orderNo = ''
-  searchForm.dateRange = ''
+  searchForm.dateRange = 'today'
   searchForm.state = ''
   searchForm.amountRange = [undefined, undefined]
 }

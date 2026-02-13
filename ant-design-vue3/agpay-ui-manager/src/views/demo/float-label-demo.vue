@@ -997,8 +997,8 @@ import {
 // AgDateRangePicker 示例数据（新版）
 const agDate1 = ref('')
 const agDate2 = ref([])
-const agDate3 = ref('')
-const agDate4 = ref([])
+const agDate3 = ref([])
+const agDate4 = ref('')
 const agDate5 = ref([])
 const agDate6 = ref([])
 const agDate7 = ref('')

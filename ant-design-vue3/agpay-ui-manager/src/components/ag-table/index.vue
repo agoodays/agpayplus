@@ -218,6 +218,14 @@
               
               
               <div class="col-settings-footer">
+                <a-button size="small" type="default" @click="colSettingsVisible = false">
+                  <close-outlined />
+                  取消
+                </a-button>
+                <a-button size="small" type="default" @click="resetColumnState">
+                  <redo-outlined />
+                  重置
+                </a-button>
                 <a-button size="small" type="primary" @click="colSettingsVisible = false">
                   <check-outlined />
                   完成
@@ -1088,29 +1096,32 @@ defineExpose({
 
 .pd-0-20 { padding: 0 12px }
 
-.col-settings {
-  width: min(90vw, 560px);
-  max-width: 90vw;
-  min-width: 480px;
-  max-height: calc(100vh - 200px);
-  background: var(--base-bg-color);
-  border-radius: var(--border-radius);
-  box-shadow: 0 2px 8px var(--shadow-color);
-  display: flex;
-  flex-direction: column;
-}
+  .col-settings {
+    /* 使用更小的最小宽度以适配窄屏设备 */
+    width: min(95vw, 560px);
+    max-width: 95vw;
+    min-width: 280px;
+    max-height: calc(100vh - 350px);
+    background: var(--base-bg-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 8px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
 
 /* 响应式宽度 */
 @media (max-width: 1366px) {
   .col-settings {
-    width: min(85vw, 520px);
+    width: min(90vw, 520px);
+    min-width: 280px;
   }
 }
 
 @media (max-width: 768px) {
   .col-settings {
-    width: 95vw;
-    min-width: 320px;
+    width: 65vw;
+    min-width: 260px;
   }
 }
 
@@ -1215,7 +1226,7 @@ defineExpose({
 .col-checkbox-wrapper {
   flex: 1;
   min-width: 0;
-  max-width: 180px;
+  max-width: 220px;
   overflow: hidden;
 }
 
@@ -1328,23 +1339,40 @@ defineExpose({
 
 /* 小屏幕优化 - 两行布局 */
 @media (max-width: 900px) {
+  /* 改为 grid 布局，保证手柄/标题/操作区按列对齐并可换行 */
   .col-item {
-    flex-wrap: wrap;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 28px 1fr auto;
+    grid-gap: 8px 12px;
+    align-items: center;
+    padding: 10px 12px;
   }
-  
-  .col-checkbox-wrapper {
-    flex-basis: 100%;
-    margin-bottom: 4px;
+
+  .col-drag-handle { grid-column: 1; }
+
+  .col-checkbox-wrapper { 
+    grid-column: 2;
+    flex-basis: auto;
+    margin-bottom: 0;
+    max-width: none;
+    min-width: 0;
   }
-  
+
+  /* 标题允许换行以避免溢出 */
+  .col-title { white-space: normal; }
+
   .col-actions-v2 {
-    flex-basis: 100%;
-    width: 100%;
-    margin-left: 0;
+    grid-column: 3;
+    justify-self: end;
+    display: flex;
+    gap: 6px;
     flex-wrap: wrap;
-    justify-content: space-between;
+    align-items: center;
+    max-width: 220px;
   }
+
+  /* 隐藏宽度输入在非常窄的屏幕以避免横向滚动 */
+  .col-width-input { display: none !important; }
 }
 
 /* 超小屏幕 */
@@ -1370,6 +1398,15 @@ defineExpose({
   justify-content: flex-end;
 }
 
+
+.col-settings-footer .footer-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.col-settings-footer :deep(.ant-btn + .ant-btn) {
+  margin-left: 12px;
+}
 .ag-table-stats {
   padding: 16px;
   margin-bottom: 16px;
