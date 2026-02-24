@@ -10,6 +10,7 @@ import { useAppStore } from '/@/store/modules/system/app'
 import { router } from '/@/router'
 import localStorageKeyConst from '/@/constants/local-storage-key-const'
 import { PAGE_PATH_LOGIN } from '/@/constants/common-const'
+import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const'
 
 class HttpRequest {
   constructor(baseUrl = import.meta.env.VITE_APP_API_BASE_URL) {
@@ -22,7 +23,7 @@ class HttpRequest {
     const headers = {}
     const token = localStorage.getItem(localStorageKeyConst.USER_TOKEN)
     if (token) {
-      headers[import.meta.env.VITE_APP_TOKEN_NAME || 'authorization'] = `Bearer ${token}`
+      headers[ACCESS_TOKEN_NAME] = `Bearer ${token}`
     }
     return {
       baseURL: this.baseUrl,
