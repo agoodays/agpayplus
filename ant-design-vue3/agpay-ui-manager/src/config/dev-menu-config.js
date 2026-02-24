@@ -40,6 +40,14 @@ export const devMenuTree = [
         menuIcon: 'TableOutlined'
       },
       {
+        entId: 'ENT_DEMO_REFACTOR_TABLE',
+        entName: '基础表格',
+        menuUri: '/demo/ag-table-refactor-demo',
+        componentName: 'demo/ag-table-refactor-demo',
+        entType: 'ML',
+        menuIcon: 'TableOutlined'
+      },
+      {
         entId: 'ENT_DEMO_STATE_SWITCH',
         entName: '状态切换',
         menuUri: '/demo/state-switch-demo',

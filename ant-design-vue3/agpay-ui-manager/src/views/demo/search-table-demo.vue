@@ -60,18 +60,16 @@
     </div>
 
     <ag-table
-      :table-columns="columns"
-      :req-table-data-func="reqTableDataFunc"
-      :req-table-count-func="reqTableCountFunc"
-      :req-download-data-func="reqDownloadDataFunc"
-      :is-enable-data-statistics="true"
-      :is-show-download="true"
-      :is-show-auto-refresh="true"
-      :is-show-table-top="true"
-      :init-data="true"
-      :page-size="10"
+      :columns="columns"
+      :on-load="reqTableDataFunc"
+      :on-load-statistics="reqTableCountFunc"
+      :on-download="reqDownloadDataFunc"
+      :enable-statistics="true"
+      :show-download="true"
+      :show-auto-refresh="true"
+      :show-toolbar="true"
       :search-data="searchForm"
-      column-state-key="demo_search_table_columns"
+      state-key="demo_search_table_columns"
     >
       <template #actions="{ record }">
         <ag-table-actions :max-show-num="3">

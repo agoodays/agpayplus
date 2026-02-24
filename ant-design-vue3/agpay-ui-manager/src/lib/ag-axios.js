@@ -4,7 +4,7 @@
  */
 import axios from 'axios'
 import { message, Modal } from 'ant-design-vue'
-import { AgLoading } from '/@/components/framework/ag-loading'
+import { AgLoading } from '/@/components/ag-loading'
 import { useUserStore } from '/@/store/modules/system/user'
 // import { decryptData, encryptData } from './encrypt'
 // import { DATA_TYPE_ENUM } from '../constants/common-const'
