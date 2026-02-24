@@ -66,23 +66,18 @@ export const useUserStore = defineStore('userStore', {
     setToken(token) {
       this.token = token || ''
     },
-    // 检查用户是否具有指定权限
+
+    /**
+     * 检查是否有权限
+     * @param {string} entId - 权限ID
+     * @returns {boolean}
+     */
     hasAccess(entId) {
       if (!entId) return true
-
-      // 超级管理员绕过权限检查
-      if (this.isAdmin === true || this.isAdmin === '1' || this.isAdmin === 'true') {
-        return true
-      }
-
-      const list = this.accessList || []
-
-      // 支持数组和单个值的检查
-      if (Array.isArray(entId)) {
-        return entId.some((id) => list.includes(id))
-      }
-
-      return list.includes(entId)
-    },
+      // 如果是超级管理员，拥有所有权限
+      if (this.isAdmin) return true
+      // 检查权限集合中是否包含此权限
+      return this.accessList && this.accessList.includes(entId)
+    }
   },
 })
