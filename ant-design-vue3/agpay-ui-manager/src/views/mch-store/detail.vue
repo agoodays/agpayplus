@@ -183,7 +183,7 @@ const handleClose = () => {
 <style lang="less" scoped>
 :deep(.ant-descriptions-item-label) {
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.85);
-  background-color: #fafafa;
+  color: var(--text-color);
+  background-color: var(--layout-surface);
 }
 </style>

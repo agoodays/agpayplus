@@ -37,14 +37,36 @@ export const appDefaultConfig = {
 }
 
 /**
+ * 应用级默认主题配置
+ * 说明：
+ * - 供 store/theme 工具复用，避免多处重复定义
+ */
+export const defaultThemeConfig = {
+  primaryColor: appDefaultConfig.primaryColor,
+  darkMode: false,
+  grayMode: false,
+  colorWeakMode: false,
+  compactTheme: appDefaultConfig.compactFlag,
+  borderRadius: appDefaultConfig.borderRadius
+}
+
+/**
+ * 应用级默认布局配置
+ */
+export const defaultLayoutConfig = {
+  layoutMode: 'classic',
+  menuSplit: false
+}
+
+/**
  * 与后端开发人员的路由名称及配置项
  * 组件名称 ：{ 默认跳转路径（如果后端配置则已动态配置为准）， 组件渲染 }
  * */
 export const asyncRouteDefine = {
 
   // 'CurrentUserInfo': { defaultPath: '/current/userinfo', component: () => import('/@/views/current/UserinfoPage') }, // 用户设置
-  //
-  // 'MainPage': { defaultPath: '/main', component: () => import('/@/views/dashboard/Analysis') },
+
+  'MainPage': { defaultPath: '/main', component: () => import('/@/views/main/main-page.vue') },
   // 'SysUserPage': { defaultPath: '/users', component: () => import('/@/views/sysuser/SysUserPage') },
   // 'SysUserTeamPage': { defaultPath: '/teams', component: () => import('/@/views/sysUserTeam/TeamList') },
   // 'RolePage': { defaultPath: '/roles', component: () => import('/@/views/role/RolePage') },

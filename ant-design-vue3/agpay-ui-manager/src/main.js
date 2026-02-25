@@ -1,6 +1,5 @@
 import { createApp } from 'vue'
 import Antd from 'ant-design-vue'
-import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import * as antIcons from '@ant-design/icons-vue'
@@ -17,26 +16,13 @@ import themeService from '/@/utils/theme-service'
 // 配置 dayjs 为中文
 dayjs.locale('zh-cn')
 
-// ==================== 主题加载 ====================
-
 /**
- * 加载并应用站点配置和主题
- * 
- * 功能：
- * 1. 从后端获取站点配置（如果可用）
- * 2. 根据配置动态加载主题样式
- * 3. 保存配置到 localStorage
- * 
- * @returns {Promise<void>}
+ * 注册 Ant Design 图标组件
  */
-async function loadSiteConfig() {
-  try {
-    await themeService.loadAndApplyTheme()
-    console.log('✅ 主题加载成功')
-  } catch (error) {
-    console.warn('⚠️ 主题加载失败，使用默认主题:', error.message)
-    // 失败后不影响应用启动，使用默认主题
-  }
+function registerAntIcons(app) {
+  Object.keys(antIcons).forEach((key) => {
+    app.component(key, antIcons[key])
+  })
 }
 
 // ==================== 应用初始化 ====================
@@ -52,7 +38,7 @@ async function initializeApp() {
   Initializer()
 
   // 加载站点配置和主题
-  await loadSiteConfig()
+  await themeService.loadAndApplyTheme()
 
   // 使用插件
   app.use(router)
@@ -63,9 +49,7 @@ async function initializeApp() {
   app.config.globalProperties.$infoBox = infoBox
 
   // 批量注册 Ant Design 图标组件
-  Object.keys(antIcons).forEach((key) => {
-    app.component(key, antIcons[key])
-  })
+  registerAntIcons(app)
 
   // 挂载应用
   app.mount('#app')

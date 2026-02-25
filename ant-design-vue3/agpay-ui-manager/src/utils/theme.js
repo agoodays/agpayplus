@@ -10,12 +10,13 @@
  * - CSS 变量定义在 src/theme/index.less
  * - 这里的 DEFAULTS 仅作为 JS 层面的回退值
  */
+import { appDefaultConfig } from '/@/config/app-config'
 
 // ==================== 默认主题配置 ====================
 
 const DEFAULTS = {
   // 主色
-  primaryColor: '#1677ff',
+  primaryColor: appDefaultConfig.primaryColor,
   primaryColorHover: 'rgba(22, 119, 255, 0.08)',
   primaryColorWeak: 'rgba(22, 119, 255, 0.06)',
   
@@ -23,18 +24,20 @@ const DEFAULTS = {
   successColor: '#52c41a',
   warningColor: '#faad14',
   errorColor: '#ff4d4f',
-  infoColor: '#1677ff',
+  infoColor: appDefaultConfig.primaryColor,
   
   // 布局
-  borderRadius: '6px',
+  borderRadius: `${appDefaultConfig.borderRadius}px`,
   borderRadiusLg: '8px',
-  sideMenuWidth: '200px',
-  pageWidth: '99%',
+  sideMenuWidth: `${appDefaultConfig.sideMenuWidth}px`,
+  pageWidth: appDefaultConfig.pageWidth,
   
   // 背景色
   baseBgColor: '#fff',
   layoutBg: '#f5f5f5',
   layoutSurface: '#f8f8f8',
+  siderBgDark: '#001529',
+  siderBgLight: '#ffffff',
   tableRowAltBg: '#FCFCFC',
   overlayBg: '#000',
   surfaceVariant: 'rgba(0,0,0,0.03)',
@@ -55,7 +58,7 @@ const DEFAULTS = {
   shadowColor: 'rgba(0,0,0,0.1)',
   
   // Ant Design 主色（保持与 primaryColor 一致）
-  antPrimaryColor: '#1677ff'
+  antPrimaryColor: appDefaultConfig.primaryColor
 }
 
 // ==================== 辅助函数 ====================
@@ -69,6 +72,17 @@ function toPx(val) {
   if (typeof val === 'number') return `${val}px`
   if (typeof val === 'string' && /^[0-9]+$/.test(val)) return `${val}px`
   return val
+}
+
+/**
+ * 批量设置 CSS 变量
+ * @param {CSSStyleDeclaration} style
+ * @param {Record<string, string>} vars
+ */
+function applyCssVars(style, vars) {
+  Object.entries(vars).forEach(([name, value]) => {
+    style.setProperty(name, value)
+  })
 }
 
 /**
@@ -141,6 +155,8 @@ export function applyThemeFromConfig(config = {}) {
   const baseBgColor = config.baseBgColor || config.background || config.bodyBackground || DEFAULTS.baseBgColor
   const layoutBg = config.layoutBg || config.layoutBackground || DEFAULTS.layoutBg
   const layoutSurface = config.layoutSurface || DEFAULTS.layoutSurface
+  const siderBgDark = config.siderBgDark || DEFAULTS.siderBgDark
+  const siderBgLight = config.siderBgLight || DEFAULTS.siderBgLight
   const tableRowAltBg = config.tableRowAltBg || config.tableAlternateBg || DEFAULTS.tableRowAltBg
   const overlayBg = config.overlayBg || config.overlay || DEFAULTS.overlayBg
   const surfaceVariant = config.surfaceVariant || config.surface || DEFAULTS.surfaceVariant
@@ -168,49 +184,45 @@ export function applyThemeFromConfig(config = {}) {
   const primaryColorWeak = config.primaryColorWeak || config.primaryWeak || hexToRgba(primaryColor, 0.06)
   
   // ==================== 应用 CSS 变量 ====================
-  
-  // 主色
-  root.style.setProperty('--primary-color', primaryColor)
-  root.style.setProperty('--primary-color-hover', primaryColorHover)
-  root.style.setProperty('--primary-color-weak', primaryColorWeak)
-  
-  // 状态颜色
-  root.style.setProperty('--success-color', successColor)
-  root.style.setProperty('--warning-color', warningColor)
-  root.style.setProperty('--error-color', errorColor)
-  root.style.setProperty('--info-color', infoColor)
-  
-  // 布局
-  root.style.setProperty('--border-radius', borderRadius)
-  root.style.setProperty('--border-radius-lg', borderRadiusLg)
-  root.style.setProperty('--side-menu-width', sideMenuWidth)
-  root.style.setProperty('--page-width', pageWidth)
-  
-  // 背景色
-  root.style.setProperty('--base-bg-color', baseBgColor)
-  root.style.setProperty('--layout-bg', layoutBg)
-  root.style.setProperty('--layout-surface', layoutSurface)
-  root.style.setProperty('--table-row-alt-bg', tableRowAltBg)
-  root.style.setProperty('--overlay-bg', overlayBg)
-  root.style.setProperty('--surface-variant', surfaceVariant)
-  root.style.setProperty('--hover-bg-color', hoverBgColor)
-  
-  // 文字颜色
-  root.style.setProperty('--text-color', textColor)
-  root.style.setProperty('--text-color-weak', textColorWeak)
-  root.style.setProperty('--text-color-muted', textColorMuted)
-  root.style.setProperty('--text-color-secondary', textColorSecondary)
-  root.style.setProperty('--text-muted', textMuted)
-  root.style.setProperty('--text-on-dark', textOnDark)
-  root.style.setProperty('--text-on-primary', textOnPrimary)
-  
-  // 边框和阴影
-  root.style.setProperty('--border-color', borderColor)
-  root.style.setProperty('--border-dashed', borderDashed)
-  root.style.setProperty('--shadow-color', shadowColor)
-  
-  // Ant Design 主色
-  root.style.setProperty('--ant-primary-color', antPrimaryColor)
+  applyCssVars(root.style, {
+    '--primary-color': primaryColor,
+    '--primary-color-hover': primaryColorHover,
+    '--primary-color-weak': primaryColorWeak,
+
+    '--success-color': successColor,
+    '--warning-color': warningColor,
+    '--error-color': errorColor,
+    '--info-color': infoColor,
+
+    '--border-radius': borderRadius,
+    '--border-radius-lg': borderRadiusLg,
+    '--side-menu-width': sideMenuWidth,
+    '--page-width': pageWidth,
+
+    '--base-bg-color': baseBgColor,
+    '--layout-bg': layoutBg,
+    '--layout-surface': layoutSurface,
+    '--sider-bg-dark': siderBgDark,
+    '--sider-bg-light': siderBgLight,
+    '--table-row-alt-bg': tableRowAltBg,
+    '--overlay-bg': overlayBg,
+    '--surface-variant': surfaceVariant,
+    '--hover-bg-color': hoverBgColor,
+
+    '--text-color': textColor,
+    '--text-color-weak': textColorWeak,
+    '--text-color-muted': textColorMuted,
+    '--text-color-secondary': textColorSecondary,
+    '--text-muted': textMuted,
+    '--text-on-dark': textOnDark,
+    '--text-on-primary': textOnPrimary,
+
+    '--border-color': borderColor,
+    '--border-dashed': borderDashed,
+    '--shadow-color': shadowColor,
+
+    '--ant-primary-color': antPrimaryColor
+  })
   
   // ==================== 返回应用的值 ====================
   
@@ -223,6 +235,8 @@ export function applyThemeFromConfig(config = {}) {
     pageWidth,
     baseBgColor,
     layoutBg,
+    siderBgDark,
+    siderBgLight,
     textColor
   }
 }

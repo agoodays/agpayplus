@@ -34,7 +34,7 @@
   --success-color: #52c41a;
   --warning-color: #faad14;
   --error-color: #ff4d4f;
-  --info-color: #1677ff;
+  --info-color: var(--primary-color);
   
   // 布局
   --border-radius: 6px;
@@ -46,6 +46,8 @@
   --base-bg-color: #fff;
   --layout-bg: #f5f5f5;
   --layout-surface: #f8f8f8;
+  --sider-bg-dark: #001529;
+  --sider-bg-light: #ffffff;
   --table-row-alt-bg: #FCFCFC;
   --overlay-bg: #000;
   --surface-variant: rgba(0, 0, 0, 0.03);
@@ -69,7 +71,28 @@
   --shadow-color: rgba(0, 0, 0, 0.1);
   
   // Ant Design 主色
-  --ant-primary-color: #1677ff;
+  --ant-primary-color: var(--primary-color);
+}
+
+/**
+ * 暗色主题变量
+ * 说明：
+ * - 与 data-theme 联动，不依赖组件内部硬编码颜色
+ * - 优先覆盖布局背景、文字和边框等核心 token
+ */
+:root[data-theme='dark'] {
+  --base-bg-color: #141414;
+  --layout-bg: #141414;
+  --layout-surface: #1f1f1f;
+  --surface-variant: rgba(255, 255, 255, 0.08);
+  --surface-subtle: rgba(255, 255, 255, 0.06);
+  --surface-light: rgba(255, 255, 255, 0.12);
+  --surface-lighter: rgba(255, 255, 255, 0.16);
+  --text-color: rgba(255, 255, 255, 0.88);
+  --text-color-weak: rgba(255, 255, 255, 0.65);
+  --text-color-muted: rgba(255, 255, 255, 0.45);
+  --border-color: #303030;
+  --shadow-color: rgba(0, 0, 0, 0.35);
 }
 
 // ==================== 基础样式 ====================

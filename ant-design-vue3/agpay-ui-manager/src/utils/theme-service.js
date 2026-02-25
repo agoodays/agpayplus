@@ -1,4 +1,3 @@
-import { systemConfigApi } from '/@/api/system/system-config-api'
 import { store } from '/@/store'
 import { useAppStore } from '/@/store/modules/system/app'
 
@@ -20,12 +19,21 @@ import { useAppStore } from '/@/store/modules/system/app'
  */
 
 /**
+ * 获取 App Store 实例
+ * @returns {import('/@/store/modules/system/app').useAppStore}
+ */
+function getAppStore() {
+  return useAppStore(store)
+}
+
+/**
  * 从后端获取站点配置
  * @returns {Promise<Object|null>} 站点配置对象或 null
  */
 async function fetchSiteConfig() {
   try {
-    const data = await systemConfigApi.getSiteConfig()
+    const appStore = getAppStore()
+    const data = await appStore.fetchSiteConfig()
     return data || null
   } catch (error) {
     console.warn('获取站点配置失败:', error)
@@ -44,15 +52,14 @@ async function fetchSiteConfig() {
  * @returns {Promise<Object|null>} 应用后的配置对象或 null
  */
 async function loadAndApplyTheme() {
+  const appStore = getAppStore()
+
+  // 先加载本地缓存，保证首屏有可用主题
+  appStore.initConfig()
+
   try {
-    // 初始化 App Store
-    const appStore = useAppStore(store)
-    
-    // 首先加载本地缓存的配置（如果有）
-    appStore.initConfig()
-    
     // 然后从后端获取最新配置
-    const config = await appStore.fetchSiteConfig()
+    const config = await fetchSiteConfig()
     
     if (config) {
       console.log('主题配置已成功加载并应用')
@@ -63,9 +70,6 @@ async function loadAndApplyTheme() {
     }
   } catch (error) {
     console.error('加载主题配置失败:', error)
-    // 即使失败，也要确保应用了本地配置
-    const appStore = useAppStore(store)
-    appStore.initConfig()
     return null
   }
 }
@@ -76,8 +80,10 @@ async function loadAndApplyTheme() {
  */
 async function refreshTheme() {
   try {
-    const appStore = useAppStore(store)
-    await appStore.fetchSiteConfig()
+    const config = await fetchSiteConfig()
+    if (!config) {
+      return false
+    }
     return true
   } catch (error) {
     console.error('刷新主题配置失败:', error)
@@ -89,7 +95,7 @@ async function refreshTheme() {
  * 重置主题为默认值
  */
 function resetTheme() {
-  const appStore = useAppStore(store)
+  const appStore = getAppStore()
   appStore.resetConfig()
   console.log('主题已重置为默认值')
 }

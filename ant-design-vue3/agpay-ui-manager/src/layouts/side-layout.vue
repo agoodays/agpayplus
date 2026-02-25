@@ -6,9 +6,10 @@
       v-model:collapsed="collapsed" 
       :width="260" 
       :trigger="null" 
+      :theme="menuTheme"
       collapsible
     >
-      <div class="ag-side-logo">        
+      <div class="ag-side-logo">
         <!-- 当侧边栏卷起来的时候，切换仅有图标 -->
         <img src="/@/assets/logo.svg" alt="agooday" class="logo-icon">
         <!-- 在这里可以添加title，我们以图片的方式替代文字 -->
@@ -18,26 +19,15 @@
       <!-- 动态菜单 -->
       <a-menu 
         class="ag-side-menu" 
-        v-model:selectedKeys="selectedKeys"
+        :items="menuItems"
         v-model:openKeys="openKeys"
-        theme="dark" 
+        v-model:selectedKeys="selectedKeys"
+        :theme="menuTheme" 
         mode="inline"
         :inline-collapsed="collapsed"
+        @openChange="handleOpenChange"
         @click="handleMenuClick"
-      >
-        <template v-for="item in menuData" :key="item.entId">
-          <!-- 没有子菜单 -->
-          <a-menu-item v-if="!item.children || item.children.length === 0" :key="item.entId">
-            <template #icon>
-              <component :is="getIconComponent(item.menuIcon || item.icon)" />
-            </template>
-            <span>{{ item.entName }}</span>
-          </a-menu-item>
-          
-          <!-- 有子菜单 -->
-          <sub-menu v-else :menu-info="item" :key="item.entId" />
-        </template>
-      </a-menu>
+      />
     </a-layout-sider>
     
     <a-layout class="ag-layout-main">
@@ -129,7 +119,7 @@
 </template>
 
 <script setup>
-import { ref, computed, getCurrentInstance, nextTick, watch, onMounted } from 'vue'
+import { ref, computed, getCurrentInstance, nextTick, watch, onMounted, onBeforeUnmount, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { 
   MenuUnfoldOutlined, 
@@ -143,7 +133,7 @@ import {
 import * as antIcons from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
 import { useUserStore } from '/@/store/modules/system/user'
-import SubMenu from './sub-menu.vue'
+import { useAppStore } from '/@/store/modules/system/app'
 
 // ==================== 图标动态加载 ====================
 
@@ -162,6 +152,7 @@ function getIconComponent(iconName) {
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const appStore = useAppStore()
 const { proxy } = getCurrentInstance()
 
 // ==================== 响应式状态 ====================
@@ -170,18 +161,40 @@ const { proxy } = getCurrentInstance()
 const selectedKeys = ref([])
 // 菜单展开的 key
 const openKeys = ref([])
+// 菜单收起前的展开 key
+const cachedOpenKeys = ref([])
 // 侧边栏折叠状态
 const collapsed = ref(false)
+// 是否由响应式尺寸自动收起
+const collapsedByResponsive = ref(false)
 // 路由刷新控制
 const isRouterAlive = ref(true)
 // 当前年份（用于版权信息）
 const currentYear = dayjs().year()
+// 响应式收起断点
+const responsiveBreakpoint = 1200
+// 仅展示左侧菜单类型：目录/菜单（ML）
+const visibleEntType = 'ML'
+let resizeRafId = 0
 
 // ==================== 计算属性 ====================
 
 // 获取菜单数据
 const menuData = computed(() => {
   return userStore.allMenuRouteTree || []
+})
+
+// 先过滤可见菜单树，再转换为 Ant Menu items
+const visibleMenuTree = computed(() => {
+  return filterVisibleMenus(menuData.value)
+})
+
+const menuTheme = computed(() => {
+  return appStore.themeConfig?.darkMode ? 'dark' : 'light'
+})
+
+const menuItems = computed(() => {
+  return transformMenuToItems(visibleMenuTree.value)
 })
 
 // 生成面包屑
@@ -203,20 +216,70 @@ watch(
   }
 )
 
+watch(
+  () => collapsed.value,
+  (isCollapsed) => {
+    if (isCollapsed) {
+      cachedOpenKeys.value = [...openKeys.value]
+      openKeys.value = []
+      return
+    }
+
+    if (cachedOpenKeys.value.length > 0) {
+      openKeys.value = [...cachedOpenKeys.value]
+    }
+  }
+)
+
 onMounted(() => {
+  handleWindowResize()
+  window.addEventListener('resize', onWindowResize)
   updateMenuKeys(route.path)
 })
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onWindowResize)
+  if (resizeRafId) {
+    cancelAnimationFrame(resizeRafId)
+    resizeRafId = 0
+  }
+})
+
+function onWindowResize() {
+  if (resizeRafId) {
+    cancelAnimationFrame(resizeRafId)
+  }
+  resizeRafId = requestAnimationFrame(() => {
+    handleWindowResize()
+    resizeRafId = 0
+  })
+}
+
+function handleWindowResize() {
+  const shouldCollapse = window.innerWidth < responsiveBreakpoint
+
+  if (shouldCollapse && !collapsed.value) {
+    collapsed.value = true
+    collapsedByResponsive.value = true
+    return
+  }
+
+  if (!shouldCollapse && collapsedByResponsive.value) {
+    collapsed.value = false
+    collapsedByResponsive.value = false
+  }
+}
 
 // 更新菜单选中状态
 function updateMenuKeys(path) {
   // 从路由中获取当前菜单的 entId
-  const currentMenu = findMenuByPath(menuData.value, path)
+  const currentMenu = findMenuByPath(visibleMenuTree.value, path)
   if (currentMenu) {
-    selectedKeys.value = [currentMenu.entId]
+    selectedKeys.value = [String(currentMenu.entId)]
 
     // 展开父级菜单
-    const parentKeys = findParentKeys(menuData.value, currentMenu.entId)
-    openKeys.value = parentKeys
+    const parentKeys = findParentKeys(visibleMenuTree.value, currentMenu.entId)
+    openKeys.value = parentKeys.map(key => String(key))
   }
 }
 
@@ -232,6 +295,48 @@ function findMenuByPath(menus, path) {
     }
   }
   return null
+}
+
+/**
+ * 过滤菜单树：
+ * 1) 当前节点 entType=ML 时保留
+ * 2) 非 ML 但存在可见子节点时保留父级壳子
+ */
+function filterVisibleMenus(menus = []) {
+  return menus
+    .map(menu => {
+      const children = menu.children && menu.children.length > 0 ? filterVisibleMenus(menu.children) : undefined
+      const shouldKeep = menu.entType === visibleEntType || (children && children.length > 0)
+
+      if (!shouldKeep) {
+        return null
+      }
+
+      return {
+        ...menu,
+        children
+      }
+    })
+    .filter(Boolean)
+}
+
+/**
+ * 转换为 Ant Design Vue Menu items
+ */
+function transformMenuToItems(menus = []) {
+  return menus
+    .map(menu => {
+      const children = menu.children && menu.children.length > 0 ? transformMenuToItems(menu.children) : undefined
+
+      const iconComponent = getIconComponent(menu.menuIcon || menu.icon)
+
+      return {
+        key: String(menu.entId),
+        label: menu.entName,
+        icon: iconComponent ? h(iconComponent) : undefined,
+        children
+      }
+    })
 }
 
 // 查找父级菜单的 key
@@ -251,16 +356,23 @@ function findParentKeys(menus, targetKey, parentKeys = []) {
 
 // 菜单点击事件
 const handleMenuClick = ({ key }) => {
-  const menu = findMenuById(menuData.value, key)
+  const menu = findMenuById(visibleMenuTree.value, key)
   if (menu && menu.menuUri) {
     router.push(menu.menuUri)
+  }
+}
+
+const handleOpenChange = (keys) => {
+  openKeys.value = keys
+  if (!collapsed.value) {
+    cachedOpenKeys.value = [...keys]
   }
 }
 
 // 根据ID查找菜单
 function findMenuById(menus, id) {
   for (const menu of menus) {
-    if (menu.entId === id) {
+    if (String(menu.entId) === String(id)) {
       return menu
     }
     if (menu.children) {
@@ -303,6 +415,14 @@ const handleLogout = () => {
 </script>
 
 <style lang="less" scoped>
+:global([data-theme='dark']) .ag-layout .ag-layout-side {
+  background: var(--sider-bg-dark);
+}
+
+:global([data-theme='light']) .ag-layout .ag-layout-side {
+  background: var(--sider-bg-light);
+}
+
 .ag-layout {
   height: 100vh;
   
@@ -313,12 +433,14 @@ const handleLogout = () => {
     left: 0;
     top: 0;
     bottom: 0;
+    background: inherit;
     
     .ag-side-logo {
       height: 32px;
       margin: 16px;
       display: flex;
       align-items: center;
+      background: inherit;
       
       .logo-icon { 
         width: 32px; 
@@ -334,6 +456,7 @@ const handleLogout = () => {
     
     .ag-side-menu {
       border-right: 0;
+      background: inherit;
       
       // 菜单项图标样式
       :deep(.ant-menu-item) {
@@ -379,7 +502,7 @@ const handleLogout = () => {
       position: sticky;
       top: 0;
       z-index: 1;
-      box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+      box-shadow: 0 1px 4px var(--shadow-color);
       
       .ag-layout-header-main {
         height: 64px;
@@ -436,7 +559,7 @@ const handleLogout = () => {
             transition: background-color 0.3s;
             
             &:hover {
-              background-color: rgba(0, 0, 0, 0.025);
+              background-color: var(--surface-subtle);
             }
             
             .ag-layout-header-user-avatar {

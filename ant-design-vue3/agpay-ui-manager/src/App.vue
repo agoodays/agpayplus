@@ -3,7 +3,7 @@
     :locale="locale"
     :theme="{
       token: {
-        colorPrimary: appConfigStore.primaryColor,
+        colorPrimary: appStore.themeConfig.primaryColor,
       },
     }"
   >
@@ -19,7 +19,7 @@
 import { computed } from 'vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import { useSpinStore } from '/@/store/modules/system/spin'
-import { useAppConfigStore } from '/@/store/modules/system/app-config'
+import { useAppStore } from '/@/store/modules/system/app'
 
 // ==================== 状态管理 ====================
 
@@ -28,18 +28,16 @@ const spinStore = useSpinStore()
 const spinning = computed(() => spinStore.loading)
 
 // 应用配置（主题颜色等）
-const appConfigStore = useAppConfigStore()
+const appStore = useAppStore()
 
-// ==================== 国际化配置 ====================
-
-// 设置 Ant Design Vue 为中文
+// Ant Design 组件中文配置（DatePicker 等依赖）
 const locale = zhCN
 
 // ==================== 开发调试 ====================
 
 // 开发环境输出主题色（生产环境自动移除）
 if (import.meta.env.DEV) {
-  console.log('🎨 当前主题色:', appConfigStore.primaryColor)
+  console.log('🎨 当前主题色:', appStore.themeConfig.primaryColor)
 }
 </script>
 

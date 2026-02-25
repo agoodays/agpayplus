@@ -18,6 +18,42 @@
   background: var(--primary-color-weak) !important;
 }
 
+// data-theme 暗色模式下的组件统一
+:root[data-theme='dark'] {
+  .ant-layout,
+  .ant-layout-content,
+  .ant-layout-header,
+  .ant-layout-footer {
+    background: var(--layout-bg) !important;
+    color: var(--text-color) !important;
+  }
+
+  .ant-dropdown-menu,
+  .ant-menu-light,
+  .ant-menu-submenu-popup,
+  .ant-select-dropdown,
+  .ant-picker-dropdown {
+    background: var(--layout-surface) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-dropdown-menu-item,
+  .ant-menu-item,
+  .ant-menu-submenu-title,
+  .ant-select-item,
+  .ant-picker-cell {
+    color: var(--text-color) !important;
+  }
+
+  .ant-dropdown-menu-item:hover,
+  .ant-menu-item:hover,
+  .ant-select-item-option-active,
+  .ant-picker-cell:hover {
+    background: var(--surface-subtle) !important;
+  }
+}
+
 // ==================== 输入框 ====================
 
 .ant-input,

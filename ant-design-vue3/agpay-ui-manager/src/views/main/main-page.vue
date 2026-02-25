@@ -18,7 +18,7 @@
             :value="statistics.todayAmount"
             :precision="2"
             suffix="元"
-            :value-style="{ color: '#3f8600' }"
+            :value-style="{ color: 'var(--success-color)' }"
           >
             <template #prefix>
               <transaction-outlined />
@@ -235,7 +235,7 @@ export default defineComponent({
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 2px 8px var(--shadow-color);
     }
 
     .quick-menu-content {

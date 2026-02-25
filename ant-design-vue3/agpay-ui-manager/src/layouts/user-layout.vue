@@ -31,13 +31,8 @@
 </template>
 
 <script setup>
-import { theme } from 'ant-design-vue'
 import dayjs from 'dayjs'
 const currentYear = dayjs().year()
-
-const { useToken } = theme
-const { token } = useToken()
-// console.log(token)
 </script>
 
 <style lang="less">
@@ -81,9 +76,6 @@ const { token } = useToken()
   transition: .3s ease
 }
 
-.user-layout-content input {
-  //height: 40px !important
-}
 .user-layout-content .login-error-message{
   margin-bottom: 24px;
 }
@@ -114,11 +106,6 @@ const { token } = useToken()
   color: var(--ant-primary-color);
   margin-bottom: 50px;
   text-align: center;
-}
-
-.user-layout-content .main .input-item {
-  //height: 65px;
-  //margin: 0!important
 }
 
 .user-layout-content .footer {

@@ -54,13 +54,13 @@ const handleGoHome = () => {
 .exception-title {
   font-size: 32px;
   font-weight: 600;
-  color: rgba(0, 0, 0, 0.85);
+  color: var(--text-color);
   margin-bottom: 16px;
 }
 
 .exception-desc {
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.45);
+  color: var(--text-color-weak);
   margin-bottom: 32px;
 }
 </style>
