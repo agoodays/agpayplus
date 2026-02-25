@@ -30,6 +30,10 @@
 import { ref, computed, watch, useSlots } from 'vue'
 
 const props = defineProps({
+  modelValue: {
+    type: [String, Number, Array],
+    default: undefined
+  },
   value: {  // ✅ 改为 value
     type: [String, Number, Array],
     default: undefined
@@ -76,13 +80,13 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value', 'change', 'focus', 'blur', 'search'])  // ✅ 改为 update:value
+const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'search'])
 
 const slots = useSlots()
 const selectRef = ref()
 const isFocused = ref(false)
 const isOpen = ref(false)
-const selectValue = ref(props.value)  // ✅ 改为 props.value
+const selectValue = ref(props.modelValue ?? props.value)
 
 // 判断是否使用 options 属性（如果有插槽内容且 options 为空，则使用插槽）
 const useOptions = computed(() => {
@@ -133,14 +137,18 @@ const eventHandlers = computed(() => {
   return handlers
 })
 
-// 监听外部值变化
-watch(() => props.value, (newVal) => {  // ✅ 改为 props.value
-  selectValue.value = newVal
-}, { deep: true, immediate: true })  // ✅ 添加 immediate
+// 监听外部值变化（同时兼容 modelValue / value）
+watch(() => [props.modelValue, props.value], ([newModelValue, newValue]) => {
+  const resolved = newModelValue ?? newValue
+  if (resolved !== selectValue.value) {
+    selectValue.value = resolved
+  }
+}, { deep: true, immediate: true })
 
 // 监听内部值变化
 watch(selectValue, (newVal) => {
-  emit('update:value', newVal)  // ✅ 改为 update:value
+  emit('update:modelValue', newVal)
+  emit('update:value', newVal)
 }, { deep: true })
 
 function handleFocus(e) {

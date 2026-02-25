@@ -60,27 +60,32 @@ export const useAppStore = defineStore('app', {
       try {
         const data = await systemConfigApi.getSiteConfig()
         
+        // 如果接口返回空，抛出并走缓存逻辑
+        if (!data) {
+          throw new Error('fetchSiteConfig returned null')
+        }
+
         // 保存站点信息
         if (data.siteInfo) {
           this.siteInfo = data.siteInfo
         }
-        
+
         // 保存系统配置
         if (data.sysConfig) {
           this.sysConfig = data.sysConfig
         }
-        
+
         // 保存默认配置
         if (data.defaultConfig) {
           this.defaultConfig = data.defaultConfig
         }
-        
+
         // 保存到本地存储
         localStorage.setItem(localStorageKeyConst.APP_CONFIG, JSON.stringify(data))
-        
+
         // 应用主题配置
         this.applySiteThemeConfig(data)
-        
+
         // 应用布局配置
         this.applySiteLayoutConfig(data)
         

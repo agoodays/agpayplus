@@ -60,7 +60,8 @@ export function generator(menuData, isTopLevel = true) {
         entType: item.entType,
         quickJump: item.quickJump,
         matchRule: item.matchRule
-      }
+      },
+      hidden: item.entType === 'MO' // 当其他菜单时需要隐藏显示
     }
 
     // 处理组件

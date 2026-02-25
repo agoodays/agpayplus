@@ -37,7 +37,11 @@ import { ref, computed, watch } from 'vue'
 const props = defineProps({
   modelValue: {
     type: [String, Number],
-    default: ''
+    default: undefined
+  },
+  value: {
+    type: [String, Number],
+    default: undefined
   },
   label: {
     type: String,
@@ -81,11 +85,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'pressEnter'])
+const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'pressEnter'])
 
 const inputRef = ref()
 const isFocused = ref(false)
-const inputValue = ref(props.modelValue)
+const inputValue = ref(props.modelValue ?? props.value ?? '')
 
 // 是否有值
 const hasValue = computed(() => {
@@ -111,14 +115,18 @@ const floatPlaceholder = computed(() => {
   return shouldFloat.value ? props.placeholder : ''
 })
 
-// 监听外部值变化
-watch(() => props.modelValue, (newVal) => {
-  inputValue.value = newVal
-})
+// 监听外部值变化（同时兼容 modelValue / value）
+watch(() => [props.modelValue, props.value], ([newModelValue, newValue]) => {
+  const resolved = newModelValue ?? newValue ?? ''
+  if (resolved !== inputValue.value) {
+    inputValue.value = resolved
+  }
+}, { immediate: true })
 
 // 监听内部值变化
 watch(inputValue, (newVal) => {
   emit('update:modelValue', newVal)
+  emit('update:value', newVal)
 })
 
 function handleFocus(e) {

@@ -4,16 +4,16 @@
     <div class="desc">运营平台登录</div>
     <a-form class="user-layout-login" ref="loginForm" :model="loginObject" :rules="rules" @finish="onFinish" @finishFailed="onFinishFailed">
       <a-form-item name="username">
-        <a-input size="large" type="text" placeholder="登录名/手机" v-model:value="loginObject.username"/>
+        <ag-input size="large" type="text" label="登录名/手机" v-model:value="loginObject.username"/>
       </a-form-item>
       <a-form-item name="password">
-        <a-input-password size="large" placeholder="密码" v-model:value="loginObject.password"/>
+        <ag-input type="password" size="large" label="密码" v-model:value="loginObject.password"/>
       </a-form-item>
       <div class="code-body">
         <div class="code-layout">
           <div class="code code-layout-item">
             <a-form-item name="vercode">
-              <a-input v-model:value="loginObject.vercode" class="code-input" size="large" type="text" placeholder="图形验证码"/>
+              <ag-input v-model:value="loginObject.vercode" class="code-input" size="large" type="text" label="图形验证码"/>
             </a-form-item>
             <div class="code-img">
               <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
@@ -41,6 +41,9 @@
 import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { notification } from 'ant-design-vue'
+import {
+  AgInput
+} from '/@/components'
 import { timeFix } from '/@/utils/time-util'
 import { loginApi } from '/@/api/system/login-api'
 import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const'

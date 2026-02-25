@@ -286,10 +286,10 @@ router.beforeEach((to, from, next) => {
       return
     }
     
-    // 首页重定向
+    // 首页重定向（避免重定向到相同路径导致循环）
     if (to.path === '/' || to.path === '/main') {
       const firstUri = findFirstAvailableUri(userStore.allMenuRouteTree)
-      if (firstUri) {
+      if (firstUri && firstUri !== to.path) {
         next({ path: firstUri, replace: true })
         return
       }
@@ -304,7 +304,12 @@ router.beforeEach((to, from, next) => {
   // 未登录
   if (!token) {
     userStore.logout()
-    next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath } })
+    // 如果已经在登录页则直接放行，避免重定向循环
+    if (to.path === PAGE_PATH_LOGIN) {
+      next()
+    } else {
+      next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath } })
+    }
     return
   }
   
@@ -314,12 +319,17 @@ router.beforeEach((to, from, next) => {
       .then(bizData => {
         userStore.setUserLoginInfo(bizData)
         registerDynamicRoutes(bizData.allMenuRouteTree)
-        
-        if (to.query.redirect) {
-          next(to.query.redirect)
+
+        const redirectPath = to.query.redirect
+        if (redirectPath && redirectPath !== to.path) {
+          next(redirectPath)
         } else if (to.path === '/') {
           const firstUri = findFirstAvailableUri(bizData.allMenuRouteTree)
-          next({ path: firstUri || PAGE_PATH_404 })
+          if (firstUri && firstUri !== to.path) {
+            next({ path: firstUri || PAGE_PATH_404 })
+          } else {
+            next()
+          }
         } else {
           next({ ...to, replace: true })
         }
