@@ -189,6 +189,9 @@ import {
 import { useTable, useModal, usePermission } from '/@/hooks/common-hooks'
 import { API_URL_REFUND_ORDER, API_URL_MCH_LIST, req } from '/@/api/manage'
 import DetailDrawer from './refund-detail-drawer.vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // 使用 Hooks
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
@@ -350,7 +353,7 @@ const handleDetail = (record) => {
  * 导出
  */
 const handleExport = () => {
-  message.info('导出功能开发中')
+  message.info(t('common.exportInDevelopment'))
 }
 </script>
 

@@ -11,7 +11,7 @@
       </template>
       <a-dropdown>
         <a-button type="link" size="small">
-          更多
+          {{ t('components.more') }}
           <down-outlined />
         </a-button>
         <template #overlay>
@@ -29,6 +29,9 @@
 <script setup>
 import { computed, useSlots } from 'vue'
 import { DownOutlined } from '@ant-design/icons-vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   // 最多显示几个操作按钮，超过的放入"更多"菜单

@@ -185,6 +185,7 @@
 <script setup>
 import { ref, reactive, watch, computed, nextTick } from 'vue'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import {
   QuestionCircleOutlined,
   SyncOutlined,
@@ -232,6 +233,8 @@ const formState = reactive({
   appSecret: '',
   appRsa2PublicKey: ''
 })
+
+const { t } = useI18n()
 
 // MD5秘钥占位符
 const appSecretPlaceholder = computed(() => {
@@ -404,7 +407,7 @@ const handleGenerateSecret = () => {
     secret += chars.charAt(Math.floor(Math.random() * chars.length))
   }
   formState.appSecret = secret
-  message.success('密钥已生成')
+  message.success(t('mchApp.secretGenerated'))
 }
 
 /**
@@ -432,10 +435,10 @@ const handleSubmit = async () => {
     // 提交数据
     if (isAdd.value) {
       await req.add(API_URL_MCH_APP, data)
-      message.success('新增成功')
+      message.success(t('common.addSuccess'))
     } else {
       await req.updateById(API_URL_MCH_APP, props.recordId, data)
-      message.success('修改成功')
+      message.success(t('common.editSuccess'))
     }
     
     handleClose()
@@ -446,7 +449,7 @@ const handleSubmit = async () => {
       return
     }
     console.error('提交失败:', error)
-    message.error(error.msg || '操作失败')
+    message.error(error.msg || t('common.operationFailed'))
   } finally {
     loading.value = false
   }

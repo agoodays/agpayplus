@@ -317,6 +317,7 @@
 <script setup>
 import { ref, reactive, watch, nextTick } from 'vue'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import {
   QuestionCircleOutlined,
   SyncOutlined,
@@ -326,6 +327,8 @@ import {
 import { Base64 } from 'js-base64'
 import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '/@/api/manage'
 import { loginApi } from '/@/api/system/login-api'
+
+const { t } = useI18n()
 
 // Props & Emits
 const props = defineProps({
@@ -608,7 +611,7 @@ const handleGeneratePassword = () => {
     password += charset.charAt(Math.floor(Math.random() * charset.length))
   }
   formState.loginPassword = password
-  message.success(`随机密码: ${password}`)
+  message.success(t('mch.randomPasswordGenerated', { password }))
 }
 
 /**
@@ -652,10 +655,10 @@ const handleSubmit = async () => {
     // 提交数据
     if (isAdd.value) {
       await req.add(API_URL_MCH_LIST, data)
-      message.success('新增成功')
+      message.success(t('common.addSuccess'))
     } else {
       await req.updateById(API_URL_MCH_LIST, props.recordId, data)
-      message.success('修改成功')
+      message.success(t('common.editSuccess'))
     }
     
     handleClose()
@@ -666,7 +669,7 @@ const handleSubmit = async () => {
       return
     }
     console.error('提交失败:', error)
-    message.error(error.msg || '操作失败')
+    message.error(error.msg || t('common.operationFailed'))
   } finally {
     loading.value = false
   }

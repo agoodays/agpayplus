@@ -171,6 +171,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import {
   SearchOutlined,
   RedoOutlined,
@@ -183,6 +184,7 @@ import AddOrEditModal from './add-or-edit.vue'
 import DetailDrawer from './detail.vue'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // 使用 Hooks
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
@@ -303,11 +305,11 @@ const handleAdvancedConfig = (record) => {
  */
 const handleDelete = (record) => {
   deleteItem(
-    '确认删除该商户吗？',
-    '该操作将删除商户下所有配置及用户信息',
+    t('mch.confirmDeleteMchTitle'),
+    t('mch.confirmDeleteMchContent'),
     async () => {
       await req.delById(API_URL_MCH_LIST, record.mchNo)
-      message.success('删除成功')
+      message.success(t('common.deleteSuccess'))
       refresh()
     }
   )

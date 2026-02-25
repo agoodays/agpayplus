@@ -9,6 +9,7 @@
  * 配置说明：
  * - entId: 菜单唯一标识（必填）
  * - entName: 菜单显示名称（必填）
+ * - menuI18nKey: 菜单多语言 key（可选，建议填写）
  * - menuUri: 路由路径（菜单项必填，目录可选）
  * - componentName: 组件路径，相对于 views 目录（菜单项必填）
  * - entType: 类型，'MO' = 目录，'ML' = 菜单链接（必填）
@@ -19,6 +20,7 @@ export const devMenuTree = [
   {
     entId: 'ENT_DEMO',
     entName: '组件示例',
+    menuI18nKey: 'menu.devDemo.root',
     menuUri: '',
     entType: 'MO',
     menuIcon: 'ExperimentOutlined',
@@ -26,6 +28,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_INDEX',
         entName: '组件总览',
+        menuI18nKey: 'menu.devDemo.index',
         menuUri: '/demo/index',
         componentName: 'demo/index',
         entType: 'ML',
@@ -34,6 +37,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_SEARCH_TABLE',
         entName: '搜索表格',
+        menuI18nKey: 'menu.devDemo.searchTable',
         menuUri: '/demo/search-table-demo',
         componentName: 'demo/search-table-demo',
         entType: 'ML',
@@ -42,6 +46,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_REFACTOR_TABLE',
         entName: '基础表格',
+        menuI18nKey: 'menu.devDemo.basicTable',
         menuUri: '/demo/ag-table-refactor-demo',
         componentName: 'demo/ag-table-refactor-demo',
         entType: 'ML',
@@ -50,6 +55,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_STATE_SWITCH',
         entName: '状态切换',
+        menuI18nKey: 'menu.devDemo.stateSwitch',
         menuUri: '/demo/state-switch-demo',
         componentName: 'demo/state-switch-demo',
         entType: 'ML',
@@ -58,6 +64,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_FORM',
         entName: '表单组件',
+        menuI18nKey: 'menu.devDemo.form',
         menuUri: '/demo/form-demo',
         componentName: 'demo/form-demo',
         entType: 'ML',
@@ -66,6 +73,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_FLOAT_INPUT',
         entName: '浮动标签组件',
+        menuI18nKey: 'menu.devDemo.floatLabel',
         menuUri: '/demo/float-label-demo',
         componentName: 'demo/float-label-demo',
         entType: 'ML',
@@ -74,6 +82,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_SELECT_INFINITE',
         entName: '分页下拉选择',
+        menuI18nKey: 'menu.devDemo.selectInfinite',
         menuUri: '/demo/select-infinite-demo',
         componentName: 'demo/select-infinite-demo',
         entType: 'ML',
@@ -82,6 +91,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_CARD',
         entName: '卡片组件',
+        menuI18nKey: 'menu.devDemo.card',
         menuUri: '/demo/card-demo',
         componentName: 'demo/card-demo',
         entType: 'ML',
@@ -90,6 +100,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_UPLOAD',
         entName: '文件上传',
+        menuI18nKey: 'menu.devDemo.upload',
         menuUri: '/demo/upload-demo',
         componentName: 'demo/upload-demo',
         entType: 'ML',
@@ -98,6 +109,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_EDITOR',
         entName: '富文本编辑',
+        menuI18nKey: 'menu.devDemo.editor',
         menuUri: '/demo/editor-demo',
         componentName: 'demo/editor-demo',
         entType: 'ML',
@@ -106,6 +118,7 @@ export const devMenuTree = [
       {
         entId: 'ENT_DEMO_CONTAINER',
         entName: '容器组件',
+        menuI18nKey: 'menu.devDemo.container',
         menuUri: '/demo/container-demo',
         componentName: 'demo/container-demo',
         entType: 'ML',
@@ -142,6 +155,7 @@ export const devUserInfo = {
  * {
  *   entId: 'ENT_DEMO_MY_NEW',
  *   entName: '我的新示例',
+ *   menuI18nKey: 'menu.devDemo.myNew',
  *   menuUri: '/main/demo-my-new',
  *   componentName: 'demo/my-new-demo',
  *   entType: 'ML',

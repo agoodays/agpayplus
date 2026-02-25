@@ -9,6 +9,7 @@ import UserLayout from '/@/layouts/user-layout.vue'
 import AgLayout from '/@/layouts/index.vue'
 import { useUserStore } from '/@/store/modules/system/user'
 import { setDocumentTitle } from '../utils/dom-util'
+import { translateWithFallback } from '/@/utils/i18n-util'
 import { PAGE_PATH_404, PAGE_PATH_LOGIN } from '/@/constants/common-const'
 import { loginApi } from '/@/api/system/login-api'
 import { asyncRouteDefine } from '/@/config/app-config'
@@ -115,6 +116,7 @@ function generateRoutes(menuTree) {
         component,
         meta: {
           title: node.entName,
+          i18nKey: node.menuI18nKey || node.i18nKey,
           icon: node.menuIcon || node.icon,
           keepAlive: false
         }
@@ -256,9 +258,11 @@ router.beforeEach((to, from, next) => {
   nProgress.start()
   
   // 设置页面标题
-  if (to.meta?.title) {
-    setDocumentTitle(`${to.meta.title} - ${import.meta.env.VITE_APP_TITLE}`)
-  }
+  const routeTitle = to.meta?.i18nKey
+    ? translateWithFallback(to.meta.i18nKey, to.meta?.title || to.name)
+    : (to.meta?.title || to.name)
+  const appTitle = translateWithFallback('app.title', import.meta.env.VITE_APP_TITLE)
+  setDocumentTitle(routeTitle ? `${routeTitle} - ${appTitle}` : appTitle)
   
   // 公共页面直接放行
   if (to.path === PAGE_PATH_404 || ALLOW_LIST.includes(to.name)) {

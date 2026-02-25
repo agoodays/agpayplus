@@ -179,6 +179,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import {
   SearchOutlined,
   RedoOutlined,
@@ -190,6 +191,7 @@ import { API_URL_MCH_APP, API_URL_MCH_LIST, req } from '/@/api/manage'
 import AddOrEditModal from './add-or-edit.vue'
 
 const route = useRoute()
+const { t } = useI18n()
 
 // 使用 Hooks
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
@@ -321,7 +323,7 @@ const handleDelete = async (record) => {
  * Oauth2配置
  */
 const handleOauth2Config = (record) => {
-  message.info('Oauth2配置功能开发中...')
+  message.info(t('mchApp.oauth2ComingSoon'))
   // TODO: 实现 Oauth2 配置功能
 }
 
@@ -329,7 +331,7 @@ const handleOauth2Config = (record) => {
  * 支付配置
  */
 const handlePayConfig = (record) => {
-  message.info('支付配置功能开发中...')
+  message.info(t('mchApp.payConfigComingSoon'))
   // TODO: 实现支付配置功能
 }
 

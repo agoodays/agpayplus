@@ -293,6 +293,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import {
   SearchOutlined,
   RedoOutlined,
@@ -309,6 +310,8 @@ import { useTable, useModal, usePermission } from '/@/hooks/common-hooks'
 import { API_URL_PAY_ORDER, API_URL_MCH_LIST, req } from '/@/api/manage'
 import DetailDrawer from './detail-drawer.vue'
 import RefundModal from './refund-modal.vue'
+
+const { t } = useI18n()
 
 // 使用 Hooks
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
@@ -521,7 +524,7 @@ const handleRefundSuccess = () => {
  * 导出
  */
 const handleExport = () => {
-  message.info('导出功能开发中')
+  message.info(t('common.exportInDevelopment'))
 }
 </script>
 

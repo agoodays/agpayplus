@@ -10,11 +10,22 @@ import { localRead } from '/@/utils/local-util'
 
 let state = { ...appDefaultConfig }
 
-let appConfigStr = localRead(localStorageKeyConst.APP_CONFIG)
+function pickKnownConfigFields(config = {}) {
+  const normalizedConfig = {}
+  for (const key in appDefaultConfig) {
+    if (Object.prototype.hasOwnProperty.call(config, key)) {
+      normalizedConfig[key] = config[key]
+    }
+  }
+  return normalizedConfig
+}
+
+const appConfigData = localRead(localStorageKeyConst.APP_CONFIG)
 let language = appDefaultConfig.language
-if (appConfigStr) {
+if (appConfigData) {
   try {
-    state = JSON.parse(appConfigStr)
+    const parsedConfig = typeof appConfigData === 'string' ? JSON.parse(appConfigData) : appConfigData
+    state = { ...state, ...pickKnownConfigFields(parsedConfig) }
     language = state.language
   } catch (e) {
     agSentry.captureError(e)
@@ -34,16 +45,31 @@ export const useAppConfigStore = defineStore('appConfig', {
     ...state,
   }),
   actions: {
+    persistConfig() {
+      const payload = {}
+      for (const key in appDefaultConfig) {
+        payload[key] = this[key]
+      }
+      localStorage.setItem(localStorageKeyConst.APP_CONFIG, JSON.stringify(payload))
+    },
     reset() {
       for (const k in appDefaultConfig) {
         this[k] = appDefaultConfig[k]
       }
+      this.persistConfig()
+    },
+    setLanguage(languageCode) {
+      this.language = languageCode
+      language = languageCode
+      this.persistConfig()
     },
     showHelpDoc() {
       this.helpDocFlag = true
+      this.persistConfig()
     },
     hideHelpDoc() {
       this.helpDocFlag = false
+      this.persistConfig()
     },
   },
 })

@@ -7,6 +7,8 @@ import './theme/index.less'
 import App from './App.vue'
 import { router } from '/@/router'
 import { store } from '/@/store'
+import { useAppConfigStore, getInitializedLanguage } from '/@/store/modules/system/app-config'
+import { i18n, setAppLocale } from '/@/i18n'
 import Initializer from './bootstrap'
 import { infoBox } from './utils/info-box'
 import themeService from '/@/utils/theme-service'
@@ -43,7 +45,13 @@ async function initializeApp() {
   // 使用插件
   app.use(router)
   app.use(store)
+  app.use(i18n)
   app.use(Antd)
+
+  // 初始化多语言（i18n + dayjs）
+  const appConfigStore = useAppConfigStore(store)
+  const language = appConfigStore.language || getInitializedLanguage()
+  setAppLocale(i18n, language)
 
   // 注册全局方法
   app.config.globalProperties.$infoBox = infoBox

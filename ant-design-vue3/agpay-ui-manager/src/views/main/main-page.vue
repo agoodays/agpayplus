@@ -4,7 +4,7 @@
       <a-row :gutter="24">
         <a-col :span="24">
           <h2>{{ greetingText }}</h2>
-          <p class="welcome-desc">欢迎使用 AgPay 运营管理平台</p>
+          <p class="welcome-desc">{{ t('main.welcomeDesc') }}</p>
         </a-col>
       </a-row>
     </a-card>
@@ -14,10 +14,10 @@
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card :loading="loading">
           <a-statistic
-            title="今日交易金额"
+            :title="t('main.todayAmount')"
             :value="statistics.todayAmount"
             :precision="2"
-            suffix="元"
+            :suffix="t('main.yuan')"
             :value-style="{ color: 'var(--success-color)' }"
           >
             <template #prefix>
@@ -30,9 +30,9 @@
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card :loading="loading">
           <a-statistic
-            title="今日交易笔数"
+            :title="t('main.todayCount')"
             :value="statistics.todayCount"
-            suffix="笔"
+            :suffix="t('main.countUnit')"
           >
             <template #prefix>
               <file-text-outlined />
@@ -44,9 +44,9 @@
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card :loading="loading">
           <a-statistic
-            title="商户总数"
+            :title="t('main.totalMch')"
             :value="statistics.totalMch"
-            suffix="个"
+            :suffix="t('main.itemUnit')"
           >
             <template #prefix>
               <shop-outlined />
@@ -58,9 +58,9 @@
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card :loading="loading">
           <a-statistic
-            title="代理商总数"
+            :title="t('main.totalAgent')"
             :value="statistics.totalAgent"
-            suffix="个"
+            :suffix="t('main.itemUnit')"
           >
             <template #prefix>
               <team-outlined />
@@ -71,7 +71,7 @@
     </a-row>
 
     <!-- 快速入口 -->
-    <a-card title="快速入口" style="margin-top: 16px" :bordered="false">
+    <a-card :title="t('main.quickEntry')" style="margin-top: 16px" :bordered="false">
       <a-row :gutter="[16, 16]">
         <a-col
           v-for="menu in quickMenuList"
@@ -100,6 +100,7 @@
 <script>
 import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import {
   TransactionOutlined,
   FileTextOutlined,
@@ -121,6 +122,7 @@ export default defineComponent({
   setup() {
     const router = useRouter()
     const userStore = useUserStore()
+    const { t } = useI18n()
 
     const loading = ref(true)
     const statistics = reactive({
@@ -132,8 +134,8 @@ export default defineComponent({
 
     // 问候语
     const greetingText = computed(() => {
-      const userName = userStore.realname || userStore.loginUsername || '用户'
-      return `${timeFix()}，${userName}！`
+      const userName = userStore.realname || userStore.loginUsername || t('main.defaultUser')
+      return t('main.greeting', { greet: timeFix(), name: userName })
     })
 
     // 获取快速菜单列表
@@ -205,6 +207,7 @@ export default defineComponent({
     })
 
     return {
+      t,
       loading,
       statistics,
       greetingText,

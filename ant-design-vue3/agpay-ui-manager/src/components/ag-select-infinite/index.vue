@@ -34,7 +34,7 @@
           <a-divider style="margin: 4px 0" />
           <div style="padding: 8px; text-align: center; color: #999">
             <a-spin v-if="loadingMore" size="small" />
-            <span v-else>{{ loadMoreText }}</span>
+            <span v-else>{{ resolvedLoadMoreText }}</span>
           </div>
         </div>
       </template>
@@ -49,6 +49,9 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   value: {
@@ -111,15 +114,15 @@ const props = defineProps({
   // 自定义文本
   loadMoreText: {
     type: String,
-    default: '滚动加载更多'
+    default: ''
   },
   noMoreText: {
     type: String,
-    default: '没有更多数据了'
+    default: ''
   },
   searchingText: {
     type: String,
-    default: '搜索中...'
+    default: ''
   }
 })
 
@@ -185,10 +188,13 @@ const eventHandlers = computed(() => {
   return handlers
 })
 
+const resolvedLoadMoreText = computed(() => props.loadMoreText || t('components.scrollLoadMore'))
+const resolvedSearchingText = computed(() => props.searchingText || t('components.searching'))
+
 // 未找到内容提示
 const notFoundContent = computed(() => {
   if (loading.value) {
-    return props.searchingText
+    return resolvedSearchingText.value
   }
   return undefined
 })

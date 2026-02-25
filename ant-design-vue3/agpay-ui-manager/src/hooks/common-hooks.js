@@ -4,8 +4,9 @@
  */
 
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import { useUserStore } from '/@/store/modules/system/user'
+import { translate } from '/@/utils/i18n-util'
 
 /**
  * 表格列表 Hook
@@ -29,7 +30,7 @@ export function useTable(apiFn, options = {}) {
     total: 0,
     showSizeChanger: true,
     showQuickJumper: true,
-    showTotal: (total) => `共 ${total} 条`
+    showTotal: (total) => translate('agTable.totalItems', { total })
   })
 
   const searchParams = reactive({})
@@ -394,13 +395,16 @@ export function useThrottle(fn, delay = 300) {
  * @returns {Function} 删除处理函数
  */
 export function useDelete(deleteFn, refreshFn, options = {}) {
-  const { confirmText = '确定要删除吗？', successText = '删除成功' } = options
+  const {
+    confirmText = translate('common.confirmDeleteContent'),
+    successText = translate('common.deleteSuccess')
+  } = options
 
   const handleDelete = async (id) => {
     try {
       await new Promise((resolve, reject) => {
         Modal.confirm({
-          title: '确认删除',
+          title: translate('common.confirmDeleteTitle'),
           content: confirmText,
           onOk: () => resolve(),
           onCancel: () => reject()
@@ -445,10 +449,10 @@ export function useExport(exportFn, options = {}) {
       // 清理
       window.URL.revokeObjectURL(url)
       
-      message.success('导出成功')
+      message.success(translate('common.exportSuccess'))
     } catch (error) {
       console.error('Export error:', error)
-      message.error('导出失败')
+      message.error(translate('common.exportFailed'))
     } finally {
       loading.value = false
     }

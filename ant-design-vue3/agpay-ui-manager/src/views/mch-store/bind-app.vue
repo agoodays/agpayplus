@@ -1,7 +1,7 @@
 ﻿<template>
   <a-modal
     v-model:open="visible"
-    title="应用分配"
+    :title="t('mchStore.bindAppTitle')"
     :width="500"
     @ok="handleSubmit"
     @cancel="handleClose"
@@ -11,13 +11,13 @@
       :model="formState"
       layout="vertical"
     >
-      <a-form-item label="请选择要绑定的应用" name="bindAppId">
+      <a-form-item :label="t('mchStore.pleaseSelectBindApp')" name="bindAppId">
         <a-select
           v-model:value="formState.bindAppId"
-          placeholder="请选择应用"
+          :placeholder="t('mchStore.pleaseSelectApp')"
           :loading="loading"
         >
-          <a-select-option value="">（空）</a-select-option>
+          <a-select-option value="">{{ t('mchStore.emptyOption') }}</a-select-option>
           <a-select-option
             v-for="item in appList"
             :key="item.appId"
@@ -30,7 +30,7 @@
 
       <a-alert
         v-if="appList.length === 0 && !loading"
-        message="该商户暂无可用应用"
+        :message="t('mchStore.noAvailableApp')"
         type="warning"
         show-icon
       />
@@ -41,7 +41,10 @@
 <script setup>
 import { ref, reactive, watch } from 'vue'
 import { message, Modal } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import { API_URL_MCH_APP, API_URL_MCH_STORE, req } from '/@/api/manage'
+
+const { t } = useI18n()
 
 // Props & Emits
 const props = defineProps({
@@ -113,7 +116,7 @@ const loadAppList = async () => {
     appList.value = res.records || []
   } catch (error) {
     console.error('加载应用列表失败:', error)
-    message.error('加载应用列表失败')
+    message.error(t('mchStore.loadAppListFailed'))
   } finally {
     loading.value = false
   }
@@ -124,10 +127,10 @@ const loadAppList = async () => {
  */
 const handleSubmit = () => {
   Modal.confirm({
-    title: '确认保存应用吗？',
-    content: '请确认是否绑定选中的应用',
-    okText: '确定',
-    cancelText: '取消',
+    title: t('mchStore.confirmBindTitle'),
+    content: t('mchStore.confirmBindContent'),
+    okText: t('common.confirm'),
+    cancelText: t('common.cancel'),
     onOk: async () => {
       try {
         loading.value = true
@@ -137,13 +140,13 @@ const handleSubmit = () => {
         }
         
         await req.updateById(API_URL_MCH_STORE, props.storeId, data)
-        message.success('绑定应用成功')
+        message.success(t('mchStore.bindAppSuccess'))
         
         handleClose()
         emit('success')
       } catch (error) {
         console.error('绑定失败:', error)
-        message.error(error.msg || '绑定失败')
+        message.error(error.msg || t('mchStore.bindAppFailed'))
       } finally {
         loading.value = false
       }

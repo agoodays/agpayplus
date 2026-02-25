@@ -1,7 +1,7 @@
 ﻿<template>
   <a-modal
     v-model:open="visible"
-    title="订单退款"
+    :title="t('refund.modalTitle')"
     :width="600"
     @ok="handleSubmit"
     @cancel="handleClose"
@@ -13,30 +13,30 @@
       layout="vertical"
     >
       <a-alert
-        message="退款说明"
-        description="请谨慎操作，退款成功后资金将原路返回到用户账户"
+        :message="t('refund.noticeTitle')"
+        :description="t('refund.noticeDesc')"
         type="warning"
         show-icon
         style="margin-bottom: 24px"
       />
 
       <a-descriptions :column="1" bordered size="small" style="margin-bottom: 24px">
-        <a-descriptions-item label="支付订单号">
+        <a-descriptions-item :label="t('refund.payOrderId')">
           <a-typography-text copyable>{{ payOrder?.payOrderId }}</a-typography-text>
         </a-descriptions-item>
 
-        <a-descriptions-item label="订单金额">
+        <a-descriptions-item :label="t('refund.orderAmount')">
           <span style="color: #1890ff; font-weight: 500">
             ¥{{ (payOrder?.amount / 100).toFixed(2) }}
           </span>
         </a-descriptions-item>
 
-        <a-descriptions-item label="商户名称">
+        <a-descriptions-item :label="t('refund.mchName')">
           {{ payOrder?.mchName }}
         </a-descriptions-item>
       </a-descriptions>
 
-      <a-form-item label="退款金额" name="refundAmount">
+      <a-form-item :label="t('refund.refundAmount')" name="refundAmount">
         <a-input-number
           v-model:value="formState.refundAmount"
           :min="0.01"
@@ -44,33 +44,33 @@
           :precision="2"
           :step="0.01"
           style="width: 100%"
-          placeholder="请输入退款金额"
+          :placeholder="t('refund.pleaseInputRefundAmount')"
         >
           <template #addonBefore>
             ¥
           </template>
         </a-input-number>
         <div style="margin-top: 8px; color: rgba(0, 0, 0, 0.45)">
-          最大可退款金额：¥{{ (payOrder?.amount / 100).toFixed(2) }}
+          {{ t('refund.maxRefundAmount') }}：¥{{ (payOrder?.amount / 100).toFixed(2) }}
         </div>
       </a-form-item>
 
-      <a-form-item label="退款原因" name="refundReason">
+      <a-form-item :label="t('refund.refundReason')" name="refundReason">
         <a-select
           v-model:value="formState.refundReason"
-          placeholder="请选择退款原因"
+          :placeholder="t('refund.pleaseSelectRefundReason')"
         >
-          <a-select-option value="用户申请退款">用户申请退款</a-select-option>
-          <a-select-option value="订单异常">订单异常</a-select-option>
-          <a-select-option value="商品缺货">商品缺货</a-select-option>
-          <a-select-option value="其他">其他</a-select-option>
+          <a-select-option :value="t('refund.reasonUserRequest')">{{ t('refund.reasonUserRequest') }}</a-select-option>
+          <a-select-option :value="t('refund.reasonOrderException')">{{ t('refund.reasonOrderException') }}</a-select-option>
+          <a-select-option :value="t('refund.reasonOutOfStock')">{{ t('refund.reasonOutOfStock') }}</a-select-option>
+          <a-select-option :value="t('refund.reasonOther')">{{ t('refund.reasonOther') }}</a-select-option>
         </a-select>
       </a-form-item>
 
-      <a-form-item label="退款备注" name="remark">
+      <a-form-item :label="t('refund.remark')" name="remark">
         <a-textarea
           v-model:value="formState.remark"
-          placeholder="请输入退款备注（选填）"
+          :placeholder="t('refund.pleaseInputRemarkOptional')"
           :rows="4"
         />
       </a-form-item>
@@ -81,7 +81,10 @@
 <script setup>
 import { ref, reactive, watch, nextTick } from 'vue'
 import { message, Modal } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import { API_URL_REFUND_ORDER, req } from '/@/api/manage'
+
+const { t } = useI18n()
 
 // Props & Emits
 const props = defineProps({
@@ -112,14 +115,14 @@ const formState = reactive({
 // 表单验证规则
 const rules = {
   refundAmount: [
-    { required: true, message: '请输入退款金额', trigger: 'blur' },
+    { required: true, message: t('refund.pleaseInputRefundAmount'), trigger: 'blur' },
     { 
       validator: (rule, value) => {
         if (value <= 0) {
-          return Promise.reject('退款金额必须大于0')
+          return Promise.reject(t('refund.amountMustGtZero'))
         }
         if (props.payOrder && value > props.payOrder.amount / 100) {
-          return Promise.reject('退款金额不能大于订单金额')
+          return Promise.reject(t('refund.amountCannotExceedOrder'))
         }
         return Promise.resolve()
       },
@@ -127,7 +130,7 @@ const rules = {
     }
   ],
   refundReason: [
-    { required: true, message: '请选择退款原因', trigger: 'change' }
+    { required: true, message: t('refund.pleaseSelectRefundReason'), trigger: 'change' }
   ]
 }
 
@@ -164,10 +167,10 @@ const initForm = () => {
 const handleSubmit = () => {
   formRef.value.validate().then(async () => {
     Modal.confirm({
-      title: '确认退款？',
-      content: `将退款 ¥${formState.refundAmount.toFixed(2)} 到用户账户，此操作不可撤销`,
-      okText: '确定',
-      cancelText: '取消',
+      title: t('refund.confirmTitle'),
+      content: t('refund.confirmContent', { amount: formState.refundAmount.toFixed(2) }),
+      okText: t('common.confirm'),
+      cancelText: t('common.cancel'),
       onOk: async () => {
         try {
           loading.value = true
@@ -180,13 +183,13 @@ const handleSubmit = () => {
           }
           
           await req.add(API_URL_REFUND_ORDER, data)
-          message.success('退款申请已提交')
+          message.success(t('refund.submitSuccess'))
           
           handleClose()
           emit('success')
         } catch (error) {
           console.error('退款失败:', error)
-          message.error(error.msg || '退款失败')
+          message.error(error.msg || t('refund.submitFailed'))
         } finally {
           loading.value = false
         }

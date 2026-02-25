@@ -213,12 +213,15 @@
 <script setup>
 import { ref, reactive, watch, nextTick } from 'vue'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import {
   PlusOutlined,
   CloseOutlined,
   CheckOutlined
 } from '@ant-design/icons-vue'
 import { API_URL_MCH_STORE, API_URL_MCH_LIST, req, upload } from '/@/api/manage'
+
+const { t } = useI18n()
 
 // 省市区数据（简化版，实际项目应该从接口获取或使用完整的省市区数据）
 // TODO: 实现完整的省市区数据
@@ -360,7 +363,7 @@ const loadDetail = async () => {
       }]
     }
   } catch (error) {
-    message.error(error.msg || '加载数据失败')
+    message.error(error.msg || t('common.loadDataFailed'))
   } finally {
     loading.value = false
   }
@@ -428,11 +431,11 @@ const handleAreaChange = (value) => {
 const beforeUpload = (file) => {
   const isImage = file.type.startsWith('image/')
   if (!isImage) {
-    message.error('只能上传图片文件！')
+    message.error(t('mchStore.onlyImageAllowed'))
   }
   const isLt2M = file.size / 1024 / 1024 < 2
   if (!isLt2M) {
-    message.error('图片大小不能超过 2MB！')
+    message.error(t('mchStore.imageMax2m'))
   }
   return isImage && isLt2M
 }
@@ -455,9 +458,9 @@ const handleUploadChange = async (info, field) => {
   // 上传成功后更新表单数据
   if (file.status === 'done' && file.response) {
     formState[field] = file.response.data.url
-    message.success('上传成功')
+    message.success(t('common.uploadSuccess'))
   } else if (file.status === 'error') {
-    message.error('上传失败')
+    message.error(t('common.uploadFailed'))
   }
 }
 
@@ -490,10 +493,10 @@ const handleSubmit = async () => {
     // 提交数据
     if (isAdd.value) {
       await req.add(API_URL_MCH_STORE, data)
-      message.success('新增成功')
+      message.success(t('common.addSuccess'))
     } else {
       await req.updateById(API_URL_MCH_STORE, props.recordId, data)
-      message.success('修改成功')
+      message.success(t('common.editSuccess'))
     }
     
     handleClose()
@@ -504,7 +507,7 @@ const handleSubmit = async () => {
       return
     }
     console.error('提交失败:', error)
-    message.error(error.msg || '操作失败')
+    message.error(error.msg || t('common.operationFailed'))
   } finally {
     loading.value = false
   }

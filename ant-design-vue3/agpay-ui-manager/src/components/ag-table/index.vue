@@ -8,7 +8,7 @@
 
       <div class="toolbar-right">
         <!-- 自动刷新 -->
-        <a-tooltip v-if="showAutoRefresh" placement="top" :title="'自动刷新'">
+        <a-tooltip v-if="showAutoRefresh" placement="top" :title="t('agTable.autoRefresh')">
           <div class="auto-refresh-group">
             <sync-outlined :spin="autoRefreshEnabled" class="refresh-icon" />
             <span class="refresh-countdown">{{ state.autoRefreshCountdown }}s</span>
@@ -17,7 +17,7 @@
         </a-tooltip>
 
         <!-- 统计图标（置于自动刷新后） -->
-        <a-tooltip v-if="enableStatistics" placement="top" :title="state.showStatistics ? '关闭统计' : '数据统计'">
+        <a-tooltip v-if="enableStatistics" placement="top" :title="state.showStatistics ? t('agTable.closeStatistics') : t('agTable.statistics')">
           <span @click="state.showStatistics = !state.showStatistics">
             <bar-chart-outlined v-if="!state.showStatistics" class="toolbar-icon" />
             <close-circle-outlined v-else class="toolbar-icon" />
@@ -30,25 +30,25 @@
             <a-menu @click="handleDensityChange">
               <a-menu-item key="small">
                 <check-outlined v-if="state.density === 'small'" style="margin-right: 8px" />
-                <span :style="{ marginLeft: state.density !== 'small' ? '20px' : '0' }">紧凑</span>
+                <span :style="{ marginLeft: state.density !== 'small' ? '20px' : '0' }">{{ t('agTable.densityCompact') }}</span>
               </a-menu-item>
               <a-menu-item key="middle">
                 <check-outlined v-if="state.density === 'middle'" style="margin-right: 8px" />
-                <span :style="{ marginLeft: state.density !== 'middle' ? '20px' : '0' }">默认</span>
+                <span :style="{ marginLeft: state.density !== 'middle' ? '20px' : '0' }">{{ t('agTable.densityDefault') }}</span>
               </a-menu-item>
               <a-menu-item key="large">
                 <check-outlined v-if="state.density === 'large'" style="margin-right: 8px" />
-                <span :style="{ marginLeft: state.density !== 'large' ? '20px' : '0' }">宽松</span>
+                <span :style="{ marginLeft: state.density !== 'large' ? '20px' : '0' }">{{ t('agTable.densityLoose') }}</span>
               </a-menu-item>
             </a-menu>
           </template>
-          <a-tooltip placement="top" title="表格密度">
+          <a-tooltip placement="top" :title="t('agTable.tableDensity')">
             <column-height-outlined class="toolbar-icon" />
           </a-tooltip>
         </a-dropdown>
 
         <!-- 导出 -->
-        <a-tooltip v-if="showDownload" placement="top" title="数据导出">
+        <a-tooltip v-if="showDownload" placement="top" :title="t('agTable.dataExport')">
           <download-outlined class="toolbar-icon" @click="handleDownload" />
         </a-tooltip>
 
@@ -65,20 +65,20 @@
               <div class="column-settings-header">
                 <div class="header-left">
                   <setting-outlined style="margin-right: 8px" />
-                  <span>列设置</span>
+                  <span>{{ t('agTable.columnSettings') }}</span>
                   <a-divider type="vertical" />
                   <a-checkbox 
                     :checked="isAllColumnsVisible"
                     :indeterminate="isSomeColumnsVisible"
                     @change="handleSelectAllColumns"
                   >
-                    全选
+                    {{ t('agTable.selectAll') }}
                   </a-checkbox>
                 </div>
                 <div class="header-right">
                   <a-space :size="8">
                     <a-tag color="blue" size="small">
-                      显示: {{ state.visibleColumns.length }} / {{ state.allColumns.length }}
+                      {{ t('agTable.visibleCount', { visible: state.visibleColumns.length, total: state.allColumns.length }) }}
                     </a-tag>
                     <a-button type="text" size="small" @click="resetColumnSettings">
                       <redo-outlined />
@@ -131,7 +131,7 @@
                   <div class="column-controls">
                     <!-- 固定列 -->
                     <div class="column-fixed-group">
-                      <a-tooltip placement="top" title="不固定">
+                      <a-tooltip placement="top" :title="t('agTable.notFixed')">
                         <a-button 
                           type="text" 
                           size="small" 
@@ -142,7 +142,7 @@
                           <span>-</span>
                         </a-button>
                       </a-tooltip>
-                      <a-tooltip placement="top" title="左固定">
+                      <a-tooltip placement="top" :title="t('agTable.fixedLeft')">
                         <a-button 
                           type="text" 
                           size="small" 
@@ -153,7 +153,7 @@
                           <vertical-left-outlined />
                         </a-button>
                       </a-tooltip>
-                      <a-tooltip placement="top" title="右固定">
+                      <a-tooltip placement="top" :title="t('agTable.fixedRight')">
                         <a-button 
                           type="text" 
                           size="small" 
@@ -168,7 +168,7 @@
                     
                     <!-- 列宽设置 -->
                     <div class="column-width-group">
-                      <a-tooltip placement="top" title="常用宽度快速设置">
+                      <a-tooltip placement="top" :title="t('agTable.quickWidth')">
                         <a-dropdown :trigger="['click']" placement="topRight" @click.stop>
                           <template #overlay>
                             <a-menu @click="({ key }) => setColumnWidth(col.key, parseInt(key))">
@@ -176,10 +176,10 @@
                               <a-menu-item key="150">150px</a-menu-item>
                               <a-menu-item key="200">200px</a-menu-item>
                               <a-menu-item key="300">300px</a-menu-item>
-                              <a-menu-item key="auto">自动宽度</a-menu-item>
+                              <a-menu-item key="auto">{{ t('agTable.autoWidth') }}</a-menu-item>
                             </a-menu>
                           </template>
-                          <a-button type="text" size="small" class="column-width-preset">预设</a-button>
+                          <a-button type="text" size="small" class="column-width-preset">{{ t('agTable.preset') }}</a-button>
                         </a-dropdown>
                       </a-tooltip>
                       <a-input-number 
@@ -200,7 +200,7 @@
                       size="small" 
                       @click.stop="moveColumn(col.key, -1)" 
                       :disabled="idx === 0"
-                      title="上移"
+                      :title="t('agTable.moveUp')"
                     >
                       <up-outlined />
                     </a-button>
@@ -209,7 +209,7 @@
                       size="small" 
                       @click.stop="moveColumn(col.key, 1)" 
                       :disabled="idx === state.allColumns.length - 1"
-                      title="下移"
+                      :title="t('agTable.moveDown')"
                     >
                       <down-outlined />
                     </a-button>
@@ -221,20 +221,20 @@
               <div class="column-settings-footer">
                 <a-button size="small" type="default" @click="columnSettingsOpen = false">
                   <close-outlined />
-                  取消
+                  {{ t('common.cancel') }}
                 </a-button>
                 <a-button size="small" type="default" @click="resetColumnSettings">
                   <redo-outlined />
-                  重置
+                  {{ t('common.reset') }}
                 </a-button>
                 <a-button size="small" type="primary" @click="columnSettingsOpen = false">
                   <check-outlined />
-                  完成
+                  {{ t('common.done') }}
                 </a-button>
               </div>
             </div>
           </template>
-          <a-tooltip placement="top" title="列设置">
+          <a-tooltip placement="top" :title="t('agTable.columnSettings')">
             <setting-outlined class="toolbar-icon" />
           </a-tooltip>
         </a-dropdown>
@@ -246,7 +246,7 @@
     
     <div v-if="state.showStatistics && enableStatistics && !hasStatisticsSlot" class="ag-table-statistics">
       <div v-if="!state.statistics" class="statistics-empty">
-        <a-empty description="暂无统计数据" :style="{ marginTop: '20px', marginBottom: '20px' }" />
+        <a-empty :description="t('agTable.noStatisticsData')" :style="{ marginTop: '20px', marginBottom: '20px' }" />
       </div>
       <div v-else class="statistics-content">
         <!-- 对象格式 -->
@@ -304,6 +304,7 @@
 <script setup>
 import { reactive, computed, watch, onMounted, useSlots, ref, onBeforeUnmount } from 'vue'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import { 
   CloseOutlined, 
   BarChartOutlined, 
@@ -362,6 +363,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['load-complete', 'change', 'reload', 'statistics-loaded'])
+const { t } = useI18n()
 
 // ==================== 内部状态 ====================
 const state = reactive({
@@ -387,7 +389,7 @@ state.pagination = reactive({
   pageSize: 10,
   showSizeChanger: true,
   showQuickJumper: true,
-  showTotal: (total) => `共 ${total} 条`
+  showTotal: (total) => t('agTable.totalItems', { total })
 })
 
 const computedLoading = computed(() => props.loading || localLoading.value)
@@ -607,7 +609,7 @@ function resetColumnSettings() {
   state.columnFixed = {}
   state.allColumns = [...props.columns]
   saveColumnSettings()
-  message.success('已重置为默认配置')
+  message.success(t('agTable.resetToDefaultSuccess'))
 }
 
 // ==================== 数据加载 ====================
@@ -688,7 +690,7 @@ function reloadStatistics() {
 
 function handleDownload() {
   if (!props.onDownload) {
-    message.warning('未配置下载功能')
+    message.warning(t('agTable.downloadNotConfigured'))
     return
   }
 
@@ -703,9 +705,9 @@ function handleDownload() {
   
   if (promise && typeof promise.then === 'function') {
     promise
-      .then(() => message.success('导出任务已触发'))
+      .then(() => message.success(t('agTable.exportTriggered')))
       .catch(err => {
-        const msg = (err && err.msg) || '导出失败'
+        const msg = (err && err.msg) || t('agTable.exportFailed')
         message.error(msg)
       })
   }

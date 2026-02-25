@@ -122,3 +122,34 @@ body {
   height: 100%;
 }
 
+// ==================== 全局滚动条 ====================
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-lighter) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--surface-lighter);
+  border-radius: 8px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-color-muted);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+

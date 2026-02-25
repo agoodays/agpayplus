@@ -373,7 +373,7 @@ const getStatusColor = (status) => {
 .search-form {
   margin-bottom: 16px;
   padding: 16px;
-  background: #fafafa;
+  /* background: #fafafa; */
   border-radius: 4px;
 }
 </style>

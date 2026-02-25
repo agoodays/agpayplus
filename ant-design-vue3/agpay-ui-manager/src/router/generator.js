@@ -55,6 +55,7 @@ export function generator(menuData, isTopLevel = true) {
       name: item.entId,
       meta: {
         title: item.entName,
+        i18nKey: item.menuI18nKey || item.i18nKey,
         icon: item.menuIcon,
         entId: item.entId,
         entType: item.entType,

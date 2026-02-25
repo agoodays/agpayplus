@@ -6,14 +6,14 @@
           <text x="50%" y="50%" font-size="120" font-weight="bold" fill="#f5222d" text-anchor="middle" dominant-baseline="middle">500</text>
         </svg>
       </div>
-      <h1 class="exception-title">服务器错误</h1>
-      <p class="exception-desc">抱歉，服务器出错了</p>
+      <h1 class="exception-title">{{ t('exception500.title') }}</h1>
+      <p class="exception-desc">{{ t('exception500.desc') }}</p>
       <a-space>
         <a-button type="primary" size="large" @click="handleGoHome">
-          返回首页
+          {{ t('exception500.backHome') }}
         </a-button>
         <a-button size="large" @click="handleRefresh">
-          刷新页面
+          {{ t('layout.refreshPage') }}
         </a-button>
       </a-space>
     </div>
@@ -22,8 +22,10 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
+const { t } = useI18n()
 
 /**
  * 返回首页

@@ -12,17 +12,17 @@
     <div class="content-footer">
       <div class="footer-info">
         <div>
-          <span>Copyright &copy;2023-{{ currentYear }} 吉日科技 版权所有</span>
+          <span>{{ t('userLayout.footerCopyright', { year: currentYear }) }}</span>
         </div>
         <div class="top-list">
           <div class="t-list-item">
-            <img src="/@/assets/beian.png"> ICP备案：鄂ICP备19941223号-9
+            <img src="/@/assets/beian.png"> {{ t('userLayout.icpRecord') }}
           </div>
           <div class="t-list-item">
-            <img src="/@/assets/pcac.png"> 中国支付清算协会备案编码：W2016091300000019
+            <img src="/@/assets/pcac.png"> {{ t('userLayout.pcacRecord') }}
           </div>
           <div class="t-list-item">
-            <img src="/@/assets/permit.png"> 电信增值业务许可证编号：鄂A2-20160913
+            <img src="/@/assets/permit.png"> {{ t('userLayout.telecomPermit') }}
           </div>
         </div>
       </div>
@@ -32,6 +32,9 @@
 
 <script setup>
 import dayjs from 'dayjs'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 const currentYear = dayjs().year()
 </script>
 

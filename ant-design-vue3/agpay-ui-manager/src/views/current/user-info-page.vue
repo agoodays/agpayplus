@@ -152,6 +152,7 @@
 import { defineComponent, ref, reactive, onMounted, getCurrentInstance } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import {
   CheckCircleOutlined,
   UploadOutlined,
@@ -173,6 +174,7 @@ export default defineComponent({
     const router = useRouter()
     const userStore = useUserStore()
     const { proxy } = getCurrentInstance()
+    const { t } = useI18n()
 
     // Tabs
     const activeTab = ref('basic')
@@ -304,7 +306,7 @@ export default defineComponent({
       try {
         await basicFormRef.value.validate()
         
-        proxy.$infoBox.confirmPrimary('确认更新信息吗？', '', async () => {
+        proxy.$infoBox.confirmPrimary(t('current.confirmUpdateInfoTitle'), '', async () => {
           basicLoading.value = true
           try {
             await req.post('/api/current/modifyUserInfo', basicForm)
@@ -313,9 +315,9 @@ export default defineComponent({
             const userInfo = await loginApi.getCurrentInfo()
             userStore.setUserLoginInfo(userInfo)
             
-            message.success('修改成功')
+            message.success(t('common.editSuccess'))
           } catch (error) {
-            message.error(error.msg || '修改失败')
+            message.error(error.msg || t('common.editFailed'))
           } finally {
             basicLoading.value = false
           }
@@ -332,7 +334,7 @@ export default defineComponent({
       try {
         await passwordFormRef.value.validate()
         
-        proxy.$infoBox.confirmPrimary('确认更新密码吗？', '更新密码后需要重新登录', async () => {
+        proxy.$infoBox.confirmPrimary(t('current.confirmUpdatePasswordTitle'), t('current.updatePasswordNeedRelogin'), async () => {
           passwordLoading.value = true
           try {
             await req.post('/api/current/modifyPwd', {
@@ -340,13 +342,13 @@ export default defineComponent({
               confirmPwd: Base64.encode(passwordForm.confirmPwd)
             })
             
-            message.success('修改成功，请重新登录')
+            message.success(t('current.editSuccessRelogin'))
             
             // 退出登录
             await userStore.logout()
             router.push({ name: 'login' })
           } catch (error) {
-            message.error(error.msg || '修改失败')
+            message.error(error.msg || t('common.editFailed'))
           } finally {
             passwordLoading.value = false
           }
@@ -361,7 +363,7 @@ export default defineComponent({
      */
     const handleUpdateSafeWord = async () => {
       if (!safeWord.value) {
-        message.error('信息内容不可为空')
+        message.error(t('current.safeWordEmpty'))
         return
       }
 
@@ -375,9 +377,9 @@ export default defineComponent({
         const userInfo = await loginApi.getCurrentInfo()
         userStore.setUserLoginInfo(userInfo)
         
-        message.success('修改成功')
+        message.success(t('common.editSuccess'))
       } catch (error) {
-        message.error(error.msg || '修改失败')
+        message.error(error.msg || t('common.editFailed'))
       } finally {
         safeWordLoading.value = false
       }
@@ -389,12 +391,12 @@ export default defineComponent({
     const beforeAvatarUpload = (file) => {
       const isImage = ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)
       if (!isImage) {
-        message.error('只能上传 JPG/PNG 格式的图片!')
+        message.error(t('current.onlyJpgPngAllowed'))
         return false
       }
       const isLt10M = file.size / 1024 / 1024 < 10
       if (!isLt10M) {
-        message.error('图片大小不能超过 10MB!')
+        message.error(t('current.imageMax10m'))
         return false
       }
       return true
@@ -422,9 +424,9 @@ export default defineComponent({
         const userInfo = await loginApi.getCurrentInfo()
         userStore.setUserLoginInfo(userInfo)
         
-        message.success('头像更新成功')
+        message.success(t('current.avatarUpdated'))
       } catch (error) {
-        message.error(error.msg || '上传失败')
+        message.error(error.msg || t('common.uploadFailed'))
       } finally {
         avatarLoading.value = false
       }

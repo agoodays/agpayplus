@@ -27,8 +27,6 @@ export const appDefaultConfig = {
   helpDocFlag: true,
   // 水印
   watermarkFlag: true,
-  // 网站名称
-  websiteName: 'AgPay运营平台',
   // 主题颜色
   // 主题颜色（作为回退值）。优先由运行时 CSS 变量 `--primary-color` 覆盖。
   primaryColor: '#1677ff',
@@ -43,7 +41,7 @@ export const appDefaultConfig = {
  */
 export const defaultThemeConfig = {
   primaryColor: appDefaultConfig.primaryColor,
-  darkMode: false,
+  darkMode: true,
   grayMode: false,
   colorWeakMode: false,
   compactTheme: appDefaultConfig.compactFlag,

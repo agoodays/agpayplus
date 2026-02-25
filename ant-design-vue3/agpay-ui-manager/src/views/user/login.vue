@@ -1,23 +1,23 @@
 <template>
   <a-alert class="login-error-message" v-if="loginErrorInfo" :message="loginErrorInfo" type="error" show-icon />
   <div class="main">
-    <div class="desc">运营平台登录</div>
+    <div class="desc">{{ t('auth.loginTitle') }}</div>
     <a-form class="user-layout-login" ref="loginForm" :model="loginObject" :rules="rules" @finish="onFinish" @finishFailed="onFinishFailed">
       <a-form-item name="username">
-        <ag-input size="large" type="text" label="登录名/手机" v-model:value="loginObject.username"/>
+        <ag-input size="large" type="text" :label="t('auth.loginNameOrPhone')" v-model:value="loginObject.username"/>
       </a-form-item>
       <a-form-item name="password">
-        <ag-input type="password" size="large" label="密码" v-model:value="loginObject.password"/>
+        <ag-input type="password" size="large" :label="t('auth.password')" v-model:value="loginObject.password"/>
       </a-form-item>
       <div class="code-body">
         <div class="code-layout">
           <div class="code code-layout-item">
             <a-form-item name="vercode">
-              <ag-input v-model:value="loginObject.vercode" class="code-input" size="large" type="text" label="图形验证码"/>
+              <ag-input v-model:value="loginObject.vercode" class="code-input" size="large" type="text" :label="t('auth.captcha')"/>
             </a-form-item>
             <div class="code-img">
               <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
-              <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">已过期 请刷新</div>
+              <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">{{ t('auth.captchaExpiredRefresh') }}</div>
             </div>
           </div>
         </div>
@@ -25,12 +25,12 @@
       <a-form-item name="isAutoLogin">
         <!-- 自动登录 -->
         <!-- <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">自动登录</a-checkbox> -->
-        <a-checkbox v-model:checked="loginObject.isAutoLogin">自动登录</a-checkbox>
+        <a-checkbox v-model:checked="loginObject.isAutoLogin">{{ t('auth.autoLogin') }}</a-checkbox>
         <!-- 忘记密码 -->
-        <a class="forget-password" href="/forget">忘记密码?</a>
+        <a class="forget-password" href="/forget">{{ t('auth.forgotPassword') }}</a>
       </a-form-item>
       <a-form-item class="submit">
-        <a-button size="large" type="primary" html-type="submit" class="login-button" :loading="loading" >登录</a-button>
+        <a-button size="large" type="primary" html-type="submit" class="login-button" :loading="loading" >{{ t('auth.login') }}</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -41,6 +41,7 @@
 import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { notification } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import {
   AgInput
 } from '/@/components'
@@ -53,6 +54,7 @@ import { useUserStore } from '/@/store/modules/system/user'
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
+const { t } = useI18n()
 
 const loginForm = ref()
 const loading = ref(false)
@@ -70,9 +72,9 @@ const loginObject = reactive({
 })
 
 const rules = {
-  username: [{ required: true, message: '请输入登录名/手机号', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  vercode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+  username: [{ required: true, message: t('auth.pleaseInputLoginNameOrPhone'), trigger: 'blur' }],
+  password: [{ required: true, message: t('auth.pleaseInputPassword'), trigger: 'blur' }],
+  vercode: [{ required: true, message: t('auth.pleaseInputCaptcha'), trigger: 'blur' }],
 }
 
 let timer = null
@@ -142,7 +144,7 @@ const onFinish = async (values) => {
     loginSuccess(res)
   } catch (error) {
     console.error('登录失败:', error)
-    loginErrorInfo.value = error.msg || '登录失败，请重试'
+    loginErrorInfo.value = error.msg || t('auth.loginFailedRetry')
     // 登录失败后刷新验证码
     refVercode()
   } finally {
@@ -158,9 +160,11 @@ const loginSuccess = (res) => {
   
   // 延迟显示欢迎信息
   setTimeout(() => {
+    const userName = userStore.realname || userStore.loginUsername || ''
+    const lastLoginText = res.lastLoginTime ? `\n${t('auth.lastLoginTime', { time: res.lastLoginTime })}` : ''
     notification.success({
-      message: '欢迎',
-      description: `${timeFix()}，欢迎回来${res.lastLoginTime ? `\n上次登录时间：${res.lastLoginTime}` : ''}`,
+      message: t('auth.welcome'),
+      description: t('auth.welcomeBack', { greet: timeFix(), name: userName }) + lastLoginText,
       style: {
         whiteSpace: 'pre-wrap'
       }
@@ -230,9 +234,6 @@ onUnmounted(() => {
   .code {
     display: flex;
     justify-content: space-between;
-    .code-input {
-      //width: 216px;
-    }
     .code-img {
       width: 120px;
       height: 40px;

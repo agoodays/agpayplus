@@ -119,8 +119,8 @@ function toggleCollapsed() {
 <style scoped>
 .ag-search {
   width: 100%;
-  /*padding: 16px;*/
-  background: #fff;
+  /* padding: 16px; */
+  /* background: #fff; */
   border-radius: 4px;
 }
 

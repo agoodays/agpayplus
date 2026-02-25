@@ -10,7 +10,7 @@
     >
       <slot>
         <a-button>
-          <upload-outlined /> 上传
+          <upload-outlined /> {{ t('components.upload') }}
         </a-button>
       </slot>
     </a-upload>
@@ -18,7 +18,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   name: { type: String, default: 'file' },
@@ -39,6 +41,4 @@ function handleChange(info) {
 </script>
 
 <style scoped>
-.ag-upload {
-}
 </style>

@@ -3,19 +3,19 @@
     <a-card :bordered="false">
       <a-result
         status="info"
-        title="支付配置功能"
-        sub-title="此功能正在开发中，敬请期待"
+        :title="t('payConfig.comingSoonTitle')"
+        :sub-title="t('common.comingSoon')"
       >
         <template #extra>
           <a-space direction="vertical" size="large" style="width: 100%">
             <a-alert
-              message="功能说明"
-              description="商户支付配置功能允许为不同商户配置支付接口参数，包括支付宝、微信支付等第三方支付渠道。"
+              :message="t('common.featureDescription')"
+              :description="t('payConfig.featureIntro')"
               type="info"
               show-icon
             />
 
-            <a-card title="计划功能" size="small">
+            <a-card :title="t('common.plannedFeatures')" size="small">
               <a-list :data-source="features" size="small">
                 <template #renderItem="{ item }">
                   <a-list-item>
@@ -37,10 +37,10 @@
 
             <a-space>
               <a-button type="primary" @click="handleGoBack">
-                返回上一页
+                {{ t('common.backPrevious') }}
               </a-button>
               <a-button @click="handleGoHome">
-                返回首页
+                {{ t('exception500.backHome') }}
               </a-button>
             </a-space>
           </a-space>
@@ -53,30 +53,32 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { CheckCircleOutlined } from '@ant-design/icons-vue'
+import { useI18n } from 'vue-i18n'
 
 const router = useRouter()
+const { t } = useI18n()
 
 // 计划功能列表
 const features = [
   {
-    title: '支付接口配置',
-    description: '支持配置支付宝、微信支付、云闪付等主流支付接口'
+    title: t('payConfig.features.apiConfig.title'),
+    description: t('payConfig.features.apiConfig.desc')
   },
   {
-    title: '参数管理',
-    description: '管理商户的支付参数，如商户号、密钥、证书等'
+    title: t('payConfig.features.paramManage.title'),
+    description: t('payConfig.features.paramManage.desc')
   },
   {
-    title: '接口测试',
-    description: '提供接口测试功能，快速验证配置是否正确'
+    title: t('payConfig.features.apiTest.title'),
+    description: t('payConfig.features.apiTest.desc')
   },
   {
-    title: '状态监控',
-    description: '实时监控支付接口状态，及时发现和处理异常'
+    title: t('payConfig.features.statusMonitor.title'),
+    description: t('payConfig.features.statusMonitor.desc')
   },
   {
-    title: '日志记录',
-    description: '记录配置变更日志，便于追溯和审计'
+    title: t('payConfig.features.auditLog.title'),
+    description: t('payConfig.features.auditLog.desc')
   }
 ]
 

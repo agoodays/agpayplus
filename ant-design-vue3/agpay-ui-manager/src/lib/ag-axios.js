@@ -6,6 +6,7 @@ import axios from 'axios'
 import { message, Modal } from 'ant-design-vue'
 import { AgLoading } from '/@/components/ag-loading'
 import { useUserStore } from '/@/store/modules/system/user'
+import { translate } from '/@/utils/i18n-util'
 // import { decryptData, encryptData } from './encrypt'
 // import { DATA_TYPE_ENUM } from '../constants/common-const'
 import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const'
@@ -314,7 +315,7 @@ function handleDownloadError(error) {
     }
   } else {
     message.destroy()
-    message.error('网络发生错误', error)
+    message.error(translate('common.networkError'), error)
   }
 }
 

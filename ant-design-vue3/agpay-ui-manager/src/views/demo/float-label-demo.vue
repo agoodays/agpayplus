@@ -1428,7 +1428,7 @@ function formatDateRange(range) {
 
 .tip-card {
   padding: 16px;
-  background: #fafafa;
+  /* background: #fafafa; */
   border: 1px solid #e8e8e8;
   border-radius: 4px;
   height: 100%;
@@ -1465,7 +1465,7 @@ function formatDateRange(range) {
 
 .form-demo {
   padding: 24px;
-  background: #fafafa;
+  /* background: #fafafa; */
   border-radius: 4px;
 }
 
@@ -1525,7 +1525,7 @@ function formatDateRange(range) {
 
 .report-demo {
   padding: 24px;
-  background: #fafafa;
+  /* background: #fafafa; */
   border-radius: 4px;
 }
 
