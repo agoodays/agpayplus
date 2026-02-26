@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { AgCard } from '/@/components'
+import { AgCard } from '@/components'
 </script>
 ```
 

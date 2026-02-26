@@ -157,7 +157,7 @@ src/views/demo/
 
 <script setup>
 import { ref } from 'vue'
-import { AgInput } from '/@/components'
+import { AgInput } from '@/components'
 
 const form = ref({ name: '' })
 </script>

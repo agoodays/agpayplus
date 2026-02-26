@@ -235,7 +235,7 @@ import {
   InboxOutlined,
   FileAddOutlined
 } from '@ant-design/icons-vue'
-import { AgCard, AgUpload } from '/@/components'
+import { AgCard, AgUpload } from '@/components'
 
 // 基础上传
 const fileList1 = ref([])

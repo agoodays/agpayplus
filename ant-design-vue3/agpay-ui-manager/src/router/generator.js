@@ -7,7 +7,7 @@ import { h } from 'vue'
 import { RouterView } from 'vue-router'
 
 // 使用 Vite 的 glob 导入预加载所有视图组件
-const modules = import.meta.glob('/@/views/**/*.vue')
+const modules = import.meta.glob('@/views/**/*.vue')
 
 /**
  * 组件懒加载
@@ -20,7 +20,7 @@ const lazyLoad = (view) => {
   // 确保路径以 .vue 结尾
   const fullPath = path.endsWith('.vue') ? path : `${path}.vue`
   // 完整路径
-  const componentPath = `/@/views${fullPath}`
+  const componentPath = `@/views${fullPath}`
   
   // 从预加载的模块中查找
   const component = modules[componentPath]
@@ -29,7 +29,7 @@ const lazyLoad = (view) => {
     console.error(`Component not found: ${componentPath}`)
     console.log('Available components:', Object.keys(modules))
     // 返回 404 页面
-    return modules['/@/views/exception/404.vue']
+    return modules['@/views/exception/404.vue']
   }
   
   return component
@@ -78,7 +78,7 @@ export function generator(menuData, isTopLevel = true) {
           currentRoute.component = lazyLoad(componentPath)
         } catch (error) {
           console.error(`Failed to load component: ${item.componentName}`, error)
-          currentRoute.component = () => import('/@/views/exception/404.vue')
+          currentRoute.component = () => import('@/views/exception/404.vue')
         }
       }
     }

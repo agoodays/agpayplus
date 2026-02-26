@@ -64,7 +64,7 @@
 
 ```vue
 <script setup>
-import { AgInput, AgSelect } from '/@/components'
+import { AgInput, AgSelect } from '@/components'
 
 const username = ref('')
 const status = ref('')
@@ -242,7 +242,7 @@ AgSearch 组件支持响应式布局，自动适配不同屏幕：
 
 ```javascript
 // 只引入需要的组件
-import { AgInput, AgSelect } from '/@/components'
+import { AgInput, AgSelect } from '@/components'
 ```
 
 ### 2. 虚拟滚动

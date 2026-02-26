@@ -159,9 +159,9 @@ import {
   SafetyCertificateOutlined
 } from '@ant-design/icons-vue'
 import { Base64 } from 'js-base64'
-import { useUserStore } from '/@/store/modules/system/user'
-import { loginApi } from '/@/api/system/login-api'
-import { req, upload } from '/@/api/manage'
+import { useUserStore } from '@/store/modules/system/user'
+import { loginApi } from '@/api/system/login-api'
+import { req, upload } from '@/api/manage'
 
 export default defineComponent({
   name: 'UserInfoPage',
@@ -210,7 +210,7 @@ export default defineComponent({
     const safeWord = ref('')
 
     // 默认头像
-    const defaultAvatar = '/@/assets/logo.svg'
+    const defaultAvatar = '@/assets/logo.svg'
 
     // 密码规则
     const passwordRulesConfig = reactive({

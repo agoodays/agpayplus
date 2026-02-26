@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { AgTableAction } from '/@/components'
+import { AgTableAction } from '@/components'
 
 const columns = [
   { title: '姓名', dataIndex: 'name' },
@@ -299,7 +299,7 @@ function getActions(record) {
 </template>
 
 <script setup>
-import { useAuth } from '/@/hooks'
+import { useAuth } from '@/hooks'
 
 const { hasPermission } = useAuth()
 </script>

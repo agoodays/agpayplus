@@ -85,7 +85,7 @@
 <script setup>
 import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { API_URL_REFUND_ORDER, req } from '/@/api/manage'
+import { API_URL_REFUND_ORDER, req } from '@/api/manage'
 
 // Props & Emits
 const props = defineProps({

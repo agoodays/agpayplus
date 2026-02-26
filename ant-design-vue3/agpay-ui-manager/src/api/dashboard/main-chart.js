@@ -1,4 +1,4 @@
-﻿import request from '/@/lib/request'
+﻿import request from '@/lib/request'
 
 /**
  * 获取今日/昨日统计数据

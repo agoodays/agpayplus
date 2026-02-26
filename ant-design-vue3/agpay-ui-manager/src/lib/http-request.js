@@ -5,12 +5,12 @@
 
 import axios from 'axios'
 import { message } from 'ant-design-vue'
-import { useUserStore } from '/@/store/modules/system/user'
-import { useAppStore } from '/@/store/modules/system/app'
-import { router } from '/@/router'
-import localStorageKeyConst from '/@/constants/local-storage-key-const'
-import { PAGE_PATH_LOGIN } from '/@/constants/common-const'
-import { ACCESS_TOKEN_NAME } from '/@/constants/system/token-const'
+import { useUserStore } from '@/store/modules/system/user'
+import { useAppStore } from '@/store/modules/system/app'
+import { router } from '@/router'
+import localStorageKeyConst from '@/constants/local-storage-key-const'
+import { PAGE_PATH_LOGIN } from '@/constants/common-const'
+import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
 
 class HttpRequest {
   constructor(baseUrl = import.meta.env.VITE_APP_API_BASE_URL) {

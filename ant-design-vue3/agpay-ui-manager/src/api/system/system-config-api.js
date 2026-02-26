@@ -1,4 +1,4 @@
-﻿import request from '/@/lib/request'
+﻿import request from '@/lib/request'
 
 /**
  * 系统配置 API

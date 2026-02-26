@@ -30,8 +30,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import { AgSelectInfinite } from '/@/components'
-import { getMerchantList } from '/@/api/merchant'
+import { AgSelectInfinite } from '@/components'
+import { getMerchantList } from '@/api/merchant'
 
 const value = ref('')
 
@@ -291,7 +291,7 @@ async function fetchMerchants({ page, pageSize, keyword }) {
 
 <script setup>
 import { reactive } from 'vue'
-import { getMerchantList } from '/@/api/merchant'
+import { getMerchantList } from '@/api/merchant'
 
 const form = reactive({
   merchantId: ''
@@ -329,7 +329,7 @@ async function fetchMerchants({ page, pageSize, keyword }) {
 
 <script setup>
 import { ref } from 'vue'
-import { getUserList } from '/@/api/user'
+import { getUserList } from '@/api/user'
 
 const selectedUsers = ref([])
 
@@ -373,7 +373,7 @@ async function fetchUsers({ page, pageSize, keyword }) {
 
 <script setup>
 import { ref } from 'vue'
-import { getProductList } from '/@/api/product'
+import { getProductList } from '@/api/product'
 
 const productId = ref('')
 

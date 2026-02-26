@@ -150,7 +150,7 @@ import {
   AgUpload,
   AgDateRangePicker,
   AgEditor
-} from '/@/components'
+} from '@/components'
 
 const formRef = ref()
 const submitting = ref(false)

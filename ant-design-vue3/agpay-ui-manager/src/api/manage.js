@@ -1,4 +1,4 @@
-﻿import request from '/@/lib/request'
+﻿import request from '@/lib/request'
 
 /**
  * 全系列 restful api格式, 定义通用req对象

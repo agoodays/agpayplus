@@ -107,9 +107,9 @@ import {
   ShopOutlined,
   TeamOutlined
 } from '@ant-design/icons-vue'
-import { useUserStore } from '/@/store/modules/system/user'
-import { timeFix } from '/@/utils/time-util'
-import { req } from '/@/api/manage'
+import { useUserStore } from '@/store/modules/system/user'
+import { timeFix } from '@/utils/time-util'
+import { req } from '@/api/manage'
 
 export default defineComponent({
   name: 'MainPage',

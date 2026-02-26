@@ -493,7 +493,7 @@
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { AgCard, AgDrawer, AgModal } from '/@/components'
+import { AgCard, AgDrawer, AgModal } from '@/components'
 
 // Drawer 相关
 const basicDrawerVisible = ref(false)

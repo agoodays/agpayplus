@@ -3,8 +3,8 @@
  *
  */
 import { request, getRequest } from '../../lib/ag-axios'
-import { LOGIN_METHOD_ENUM } from '/@/constants/system/login-const'
-import { Base64 } from '/@/lib/encrypt'
+import { LOGIN_METHOD_ENUM } from '@/constants/system/login-const'
+import { Base64 } from '@/lib/encrypt'
 
 export const loginApi = {
     /**

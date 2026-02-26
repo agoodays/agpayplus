@@ -302,7 +302,7 @@ import {
   AgFloatDateRangePicker,
   AgFloatTextarea,
   AgFloatSelect
-} from '/@/components'
+} from '@/components'
 
 const form = reactive({
   username: '',
@@ -412,7 +412,7 @@ import {
   AgFloatDateRangePicker,
   AgFloatTextarea,
   AgFloatSelect
-} from '/@/components'
+} from '@/components'
 ```
 
 ### 全局注册（可选）
@@ -425,7 +425,7 @@ import {
   AgFloatDateRangePicker,
   AgFloatTextarea,
   AgFloatSelect
-} from '/@/components'
+} from '@/components'
 
 app.component('AgFloatInput', AgFloatInput)
 app.component('AgFloatInputNumber', AgFloatInputNumber)

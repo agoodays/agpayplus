@@ -2,7 +2,7 @@
  * 时间操作类
  *
  */
-import { translateWithFallback } from '/@/utils/i18n-util'
+import { translateWithFallback } from '@/utils/i18n-util'
 
 export function timeFix () {
   const time = new Date()

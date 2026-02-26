@@ -30,7 +30,7 @@
 
 ```vue
 <script setup>
-import { AgDateRangePicker } from '/@/components'
+import { AgDateRangePicker } from '@/components'
 </script>
 ```
 

@@ -3,10 +3,10 @@
  *
  */
 import { defineStore } from 'pinia'
-import { appDefaultConfig } from '/@/config/app-config'
-import localStorageKeyConst from '/@/constants/local-storage-key-const'
-import { agSentry } from '/@/lib/ag-sentry'
-import { localRead } from '/@/utils/local-util'
+import { appDefaultConfig } from '@/config/app-config'
+import localStorageKeyConst from '@/constants/local-storage-key-const'
+import { agSentry } from '@/lib/ag-sentry'
+import { localRead } from '@/utils/local-util'
 
 let state = { ...appDefaultConfig }
 

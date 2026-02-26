@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { systemConfigApi } from '/@/api/system/system-config-api'
-import localStorageKeyConst from '/@/constants/local-storage-key-const'
-import { defaultThemeConfig, defaultLayoutConfig } from '/@/config/app-config'
+import { systemConfigApi } from '@/api/system/system-config-api'
+import localStorageKeyConst from '@/constants/local-storage-key-const'
+import { defaultThemeConfig, defaultLayoutConfig } from '@/config/app-config'
 
 export const useAppStore = defineStore('app', {
   state: () => ({

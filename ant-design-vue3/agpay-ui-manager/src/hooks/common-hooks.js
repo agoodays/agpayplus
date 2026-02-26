@@ -5,8 +5,8 @@
 
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { message, Modal } from 'ant-design-vue'
-import { useUserStore } from '/@/store/modules/system/user'
-import { translate } from '/@/utils/i18n-util'
+import { useUserStore } from '@/store/modules/system/user'
+import { translate } from '@/utils/i18n-util'
 
 /**
  * 表格列表 Hook

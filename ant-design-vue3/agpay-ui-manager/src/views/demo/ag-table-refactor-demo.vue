@@ -173,8 +173,8 @@ import {
   PlusOutlined,
   DeleteOutlined
 } from '@ant-design/icons-vue'
-import { AgTable } from '/@/components'
-import { req } from '/@/api/manage'
+import { AgTable } from '@/components'
+import { req } from '@/api/manage'
 
 // ==================== 搜索表单 ====================
 const searchForm = reactive({

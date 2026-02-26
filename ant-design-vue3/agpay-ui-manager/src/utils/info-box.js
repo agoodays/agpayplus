@@ -3,7 +3,7 @@
  *
  */
 import { Modal } from 'ant-design-vue'
-import { translateWithFallback } from '/@/utils/i18n-util'
+import { translateWithFallback } from '@/utils/i18n-util'
 
 function getConfirmDefaults() {
   return {

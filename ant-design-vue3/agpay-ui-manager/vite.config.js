@@ -16,11 +16,7 @@ export default defineConfig(({ mode }) => {
   return {
     resolve: {
       alias: [
-        // 绝对路径重命名：/@/xxxx => src/xxxx
-        {
-          find: /\/@\//,
-          replacement: pathResolve('src') + '/'
-        },
+        // 绝对路径重命名：@/xxxx => src/xxxx
         {
           find: '@',
           replacement: pathResolve('src')

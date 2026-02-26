@@ -284,7 +284,7 @@ import {
   LayoutOutlined,
   BorderOutlined
 } from '@ant-design/icons-vue'
-import { AgCard } from '/@/components'
+import { AgCard } from '@/components'
 
 const router = useRouter()
 

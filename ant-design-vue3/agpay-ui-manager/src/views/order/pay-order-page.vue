@@ -306,8 +306,8 @@ import {
   WalletOutlined,
   UndoOutlined
 } from '@ant-design/icons-vue'
-import { useTable, useModal, usePermission } from '/@/hooks/common-hooks'
-import { API_URL_PAY_ORDER, API_URL_MCH_LIST, req } from '/@/api/manage'
+import { useTable, useModal, usePermission } from '@/hooks/common-hooks'
+import { API_URL_PAY_ORDER, API_URL_MCH_LIST, req } from '@/api/manage'
 import DetailDrawer from './detail-drawer.vue'
 import RefundModal from './refund-modal.vue'
 

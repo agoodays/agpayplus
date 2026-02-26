@@ -5,13 +5,13 @@ import 'dayjs/locale/zh-cn'
 import * as antIcons from '@ant-design/icons-vue'
 import './theme/index.less'
 import App from './App.vue'
-import { router } from '/@/router'
-import { store } from '/@/store'
-import { useAppConfigStore, getInitializedLanguage } from '/@/store/modules/system/app-config'
-import { i18n, setAppLocale } from '/@/i18n'
+import { router } from '@/router'
+import { store } from '@/store'
+import { useAppConfigStore, getInitializedLanguage } from '@/store/modules/system/app-config'
+import { i18n, setAppLocale } from '@/i18n'
 import Initializer from './bootstrap'
 import { infoBox } from './utils/info-box'
-import themeService from '/@/utils/theme-service'
+import themeService from '@/utils/theme-service'
 
 // ==================== 全局配置 ====================
 

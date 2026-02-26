@@ -178,8 +178,8 @@ import {
   PlusOutlined,
   ReloadOutlined
 } from '@ant-design/icons-vue'
-import { useTable, useModal, usePermission, useDelete } from '/@/hooks/common-hooks'
-import { API_URL_MCH_LIST, req } from '/@/api/manage'
+import { useTable, useModal, usePermission, useDelete } from '@/hooks/common-hooks'
+import { API_URL_MCH_LIST, req } from '@/api/manage'
 import AddOrEditModal from './add-or-edit.vue'
 import DetailDrawer from './detail.vue'
 

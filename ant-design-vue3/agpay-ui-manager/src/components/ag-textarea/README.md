@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { AgTextarea } from '/@/components'
+import { AgTextarea } from '@/components'
 
 const value = ref('')
 </script>

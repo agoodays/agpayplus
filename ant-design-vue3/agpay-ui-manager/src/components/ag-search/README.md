@@ -34,7 +34,7 @@
 
 <script setup>
 import { reactive } from 'vue'
-import { AgSearch } from '/@/components'
+import { AgSearch } from '@/components'
 
 const searchForm = reactive({
   orderNo: '',
@@ -114,7 +114,7 @@ function onReset() {
 
 <script setup>
 import { reactive } from 'vue'
-import { AgSearch, AgDateRangePicker } from '/@/components'
+import { AgSearch, AgDateRangePicker } from '@/components'
 
 const searchForm = reactive({
   orderNo: '',

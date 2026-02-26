@@ -18,13 +18,13 @@
 
 ```javascript
 // 方式一：命名导入
-import { AgLoading } from '/@/components/ag-loading'
+import { AgLoading } from '@/components/ag-loading'
 
 // 方式二：默认导入
-import AgLoading from '/@/components/ag-loading'
+import AgLoading from '@/components/ag-loading'
 
 // 方式三：从组件索引导入
-import { AgLoading } from '/@/components'
+import { AgLoading } from '@/components'
 ```
 
 ## 🔧 API 说明
@@ -62,7 +62,7 @@ AgLoading.hide()
 ### 基础用法
 
 ```javascript
-import { AgLoading } from '/@/components/ag-loading'
+import { AgLoading } from '@/components/ag-loading'
 
 // 显示加载
 AgLoading.show()
@@ -76,7 +76,7 @@ AgLoading.hide()
 ### 异步操作
 
 ```javascript
-import { AgLoading } from '/@/components/ag-loading'
+import { AgLoading } from '@/components/ag-loading'
 
 async function fetchData() {
   AgLoading.show()
@@ -102,8 +102,8 @@ async function fetchData() {
 </template>
 
 <script setup>
-import { AgLoading } from '/@/components/ag-loading'
-import { userApi } from '/@/api/user'
+import { AgLoading } from '@/components/ag-loading'
+import { userApi } from '@/api/user'
 
 async function handleSubmit() {
   AgLoading.show()
@@ -123,7 +123,7 @@ async function handleSubmit() {
 ### 在路由守卫中使用
 
 ```javascript
-import { AgLoading } from '/@/components/ag-loading'
+import { AgLoading } from '@/components/ag-loading'
 
 router.beforeEach((to, from, next) => {
   AgLoading.show()
@@ -138,7 +138,7 @@ router.afterEach(() => {
 ### 在 Axios 拦截器中使用
 
 ```javascript
-import { AgLoading } from '/@/components/ag-loading'
+import { AgLoading } from '@/components/ag-loading'
 import axios from 'axios'
 
 let loadingCount = 0
@@ -195,8 +195,8 @@ axios.interceptors.response.use(
 <script setup>
 import { reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgLoading } from '/@/components/ag-loading'
-import { userApi } from '/@/api/user'
+import { AgLoading } from '@/components/ag-loading'
+import { userApi } from '@/api/user'
 
 const form = reactive({
   username: '',
@@ -239,8 +239,8 @@ async function handleSubmit() {
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgLoading } from '/@/components/ag-loading'
-import { dataApi } from '/@/api/data'
+import { AgLoading } from '@/components/ag-loading'
+import { dataApi } from '@/api/data'
 
 const dataSource = ref([])
 const columns = [
@@ -303,7 +303,7 @@ export const useSpinStore = defineStore('spin', {
 </template>
 
 <script setup>
-import { useSpinStore } from '/@/store/modules/system/spin'
+import { useSpinStore } from '@/store/modules/system/spin'
 
 const spinStore = useSpinStore()
 </script>
@@ -334,7 +334,7 @@ this.$loading.show()
 this.$loading.hide()
 
 // Vue 3（新）
-import { AgLoading } from '/@/components/ag-loading'
+import { AgLoading } from '@/components/ag-loading'
 AgLoading.show()
 AgLoading.hide()
 ```

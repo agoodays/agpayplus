@@ -20,7 +20,7 @@
 ### 导入组件
 
 ```javascript
-import { AgInputNumberRange } from '/@/components'
+import { AgInputNumberRange } from '@/components'
 ```
 
 ### 基础用法

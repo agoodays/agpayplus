@@ -71,7 +71,7 @@
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AgModal from '/@/components/ag-modal'
+import AgModal from '@/components/ag-modal'
 
 const visible = ref(false)
 
@@ -117,7 +117,7 @@ function handleOk() {
 <script setup>
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import AgModal from '/@/components/ag-modal'
+import AgModal from '@/components/ag-modal'
 
 const visible = ref(false)
 const loading = ref(false)
@@ -197,7 +197,7 @@ async function handleSubmit() {
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AgModal from '/@/components/ag-modal'
+import AgModal from '@/components/ag-modal'
 
 const visible = ref(false)
 
@@ -240,7 +240,7 @@ async function handleDelete() {
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AgModal from '/@/components/ag-modal'
+import AgModal from '@/components/ag-modal'
 
 const visible = ref(false)
 const opinion = ref('')
@@ -302,7 +302,7 @@ async function handleReject() {
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AgModal from '/@/components/ag-modal'
+import AgModal from '@/components/ag-modal'
 
 const deleteVisible = ref(false)
 const deleting = ref(false)
@@ -436,7 +436,7 @@ async function handleDelete() {
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { message } from 'ant-design-vue'
-import AgModal from '/@/components/ag-modal'
+import AgModal from '@/components/ag-modal'
 
 const modalVisible = ref(false)
 const deleteVisible = ref(false)

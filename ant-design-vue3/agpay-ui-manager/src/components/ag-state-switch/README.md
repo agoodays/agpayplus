@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { AgStateSwitch } from '/@/components'
+import { AgStateSwitch } from '@/components'
 
 // record.state 的值:
 // 0 = 停用（红色徽章）
@@ -52,8 +52,8 @@ import { AgStateSwitch } from '/@/components'
 </template>
 
 <script setup>
-import { AgStateSwitch } from '/@/components'
-import { updateUserState } from '/@/api/user'
+import { AgStateSwitch } from '@/components'
+import { updateUserState } from '@/api/user'
 
 async function handleStateChange(newState) {
   // newState: 1 表示启用，0 表示停用
@@ -100,7 +100,7 @@ async function handleStateChange(newState) {
 
 <script setup>
 import { ref } from 'vue'
-import { AgTable, AgStateSwitch } from '/@/components'
+import { AgTable, AgStateSwitch } from '@/components'
 
 const columns = ref([
   { title: 'ID', key: 'id', dataIndex: 'id' },
@@ -128,8 +128,8 @@ const columns = ref([
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgTable, AgStateSwitch } from '/@/components'
-import { updateUserState } from '/@/api/user'
+import { AgTable, AgStateSwitch } from '@/components'
+import { updateUserState } from '@/api/user'
 
 const columns = ref([
   { title: 'ID', key: 'id', dataIndex: 'id' },
@@ -187,7 +187,7 @@ async function handleStateChange(record, newState) {
 
 <script setup>
 import { computed } from 'vue'
-import { useStore } from '/@/store'
+import { useStore } from '@/store'
 
 const store = useStore()
 
@@ -220,7 +220,7 @@ async function handleStateChange(newState) {
 
 <script setup>
 import { reactive } from 'vue'
-import { AgStateSwitch } from '/@/components'
+import { AgStateSwitch } from '@/components'
 
 const formData = reactive({
   name: '',
@@ -259,9 +259,9 @@ function handleFormStateChange(newState) {
 <script setup>
 import { ref, computed } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgTable, AgStateSwitch } from '/@/components'
-import { getUserList, updateUser } from '/@/api/user'
-import { useStore } from '/@/store'
+import { AgTable, AgStateSwitch } from '@/components'
+import { getUserList, updateUser } from '@/api/user'
+import { useStore } from '@/store'
 
 const store = useStore()
 

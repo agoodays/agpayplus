@@ -46,8 +46,8 @@ import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { message, notification } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import { loginApi } from '/@/api/system/login-api'
-import { timeFix } from '/@/utils/time-util.js'
+import { loginApi } from '@/api/system/login-api'
+import { timeFix } from '@/utils/time-util.js'
 
 const route = useRoute()
 const router = useRouter()

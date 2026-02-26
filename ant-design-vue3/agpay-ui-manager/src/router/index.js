@@ -5,15 +5,15 @@
 import nProgress from 'nprogress'
 import 'nprogress/nprogress.css'
 import { createRouter, createWebHistory } from 'vue-router'
-import UserLayout from '/@/layouts/user-layout.vue'
-import AgLayout from '/@/layouts/index.vue'
-import { useUserStore } from '/@/store/modules/system/user'
+import UserLayout from '@/layouts/user-layout.vue'
+import AgLayout from '@/layouts/index.vue'
+import { useUserStore } from '@/store/modules/system/user'
 import { setDocumentTitle } from '../utils/dom-util'
-import { translateWithFallback } from '/@/utils/i18n-util'
-import { PAGE_PATH_404, PAGE_PATH_LOGIN } from '/@/constants/common-const'
-import { loginApi } from '/@/api/system/login-api'
-import { asyncRouteDefine } from '/@/config/app-config'
-import { devMenuTree, devUserInfo } from '/@/config/dev-menu-config'
+import { translateWithFallback } from '@/utils/i18n-util'
+import { PAGE_PATH_404, PAGE_PATH_LOGIN } from '@/constants/common-const'
+import { loginApi } from '@/api/system/login-api'
+import { asyncRouteDefine } from '@/config/app-config'
+import { devMenuTree, devUserInfo } from '@/config/dev-menu-config'
 
 // ==================== 常量配置 ====================
 
@@ -142,8 +142,8 @@ const routes = [
     name: 'user',
     component: UserLayout,
     children: [
-      { path: 'login', name: 'login', component: () => import('/@/views/user/login.vue') },
-      { path: 'forget', name: 'forget', component: () => import('/@/views/user/forget.vue') }
+      { path: 'login', name: 'login', component: () => import('@/views/user/login.vue') },
+      { path: 'forget', name: 'forget', component: () => import('@/views/user/forget.vue') }
     ]
   },
   {
@@ -151,9 +151,9 @@ const routes = [
     name: 'exception',
     component: UserLayout,
     children: [
-      { path: '403', name: 'exception403', component: () => import('/@/views/exception/403.vue') },
-      { path: '404', name: 'exception404', component: () => import('/@/views/exception/404.vue') },
-      { path: '500', name: 'exception500', component: () => import('/@/views/exception/500.vue') }
+      { path: '403', name: 'exception403', component: () => import('@/views/exception/403.vue') },
+      { path: '404', name: 'exception404', component: () => import('@/views/exception/404.vue') },
+      { path: '500', name: 'exception500', component: () => import('@/views/exception/500.vue') }
     ]
   }
 ]

@@ -17,12 +17,12 @@ import { useRoute } from 'vue-router'
 import { theme as antdTheme } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import enUS from 'ant-design-vue/es/locale/en_US'
-import { useSpinStore } from '/@/store/modules/system/spin'
-import { useAppStore } from '/@/store/modules/system/app'
-import { useAppConfigStore } from '/@/store/modules/system/app-config'
-import { i18n, setAppLocale } from '/@/i18n'
-import { setDocumentTitle } from '/@/utils/dom-util'
-import { translateWithFallback } from '/@/utils/i18n-util'
+import { useSpinStore } from '@/store/modules/system/spin'
+import { useAppStore } from '@/store/modules/system/app'
+import { useAppConfigStore } from '@/store/modules/system/app-config'
+import { i18n, setAppLocale } from '@/i18n'
+import { setDocumentTitle } from '@/utils/dom-util'
+import { translateWithFallback } from '@/utils/i18n-util'
 
 // ==================== 状态管理 ====================
 

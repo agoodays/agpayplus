@@ -33,7 +33,7 @@
 <script setup>
 import { ref } from 'vue'
 import { UploadOutlined } from '@ant-design/icons-vue'
-import { AgUpload } from '/@/components'
+import { AgUpload } from '@/components'
 
 const fileList = ref([])
 </script>
@@ -181,7 +181,7 @@ function beforeUpload(file) {
 
 <script setup>
 import { ref } from 'vue'
-import { uploadFile } from '/@/api/upload'
+import { uploadFile } from '@/api/upload'
 import { message } from 'ant-design-vue'
 
 const fileList = ref([])

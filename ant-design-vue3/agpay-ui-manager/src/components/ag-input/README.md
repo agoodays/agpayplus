@@ -96,7 +96,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const username = ref('')
 const email = ref('')
@@ -117,7 +117,7 @@ const email = ref('')
 
 <script setup>
 import { ref } from 'vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const phone = ref('')
 </script>
@@ -149,7 +149,7 @@ const phone = ref('')
 
 <script setup>
 import { ref } from 'vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const search = ref('')
 </script>
@@ -169,7 +169,7 @@ const search = ref('')
 
 <script setup>
 import { ref } from 'vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const code = ref('')
 </script>
@@ -189,7 +189,7 @@ const code = ref('')
 
 <script setup>
 import { ref } from 'vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const password = ref('')
 </script>
@@ -221,7 +221,7 @@ const password = ref('')
 <script setup>
 import { ref } from 'vue'
 import { UserOutlined, SearchOutlined } from '@ant-design/icons-vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const username = ref('')
 const search = ref('')
@@ -255,7 +255,7 @@ const search = ref('')
 
 <script setup>
 import { ref } from 'vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const small = ref('')
 const middle = ref('')
@@ -280,7 +280,7 @@ const large = ref('')
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const value = ref('')
 
@@ -319,7 +319,7 @@ function handlePressEnter() {
 
 <script setup>
 import { ref } from 'vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const inputRef = ref()
 const value = ref('')
@@ -382,7 +382,7 @@ function handleFocus() {
 import { reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import { UserOutlined, LockOutlined } from '@ant-design/icons-vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const loginForm = reactive({
   username: '',
@@ -502,7 +502,7 @@ async function handleLogin() {
 <script setup>
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const formRef = ref()
 
@@ -645,7 +645,7 @@ function handleReset() {
 import { reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import { SearchOutlined } from '@ant-design/icons-vue'
-import AgFloatInput from '/@/components/ag-float-input'
+import AgFloatInput from '@/components/ag-float-input'
 
 const searchForm = reactive({
   keyword: '',

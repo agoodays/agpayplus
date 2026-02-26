@@ -1,5 +1,5 @@
-import { store } from '/@/store'
-import { useAppStore } from '/@/store/modules/system/app'
+import { store } from '@/store'
+import { useAppStore } from '@/store/modules/system/app'
 
 /**
  * ThemeService - 主题服务
@@ -11,7 +11,7 @@ import { useAppStore } from '/@/store/modules/system/app'
  *
  * 使用方式：
  * ```javascript
- * import themeService from '/@/utils/themeService'
+ * import themeService from '@/utils/themeService'
  * 
  * // 在应用启动时加载并应用主题
  * await themeService.loadAndApplyTheme()
@@ -20,7 +20,7 @@ import { useAppStore } from '/@/store/modules/system/app'
 
 /**
  * 获取 App Store 实例
- * @returns {import('/@/store/modules/system/app').useAppStore}
+ * @returns {import('@/store/modules/system/app').useAppStore}
  */
 function getAppStore() {
   return useAppStore(store)

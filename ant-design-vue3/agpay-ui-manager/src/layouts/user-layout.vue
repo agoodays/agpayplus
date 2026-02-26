@@ -1,6 +1,6 @@
 <template>
   <div class="content-header">
-    <img src="/@/assets/logo.svg" class="header-logo">
+    <img src="@/assets/logo.svg" class="header-logo">
   </div>
   <div class="content-body">
     <div class="content-main justify-end">
@@ -16,13 +16,13 @@
         </div>
         <div class="top-list">
           <div class="t-list-item">
-            <img src="/@/assets/beian.png"> {{ t('userLayout.icpRecord') }}
+            <img src="@/assets/beian.png"> {{ t('userLayout.icpRecord') }}
           </div>
           <div class="t-list-item">
-            <img src="/@/assets/pcac.png"> {{ t('userLayout.pcacRecord') }}
+            <img src="@/assets/pcac.png"> {{ t('userLayout.pcacRecord') }}
           </div>
           <div class="t-list-item">
-            <img src="/@/assets/permit.png"> {{ t('userLayout.telecomPermit') }}
+            <img src="@/assets/permit.png"> {{ t('userLayout.telecomPermit') }}
           </div>
         </div>
       </div>

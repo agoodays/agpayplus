@@ -42,7 +42,7 @@
 import { ref, reactive, watch } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import { API_URL_MCH_APP, API_URL_MCH_STORE, req } from '/@/api/manage'
+import { API_URL_MCH_APP, API_URL_MCH_STORE, req } from '@/api/manage'
 
 const { t } = useI18n()
 

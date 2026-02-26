@@ -219,7 +219,7 @@ import {
   CloseOutlined,
   CheckOutlined
 } from '@ant-design/icons-vue'
-import { API_URL_MCH_STORE, API_URL_MCH_LIST, req, upload } from '/@/api/manage'
+import { API_URL_MCH_STORE, API_URL_MCH_LIST, req, upload } from '@/api/manage'
 
 const { t } = useI18n()
 

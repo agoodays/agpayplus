@@ -192,7 +192,7 @@ import {
   CloseOutlined,
   CheckOutlined
 } from '@ant-design/icons-vue'
-import { API_URL_MCH_APP, API_URL_MCH_LIST, req, getSysRSA2PublicKey } from '/@/api/manage'
+import { API_URL_MCH_APP, API_URL_MCH_LIST, req, getSysRSA2PublicKey } from '@/api/manage'
 
 // Props & Emits
 const props = defineProps({

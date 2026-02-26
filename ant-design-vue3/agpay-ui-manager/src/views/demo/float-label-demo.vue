@@ -992,7 +992,7 @@ import {
   AgDateRangePicker,
   AgTextarea,
   AgSelect
-} from '/@/components'
+} from '@/components'
 
 // AgDateRangePicker 示例数据（新版）
 const agDate1 = ref('')

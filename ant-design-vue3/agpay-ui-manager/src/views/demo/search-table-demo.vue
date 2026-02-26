@@ -89,7 +89,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgSearch, AgTable, AgInput, AgSelect, AgDateRangePicker, AgTableActions, AgInputNumberRange } from '/@/components'
+import { AgSearch, AgTable, AgInput, AgSelect, AgDateRangePicker, AgTableActions, AgInputNumberRange } from '@/components'
 
 // 搜索参数
 const searchForm = reactive({ 

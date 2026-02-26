@@ -157,7 +157,7 @@
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons-vue'
-import { AgCard } from '/@/components'
+import { AgCard } from '@/components'
 
 function handleEdit() {
   message.info('点击了编辑按钮')

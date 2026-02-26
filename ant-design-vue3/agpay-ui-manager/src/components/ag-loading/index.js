@@ -8,7 +8,7 @@
  * 
  * 使用示例：
  * ```javascript
- * import { AgLoading } from '/@/components/ag-loading'
+ * import { AgLoading } from '@/components/ag-loading'
  * 
  * // 显示加载
  * AgLoading.show()
@@ -25,7 +25,7 @@
  * }
  * ```
  */
-import { useSpinStore } from '/@/store/modules/system/spin'
+import { useSpinStore } from '@/store/modules/system/spin'
 
 export const AgLoading = {
   /**

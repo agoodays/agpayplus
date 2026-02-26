@@ -231,7 +231,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgCard, AgEditor } from '/@/components'
+import { AgCard, AgEditor } from '@/components'
 
 // 基础内容
 const content1 = ref('<p>这是初始内容</p>')

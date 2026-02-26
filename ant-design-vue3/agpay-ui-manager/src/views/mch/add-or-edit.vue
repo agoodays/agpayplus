@@ -325,8 +325,8 @@ import {
   CheckOutlined
 } from '@ant-design/icons-vue'
 import { Base64 } from 'js-base64'
-import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '/@/api/manage'
-import { loginApi } from '/@/api/system/login-api'
+import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '@/api/manage'
+import { loginApi } from '@/api/system/login-api'
 
 const { t } = useI18n()
 

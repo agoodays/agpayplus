@@ -29,7 +29,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { AgInputNumber } from '/@/components'
+import { AgInputNumber } from '@/components'
 
 const value = ref(undefined)
 </script>

@@ -68,7 +68,7 @@ npm install @wangeditor/editor-for-vue @wangeditor/editor
 
 <script setup>
 import { ref } from 'vue'
-import AgEditor from '/@/components/ag-editor'
+import AgEditor from '@/components/ag-editor'
 
 const content = ref('<p>初始内容</p>')
 </script>
@@ -86,7 +86,7 @@ const content = ref('<p>初始内容</p>')
 
 <script setup>
 import { ref } from 'vue'
-import AgEditor from '/@/components/ag-editor'
+import AgEditor from '@/components/ag-editor'
 
 const content = ref('')
 </script>
@@ -104,7 +104,7 @@ const content = ref('')
 
 <script setup>
 import { ref } from 'vue'
-import AgEditor from '/@/components/ag-editor'
+import AgEditor from '@/components/ag-editor'
 
 const content = ref('')
 </script>
@@ -122,7 +122,7 @@ const content = ref('')
 
 <script setup>
 import { ref } from 'vue'
-import AgEditor from '/@/components/ag-editor'
+import AgEditor from '@/components/ag-editor'
 
 const content = ref('')
 
@@ -155,7 +155,7 @@ const toolbarConfig = {
 
 <script setup>
 import { ref } from 'vue'
-import AgEditor from '/@/components/ag-editor'
+import AgEditor from '@/components/ag-editor'
 
 const content = ref('')
 
@@ -180,8 +180,8 @@ const editorConfig = {
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AgEditor from '/@/components/ag-editor'
-import { uploadApi } from '/@/api/upload'
+import AgEditor from '@/components/ag-editor'
+import { uploadApi } from '@/api/upload'
 
 const content = ref('')
 
@@ -225,7 +225,7 @@ const uploadConfig = {
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AgEditor from '/@/components/ag-editor'
+import AgEditor from '@/components/ag-editor'
 
 const content = ref('')
 const editorRef = ref()
@@ -291,8 +291,8 @@ function focusEditor() {
 <script setup>
 import { reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import AgEditor from '/@/components/ag-editor'
-import { articleApi } from '/@/api/article'
+import AgEditor from '@/components/ag-editor'
+import { articleApi } from '@/api/article'
 
 const formState = reactive({
   title: '',
@@ -390,9 +390,9 @@ async function handleSubmit() {
 <script setup>
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import AgEditor from '/@/components/ag-editor'
-import { articleApi } from '/@/api/article'
-import { uploadApi } from '/@/api/upload'
+import AgEditor from '@/components/ag-editor'
+import { articleApi } from '@/api/article'
+import { uploadApi } from '@/api/upload'
 
 const formRef = ref()
 const editorRef = ref()

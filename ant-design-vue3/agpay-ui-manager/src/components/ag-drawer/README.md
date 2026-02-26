@@ -105,7 +105,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import AgDrawer from '/@/components/ag-drawer'
+import AgDrawer from '@/components/ag-drawer'
 
 const visible = ref(false)
 </script>
@@ -183,7 +183,7 @@ const visible = ref(false)
 
 <script setup>
 import { ref } from 'vue'
-import AgDrawer from '/@/components/ag-drawer'
+import AgDrawer from '@/components/ag-drawer'
 
 const visible1 = ref(false)
 const visible2 = ref(false)
@@ -217,7 +217,7 @@ const visible4 = ref(false)
 
 <script setup>
 import { ref } from 'vue'
-import AgDrawer from '/@/components/ag-drawer'
+import AgDrawer from '@/components/ag-drawer'
 
 const visible1 = ref(false)
 const visible2 = ref(false)
@@ -252,7 +252,7 @@ const visible2 = ref(false)
 
 <script setup>
 import { ref } from 'vue'
-import AgDrawer from '/@/components/ag-drawer'
+import AgDrawer from '@/components/ag-drawer'
 
 const visible = ref(false)
 const currentSize = ref('medium')
@@ -308,7 +308,7 @@ function getSizePercent(size) {
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import AgDrawer from '/@/components/ag-drawer'
+import AgDrawer from '@/components/ag-drawer'
 
 const visible = ref(false)
 const loading = ref(false)
@@ -412,7 +412,7 @@ async function handleConfirm() {
 
 <script setup>
 import { ref } from 'vue'
-import AgDrawer from '/@/components/ag-drawer'
+import AgDrawer from '@/components/ag-drawer'
 
 const detailVisible = ref(false)
 const currentOrder = ref(null)
@@ -459,7 +459,7 @@ function getStatusText(status) {
 
 <script setup>
 import { ref } from 'vue'
-import AgDrawer from '/@/components/ag-drawer'
+import AgDrawer from '@/components/ag-drawer'
 
 const drawerRef = ref()
 const visible = ref(false)
@@ -594,7 +594,7 @@ function closeDrawer() {
 <script setup>
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import AgDrawer from '/@/components/ag-drawer'
+import AgDrawer from '@/components/ag-drawer'
 
 const detailVisible = ref(false)
 const editVisible = ref(false)

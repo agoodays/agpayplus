@@ -18,7 +18,7 @@
 
 ```vue
 <script setup>
-import { AgTableActions } from '/@/components'
+import { AgTableActions } from '@/components'
 </script>
 ```
 
@@ -59,7 +59,7 @@ import { AgTableActions } from '/@/components'
 </template>
 
 <script setup>
-import { AgTable, AgTableActions } from '/@/components'
+import { AgTable, AgTableActions } from '@/components'
 
 const columns = [
   { title: 'ID', key: 'id', dataIndex: 'id' },

@@ -215,7 +215,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgCard, AgSelectInfinite } from '/@/components'
+import { AgCard, AgSelectInfinite } from '@/components'
 
 // 单选值
 const value1 = ref('')

@@ -29,7 +29,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { AgSelect } from '/@/components'
+import { AgSelect } from '@/components'
 
 const value = ref('')
 const options = [
@@ -245,7 +245,7 @@ const options = [
 
 <script setup>
 import { ref } from 'vue'
-import { getMerchantList } from '/@/api/merchant'
+import { getMerchantList } from '@/api/merchant'
 
 const value = ref('')
 const merchantOptions = ref([])

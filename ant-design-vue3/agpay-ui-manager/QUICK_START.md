@@ -161,7 +161,7 @@ VITE_BYPASS_LOGIN=true
 
 <script setup>
 import { ref } from 'vue'
-import { AgInput } from '/@/components'
+import { AgInput } from '@/components'
 
 const form = ref({
   name: ''
@@ -183,7 +183,7 @@ const form = ref({
 
 <script setup>
 import { ref } from 'vue'
-import { AgSelect } from '/@/components'
+import { AgSelect } from '@/components'
 
 const form = ref({
   status: ''
@@ -211,7 +211,7 @@ const statusOptions = [
 
 <script setup>
 import { ref } from 'vue'
-import { AgSelectInfinite } from '/@/components'
+import { AgSelectInfinite } from '@/components'
 
 const form = ref({
   merchantId: ''
@@ -268,7 +268,7 @@ async function fetchMerchants({ page, pageSize, keyword }) {
 
 <script setup>
 import { ref } from 'vue'
-import { AgSearch, AgInput, AgSelect } from '/@/components'
+import { AgSearch, AgInput, AgSelect } from '@/components'
 
 const searchForm = ref({
   orderNo: '',
@@ -307,7 +307,7 @@ function handleReset() {
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { AgTable } from '/@/components'
+import { AgTable } from '@/components'
 import { PlusOutlined } from '@ant-design/icons-vue'
 
 const loading = ref(false)
@@ -375,7 +375,7 @@ onMounted(() => {
 
 <script setup>
 import { ref } from 'vue'
-import { AgDrawer } from '/@/components'
+import { AgDrawer } from '@/components'
 
 const visible = ref(false)
 </script>
@@ -402,7 +402,7 @@ const visible = ref(false)
 
 <script setup>
 import { ref } from 'vue'
-import { AgModal, AgInput } from '/@/components'
+import { AgModal, AgInput } from '@/components'
 
 const visible = ref(false)
 const form = ref({
@@ -424,10 +424,10 @@ function handleOk() {
 
 ```javascript
 // ✅ 推荐：从统一入口导入
-import { AgInput, AgSelect, AgTable } from '/@/components'
+import { AgInput, AgSelect, AgTable } from '@/components'
 
 // ❌ 不推荐：直接导入组件文件
-import AgInput from '/@/components/ag-input/index.vue'
+import AgInput from '@/components/ag-input/index.vue'
 ```
 
 ### 2. 表单验证

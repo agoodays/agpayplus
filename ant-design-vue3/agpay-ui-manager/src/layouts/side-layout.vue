@@ -9,8 +9,8 @@
       collapsible
     >
       <div class="ag-side-logo">
-        <img src="/@/assets/logo.svg" alt="agooday" class="logo-icon">
-        <img v-show="!collapsed" src="/@/assets/agpay.svg" alt="agpay" class="logo-full">
+        <img src="@/assets/logo.svg" alt="agooday" class="logo-icon">
+        <img v-show="!collapsed" src="@/assets/agpay.svg" alt="agpay" class="logo-full">
       </div>
 
       <a-menu
@@ -132,9 +132,9 @@ import {
 } from '@ant-design/icons-vue'
 import * as antIcons from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
-import { useUserStore } from '/@/store/modules/system/user'
-import { useAppStore } from '/@/store/modules/system/app'
-import { useAppConfigStore } from '/@/store/modules/system/app-config'
+import { useUserStore } from '@/store/modules/system/user'
+import { useAppStore } from '@/store/modules/system/app'
+import { useAppConfigStore } from '@/store/modules/system/app-config'
 import { useI18n } from 'vue-i18n'
 
 function getIconComponent(iconName) {

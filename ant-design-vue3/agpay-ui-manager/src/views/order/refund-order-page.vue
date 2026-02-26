@@ -186,8 +186,8 @@ import {
   ReloadOutlined,
   DownloadOutlined
 } from '@ant-design/icons-vue'
-import { useTable, useModal, usePermission } from '/@/hooks/common-hooks'
-import { API_URL_REFUND_ORDER, API_URL_MCH_LIST, req } from '/@/api/manage'
+import { useTable, useModal, usePermission } from '@/hooks/common-hooks'
+import { API_URL_REFUND_ORDER, API_URL_MCH_LIST, req } from '@/api/manage'
 import DetailDrawer from './refund-detail-drawer.vue'
 import { useI18n } from 'vue-i18n'
 

@@ -10,7 +10,7 @@
  * - CSS 变量定义在 src/theme/index.less
  * - 这里的 DEFAULTS 仅作为 JS 层面的回退值
  */
-import { appDefaultConfig } from '/@/config/app-config'
+import { appDefaultConfig } from '@/config/app-config'
 
 // ==================== 默认主题配置 ====================
 

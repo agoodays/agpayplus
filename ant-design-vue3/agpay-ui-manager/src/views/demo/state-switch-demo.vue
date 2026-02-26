@@ -142,7 +142,7 @@
 <script setup>
 import { ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgStateSwitch, AgTable } from '/@/components'
+import { AgStateSwitch, AgTable } from '@/components'
 
 // Switch 状态
 const switchState1 = ref(1)

@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { req } from '/@/api/manage'
+import { req } from '@/api/manage'
 
 const columns = [ /* ... */ ]
 const searchParams = ref({})
@@ -99,8 +99,8 @@ async function handleDownload(params) {
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { useTable } from '/@/hooks/common-hooks'
-import { req } from '/@/api/manage'
+import { useTable } from '@/hooks/common-hooks'
+import { req } from '@/api/manage'
 
 const columns = [ /* ... */ ]
 
@@ -142,8 +142,8 @@ function handleTableChange(pag) {
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { useTable } from '/@/hooks/common-hooks'
-import { req } from '/@/api/manage'
+import { useTable } from '@/hooks/common-hooks'
+import { req } from '@/api/manage'
 
 const columns = [ /* ... */ ]
 
@@ -170,7 +170,7 @@ onMounted(() => fetchData())
 
 <script setup>
 import { ref } from 'vue'
-import { req } from '/@/api/manage'
+import { req } from '@/api/manage'
 
 const columns = [ /* ... */ ]
 const searchParams = ref({})

@@ -82,7 +82,7 @@
 import { ref, reactive, watch, nextTick } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import { API_URL_REFUND_ORDER, req } from '/@/api/manage'
+import { API_URL_REFUND_ORDER, req } from '@/api/manage'
 
 const { t } = useI18n()
 
