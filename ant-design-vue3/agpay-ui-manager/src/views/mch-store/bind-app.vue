@@ -1,6 +1,6 @@
 ﻿<template>
   <a-modal
-    v-model:open="visible"
+    v-model:open="open"
     :title="t('mchStore.bindAppTitle')"
     :width="500"
     @ok="handleSubmit"
@@ -48,7 +48,7 @@ const { t } = useI18n()
 
 // Props & Emits
 const props = defineProps({
-  visible: {
+  open: {
     type: Boolean,
     default: false
   },
@@ -66,12 +66,12 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible', 'success'])
+const emit = defineEmits(['update:open', 'success'])
 
 // State
 const formRef = ref()
 const loading = ref(false)
-const visible = ref(false)
+const open = ref(false)
 const appList = ref([])
 
 // 表单数据
@@ -79,17 +79,17 @@ const formState = reactive({
   bindAppId: ''
 })
 
-// 监听 props.visible 变化
-watch(() => props.visible, (val) => {
-  visible.value = val
+// 监听 props.open 变化
+watch(() => props.open, (val) => {
+  open.value = val
   if (val) {
     initForm()
   }
 })
 
-// 监听 visible 变化
-watch(visible, (val) => {
-  emit('update:visible', val)
+// 监听 open 变化
+watch(open, (val) => {
+  emit('update:open', val)
 })
 
 /**
@@ -158,6 +158,6 @@ const handleSubmit = () => {
  * 关闭弹窗
  */
 const handleClose = () => {
-  visible.value = false
+  open.value = false
 }
 </script>

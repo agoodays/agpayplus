@@ -373,7 +373,7 @@ async function handleSubmit() {
     
     <!-- 预览模态框 -->
     <a-modal
-      v-model:visible="previewVisible"
+      v-model:open="previewOpen"
       title="预览"
       width="800px"
       :footer="null"
@@ -397,7 +397,7 @@ import { uploadApi } from '@/api/upload'
 const formRef = ref()
 const editorRef = ref()
 const submitting = ref(false)
-const previewVisible = ref(false)
+const previewOpen = ref(false)
 
 const article = reactive({
   title: '',
@@ -453,7 +453,7 @@ function handlePreview() {
     message.warning('请先输入内容')
     return
   }
-  previewVisible.value = true
+  previewOpen.value = true
 }
 
 function handleReset() {

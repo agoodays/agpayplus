@@ -110,7 +110,7 @@
 
     <!-- 详情抽屉 -->
     <a-drawer
-      v-model:open="detailVisible"
+      v-model:open="detailOpen"
       title="订单详情"
       width="600"
     >
@@ -139,7 +139,7 @@
 
     <!-- 编辑弹窗 -->
     <a-modal
-      v-model:open="editVisible"
+      v-model:open="editOpen"
       title="编辑订单"
       ok-text="保存"
       cancel-text="取消"
@@ -262,28 +262,28 @@ const rowSelection = {
 }
 
 // ==================== 详情抽屉 ====================
-const detailVisible = ref(false)
+const detailOpen = ref(false)
 const currentRecord = ref(null)
 
 const handleViewDetail = (record) => {
   currentRecord.value = record
-  detailVisible.value = true
+  detailOpen.value = true
 }
 
 // ==================== 编辑弹窗 ====================
-const editVisible = ref(false)
+const editOpen = ref(false)
 const editForm = ref(null)
 
 const handleEdit = (record) => {
   editForm.value = { ...record }
-  editVisible.value = true
+  editOpen.value = true
 }
 
 const handleSaveEdit = async () => {
   try {
     await api.update('/order/edit', editForm.value)
     message.success('编辑成功')
-    editVisible.value = false
+    editOpen.value = false
     tableRef.value.reload()
   } catch (error) {
     message.error(error.message || '编辑失败')

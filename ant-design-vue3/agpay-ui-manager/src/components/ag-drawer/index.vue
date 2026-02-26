@@ -1,6 +1,6 @@
 ﻿<template>
   <a-drawer
-    :visible="visible"
+    :open="open"
     :title="title"
     :width="computedWidth"
     :closable="closable"
@@ -35,7 +35,7 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  visible: {
+  open: {
     type: Boolean,
     default: false
   },
@@ -89,7 +89,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible', 'close', 'confirm'])
+const emit = defineEmits(['update:open', 'close', 'confirm'])
 
 // 计算实际宽度
 const computedWidth = computed(() => {
@@ -114,7 +114,7 @@ const computedWidth = computed(() => {
 })
 
 function handleClose() {
-  emit('update:visible', false)
+  emit('update:open', false)
   emit('close')
 }
 

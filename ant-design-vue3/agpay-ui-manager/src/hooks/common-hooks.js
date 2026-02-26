@@ -205,7 +205,7 @@ export function useForm(initialValues = {}, validationRules = {}) {
 export function useModal(options = {}) {
   const { onOpen, onClose, onOk, onCancel } = options
 
-  const visible = ref(false)
+  const open = ref(false)
   const loading = ref(false)
   const modalData = reactive({})
 
@@ -213,7 +213,7 @@ export function useModal(options = {}) {
    * 显示弹窗
    */
   const showModal = (data = {}) => {
-    visible.value = true
+    open.value = true
     Object.assign(modalData, data)
     onOpen && onOpen(data)
   }
@@ -222,7 +222,7 @@ export function useModal(options = {}) {
    * 隐藏弹窗
    */
   const hideModal = () => {
-    visible.value = false
+    open.value = false
     loading.value = false
     Object.keys(modalData).forEach((key) => {
       delete modalData[key]
@@ -258,7 +258,7 @@ export function useModal(options = {}) {
   }
 
   return {
-    visible,
+    open,
     loading,
     modalData,
     showModal,

@@ -362,10 +362,10 @@ onMounted(() => {
 
 ```vue
 <template>
-  <a-button @click="visible = true">打开抽屉</a-button>
+  <a-button @click="open = true">打开抽屉</a-button>
   
   <AgDrawer
-    v-model:visible="visible"
+    v-model:open="open"
     title="用户详情"
     width="600px"
   >
@@ -377,7 +377,7 @@ onMounted(() => {
 import { ref } from 'vue'
 import { AgDrawer } from '@/components'
 
-const visible = ref(false)
+const open = ref(false)
 </script>
 ```
 
@@ -385,10 +385,10 @@ const visible = ref(false)
 
 ```vue
 <template>
-  <a-button @click="visible = true">打开模态框</a-button>
+  <a-button @click="open = true">打开模态框</a-button>
   
   <AgModal
-    v-model:visible="visible"
+    v-model:open="open"
     title="编辑用户"
     @ok="handleOk"
   >
@@ -404,14 +404,14 @@ const visible = ref(false)
 import { ref } from 'vue'
 import { AgModal, AgInput } from '@/components'
 
-const visible = ref(false)
+const open = ref(false)
 const form = ref({
   name: ''
 })
 
 function handleOk() {
   console.log('提交:', form.value)
-  visible.value = false
+  open.value = false
 }
 </script>
 ```

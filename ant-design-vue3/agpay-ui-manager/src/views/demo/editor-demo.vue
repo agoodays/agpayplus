@@ -194,7 +194,7 @@
 
     <!-- 预览模态框 -->
     <a-modal
-      v-model:visible="previewVisible"
+      v-model:open="previewOpen"
       :title="previewTitle"
       width="800px"
       :footer="null"
@@ -264,7 +264,7 @@ const noticeForm = reactive({
 })
 
 // 预览
-const previewVisible = ref(false)
+const previewOpen = ref(false)
 const previewTitle = ref('')
 const previewType = ref('')
 
@@ -293,7 +293,7 @@ function handlePreviewArticle() {
   }
   previewType.value = 'article'
   previewTitle.value = '文章预览'
-  previewVisible.value = true
+  previewOpen.value = true
 }
 
 // 清空文章
@@ -326,7 +326,7 @@ function handlePreviewNotice() {
   }
   previewType.value = 'notice'
   previewTitle.value = '公告预览'
-  previewVisible.value = true
+  previewOpen.value = true
 }
 
 // 获取分类名称

@@ -12,49 +12,49 @@
         />
 
         <a-space wrap>
-          <a-button type="primary" @click="basicDrawerVisible = true">
+          <a-button type="primary" @click="basicDrawerOpen = true">
             基础抽屉（720px）
           </a-button>
-          <a-button @click="detailDrawerVisible = true">
+          <a-button @click="detailDrawerOpen = true">
             详情抽屉（800px）
           </a-button>
-          <a-button @click="formDrawerVisible = true">
+          <a-button @click="formDrawerOpen = true">
             表单抽屉（720px）
           </a-button>
           
           <a-divider type="vertical" style="height: 2em" />
           <span style="color: #1890ff; font-weight: bold">预设尺寸：</span>
           
-          <a-button @click="smallDrawerVisible = true">
+          <a-button @click="smallDrawerOpen = true">
             小尺寸（30%）
           </a-button>
-          <a-button @click="mediumDrawerVisible = true">
+          <a-button @click="mediumDrawerOpen = true">
             中等（50%）
           </a-button>
-          <a-button @click="largeDrawerVisible = true">
+          <a-button @click="largeDrawerOpen = true">
             大尺寸（70%）
           </a-button>
-          <a-button @click="xlargeDrawerVisible = true">
+          <a-button @click="xlargeDrawerOpen = true">
             超大（90%）
           </a-button>
           
           <a-divider type="vertical" style="height: 2em" />
           <span style="color: #52c41a; font-weight: bold">自定义比例：</span>
           
-          <a-button @click="ratio40DrawerVisible = true">
+          <a-button @click="ratio40DrawerOpen = true">
             40% 宽度
           </a-button>
-          <a-button @click="ratio60DrawerVisible = true">
+          <a-button @click="ratio60DrawerOpen = true">
             60% 宽度
           </a-button>
-          <a-button @click="ratio80DrawerVisible = true">
+          <a-button @click="ratio80DrawerOpen = true">
             80% 宽度
           </a-button>
         </a-space>
 
         <!-- 基础抽屉 -->
         <AgDrawer
-          v-model:visible="basicDrawerVisible"
+          v-model:open="basicDrawerOpen"
           title="基础抽屉（固定宽度 720px）"
         >
           <a-alert
@@ -75,7 +75,7 @@
 
         <!-- 小尺寸抽屉 (30%) -->
         <AgDrawer
-          v-model:visible="smallDrawerVisible"
+          v-model:open="smallDrawerOpen"
           title="小尺寸抽屉（30% 屏幕宽度）"
           size="small"
         >
@@ -97,7 +97,7 @@
 
         <!-- 中等尺寸抽屉 (50%) -->
         <AgDrawer
-          v-model:visible="mediumDrawerVisible"
+          v-model:open="mediumDrawerOpen"
           title="中等尺寸抽屉（50% 屏幕宽度）"
           size="medium"
         >
@@ -119,7 +119,7 @@
 
         <!-- 大尺寸抽屉 (70%) -->
         <AgDrawer
-          v-model:visible="largeDrawerVisible"
+          v-model:open="largeDrawerOpen"
           title="大尺寸抽屉（70% 屏幕宽度）"
           size="large"
         >
@@ -144,7 +144,7 @@
 
         <!-- 超大尺寸抽屉 (90%) -->
         <AgDrawer
-          v-model:visible="xlargeDrawerVisible"
+          v-model:open="xlargeDrawerOpen"
           title="超大尺寸抽屉（90% 屏幕宽度）"
           size="xlarge"
         >
@@ -176,7 +176,7 @@
 
         <!-- 自定义比例 40% -->
         <AgDrawer
-          v-model:visible="ratio40DrawerVisible"
+          v-model:open="ratio40DrawerOpen"
           title="自定义比例 40%"
           :widthRatio="0.4"
         >
@@ -197,7 +197,7 @@
 
         <!-- 自定义比例 60% -->
         <AgDrawer
-          v-model:visible="ratio60DrawerVisible"
+          v-model:open="ratio60DrawerOpen"
           title="自定义比例 60%"
           :widthRatio="0.6"
         >
@@ -218,7 +218,7 @@
 
         <!-- 自定义比例 80% -->
         <AgDrawer
-          v-model:visible="ratio80DrawerVisible"
+          v-model:open="ratio80DrawerOpen"
           title="自定义比例 80%"
           :widthRatio="0.8"
         >
@@ -239,7 +239,7 @@
 
         <!-- 详情抽屉 -->
         <AgDrawer
-          v-model:visible="detailDrawerVisible"
+          v-model:open="detailDrawerOpen"
           title="订单详情"
           :width="800"
         >
@@ -276,7 +276,7 @@
 
         <!-- 表单抽屉 -->
         <AgDrawer
-          v-model:visible="formDrawerVisible"
+          v-model:open="formDrawerOpen"
           title="添加商户"
           :width="720"
           :showConfirm="true"
@@ -321,7 +321,7 @@
 
         <!-- 大尺寸抽屉 -->
         <AgDrawer
-          v-model:visible="largeDrawerVisible"
+          v-model:open="largeDrawerOpen"
           title="大尺寸抽屉"
           :width="1200"
         >
@@ -341,23 +341,23 @@
         />
 
         <a-space>
-          <a-button type="primary" @click="basicModalVisible = true">
+          <a-button type="primary" @click="basicModalOpen = true">
             基础模态框
           </a-button>
-          <a-button @click="formModalVisible = true">
+          <a-button @click="formModalOpen = true">
             表单模态框
           </a-button>
-          <a-button danger @click="deleteModalVisible = true">
+          <a-button danger @click="deleteModalOpen = true">
             删除确认
           </a-button>
-          <a-button @click="customModalVisible = true">
+          <a-button @click="customModalOpen = true">
             自定义按钮
           </a-button>
         </a-space>
 
         <!-- 基础模态框 -->
         <AgModal
-          v-model:visible="basicModalVisible"
+          v-model:open="basicModalOpen"
           title="基础模态框"
           @ok="handleBasicModalOk"
         >
@@ -373,7 +373,7 @@
 
         <!-- 表单模态框 -->
         <AgModal
-          v-model:visible="formModalVisible"
+          v-model:open="formModalOpen"
           title="添加用户"
           :width="600"
           :confirmLoading="modalSubmitLoading"
@@ -413,7 +413,7 @@
 
         <!-- 删除确认框 -->
         <AgModal
-          v-model:visible="deleteModalVisible"
+          v-model:open="deleteModalOpen"
           title="确认删除"
           :maskClosable="false"
           okText="确认删除"
@@ -435,7 +435,7 @@
 
         <!-- 自定义按钮模态框 -->
         <AgModal
-          v-model:visible="customModalVisible"
+          v-model:open="customModalOpen"
           title="审核"
           :width="500"
         >
@@ -447,7 +447,7 @@
 
           <template #footer>
             <a-space>
-              <a-button @click="customModalVisible = false">取消</a-button>
+              <a-button @click="customModalOpen = false">取消</a-button>
               <a-button type="danger" @click="handleReject">驳回</a-button>
               <a-button type="primary" @click="handleApprove">通过</a-button>
             </a-space>
@@ -496,16 +496,16 @@ import { PlusOutlined } from '@ant-design/icons-vue'
 import { AgCard, AgDrawer, AgModal } from '@/components'
 
 // Drawer 相关
-const basicDrawerVisible = ref(false)
-const detailDrawerVisible = ref(false)
-const formDrawerVisible = ref(false)
-const smallDrawerVisible = ref(false)
-const mediumDrawerVisible = ref(false)
-const largeDrawerVisible = ref(false)
-const xlargeDrawerVisible = ref(false)
-const ratio40DrawerVisible = ref(false)
-const ratio60DrawerVisible = ref(false)
-const ratio80DrawerVisible = ref(false)
+const basicDrawerOpen = ref(false)
+const detailDrawerOpen = ref(false)
+const formDrawerOpen = ref(false)
+const smallDrawerOpen = ref(false)
+const mediumDrawerOpen = ref(false)
+const largeDrawerOpen = ref(false)
+const xlargeDrawerOpen = ref(false)
+const ratio40DrawerOpen = ref(false)
+const ratio60DrawerOpen = ref(false)
+const ratio80DrawerOpen = ref(false)
 const detailLoading = ref(false)
 const drawerSubmitLoading = ref(false)
 const drawerFormRef = ref()
@@ -543,10 +543,10 @@ const drawerRules = {
 }
 
 // Modal 相关
-const basicModalVisible = ref(false)
-const formModalVisible = ref(false)
-const deleteModalVisible = ref(false)
-const customModalVisible = ref(false)
+const basicModalOpen = ref(false)
+const formModalOpen = ref(false)
+const deleteModalOpen = ref(false)
+const customModalOpen = ref(false)
 const modalSubmitLoading = ref(false)
 const deleteLoading = ref(false)
 const deleteConfirmed = ref(false)
@@ -624,7 +624,7 @@ async function handleDrawerSubmit() {
 
     console.log('提交表单:', drawerForm)
     message.success('添加成功')
-    formDrawerVisible.value = false
+    formDrawerOpen.value = false
 
     // 重置表单
     Object.assign(drawerForm, {
@@ -647,7 +647,7 @@ async function handleDrawerSubmit() {
 // Modal 方法
 function handleBasicModalOk() {
   message.info('点击了确定按钮')
-  basicModalVisible.value = false
+  basicModalOpen.value = false
 }
 
 async function handleModalSubmit() {
@@ -661,7 +661,7 @@ async function handleModalSubmit() {
 
     console.log('提交用户:', modalForm)
     message.success('添加成功')
-    formModalVisible.value = false
+    formModalOpen.value = false
 
     // 重置表单
     Object.assign(modalForm, {
@@ -693,7 +693,7 @@ async function handleDelete() {
     await new Promise(resolve => setTimeout(resolve, 1000))
 
     message.success('删除成功')
-    deleteModalVisible.value = false
+    deleteModalOpen.value = false
     deleteConfirmed.value = false
   } catch (error) {
     message.error('删除失败')
@@ -713,7 +713,7 @@ async function handleApprove() {
     await new Promise(resolve => setTimeout(resolve, 500))
 
     message.success('审核通过')
-    customModalVisible.value = false
+    customModalOpen.value = false
     auditOpinion.value = ''
   } catch (error) {
     message.error('操作失败')
@@ -731,7 +731,7 @@ async function handleReject() {
     await new Promise(resolve => setTimeout(resolve, 500))
 
     message.success('已驳回')
-    customModalVisible.value = false
+    customModalOpen.value = false
     auditOpinion.value = ''
   } catch (error) {
     message.error('操作失败')
@@ -748,22 +748,22 @@ function showAddMerchant() {
     type: undefined,
     address: ''
   })
-  formDrawerVisible.value = true
+  formDrawerOpen.value = true
 }
 
 function showMerchantDetail(record) {
-  detailDrawerVisible.value = true
+  detailDrawerOpen.value = true
   console.log('查看商户详情:', record)
 }
 
 function showEditMerchant(record) {
   Object.assign(drawerForm, record)
-  formDrawerVisible.value = true
+  formDrawerOpen.value = true
 }
 
 function showDeleteMerchant(record) {
   deleteConfirmed.value = false
-  deleteModalVisible.value = true
+  deleteModalOpen.value = true
   console.log('删除商户:', record)
 }
 </script>

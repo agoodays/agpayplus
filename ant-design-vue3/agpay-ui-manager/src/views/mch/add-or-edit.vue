@@ -1,6 +1,6 @@
 ﻿<template>
   <a-drawer
-    v-model:open="visible"
+    v-model:open="open"
     :title="isAdd ? '新增商户' : '修改商户'"
     :width="720"
     :mask-closable="false"
@@ -332,7 +332,7 @@ const { t } = useI18n()
 
 // Props & Emits
 const props = defineProps({
-  visible: {
+  open: {
     type: Boolean,
     default: false
   },
@@ -342,13 +342,13 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible', 'success'])
+const emit = defineEmits(['update:open', 'success'])
 
 // State
 const formRef = ref()
 const loading = ref(false)
 const isAdd = ref(true)
-const visible = ref(false)
+const open = ref(false)
 
 // 代理商和服务商列表
 const agentList = ref([])
@@ -470,17 +470,17 @@ const rules = {
   ]
 }
 
-// 监听 props.visible 变化
-watch(() => props.visible, (val) => {
-  visible.value = val
+// 监听 props.open 变化
+watch(() => props.open, (val) => {
+  open.value = val
   if (val) {
     initForm()
   }
 })
 
-// 监听 visible 变化
-watch(visible, (val) => {
-  emit('update:visible', val)
+// 监听 open 变化
+watch(open, (val) => {
+  emit('update:open', val)
 })
 
 /**
@@ -679,7 +679,7 @@ const handleSubmit = async () => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  visible.value = false
+  open.value = false
 }
 </script>
 

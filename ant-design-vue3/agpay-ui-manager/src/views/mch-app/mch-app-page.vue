@@ -167,7 +167,7 @@
 
     <!-- 新增/编辑弹窗 -->
     <add-or-edit-modal
-      v-model:visible="modalVisible"
+      v-model:open="modalOpen"
       :record-id="currentRecordId"
       :mch-no="currentMchNo"
       @success="handleModalSuccess"
@@ -197,7 +197,7 @@ const { t } = useI18n()
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
   useTable((params) => req.list(API_URL_MCH_APP, params))
 
-const { visible: modalVisible, showModal, hideModal } = useModal()
+const { open: modalOpen, showModal, hideModal } = useModal()
 const { hasPermission } = usePermission()
 const { handleDelete: deleteItem } = useDelete()
 

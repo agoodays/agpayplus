@@ -154,14 +154,14 @@
 
     <!-- 新增/编辑弹窗 -->
     <add-or-edit-modal
-      v-model:visible="modalVisible"
+      v-model:open="modalOpen"
       :record-id="currentRecordId"
       @success="handleModalSuccess"
     />
 
     <!-- 详情抽屉 -->
     <detail-drawer
-      v-model:visible="detailVisible"
+      v-model:open="detailOpen"
       :record-id="currentRecordId"
     />
   </div>
@@ -190,8 +190,8 @@ const { t } = useI18n()
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
   useTable((params) => req.list(API_URL_MCH_LIST, params))
 
-const { visible: modalVisible, showModal, hideModal } = useModal()
-const { visible: detailVisible, showModal: showDetail } = useModal()
+const { open: modalOpen, showModal, hideModal } = useModal()
+const { open: detailOpen, showModal: showDetail } = useModal()
 const { hasPermission } = usePermission()
 const { handleDelete: deleteItem } = useDelete()
 

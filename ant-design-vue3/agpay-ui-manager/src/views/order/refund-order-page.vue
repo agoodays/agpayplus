@@ -169,7 +169,7 @@
 
     <!-- 详情抽屉 -->
     <detail-drawer
-      v-model:visible="detailVisible"
+      v-model:open="detailOpen"
       :refund-order-id="currentRefundOrderId"
     />
   </div>
@@ -197,7 +197,7 @@ const { t } = useI18n()
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
   useTable((params) => req.list(API_URL_REFUND_ORDER, params))
 
-const { visible: detailVisible, showModal: showDetail } = useModal()
+const { open: detailOpen, showModal: showDetail } = useModal()
 const { hasPermission } = usePermission()
 
 // State

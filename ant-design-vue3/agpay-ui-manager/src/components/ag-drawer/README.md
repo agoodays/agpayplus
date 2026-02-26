@@ -36,7 +36,7 @@
 
 | 参数 | 说明 | 类型 | 默认值 |
 |-----|------|------|-------|
-| visible | 是否显示（支持 v-model） | boolean | false |
+| open | 是否显示（支持 v-model） | boolean | false |
 | title | 标题 | string | '详情' |
 | width | 宽度（px 或百分比字符串） | string \| number | 720 |
 | widthRatio | 按屏幕比例设置宽度（0-1之间）| number | 0 |
@@ -68,7 +68,7 @@
 
 | 事件名 | 说明 | 参数 |
 |-------|------|------|
-| update:visible | visible 变化时触发 | (visible: boolean) |
+| update:open | open 变化时触发 | (open: boolean) |
 | close | 关闭时触发 | - |
 | confirm | 点击确认按钮时触发 | - |
 
@@ -92,10 +92,10 @@
 ```vue
 <template>
   <div>
-    <a-button @click="visible = true">打开抽屉</a-button>
+    <a-button @click="open = true">打开抽屉</a-button>
     
     <AgDrawer
-      v-model:visible="visible"
+      v-model:open="open"
       title="用户详情"
     >
       <p>这里是抽屉内容</p>
@@ -107,7 +107,7 @@
 import { ref } from 'vue'
 import AgDrawer from '@/components/ag-drawer'
 
-const visible = ref(false)
+const open = ref(false)
 </script>
 ```
 
@@ -122,7 +122,7 @@ const visible = ref(false)
 <template>
   <!-- 固定宽度 900px -->
   <AgDrawer
-    v-model:visible="visible1"
+    v-model:open="open1"
     title="固定宽度 900px"
     :width="900"
   >
@@ -131,7 +131,7 @@ const visible = ref(false)
 
   <!-- 百分比宽度 -->
   <AgDrawer
-    v-model:visible="visible2"
+    v-model:open="open2"
     title="百分比宽度 60%"
     width="60%"
   >
@@ -146,7 +146,7 @@ const visible = ref(false)
 <template>
   <!-- 小尺寸：30% 屏幕宽度 -->
   <AgDrawer
-    v-model:visible="visible1"
+    v-model:open="open1"
     title="小尺寸抽屉"
     size="small"
   >
@@ -155,7 +155,7 @@ const visible = ref(false)
 
   <!-- 中等尺寸：50% 屏幕宽度 -->
   <AgDrawer
-    v-model:visible="visible2"
+    v-model:open="open2"
     title="中等尺寸抽屉"
     size="medium"
   >
@@ -164,7 +164,7 @@ const visible = ref(false)
 
   <!-- 大尺寸：70% 屏幕宽度 -->
   <AgDrawer
-    v-model:visible="visible3"
+    v-model:open="open3"
     title="大尺寸抽屉"
     size="large"
   >
@@ -173,7 +173,7 @@ const visible = ref(false)
 
   <!-- 超大尺寸：90% 屏幕宽度 -->
   <AgDrawer
-    v-model:visible="visible4"
+    v-model:open="open4"
     title="超大尺寸抽屉"
     size="xlarge"
   >
@@ -185,10 +185,10 @@ const visible = ref(false)
 import { ref } from 'vue'
 import AgDrawer from '@/components/ag-drawer'
 
-const visible1 = ref(false)
-const visible2 = ref(false)
-const visible3 = ref(false)
-const visible4 = ref(false)
+const open1 = ref(false)
+const open2 = ref(false)
+const open3 = ref(false)
+const open4 = ref(false)
 </script>
 ```
 
@@ -198,7 +198,7 @@ const visible4 = ref(false)
 <template>
   <!-- 40% 屏幕宽度 -->
   <AgDrawer
-    v-model:visible="visible1"
+    v-model:open="open1"
     title="40% 宽度"
     :widthRatio="0.4"
   >
@@ -207,7 +207,7 @@ const visible4 = ref(false)
 
   <!-- 75% 屏幕宽度 -->
   <AgDrawer
-    v-model:visible="visible2"
+    v-model:open="open2"
     title="75% 宽度"
     :widthRatio="0.75"
   >
@@ -219,8 +219,8 @@ const visible4 = ref(false)
 import { ref } from 'vue'
 import AgDrawer from '@/components/ag-drawer'
 
-const visible1 = ref(false)
-const visible2 = ref(false)
+const open1 = ref(false)
+const open2 = ref(false)
 </script>
 ```
 
@@ -234,7 +234,7 @@ const visible2 = ref(false)
     <a-button @click="showDrawer('large')">大尺寸</a-button>
     
     <AgDrawer
-      v-model:visible="visible"
+      v-model:open="open"
       :title="`${currentSize} 尺寸抽屉`"
       :size="currentSize"
     >
@@ -254,12 +254,12 @@ const visible2 = ref(false)
 import { ref } from 'vue'
 import AgDrawer from '@/components/ag-drawer'
 
-const visible = ref(false)
+const open = ref(false)
 const currentSize = ref('medium')
 
 function showDrawer(size) {
   currentSize.value = size
-  visible.value = true
+  open.value = true
 }
 
 function getSizePercent(size) {
@@ -279,7 +279,7 @@ function getSizePercent(size) {
 ```vue
 <template>
   <AgDrawer
-    v-model:visible="visible"
+    v-model:open="open"
     title="详细信息"
     :width="900"
   >
@@ -293,7 +293,7 @@ function getSizePercent(size) {
 ```vue
 <template>
   <AgDrawer
-    v-model:visible="visible"
+    v-model:open="open"
     title="编辑信息"
     :showConfirm="true"
     :confirmLoading="loading"
@@ -310,7 +310,7 @@ import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import AgDrawer from '@/components/ag-drawer'
 
-const visible = ref(false)
+const open = ref(false)
 const loading = ref(false)
 
 async function handleConfirm() {
@@ -319,7 +319,7 @@ async function handleConfirm() {
     // 提交数据
     await api.submit()
     message.success('提交成功')
-    visible.value = false
+    open.value = false
   } finally {
     loading.value = false
   }
@@ -332,14 +332,14 @@ async function handleConfirm() {
 ```vue
 <template>
   <AgDrawer
-    v-model:visible="visible"
+    v-model:open="open"
     title="操作"
   >
     <p>内容</p>
     
     <template #footer>
       <a-space>
-        <a-button @click="visible = false">取消</a-button>
+        <a-button @click="open = false">取消</a-button>
         <a-button type="default" @click="handleSave">保存草稿</a-button>
         <a-button type="primary" @click="handleSubmit">提交</a-button>
       </a-space>
@@ -353,7 +353,7 @@ async function handleConfirm() {
 ```vue
 <template>
   <AgDrawer
-    v-model:visible="visible"
+    v-model:open="open"
     title="查看详情"
     :showFooter="false"
   >
@@ -379,7 +379,7 @@ async function handleConfirm() {
     </a-table>
 
     <AgDrawer
-      v-model:visible="detailVisible"
+      v-model:open="detailOpen"
       title="订单详情"
       :width="800"
     >
@@ -414,7 +414,7 @@ async function handleConfirm() {
 import { ref } from 'vue'
 import AgDrawer from '@/components/ag-drawer'
 
-const detailVisible = ref(false)
+const detailOpen = ref(false)
 const currentOrder = ref(null)
 
 const orders = ref([
@@ -429,7 +429,7 @@ const columns = [
 
 function showDetail(record) {
   currentOrder.value = record
-  detailVisible.value = true
+  detailOpen.value = true
 }
 
 function getStatusColor(status) {
@@ -450,7 +450,7 @@ function getStatusText(status) {
 <template>
   <AgDrawer
     ref="drawerRef"
-    v-model:visible="visible"
+    v-model:open="open"
     title="信息"
   >
     <p>内容</p>
@@ -462,7 +462,7 @@ import { ref } from 'vue'
 import AgDrawer from '@/components/ag-drawer'
 
 const drawerRef = ref()
-const visible = ref(false)
+const open = ref(false)
 
 function closeDrawer() {
   drawerRef.value.close()
@@ -490,7 +490,7 @@ function closeDrawer() {
 
     <!-- 详情抽屉 -->
     <AgDrawer
-      v-model:visible="detailVisible"
+      v-model:open="detailOpen"
       title="商户详情"
       :width="800"
     >
@@ -547,7 +547,7 @@ function closeDrawer() {
 
     <!-- 编辑抽屉 -->
     <AgDrawer
-      v-model:visible="editVisible"
+      v-model:open="editOpen"
       title="编辑商户"
       :width="720"
       :showConfirm="true"
@@ -596,8 +596,8 @@ import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import AgDrawer from '@/components/ag-drawer'
 
-const detailVisible = ref(false)
-const editVisible = ref(false)
+const detailOpen = ref(false)
+const editOpen = ref(false)
 const detailLoading = ref(false)
 const submitLoading = ref(false)
 const merchantDetail = ref(null)
@@ -624,7 +624,7 @@ const rules = {
 }
 
 async function showDetail(record) {
-  detailVisible.value = true
+  detailOpen.value = true
   detailLoading.value = true
   
   try {
@@ -638,7 +638,7 @@ async function showDetail(record) {
 
 function showEdit(record) {
   Object.assign(formData, record)
-  editVisible.value = true
+  editOpen.value = true
 }
 
 async function handleSubmit() {
@@ -649,7 +649,7 @@ async function handleSubmit() {
     await api.update(formData)
     
     message.success('保存成功')
-    editVisible.value = false
+    editOpen.value = false
   } catch (error) {
     if (!error.errorFields) {
       message.error('保存失败')
@@ -679,8 +679,8 @@ function getStatusText(status) {
 ## ⚠️ 注意事项
 
 1. **v-model 绑定**
-   - 使用 `v-model:visible` 控制显示隐藏
-   - 不要直接修改 props 的 visible
+  - 使用 `v-model:open` 控制显示隐藏
+  - 不要直接修改 props 的 open
 
 2. **宽度设置优先级** ⭐
    - `size` > `widthRatio` > `width`

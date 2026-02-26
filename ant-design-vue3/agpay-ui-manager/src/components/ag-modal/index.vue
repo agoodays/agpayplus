@@ -1,6 +1,6 @@
 ﻿<template>
   <a-modal
-    :visible="visible"
+    :open="open"
     :title="title"
     :width="width"
     :closable="closable"
@@ -22,7 +22,7 @@
 
 <script setup>
 const props = defineProps({
-  visible: {
+  open: {
     type: Boolean,
     default: false
   },
@@ -60,14 +60,14 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible', 'ok', 'cancel'])
+const emit = defineEmits(['update:open', 'ok', 'cancel'])
 
 function handleOk() {
   emit('ok')
 }
 
 function handleCancel() {
-  emit('update:visible', false)
+  emit('update:open', false)
   emit('cancel')
 }
 

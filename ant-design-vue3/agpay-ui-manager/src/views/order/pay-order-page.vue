@@ -277,13 +277,13 @@
 
     <!-- 详情抽屉 -->
     <detail-drawer
-      v-model:visible="detailVisible"
+      v-model:open="detailOpen"
       :pay-order-id="currentPayOrderId"
     />
 
     <!-- 退款弹窗 -->
     <refund-modal
-      v-model:visible="refundVisible"
+      v-model:open="refundOpen"
       :pay-order="currentPayOrder"
       @success="handleRefundSuccess"
     />
@@ -317,8 +317,8 @@ const { t } = useI18n()
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
   useTable((params) => req.list(API_URL_PAY_ORDER, params))
 
-const { visible: detailVisible, showModal: showDetail } = useModal()
-const { visible: refundVisible, showModal: showRefund } = useModal()
+const { open: detailOpen, showModal: showDetail } = useModal()
+const { open: refundOpen, showModal: showRefund } = useModal()
 const { hasPermission } = usePermission()
 
 // State

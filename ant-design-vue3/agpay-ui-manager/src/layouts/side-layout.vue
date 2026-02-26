@@ -20,7 +20,6 @@
         v-model:selectedKeys="selectedKeys"
         :theme="menuTheme"
         mode="inline"
-        :inline-collapsed="collapsed"
         @openChange="handleOpenChange"
         @click="handleMenuClick"
       />

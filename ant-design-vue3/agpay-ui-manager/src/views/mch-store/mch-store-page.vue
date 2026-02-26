@@ -150,20 +150,20 @@
 
     <!-- 新增/编辑弹窗 -->
     <add-or-edit-modal
-      v-model:visible="modalVisible"
+      v-model:open="modalOpen"
       :record-id="currentRecordId"
       @success="handleModalSuccess"
     />
 
     <!-- 详情抽屉 -->
     <detail-drawer
-      v-model:visible="detailVisible"
+      v-model:open="detailOpen"
       :record-id="currentRecordId"
     />
 
     <!-- 应用分配弹窗 -->
     <bind-app-modal
-      v-model:visible="bindAppVisible"
+      v-model:open="bindAppOpen"
       :store-id="currentRecordId"
       :bind-app-id="currentBindAppId"
       :mch-no="currentMchNo"
@@ -194,9 +194,9 @@ const route = useRoute()
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
   useTable((params) => req.list(API_URL_MCH_STORE, params))
 
-const { visible: modalVisible, showModal, hideModal } = useModal()
-const { visible: detailVisible, showModal: showDetail } = useModal()
-const { visible: bindAppVisible, showModal: showBindApp } = useModal()
+const { open: modalOpen, showModal, hideModal } = useModal()
+const { open: detailOpen, showModal: showDetail } = useModal()
+const { open: bindAppOpen, showModal: showBindApp } = useModal()
 const { hasPermission } = usePermission()
 const { handleDelete: deleteItem } = useDelete()
 

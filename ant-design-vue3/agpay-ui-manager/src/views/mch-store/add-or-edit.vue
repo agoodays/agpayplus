@@ -1,6 +1,6 @@
 ﻿<template>
   <a-drawer
-    v-model:open="visible"
+    v-model:open="open"
     :title="isAdd ? '新增门店' : '修改门店'"
     :width="720"
     :mask-closable="false"
@@ -185,7 +185,7 @@
 
     <!-- 图片预览 -->
     <a-modal
-      v-model:open="previewVisible"
+      v-model:open="previewOpen"
       :footer="null"
       @cancel="handleCancelPreview"
     >
@@ -229,7 +229,7 @@ const areaOptions = ref([])
 
 // Props & Emits
 const props = defineProps({
-  visible: {
+  open: {
     type: Boolean,
     default: false
   },
@@ -239,13 +239,13 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible', 'success'])
+const emit = defineEmits(['update:open', 'success'])
 
 // State
 const formRef = ref()
 const loading = ref(false)
 const isAdd = ref(true)
-const visible = ref(false)
+const open = ref(false)
 const mchList = ref([])
 const areas = ref([])
 
@@ -255,7 +255,7 @@ const storeOuterImgFileList = ref([])
 const storeInnerImgFileList = ref([])
 
 // 图片预览
-const previewVisible = ref(false)
+const previewOpen = ref(false)
 const previewImage = ref('')
 
 // 表单数据
@@ -294,17 +294,17 @@ const rules = {
   ]
 }
 
-// 监听 props.visible 变化
-watch(() => props.visible, (val) => {
-  visible.value = val
+// 监听 props.open 变化
+watch(() => props.open, (val) => {
+  open.value = val
   if (val) {
     initForm()
   }
 })
 
-// 监听 visible 变化
-watch(visible, (val) => {
-  emit('update:visible', val)
+// 监听 open 变化
+watch(open, (val) => {
+  emit('update:open', val)
 })
 
 /**
@@ -469,14 +469,14 @@ const handleUploadChange = async (info, field) => {
  */
 const handlePreview = (file) => {
   previewImage.value = file.url || file.thumbUrl
-  previewVisible.value = true
+  previewOpen.value = true
 }
 
 /**
  * 取消预览
  */
 const handleCancelPreview = () => {
-  previewVisible.value = false
+  previewOpen.value = false
 }
 
 /**
@@ -517,7 +517,7 @@ const handleSubmit = async () => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  visible.value = false
+  open.value = false
 }
 </script>
 

@@ -1,6 +1,6 @@
 ﻿<template>
   <a-drawer
-    v-model:open="visible"
+    v-model:open="open"
     title="退款订单详情"
     :width="720"
     @close="handleClose"
@@ -89,7 +89,7 @@ import { API_URL_REFUND_ORDER, req } from '@/api/manage'
 
 // Props & Emits
 const props = defineProps({
-  visible: {
+  open: {
     type: Boolean,
     default: false
   },
@@ -99,11 +99,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['update:open'])
 
 // State
 const loading = ref(false)
-const visible = ref(false)
+const open = ref(false)
 const detailData = reactive({
   refundOrderId: '',
   payOrderId: '',
@@ -123,17 +123,17 @@ const detailData = reactive({
   errMsg: ''
 })
 
-// 监听 props.visible 变化
-watch(() => props.visible, (val) => {
-  visible.value = val
+// 监听 props.open 变化
+watch(() => props.open, (val) => {
+  open.value = val
   if (val && props.refundOrderId) {
     loadDetail()
   }
 })
 
-// 监听 visible 变化
-watch(visible, (val) => {
-  emit('update:visible', val)
+// 监听 open 变化
+watch(open, (val) => {
+  emit('update:open', val)
 })
 
 /**
@@ -195,7 +195,7 @@ const getRefundType = (type) => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  visible.value = false
+  open.value = false
 }
 </script>
 

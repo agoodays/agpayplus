@@ -18,7 +18,7 @@
 
 | 参数 | 说明 | 类型 | 默认值 |
 |-----|------|------|-------|
-| visible | 是否显示（支持 v-model） | boolean | false |
+| open | 是否显示（支持 v-model） | boolean | false |
 | title | 标题 | string | '提示' |
 | width | 宽度 | string \| number | 520 |
 | closable | 是否显示关闭按钮 | boolean | true |
@@ -32,7 +32,7 @@
 
 | 事件名 | 说明 | 参数 |
 |-------|------|------|
-| update:visible | visible 变化时触发 | (visible: boolean) |
+| update:open | open 变化时触发 | (open: boolean) |
 | ok | 点击确定按钮时触发 | - |
 | cancel | 点击取消按钮时触发 | - |
 
@@ -56,10 +56,10 @@
 ```vue
 <template>
   <div>
-    <a-button @click="visible = true">打开模态框</a-button>
+    <a-button @click="open = true">打开模态框</a-button>
     
     <AgModal
-      v-model:visible="visible"
+      v-model:open="open"
       title="提示"
       @ok="handleOk"
     >
@@ -73,11 +73,11 @@ import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import AgModal from '@/components/ag-modal'
 
-const visible = ref(false)
+const open = ref(false)
 
 function handleOk() {
   message.success('点击了确定')
-  visible.value = false
+  open.value = false
 }
 </script>
 ```
@@ -87,7 +87,7 @@ function handleOk() {
 ```vue
 <template>
   <AgModal
-    v-model:visible="visible"
+    v-model:open="open"
     title="添加用户"
     :confirmLoading="loading"
     @ok="handleSubmit"
@@ -119,7 +119,7 @@ import { ref, reactive } from 'vue'
 import { message } from 'ant-design-vue'
 import AgModal from '@/components/ag-modal'
 
-const visible = ref(false)
+const open = ref(false)
 const loading = ref(false)
 const formRef = ref()
 
@@ -146,7 +146,7 @@ async function handleSubmit() {
     await api.createUser(form)
     
     message.success('添加成功')
-    visible.value = false
+    open.value = false
   } catch (error) {
     if (!error.errorFields) {
       message.error('添加失败')
@@ -163,7 +163,7 @@ async function handleSubmit() {
 ```vue
 <template>
   <AgModal
-    v-model:visible="visible"
+    v-model:open="open"
     title="详细信息"
     :width="800"
   >
@@ -184,7 +184,7 @@ async function handleSubmit() {
 ```vue
 <template>
   <AgModal
-    v-model:visible="visible"
+    v-model:open="open"
     title="确认删除"
     okText="删除"
     cancelText="取消"
@@ -199,13 +199,13 @@ import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import AgModal from '@/components/ag-modal'
 
-const visible = ref(false)
+const open = ref(false)
 
 async function handleDelete() {
   try {
     await api.delete()
     message.success('删除成功')
-    visible.value = false
+    open.value = false
   } catch (error) {
     message.error('删除失败')
   }
@@ -218,7 +218,7 @@ async function handleDelete() {
 ```vue
 <template>
   <AgModal
-    v-model:visible="visible"
+    v-model:open="open"
     title="审核"
   >
     <a-form>
@@ -229,7 +229,7 @@ async function handleDelete() {
     
     <template #footer>
       <a-space>
-        <a-button @click="visible = false">取消</a-button>
+        <a-button @click="open = false">取消</a-button>
         <a-button type="danger" @click="handleReject">驳回</a-button>
         <a-button type="primary" @click="handleApprove">通过</a-button>
       </a-space>
@@ -242,7 +242,7 @@ import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import AgModal from '@/components/ag-modal'
 
-const visible = ref(false)
+const open = ref(false)
 const opinion = ref('')
 
 async function handleApprove() {
@@ -253,7 +253,7 @@ async function handleApprove() {
   
   await api.approve({ opinion: opinion.value, status: 1 })
   message.success('审核通过')
-  visible.value = false
+  open.value = false
 }
 
 async function handleReject() {
@@ -264,7 +264,7 @@ async function handleReject() {
   
   await api.approve({ opinion: opinion.value, status: 2 })
   message.success('已驳回')
-  visible.value = false
+  open.value = false
 }
 </script>
 ```
@@ -277,7 +277,7 @@ async function handleReject() {
     <a-button danger @click="showDeleteConfirm">删除</a-button>
     
     <AgModal
-      v-model:visible="deleteVisible"
+      v-model:open="deleteOpen"
       title="确认删除"
       :maskClosable="false"
       okText="确认删除"
@@ -304,13 +304,13 @@ import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import AgModal from '@/components/ag-modal'
 
-const deleteVisible = ref(false)
+const deleteOpen = ref(false)
 const deleting = ref(false)
 const confirmed = ref(false)
 
 function showDeleteConfirm() {
   confirmed.value = false
-  deleteVisible.value = true
+  deleteOpen.value = true
 }
 
 async function handleDelete() {
@@ -323,7 +323,7 @@ async function handleDelete() {
   try {
     await api.delete()
     message.success('删除成功')
-    deleteVisible.value = false
+    deleteOpen.value = false
   } catch (error) {
     message.error('删除失败')
   } finally {
@@ -346,7 +346,7 @@ async function handleDelete() {
 
     <!-- 添加/编辑模态框 -->
     <AgModal
-      v-model:visible="modalVisible"
+      v-model:open="modalOpen"
       :title="modalTitle"
       :width="600"
       :confirmLoading="submitLoading"
@@ -416,7 +416,7 @@ async function handleDelete() {
 
     <!-- 删除确认框 -->
     <AgModal
-      v-model:visible="deleteVisible"
+      v-model:open="deleteOpen"
       title="确认删除"
       :maskClosable="false"
       okText="确认删除"
@@ -438,8 +438,8 @@ import { ref, reactive, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import AgModal from '@/components/ag-modal'
 
-const modalVisible = ref(false)
-const deleteVisible = ref(false)
+const modalOpen = ref(false)
+const deleteOpen = ref(false)
 const submitLoading = ref(false)
 const deleteLoading = ref(false)
 const isEdit = ref(false)
@@ -478,18 +478,18 @@ const modalTitle = computed(() => {
 function showAddModal() {
   isEdit.value = false
   resetForm()
-  modalVisible.value = true
+  modalOpen.value = true
 }
 
 function showEditModal(record) {
   isEdit.value = true
   Object.assign(formData, record)
-  modalVisible.value = true
+  modalOpen.value = true
 }
 
 function showDeleteModal(record) {
   currentUser.value = record
-  deleteVisible.value = true
+  deleteOpen.value = true
 }
 
 function resetForm() {
@@ -520,7 +520,7 @@ async function handleSubmit() {
       message.success('添加成功')
     }
     
-    modalVisible.value = false
+    modalOpen.value = false
     // 刷新列表
     
   } catch (error) {
@@ -537,7 +537,7 @@ async function handleDelete() {
   try {
     await api.deleteUser(currentUser.value.id)
     message.success('删除成功')
-    deleteVisible.value = false
+    deleteOpen.value = false
     // 刷新列表
   } catch (error) {
     message.error('删除失败')
@@ -557,8 +557,8 @@ defineExpose({
 ## ⚠️ 注意事项
 
 1. **v-model 绑定**
-   - 使用 `v-model:visible` 控制显示隐藏
-   - 不要直接修改 props 的 visible
+  - 使用 `v-model:open` 控制显示隐藏
+  - 不要直接修改 props 的 open
 
 2. **表单验证**
    - 在 @ok 事件中进行表单验证
@@ -600,7 +600,7 @@ defineExpose({
 3. **组合使用**
    ```vue
    <AgModal
-     v-model:visible="visible"
+     v-model:open="open"
      :confirmLoading="loading"
      @ok="handleOk"
    >
