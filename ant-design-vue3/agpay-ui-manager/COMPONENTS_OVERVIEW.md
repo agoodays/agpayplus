@@ -49,9 +49,9 @@
 
 ## 📖 快速开始
 
-### 全局注册（推荐）
+### 按需导入（推荐）
 
-所有组件已在 `main.js` 中全局注册，可直接使用：
+项目当前默认采用按需导入方式，请在页面中显式引入组件：
 
 ```vue
 <template>
@@ -60,7 +60,13 @@
 </template>
 ```
 
-### 按需引入
+### 组件使用指南
+
+推荐先阅读统一指南：
+
+- [自定义组件使用指南](./CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
+### 典型引入方式
 
 ```vue
 <script setup>
@@ -125,6 +131,7 @@ AgSearch 组件支持响应式布局，自动适配不同屏幕：
 ### 核心文档
 
 - [组件总览](./COMPONENTS_OVERVIEW.md) - 本文档
+- [自定义组件使用指南](./CUSTOM_COMPONENTS_USAGE_GUIDE.md) - 自定义组件统一使用规范
 - [快速开始](./QUICK_START.md) - 快速上手指南
 - [浮动标签完整指南](./FLOAT_COMPONENTS_README.md) - 浮动标签组件详解
 

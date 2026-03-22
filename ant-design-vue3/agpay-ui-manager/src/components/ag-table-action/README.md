@@ -1,5 +1,11 @@
 ﻿# AgTableAction - 表格行操作组件 🎯
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgTableAction } from '@/components'`
+- 推荐搭配：在 `AgTable`/`a-table` 的操作列插槽中使用。
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
 ## 📝 组件说明
 
 `AgTableAction` 是一个快捷的表格行操作组件，提供常用的查看、编辑、删除操作，并支持扩展更多操作。

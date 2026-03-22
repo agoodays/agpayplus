@@ -1,5 +1,12 @@
 ﻿# AgUpload - 文件上传组件 📤
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgUpload } from '@/components'`
+- 推荐绑定：`v-model`（文件列表）
+- 若本文出现 `@/components/ag-xxx` 直引路径，属于历史写法，统一按上方推荐导入替换。
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
 ## 📝 组件说明
 
 `AgUpload` 是一个增强的文件上传组件，基于 Ant Design Upload 封装，支持拖拽上传、图片预览、进度显示等功能。

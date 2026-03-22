@@ -394,7 +394,7 @@ function handleReset() {
 .result {
   margin-top: 12px;
   padding: 8px;
-  background-color: #f5f5f5;
+  /* background-color: #f5f5f5; */
   border-radius: 4px;
   font-size: 12px;
   color: #666;

@@ -1,5 +1,11 @@
 ﻿# AgTableActions - 表格操作列容器 🎯
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgTableActions } from '@/components'`
+- 推荐搭配：在操作列中包裹多个按钮，使用 `max-show-num` 控制折叠数量。
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
 ## 📝 组件说明
 
 `AgTableActions` 是一个智能的操作列容器组件，当操作按钮过多时，自动将多余的按钮折叠到"更多"下拉菜单中，保持界面简洁。

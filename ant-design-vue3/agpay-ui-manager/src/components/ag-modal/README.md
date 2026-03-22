@@ -1,5 +1,12 @@
 ﻿# AgModal - 模态框组件
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgModal } from '@/components'`
+- 推荐绑定：`v-model`（控制显示/隐藏）
+- 若本文出现 `@/components/ag-xxx` 直引路径，属于历史写法，统一按上方推荐导入替换。
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
 ## 📝 组件说明
 
 基于 Ant Design Vue 的 Modal 组件封装，提供统一的模态框使用方式。

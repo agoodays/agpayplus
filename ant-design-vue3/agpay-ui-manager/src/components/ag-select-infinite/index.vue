@@ -54,6 +54,10 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const props = defineProps({
+  modelValue: {
+    type: [String, Number, Array],
+    default: undefined
+  },
   value: {
     type: [String, Number, Array],
     default: undefined
@@ -126,11 +130,11 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:value', 'change', 'focus', 'blur', 'search'])
+const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'search'])
 
 const selectRef = ref()
 const isFocused = ref(false)
-const selectValue = ref(props.value)
+const selectValue = ref(props.modelValue ?? props.value)
 
 // 数据状态
 const options = ref([])
@@ -304,13 +308,17 @@ function handleChange(value, option) {
   emit('change', value, option)
 }
 
-// 监听外部值变化
-watch(() => props.value, (newVal) => {
-  selectValue.value = newVal
-}, { deep: true })
+// 监听外部值变化（同时兼容 modelValue / value）
+watch(() => [props.modelValue, props.value], ([newModelValue, newValue]) => {
+  const resolved = newModelValue ?? newValue
+  if (resolved !== selectValue.value) {
+    selectValue.value = resolved
+  }
+}, { deep: true, immediate: true })
 
 // 监听内部值变化
 watch(selectValue, (newVal) => {
+  emit('update:modelValue', newVal)
   emit('update:value', newVal)
 }, { deep: true })
 
@@ -356,7 +364,7 @@ onMounted(() => {
   top: 50%;
   transform: translateY(-50%);
   padding: 0 4px;
-  background-color: #fff;
+  background-color: var(--base-bg-color);
   color: rgba(0, 0, 0, 0.45);
   pointer-events: none;
   transition: all 0.2s ease-out;

@@ -1,5 +1,12 @@
 ﻿# AgSelectInfinite - 分页下拉选择器 📋🔄
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgSelectInfinite } from '@/components'`
+- 推荐绑定：`v-model`（兼容 `v-model:value`，新代码建议统一 `v-model`）
+- 若本文出现 `@/components/ag-xxx` 直引路径，属于历史写法，统一按上方推荐导入替换。
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
 ## 📝 组件说明
 
 `AgSelectInfinite` 是一个支持分页加载和搜索功能的增强下拉选择器，适用于需要从后端动态加载大量数据的场景。

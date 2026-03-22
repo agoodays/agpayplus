@@ -1419,7 +1419,7 @@ function formatDateRange(range) {
 
 .usage-tips code {
   padding: 2px 6px;
-  background: #f5f5f5;
+  /* background: #f5f5f5; */
   border: 1px solid #d9d9d9;
   border-radius: 3px;
   font-family: 'Consolas', 'Monaco', monospace;
@@ -1472,7 +1472,7 @@ function formatDateRange(range) {
 .code-example {
   margin-top: 16px;
   padding: 16px;
-  background: #f5f5f5;
+  /* background: #f5f5f5; */
   border-radius: 4px;
 }
 
@@ -1501,7 +1501,7 @@ function formatDateRange(range) {
 .result-display {
   margin-top: 16px;
   padding: 16px;
-  background: #f5f5f5;
+  /* background: #f5f5f5; */
   border-radius: 4px;
 }
 

@@ -317,7 +317,7 @@ function handlePreview() {
 }
 
 pre {
-  background: #f5f5f5;
+  /* background: #f5f5f5; */
   padding: 16px;
   border-radius: 4px;
   overflow: auto;

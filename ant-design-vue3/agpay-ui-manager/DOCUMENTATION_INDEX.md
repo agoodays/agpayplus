@@ -7,6 +7,7 @@
 | 文档 | 说明 | 优先级 |
 |-----|------|--------|
 | [COMPONENTS_OVERVIEW.md](./COMPONENTS_OVERVIEW.md) | **组件库总览** - 所有组件概览 | ⭐⭐⭐⭐⭐ |
+| [CUSTOM_COMPONENTS_USAGE_GUIDE.md](./CUSTOM_COMPONENTS_USAGE_GUIDE.md) | **自定义组件使用指南** - 统一使用规范与场景示例 | ⭐⭐⭐⭐⭐ |
 | [QUICK_START.md](./QUICK_START.md) | **快速开始** - 快速上手指南 | ⭐⭐⭐⭐⭐ |
 | [README.md](./README.md) | **项目说明** - 项目整体介绍 | ⭐⭐⭐⭐ |
 | [PROJECT_STATUS.md](./PROJECT_STATUS.md) | **项目状态** - 快速状态参考 | ⭐⭐⭐⭐ |

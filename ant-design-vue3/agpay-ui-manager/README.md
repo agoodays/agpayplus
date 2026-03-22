@@ -114,6 +114,7 @@ npm run format        # 格式化代码
 |-----|------|
 | [快速开始](./QUICK_START.md) | 新手入门指南 ⭐ |
 | [组件总览](./COMPONENTS_OVERVIEW.md) | 所有组件介绍 |
+| [自定义组件使用指南](./CUSTOM_COMPONENTS_USAGE_GUIDE.md) | 自定义组件统一使用规范 |
 | [项目状态](./PROJECT_STATUS.md) | 项目进度和统计 |
 | [文档索引](./DOCUMENTATION_INDEX.md) | 完整文档列表 |
 

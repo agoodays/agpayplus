@@ -1,5 +1,11 @@
 ﻿# AgStateSwitch 通用状态切换组件使用指南
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgStateSwitch } from '@/components'`
+- 推荐状态值：`0`（停用）/`1`（启用）
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
 ## 组件简介
 
 `AgStateSwitch` 是一个通用的状态切换按钮组件，支持两种显示模式：

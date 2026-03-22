@@ -1,5 +1,12 @@
 ﻿# AgCard - 卡片容器组件 🎴
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgCard } from '@/components'`
+- 若本文出现 `@/components/ag-xxx` 直引路径，属于历史写法，统一按上方推荐导入替换。
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+- 业务示例参考：[Demo 示例](../../../src/views/demo/)
+
 ## 📝 组件说明
 
 `AgCard` 是一个增强的卡片容器组件，基于 Ant Design Card 封装，提供统一的样式和更便捷的使用方式。

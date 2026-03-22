@@ -1,5 +1,12 @@
 ﻿# AgTextarea - 多行文本域组件 📝
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgTextarea } from '@/components'`
+- 推荐绑定：`v-model`（兼容 `v-model:value`，新代码建议统一 `v-model`）
+- 若本文出现 `@/components/ag-xxx` 直引路径，属于历史写法，统一按上方推荐导入替换。
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
 ## 📝 组件说明
 
 `AgTextarea` 是带浮动标签的多行文本输入框，支持字数限制、字数统计、自适应高度等功能。

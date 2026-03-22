@@ -1,5 +1,12 @@
 ﻿# AgSearch 组件使用指南
 
+## 📌 当前推荐用法（2026）
+
+- 推荐导入：`import { AgSearch } from '@/components'`
+- 推荐绑定：`v-model`（对象模型）
+- 建议优先使用 `#base` / `#advanced` 插槽组织查询项。
+- 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
+
 ## 组件简介
 
 `AgSearch` 是一个功能强大的搜索表单组件，支持基础搜索和高级搜索（展开/收起）功能，确保搜索条件宽度一致，提供良好的用户体验。
