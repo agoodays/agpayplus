@@ -20,46 +20,43 @@ export const showTableTotal = function (total) {
 export const FLAG_NUMBER_ENUM = {
   TRUE: {
     value: 1,
-    desc: '是',
+    desc: '是'
   },
   FALSE: {
     value: 0,
-    desc: '否',
-  },
+    desc: '否'
+  }
 }
 
 export const GENDER_ENUM = {
   UNKNOWN: {
     value: 0,
-    desc: '未知',
+    desc: '未知'
   },
   MAN: {
     value: 1,
-    desc: '男',
+    desc: '男'
   },
   WOMAN: {
     value: 2,
-    desc: '女',
-  },
+    desc: '女'
+  }
 }
 
 export const USER_TYPE_ENUM = {
   ADMIN_EMPLOYEE: {
     value: 1,
-    desc: '员工',
-  },
-
+    desc: '员工'
+  }
 }
 
 export const DATA_TYPE_ENUM = {
   NORMAL: {
     value: 1,
-    desc: '普通',
+    desc: '普通'
   },
   ENCRYPT: {
     value: 10,
-    desc: '加密',
-  },
-
+    desc: '加密'
+  }
 }
-

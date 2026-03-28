@@ -1,0 +1,128 @@
+// 浮动标签统一样式
+
+// 容器基础样式
+.ag-float-container {
+  position: relative;
+
+  // 聚焦状态
+  &.is-focused {
+    .ag-float-label {
+      color: var(--primary-color);
+    }
+  }
+
+  // 选择器打开状态
+  &.is-open {
+    .ag-float-label {
+      color: var(--primary-color);
+    }
+  }
+
+  // 暗色模式下的输入框样式
+  :root[data-theme='dark'] & {
+    .ant-input,
+    .ant-input-affix-wrapper,
+    .ant-input-number-input,
+    .ant-select-selector {
+      background-color: var(--layout-surface) !important;
+      color: var(--text-color) !important;
+      border-color: var(--border-color) !important;
+    }
+  }
+
+  // 输入框通用样式
+  .ant-input {
+    // 聚焦状态
+    &:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-color-hover);
+    }
+  }
+
+  // 带前缀/后缀的输入框
+  .ant-input-affix-wrapper {
+    &-focused {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-color-hover);
+    }
+  }
+
+  // 数字输入框
+  .ant-input-number {
+    width: 100%;
+
+    &.ant-input-number-focused {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--primary-color-hover);
+    }
+  }
+
+  // 选择器
+  .ant-select-selector {
+    .ant-select-focused & {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 2px var(--primary-color-hover) !important;
+    }
+  }
+
+  // 小尺寸
+  .ant-input-sm {
+    font-size: 14px;
+  }
+
+  // 大尺寸
+  .ant-input-lg {
+    font-size: 16px;
+  }
+}
+
+// 浮动标签基础样式
+.ag-float-label {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0 4px;
+  background-color: var(--base-bg-color);
+  color: var(--text-color-weak);
+  pointer-events: none;
+  transition: all 0.2s ease-out;
+  z-index: 1;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+
+  // 浮动状态
+  &.is-floating {
+    top: -7px;
+    font-size: 12px;
+    color: var(--primary-color);
+    padding: 0 6px;
+    border-radius: 4px;
+    box-shadow: 0 1px 0 0 var(--base-bg-color);
+  }
+
+  // 禁用状态
+  &.is-disabled {
+    color: var(--text-color-muted);
+
+    &.is-floating {
+      color: var(--text-color-muted);
+    }
+  }
+
+  // 暗色模式下使用容器背景色
+  :root[data-theme='dark'] & {
+    background-color: var(--layout-surface);
+
+    &.is-floating {
+      box-shadow: 0 1px 0 0 var(--layout-surface);
+    }
+  }
+}
+
+// 必填星号
+.ag-required-star {
+  color: var(--error-color, #ff4d4f);
+  margin-left: 2px;
+}

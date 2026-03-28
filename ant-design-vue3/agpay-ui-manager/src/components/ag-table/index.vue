@@ -1,7 +1,7 @@
-<template>
+﻿<template>
   <div class="ag-table">
     <!-- 工具栏 -->
-    <div class="ag-table-toolbar" v-if="showToolbar">
+    <div v-if="showToolbar" class="ag-table-toolbar">
       <div class="toolbar-left">
         <slot name="toolbar-left"></slot>
       </div>
@@ -17,7 +17,11 @@
         </a-tooltip>
 
         <!-- 统计图标（置于自动刷新后） -->
-        <a-tooltip v-if="enableStatistics" placement="top" :title="state.showStatistics ? t('agTable.closeStatistics') : t('agTable.statistics')">
+        <a-tooltip
+          v-if="enableStatistics"
+          placement="top"
+          :title="state.showStatistics ? t('agTable.closeStatistics') : t('agTable.statistics')"
+        >
           <span @click="state.showStatistics = !state.showStatistics">
             <bar-chart-outlined v-if="!state.showStatistics" class="toolbar-icon" />
             <close-circle-outlined v-else class="toolbar-icon" />
@@ -30,15 +34,21 @@
             <a-menu @click="handleDensityChange">
               <a-menu-item key="small">
                 <check-outlined v-if="state.density === 'small'" style="margin-right: 8px" />
-                <span :style="{ marginLeft: state.density !== 'small' ? '20px' : '0' }">{{ t('agTable.densityCompact') }}</span>
+                <span :style="{ marginLeft: state.density !== 'small' ? '20px' : '0' }">{{
+                  t('agTable.densityCompact')
+                }}</span>
               </a-menu-item>
               <a-menu-item key="middle">
                 <check-outlined v-if="state.density === 'middle'" style="margin-right: 8px" />
-                <span :style="{ marginLeft: state.density !== 'middle' ? '20px' : '0' }">{{ t('agTable.densityDefault') }}</span>
+                <span :style="{ marginLeft: state.density !== 'middle' ? '20px' : '0' }">{{
+                  t('agTable.densityDefault')
+                }}</span>
               </a-menu-item>
               <a-menu-item key="large">
                 <check-outlined v-if="state.density === 'large'" style="margin-right: 8px" />
-                <span :style="{ marginLeft: state.density !== 'large' ? '20px' : '0' }">{{ t('agTable.densityLoose') }}</span>
+                <span :style="{ marginLeft: state.density !== 'large' ? '20px' : '0' }">{{
+                  t('agTable.densityLoose')
+                }}</span>
               </a-menu-item>
             </a-menu>
           </template>
@@ -53,9 +63,9 @@
         </a-tooltip>
 
         <!-- 列设置 -->
-        <a-dropdown 
-          v-model:open="columnSettingsOpen" 
-          :trigger="['click']" 
+        <a-dropdown
+          v-model:open="columnSettingsOpen"
+          :trigger="['click']"
           placement="bottomRight"
           :get-popup-container="(trigger) => trigger.parentElement"
         >
@@ -67,7 +77,7 @@
                   <setting-outlined style="margin-right: 8px" />
                   <span>{{ t('agTable.columnSettings') }}</span>
                   <a-divider type="vertical" />
-                  <a-checkbox 
+                  <a-checkbox
                     :checked="isAllColumnsVisible"
                     :indeterminate="isSomeColumnsVisible"
                     @change="handleSelectAllColumns"
@@ -78,7 +88,12 @@
                 <div class="header-right">
                   <a-space :size="8">
                     <a-tag color="blue" size="small">
-                      {{ t('agTable.visibleCount', { visible: state.visibleColumns.length, total: state.allColumns.length }) }}
+                      {{
+                        t('agTable.visibleCount', {
+                          visible: state.visibleColumns.length,
+                          total: state.allColumns.length
+                        })
+                      }}
                     </a-tag>
                     <a-button type="text" size="small" @click="resetColumnSettings">
                       <redo-outlined />
@@ -92,9 +107,9 @@
 
               <!-- 列项列表 -->
               <div class="column-settings-content">
-                <div 
-                  v-for="(col, idx) in state.allColumns" 
-                  :key="col.key" 
+                <div
+                  v-for="(col, idx) in state.allColumns"
+                  :key="col.key"
                   class="column-item"
                   :class="{ 'is-dragging': dragKey === col.key }"
                   draggable="true"
@@ -107,65 +122,61 @@
                   <div class="column-drag-handle">
                     <holder-outlined />
                   </div>
-                  
+
                   <!-- 复选框 + 列名 -->
                   <div class="column-checkbox-wrapper">
-                    <a-checkbox 
+                    <a-checkbox
                       :checked="state.visibleColumns.includes(col.key)"
                       @change="(e) => toggleColumn(col.key, e.target.checked)"
                       @click.stop
                     >
-                      <a-tooltip 
-                        :title="col.title || col.key" 
-                        placement="topLeft"
-                        :mouse-enter-delay="0.5"
-                      >
+                      <a-tooltip :title="col.title || col.key" placement="topLeft" :mouse-enter-delay="0.5">
                         <span class="column-title">
                           {{ col.title || col.key }}
                         </span>
                       </a-tooltip>
                     </a-checkbox>
                   </div>
-                  
+
                   <!-- 操作区域 -->
                   <div class="column-controls">
                     <!-- 固定列 -->
                     <div class="column-fixed-group">
                       <a-tooltip placement="top" :title="t('agTable.notFixed')">
-                        <a-button 
-                          type="text" 
-                          size="small" 
-                          @click.stop="setColumnFixed(col.key, undefined)"
+                        <a-button
+                          type="text"
+                          size="small"
                           :class="{ active: !getColumnFixed(col.key) }"
                           class="column-fixed-btn"
+                          @click.stop="setColumnFixed(col.key, undefined)"
                         >
                           <span>-</span>
                         </a-button>
                       </a-tooltip>
                       <a-tooltip placement="top" :title="t('agTable.fixedLeft')">
-                        <a-button 
-                          type="text" 
-                          size="small" 
-                          @click.stop="setColumnFixed(col.key, 'left')"
+                        <a-button
+                          type="text"
+                          size="small"
                           :class="{ active: getColumnFixed(col.key) === 'left' }"
                           class="column-fixed-btn"
+                          @click.stop="setColumnFixed(col.key, 'left')"
                         >
                           <vertical-left-outlined />
                         </a-button>
                       </a-tooltip>
                       <a-tooltip placement="top" :title="t('agTable.fixedRight')">
-                        <a-button 
-                          type="text" 
-                          size="small" 
-                          @click.stop="setColumnFixed(col.key, 'right')"
+                        <a-button
+                          type="text"
+                          size="small"
                           :class="{ active: getColumnFixed(col.key) === 'right' }"
                           class="column-fixed-btn"
+                          @click.stop="setColumnFixed(col.key, 'right')"
                         >
                           <vertical-right-outlined />
                         </a-button>
                       </a-tooltip>
                     </div>
-                    
+
                     <!-- 列宽设置 -->
                     <div class="column-width-group">
                       <a-tooltip placement="top" :title="t('agTable.quickWidth')">
@@ -179,37 +190,39 @@
                               <a-menu-item key="auto">{{ t('agTable.autoWidth') }}</a-menu-item>
                             </a-menu>
                           </template>
-                          <a-button type="text" size="small" class="column-width-preset">{{ t('agTable.preset') }}</a-button>
+                          <a-button type="text" size="small" class="column-width-preset">{{
+                            t('agTable.preset')
+                          }}</a-button>
                         </a-dropdown>
                       </a-tooltip>
-                      <a-input-number 
-                        size="small" 
-                        :min="50" 
-                        :max="1000" 
-                        :value="state.columnWidths[col.key] || col.width || 150" 
-                        @change="val => setColumnWidth(col.key, val)"
-                        @click.stop
+                      <a-input-number
+                        size="small"
+                        :min="50"
+                        :max="1000"
+                        :value="state.columnWidths[col.key] || col.width || 150"
                         :step="10"
                         class="column-width-input"
+                        @change="(val) => setColumnWidth(col.key, val)"
+                        @click.stop
                       />
                     </div>
-                    
+
                     <!-- 移动按钮 -->
-                    <a-button 
-                      type="text" 
-                      size="small" 
-                      @click.stop="moveColumn(col.key, -1)" 
+                    <a-button
+                      type="text"
+                      size="small"
                       :disabled="idx === 0"
                       :title="t('agTable.moveUp')"
+                      @click.stop="moveColumn(col.key, -1)"
                     >
                       <up-outlined />
                     </a-button>
-                    <a-button 
-                      type="text" 
-                      size="small" 
-                      @click.stop="moveColumn(col.key, 1)" 
+                    <a-button
+                      type="text"
+                      size="small"
                       :disabled="idx === state.allColumns.length - 1"
                       :title="t('agTable.moveDown')"
+                      @click.stop="moveColumn(col.key, 1)"
                     >
                       <down-outlined />
                     </a-button>
@@ -242,8 +255,8 @@
     </div>
 
     <!-- 统计数据区域 -->
-    <slot name="statistics" v-if="state.showStatistics && enableStatistics" :data="state.statistics" />
-    
+    <slot v-if="state.showStatistics && enableStatistics" name="statistics" :data="state.statistics" />
+
     <div v-if="state.showStatistics && enableStatistics && !hasStatisticsSlot" class="ag-table-statistics">
       <div v-if="!state.statistics" class="statistics-empty">
         <a-empty :description="t('agTable.noStatisticsData')" :style="{ marginTop: '20px', marginBottom: '20px' }" />
@@ -251,30 +264,18 @@
       <div v-else class="statistics-content">
         <!-- 对象格式 -->
         <div v-if="statisticsFormat.isObject" class="statistics-grid">
-          <div 
-            v-for="(entry, idx) in statisticsFormat.entries" 
-            :key="`stat-${idx}`"
-            class="statistics-card"
-          >
+          <div v-for="(entry, idx) in statisticsFormat.entries" :key="`stat-${idx}`" class="statistics-card">
             <div class="statistics-label">{{ entry[0] }}</div>
             <div class="statistics-value">{{ entry[1] }}</div>
           </div>
         </div>
-        
+
         <!-- 数组格式 -->
         <div v-else class="statistics-groups">
-          <div 
-            v-for="group in statisticsFormat.groups" 
-            :key="`group-${group.id}`"
-            class="statistics-group"
-          >
+          <div v-for="group in statisticsFormat.groups" :key="`group-${group.id}`" class="statistics-group">
             <div v-if="group.name" class="statistics-group-title">{{ group.name }}</div>
             <div class="statistics-grid">
-              <div 
-                v-for="(entry, idx) in group.entries" 
-                :key="`entry-${idx}`"
-                class="statistics-card"
-              >
+              <div v-for="(entry, idx) in group.entries" :key="`entry-${idx}`" class="statistics-card">
                 <div class="statistics-label">{{ entry[0] }}</div>
                 <div class="statistics-value">{{ entry[1] }}</div>
               </div>
@@ -294,7 +295,9 @@
       :row-key="rowKey"
       :size="state.density"
       :scroll="{ x: scrollX }"
+      :virtual="{ scroll: true, itemHeight: 54 }"
       @change="handleTableChange"
+      @row-click="handleRowClick"
     >
       <slot></slot>
     </a-table>
@@ -305,9 +308,9 @@
 import { reactive, computed, watch, onMounted, useSlots, ref, onBeforeUnmount } from 'vue'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import { 
-  CloseOutlined, 
-  BarChartOutlined, 
+import {
+  CloseOutlined,
+  BarChartOutlined,
   CloseCircleOutlined,
   SyncOutlined,
   DownloadOutlined,
@@ -326,7 +329,6 @@ import {
 const STORAGE_PREFIX = 'agpay_table_'
 const STORAGE_VERSION = 1
 const DEBOUNCE_DELAY = 500
-const AUTO_REFRESH_DEFAULT = 180
 
 // ==================== Props ====================
 const props = defineProps({
@@ -338,26 +340,28 @@ const props = defineProps({
   rowKey: { type: [String, Function], default: 'id' },
   rowSelection: { type: Object, default: null },
   scrollX: { type: Number, default: 500 },
-  
+  // 行点击事件
+  rowClick: { type: Function, default: null },
+
   // 工具栏配置
   showToolbar: { type: Boolean, default: true },
   showAutoRefresh: { type: Boolean, default: false },
   showDownload: { type: Boolean, default: false },
   enableStatistics: { type: Boolean, default: false },
   enableAutoRefresh: { type: Boolean, default: false },
-  
+
   // API 回调函数（可选）
   onLoad: { type: Function, default: null },
   onLoadStatistics: { type: Function, default: null },
   onDownload: { type: Function, default: null },
-  
+
   // 搜索和统计配置
   searchData: { type: Object, default: null },
   initialStatistics: { type: [Object, Array], default: null },
-  
+
   // 自动刷新配置
-  autoRefreshInterval: { type: Number, default: AUTO_REFRESH_DEFAULT },
-  
+  autoRefreshInterval: { type: Number, default: 180 },
+
   // 列持久化键
   stateKey: { type: String, default: '' }
 })
@@ -405,10 +409,8 @@ const isPaginationControlled = computed(() => typeof props.pagination === 'objec
 
 // 表格数据（优先使用受控 props.data，否则使用内部数据）
 const tableData = computed(() => ({
-  records: (props.data && props.data.length) ? props.data : internalData.value,
-  total: isPaginationControlled.value
-    ? (props.pagination.total || 0)
-    : (state.pagination.total || 0)
+  records: props.data && props.data.length ? props.data : internalData.value,
+  total: isPaginationControlled.value ? props.pagination.total || 0 : state.pagination.total || 0
 }))
 
 // 分页配置
@@ -434,29 +436,36 @@ const paginationConfig = computed(() => {
 const slots = useSlots()
 const hasStatisticsSlot = !!slots.statistics
 
-// 显示的列
-const displayColumns = computed(() => 
-  state.allColumns
-    .filter(col => state.visibleColumns.includes(col.key))
-    .map(col => {
-      const c = { 
-        ...col, 
+// 显示的列（使用缓存优化）
+const displayColumns = computed(() => {
+  // 缓存计算结果，避免重复计算
+  if (!state.allColumns.length) return []
+
+  return state.allColumns
+    .filter((col) => state.visibleColumns.includes(col.key))
+    .map((col) => {
+      const c = {
+        ...col,
         width: state.columnWidths[col.key] || col.width,
         fixed: state.columnFixed[col.key] || col.fixed
       }
-      
+
       // 处理自定义slots
       if (c.customRender && typeof c.customRender === 'string') {
         const slotName = c.customRender
-        c.customRender = ({ text, record, index }) => {
-          const slot = slots[slotName]
-          return slot ? slot({ text, record, index }) : text
+        // 避免每次渲染都创建新函数
+        if (!c._customRenderCache) {
+          c._customRenderCache = ({ text, record, index }) => {
+            const slot = slots[slotName]
+            return slot ? slot({ text, record, index }) : text
+          }
         }
+        c.customRender = c._customRenderCache
       }
-      
+
       return c
     })
-)
+})
 
 // 是否全部列可见
 const isAllColumnsVisible = computed(() => {
@@ -472,15 +481,14 @@ const isSomeColumnsVisible = computed(() => {
 const statisticsFormat = computed(() => {
   const d = state.statistics
   if (!d) return { isObject: true, entries: [] }
-  
+
   try {
     if (Array.isArray(d)) {
       const groups = d
-        .filter(item => item && typeof item === 'object')
+        .filter((item) => item && typeof item === 'object')
         .map((item, idx) => {
-          const entries = Object.entries(item)
-            .filter(([key]) => !key.startsWith('_'))
-          
+          const entries = Object.entries(item).filter(([key]) => !key.startsWith('_'))
+
           return {
             id: `group-${idx}`,
             name: item._groupName || null,
@@ -533,7 +541,7 @@ const storage = {
       return null
     }
   },
-  
+
   set(key, value) {
     try {
       localStorage.setItem(key, value)
@@ -541,7 +549,7 @@ const storage = {
       // ignored
     }
   },
-  
+
   remove(key) {
     try {
       localStorage.removeItem(key)
@@ -560,7 +568,7 @@ const saveColumnSettings = debounce(() => {
     visible: state.visibleColumns,
     widths: state.columnWidths,
     fixed: state.columnFixed,
-    order: state.allColumns.map(c => c.key)
+    order: state.allColumns.map((c) => c.key)
   }
   storage.set(key, JSON.stringify(payload))
 }, DEBOUNCE_DELAY)
@@ -568,24 +576,24 @@ const saveColumnSettings = debounce(() => {
 function loadColumnSettings() {
   const key = getStorageKey('columns')
   const data = storage.get(key)
-  
+
   if (!data) return
-  
+
   const payload = safeJSONParse(data)
   if (!payload || payload.version !== STORAGE_VERSION) return
-  
+
   if (Array.isArray(payload.visible) && payload.visible.length > 0) {
     state.visibleColumns = payload.visible
   }
-  
+
   if (payload.widths) state.columnWidths = payload.widths
   if (payload.fixed) state.columnFixed = payload.fixed
-  
+
   if (Array.isArray(payload.order) && payload.order.length > 0) {
-    const map = Object.fromEntries(state.allColumns.map(c => [c.key, c]))
-    state.allColumns = payload.order.map(k => map[k]).filter(Boolean)
+    const map = Object.fromEntries(state.allColumns.map((c) => [c.key, c]))
+    state.allColumns = payload.order.map((k) => map[k]).filter(Boolean)
   }
-  
+
   loadDensitySetting()
 }
 
@@ -597,14 +605,14 @@ function saveDensitySetting(density) {
 function loadDensitySetting() {
   const key = getStorageKey('density')
   const density = storage.get(key)
-  
+
   if (density && ['small', 'middle', 'large'].includes(density)) {
     state.density = density
   }
 }
 
 function resetColumnSettings() {
-  state.visibleColumns = props.columns.map(c => c.key)
+  state.visibleColumns = props.columns.map((c) => c.key)
   state.columnWidths = {}
   state.columnFixed = {}
   state.allColumns = [...props.columns]
@@ -624,23 +632,17 @@ function reload(goToFirst = false) {
 
   const pagination = paginationConfig.value
   const params = {
-    pageNumber: goToFirst ? 1 : (pagination?.current || 1),
+    pageNumber: goToFirst ? 1 : pagination?.current || 1,
     pageSize: pagination?.pageSize || 10,
     ...props.searchData
-  }
-
-  // 如果没有 onLoad 函数，只能使用静态数据
-  if (!props.onLoad) {
-    console.warn('[ag-table] onLoad is not provided, using static data from props.data')
-    emit('load-complete')
-    return
   }
 
   // 使用内部 loading 状态以便在非受控模式下显示加载中
   localLoading.value = true
 
-  props.onLoad(params)
-    .then(res => {
+  props
+    .onLoad(params)
+    .then((res) => {
       // 如果父组件没有通过 props.data 提供数据，则由组件内部管理显示数据
       if (!props.data || (Array.isArray(props.data) && props.data.length === 0)) {
         internalData.value = res.records || res.list || []
@@ -657,7 +659,7 @@ function reload(goToFirst = false) {
       emit('reload', res)
       emit('load-complete')
     })
-    .catch(err => {
+    .catch((err) => {
       console.error('[ag-table] Failed to load data:', err)
       emit('load-complete')
     })
@@ -676,13 +678,14 @@ function reloadStatistics() {
     ...props.searchData
   }
 
-  props.onLoadStatistics(params)
-    .then(res => {
+  props
+    .onLoadStatistics(params)
+    .then((res) => {
       state.statistics = res
       emit('statistics-loaded', res)
       emit('load-complete')
     })
-    .catch(err => {
+    .catch((err) => {
       console.warn('[ag-table] Failed to load statistics:', err)
       emit('load-complete')
     })
@@ -694,7 +697,6 @@ function handleDownload() {
     return
   }
 
-  const pagination = paginationConfig.value
   const params = {
     pageNumber: 1,
     pageSize: -1,
@@ -702,11 +704,11 @@ function handleDownload() {
   }
 
   const promise = props.onDownload(params)
-  
+
   if (promise && typeof promise.then === 'function') {
     promise
       .then(() => message.success(t('agTable.exportTriggered')))
-      .catch(err => {
+      .catch((err) => {
         const msg = (err && err.msg) || t('agTable.exportFailed')
         message.error(msg)
       })
@@ -752,6 +754,12 @@ function handleTableChange(pagination, filters, sorter) {
   reload()
 }
 
+function handleRowClick(record, event) {
+  if (props.rowClick) {
+    props.rowClick(record, event)
+  }
+}
+
 function handleDensityChange({ key }) {
   state.density = key
   saveDensitySetting(key)
@@ -760,9 +768,9 @@ function handleDensityChange({ key }) {
 // ==================== 列操作 ====================
 
 function moveColumn(key, dir) {
-  const idx = state.allColumns.findIndex(c => c.key === key)
+  const idx = state.allColumns.findIndex((c) => c.key === key)
   if (idx === -1 || idx + dir < 0 || idx + dir >= state.allColumns.length) return
-  
+
   const arr = [...state.allColumns]
   const [item] = arr.splice(idx, 1)
   arr.splice(idx + dir, 0, item)
@@ -777,8 +785,7 @@ function setColumnFixed(key, val) {
   if (val) {
     state.columnFixed = { ...state.columnFixed, [key]: val }
   } else {
-    const { [key]: _, ...rest } = state.columnFixed
-    state.columnFixed = rest
+    state.columnFixed = Object.fromEntries(Object.entries(state.columnFixed).filter(([k]) => k !== key))
   }
 }
 
@@ -787,9 +794,7 @@ function getColumnFixed(key) {
 }
 
 function handleSelectAllColumns(e) {
-  state.visibleColumns = e.target.checked 
-    ? state.allColumns.map(c => c.key)
-    : []
+  state.visibleColumns = e.target.checked ? state.allColumns.map((c) => c.key) : []
 }
 
 function toggleColumn(key, checked) {
@@ -798,7 +803,7 @@ function toggleColumn(key, checked) {
       state.visibleColumns = [...state.visibleColumns, key]
     }
   } else {
-    state.visibleColumns = state.visibleColumns.filter(k => k !== key)
+    state.visibleColumns = state.visibleColumns.filter((k) => k !== key)
   }
 }
 
@@ -818,12 +823,12 @@ function onDragOver(e, key) {
 function onDrop(e, key) {
   e.preventDefault()
   if (!dragKey || dragKey === key) return
-  
-  const from = state.allColumns.findIndex(c => c.key === dragKey)
-  const to = state.allColumns.findIndex(c => c.key === key)
-  
+
+  const from = state.allColumns.findIndex((c) => c.key === dragKey)
+  const to = state.allColumns.findIndex((c) => c.key === key)
+
   if (from === -1 || to === -1) return
-  
+
   const arr = [...state.allColumns]
   const [item] = arr.splice(from, 1)
   arr.splice(to, 0, item)
@@ -839,7 +844,7 @@ function onDragEnd() {
 
 function startAutoRefresh() {
   if (state.autoRefreshTimerId) clearInterval(state.autoRefreshTimerId)
-  
+
   state.autoRefreshTimerId = setInterval(() => {
     if (autoRefreshEnabled.value) {
       state.autoRefreshCountdown--
@@ -861,51 +866,72 @@ function stopAutoRefresh() {
 // ==================== 监听器 ====================
 
 // 监听 columns 变化
-watch(() => props.columns, (val) => {
-  state.allColumns = val || []
-  state.visibleColumns = (val || []).map(c => c.key)
-}, { immediate: true })
+watch(
+  () => props.columns,
+  (val) => {
+    state.allColumns = val || []
+    state.visibleColumns = (val || []).map((c) => c.key)
+  },
+  { immediate: true, flush: 'post' }
+)
 
-// 保存列配置
-watch(() => state.visibleColumns, () => saveColumnSettings(), { deep: true })
-watch(() => state.allColumns.map(c => c.key), () => saveColumnSettings())
-watch(() => state.columnWidths, () => saveColumnSettings(), { deep: true })
-watch(() => state.columnFixed, () => saveColumnSettings(), { deep: true })
+// 保存列配置（使用防抖优化）
+watch(
+  () => [state.visibleColumns, state.allColumns.map((c) => c.key), state.columnWidths, state.columnFixed],
+  () => saveColumnSettings(),
+  { deep: true, flush: 'post' }
+)
 
-// 搜索条件变化时重新加载数据
-watch(() => props.searchData, () => {
+// 搜索条件变化时重新加载数据（使用防抖优化）
+const debouncedReload = debounce(() => {
   if (props.onLoad) {
     reload(true)
   }
-}, { deep: true })
+}, DEBOUNCE_DELAY)
+
+watch(
+  () => props.searchData,
+  () => {
+    debouncedReload()
+  },
+  { deep: true, flush: 'post' }
+)
 
 // 统计面板展开/收起
-watch(() => state.showStatistics, (val) => {
-  if (val && props.enableStatistics && !hasStatisticsSlot) {
-    reloadStatistics()
-  }
-})
+watch(
+  () => state.showStatistics,
+  (val) => {
+    if (val && props.enableStatistics && !hasStatisticsSlot) {
+      reloadStatistics()
+    }
+  },
+  { flush: 'post' }
+)
 
 // 自动刷新启用状态
-watch(autoRefreshEnabled, (val) => {
-  if (val && props.showAutoRefresh) {
-    state.autoRefreshCountdown = props.autoRefreshInterval
-    startAutoRefresh()
-  } else {
-    stopAutoRefresh()
-  }
-})
+watch(
+  autoRefreshEnabled,
+  (val) => {
+    if (val && props.showAutoRefresh) {
+      state.autoRefreshCountdown = props.autoRefreshInterval
+      startAutoRefresh()
+    } else {
+      stopAutoRefresh()
+    }
+  },
+  { flush: 'post' }
+)
 
 // ==================== 生命周期 ====================
 
 onMounted(() => {
   loadColumnSettings()
-  
+
   // 如果提供了数据加载函数，初始化时加载
   if (props.onLoad) {
     reload(true)
   }
-  
+
   // 初始化自动刷新状态
   if (props.showAutoRefresh && props.enableAutoRefresh) {
     autoRefreshEnabled.value = true

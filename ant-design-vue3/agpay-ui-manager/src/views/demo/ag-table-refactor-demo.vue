@@ -1,9 +1,7 @@
 <template>
   <a-card>
     <!-- 搜索表单 -->
-    <template #title>
-      订单列表
-    </template>
+    <template #title> 订单列表 </template>
 
     <a-form :model="searchForm" layout="inline" class="search-form">
       <a-form-item label="订单号">
@@ -22,20 +20,14 @@
 
       <a-form-item>
         <a-space>
-          <a-button type="primary" @click="handleSearch">
-            <search-outlined /> 搜索
-          </a-button>
-          <a-button @click="handleReset">
-            <reload-outlined /> 重置
-          </a-button>
+          <a-button type="primary" @click="handleSearch"> <search-outlined /> 搜索 </a-button>
+          <a-button @click="handleReset"> <reload-outlined /> 重置 </a-button>
         </a-space>
       </a-form-item>
 
       <a-form-item>
         <a-space>
-          <a-button type="primary" @click="handleAdd">
-            <plus-outlined /> 新增
-          </a-button>
+          <a-button type="primary" @click="handleAdd"> <plus-outlined /> 新增 </a-button>
           <a-button danger :disabled="selectedRowKeys.length === 0" @click="handleBatchDelete">
             <delete-outlined /> 批量删除
           </a-button>
@@ -62,9 +54,7 @@
     >
       <template #toolbar-left>
         <a-space>
-          <a-button type="primary" @click="handleAdd">
-            <plus-outlined /> 新增
-          </a-button>
+          <a-button type="primary" @click="handleAdd"> <plus-outlined /> 新增 </a-button>
           <a-button danger :disabled="selectedRowKeys.length === 0" @click="handleBatchDelete">
             <delete-outlined /> 批量删除
           </a-button>
@@ -93,12 +83,7 @@
       <template #actions="{ record }">
         <a-space size="small">
           <a-button type="link" size="small" @click="handleViewDetail(record)">查看</a-button>
-          <a-button 
-            v-if="record.status === 'pending'"
-            type="link" 
-            size="small" 
-            @click="handleEdit(record)"
-          >
+          <a-button v-if="record.status === 'pending'" type="link" size="small" @click="handleEdit(record)">
             编辑
           </a-button>
           <a-popconfirm title="确认删除?" @confirm="handleDelete(record)">
@@ -109,11 +94,7 @@
     </ag-table>
 
     <!-- 详情抽屉 -->
-    <a-drawer
-      v-model:open="detailOpen"
-      title="订单详情"
-      width="600"
-    >
+    <a-drawer v-model:open="detailOpen" title="订单详情" width="600">
       <div v-if="currentRecord">
         <a-descriptions :column="1" bordered>
           <a-descriptions-item label="订单号">
@@ -122,9 +103,7 @@
           <a-descriptions-item label="商户">
             {{ currentRecord.merchant }}
           </a-descriptions-item>
-          <a-descriptions-item label="金额">
-            ¥{{ currentRecord.amount }}
-          </a-descriptions-item>
+          <a-descriptions-item label="金额"> ¥{{ currentRecord.amount }} </a-descriptions-item>
           <a-descriptions-item label="状态">
             <a-tag :color="getStatusColor(currentRecord.status)">
               {{ getStatusLabel(currentRecord.status) }}
@@ -138,13 +117,7 @@
     </a-drawer>
 
     <!-- 编辑弹窗 -->
-    <a-modal
-      v-model:open="editOpen"
-      title="编辑订单"
-      ok-text="保存"
-      cancel-text="取消"
-      @ok="handleSaveEdit"
-    >
+    <a-modal v-model:open="editOpen" title="编辑订单" ok-text="保存" cancel-text="取消" @ok="handleSaveEdit">
       <a-form v-if="editForm" :model="editForm" layout="vertical">
         <a-form-item label="订单号">
           <a-input v-model:value="editForm.orderNo" disabled />
@@ -167,12 +140,7 @@
 import { ref, reactive, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
-import {
-  SearchOutlined,
-  ReloadOutlined,
-  PlusOutlined,
-  DeleteOutlined
-} from '@ant-design/icons-vue'
+import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { AgTable } from '@/components'
 import { req } from '@/api/manage'
 
@@ -184,7 +152,7 @@ const searchForm = reactive({
 })
 
 // ==================== 使用 onLoad 调用后端 ====================
-// 将请求函数传入 AgTable 的 `onLoad` prop，组件会在需要时调用它。
+// 将请求函数传入 ag-table 的 `onLoad` prop，组件会在需要时调用它。
 const tableSearchParams = computed(() => ({
   orderNo: searchForm.orderNo,
   status: searchForm.status,
@@ -192,7 +160,7 @@ const tableSearchParams = computed(() => ({
   endDate: searchForm.dateRange?.[1]?.format('YYYY-MM-DD')
 }))
 
-// onLoad 函数，AgTable 会传入分页等参数作为参数对象
+// onLoad 函数，ag-table 会传入分页等参数作为参数对象
 async function loadTable(params) {
   // params 可能包含: pageNumber, pageSize, sort, filters, ...
   const res = await req.list('/order/list', params)

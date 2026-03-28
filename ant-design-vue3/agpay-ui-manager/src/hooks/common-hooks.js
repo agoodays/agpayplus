@@ -3,7 +3,7 @@
  * 提供常用的组合式函数，简化组件开发
  */
 
-import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { useUserStore } from '@/store/modules/system/user'
 import { translate } from '@/utils/i18n-util'
@@ -15,12 +15,7 @@ import { translate } from '@/utils/i18n-util'
  * @returns {Object} 表格相关的响应式数据和方法
  */
 export function useTable(apiFn, options = {}) {
-  const {
-    immediate = true,
-    defaultPageSize = 10,
-    onSuccess,
-    onError
-  } = options
+  const { immediate = true, defaultPageSize = 10, onSuccess, onError } = options
 
   const loading = ref(false)
   const dataSource = ref([])
@@ -49,7 +44,7 @@ export function useTable(apiFn, options = {}) {
       }
 
       const data = await apiFn(queryParams)
-      
+
       dataSource.value = data.records || data.list || data
       pagination.total = data.total || 0
 
@@ -65,7 +60,7 @@ export function useTable(apiFn, options = {}) {
   /**
    * 表格变化处理
    */
-  const handleTableChange = (pag, filters, sorter) => {
+  const handleTableChange = (pag) => {
     pagination.current = pag.current
     pagination.pageSize = pag.pageSize
     fetchData()
@@ -395,10 +390,8 @@ export function useThrottle(fn, delay = 300) {
  * @returns {Function} 删除处理函数
  */
 export function useDelete(deleteFn, refreshFn, options = {}) {
-  const {
-    confirmText = translate('common.confirmDeleteContent'),
-    successText = translate('common.deleteSuccess')
-  } = options
+  const { confirmText = translate('common.confirmDeleteContent'), successText = translate('common.deleteSuccess') } =
+    options
 
   const handleDelete = async (id) => {
     try {
@@ -438,17 +431,17 @@ export function useExport(exportFn, options = {}) {
     loading.value = true
     try {
       const blob = await exportFn(params)
-      
+
       // 创建下载链接
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
       link.download = fileName
       link.click()
-      
+
       // 清理
       window.URL.revokeObjectURL(url)
-      
+
       message.success(translate('common.exportSuccess'))
     } catch (error) {
       console.error('Export error:', error)

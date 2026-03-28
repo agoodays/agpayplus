@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="main-page">
     <a-card :bordered="false" class="welcome-card">
       <a-row :gutter="24">
@@ -29,11 +29,7 @@
 
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card :loading="loading">
-          <a-statistic
-            :title="t('main.todayCount')"
-            :value="statistics.todayCount"
-            :suffix="t('main.countUnit')"
-          >
+          <a-statistic :title="t('main.todayCount')" :value="statistics.todayCount" :suffix="t('main.countUnit')">
             <template #prefix>
               <file-text-outlined />
             </template>
@@ -43,11 +39,7 @@
 
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card :loading="loading">
-          <a-statistic
-            :title="t('main.totalMch')"
-            :value="statistics.totalMch"
-            :suffix="t('main.itemUnit')"
-          >
+          <a-statistic :title="t('main.totalMch')" :value="statistics.totalMch" :suffix="t('main.itemUnit')">
             <template #prefix>
               <shop-outlined />
             </template>
@@ -57,11 +49,7 @@
 
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card :loading="loading">
-          <a-statistic
-            :title="t('main.totalAgent')"
-            :value="statistics.totalAgent"
-            :suffix="t('main.itemUnit')"
-          >
+          <a-statistic :title="t('main.totalAgent')" :value="statistics.totalAgent" :suffix="t('main.itemUnit')">
             <template #prefix>
               <team-outlined />
             </template>
@@ -73,19 +61,8 @@
     <!-- 快速入口 -->
     <a-card :title="t('main.quickEntry')" style="margin-top: 16px" :bordered="false">
       <a-row :gutter="[16, 16]">
-        <a-col
-          v-for="menu in quickMenuList"
-          :key="menu.entId"
-          :xs="24"
-          :sm="12"
-          :md="8"
-          :lg="6"
-        >
-          <a-card
-            hoverable
-            class="quick-menu-card"
-            @click="handleMenuClick(menu)"
-          >
+        <a-col v-for="menu in quickMenuList" :key="menu.entId" :xs="24" :sm="12" :md="8" :lg="6">
+          <a-card hoverable class="quick-menu-card" @click="handleMenuClick(menu)">
             <div class="quick-menu-content">
               <component :is="menu.icon" class="quick-menu-icon" />
               <span class="quick-menu-title">{{ menu.entName }}</span>
@@ -101,12 +78,7 @@
 import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import {
-  TransactionOutlined,
-  FileTextOutlined,
-  ShopOutlined,
-  TeamOutlined
-} from '@ant-design/icons-vue'
+import { TransactionOutlined, FileTextOutlined, ShopOutlined, TeamOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/store/modules/system/user'
 import { timeFix } from '@/utils/time-util'
 import { req } from '@/api/manage'
@@ -146,7 +118,7 @@ export default defineComponent({
 
       // 递归查找菜单
       const findQuickMenus = (menus) => {
-        menus.forEach(menu => {
+        menus.forEach((menu) => {
           // 如果是菜单链接类型且有路径
           if (menu.entType === 'ML' && menu.menuUri) {
             quickMenus.push(menu)

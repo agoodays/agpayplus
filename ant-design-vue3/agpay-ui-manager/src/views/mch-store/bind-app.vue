@@ -1,28 +1,16 @@
-﻿<template>
+<template>
   <a-modal
-    v-model:open="open"
+    v-model:open="localOpen"
     :title="t('mchStore.bindAppTitle')"
     :width="500"
     @ok="handleSubmit"
     @cancel="handleClose"
   >
-    <a-form
-      ref="formRef"
-      :model="formState"
-      layout="vertical"
-    >
+    <a-form ref="formRef" :model="formState" layout="vertical">
       <a-form-item :label="t('mchStore.pleaseSelectBindApp')" name="bindAppId">
-        <a-select
-          v-model:value="formState.bindAppId"
-          :placeholder="t('mchStore.pleaseSelectApp')"
-          :loading="loading"
-        >
+        <a-select v-model:value="formState.bindAppId" :placeholder="t('mchStore.pleaseSelectApp')" :loading="loading">
           <a-select-option value="">{{ t('mchStore.emptyOption') }}</a-select-option>
-          <a-select-option
-            v-for="item in appList"
-            :key="item.appId"
-            :value="item.appId"
-          >
+          <a-select-option v-for="item in appList" :key="item.appId" :value="item.appId">
             {{ item.appName }} [{{ item.appId }}]
           </a-select-option>
         </a-select>
@@ -71,7 +59,7 @@ const emit = defineEmits(['update:open', 'success'])
 // State
 const formRef = ref()
 const loading = ref(false)
-const open = ref(false)
+const localOpen = ref(false)
 const appList = ref([])
 
 // 表单数据
@@ -80,15 +68,18 @@ const formState = reactive({
 })
 
 // 监听 props.open 变化
-watch(() => props.open, (val) => {
-  open.value = val
-  if (val) {
-    initForm()
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val) {
+      initForm()
+    }
   }
-})
+)
 
-// 监听 open 变化
-watch(open, (val) => {
+// 监听 localOpen 变化
+watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
@@ -98,7 +89,7 @@ watch(open, (val) => {
 const initForm = async () => {
   // 设置当前绑定的应用
   formState.bindAppId = props.bindAppId || ''
-  
+
   // 加载应用列表
   await loadAppList()
 }
@@ -134,14 +125,14 @@ const handleSubmit = () => {
     onOk: async () => {
       try {
         loading.value = true
-        
+
         const data = {
           bindAppId: formState.bindAppId || null
         }
-        
+
         await req.updateById(API_URL_MCH_STORE, props.storeId, data)
         message.success(t('mchStore.bindAppSuccess'))
-        
+
         handleClose()
         emit('success')
       } catch (error) {
@@ -158,6 +149,6 @@ const handleSubmit = () => {
  * 关闭弹窗
  */
 const handleClose = () => {
-  open.value = false
+  emit('update:open', false)
 }
 </script>

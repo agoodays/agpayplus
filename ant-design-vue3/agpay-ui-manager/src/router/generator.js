@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 动态路由生成器
  * 根据后端返回的菜单数据动态生成路由
  */
@@ -21,17 +21,17 @@ const lazyLoad = (view) => {
   const fullPath = path.endsWith('.vue') ? path : `${path}.vue`
   // 完整路径
   const componentPath = `@/views${fullPath}`
-  
+
   // 从预加载的模块中查找
   const component = modules[componentPath]
-  
+
   if (!component) {
     console.error(`Component not found: ${componentPath}`)
     console.log('Available components:', Object.keys(modules))
     // 返回 404 页面
     return modules['@/views/exception/404.vue']
   }
-  
+
   return component
 }
 
@@ -41,7 +41,7 @@ const lazyLoad = (view) => {
  * @param {Boolean} isTopLevel 是否是顶层路由
  * @returns {Array} 路由配置数组
  */
-export function generator(menuData, isTopLevel = true) {
+export function generator(menuData) {
   const routes = []
 
   for (const item of menuData) {
@@ -86,7 +86,7 @@ export function generator(menuData, isTopLevel = true) {
     // 递归处理子菜单
     if (item.children && item.children.length > 0) {
       currentRoute.children = generator(item.children, false)
-      
+
       // 如果没有设置组件且有子路由，设置为 RouteView
       if (!currentRoute.component) {
         currentRoute.component = () => h(RouterView)
@@ -137,7 +137,7 @@ export function flattenRoutes(routes) {
   function flatten(routeList, parent = '') {
     for (const route of routeList) {
       const currentPath = parent ? `${parent}/${route.path}` : route.path
-      
+
       result.push({
         ...route,
         fullPath: currentPath
@@ -183,8 +183,6 @@ export function findRoute(routes, path) {
  * @returns {Array} 面包屑数组
  */
 export function getBreadcrumb(routes, path) {
-  const breadcrumb = []
-
   function find(routeList, targetPath, parents = []) {
     for (const route of routeList) {
       const currentParents = [...parents, route]

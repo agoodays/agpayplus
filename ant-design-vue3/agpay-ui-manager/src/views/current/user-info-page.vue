@@ -1,7 +1,7 @@
-﻿<template>
+<template>
   <div class="user-info-page">
     <a-card :bordered="false">
-      <a-tabs v-model:activeKey="activeTab">
+      <a-tabs v-model:active-key="activeTab">
         <!-- 基本信息 -->
         <a-tab-pane key="basic" tab="基本信息">
           <a-row :gutter="24">
@@ -33,7 +33,7 @@
                 </a-form-item>
 
                 <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
-                  <a-button type="primary" @click="handleUpdateBasic" :loading="basicLoading">
+                  <a-button type="primary" :loading="basicLoading" @click="handleUpdateBasic">
                     <check-circle-outlined />
                     更新基本信息
                   </a-button>
@@ -44,11 +44,7 @@
             <a-col :md="8" :lg="8">
               <div class="avatar-upload">
                 <div class="avatar-preview">
-                  <img
-                    :src="basicForm.avatarUrl || defaultAvatar"
-                    alt="头像"
-                    @click="handlePreviewAvatar"
-                  />
+                  <img :src="basicForm.avatarUrl || defaultAvatar" alt="头像" @click="handlePreviewAvatar" />
                 </div>
                 <a-upload
                   name="file"
@@ -69,7 +65,7 @@
 
         <!-- 安全信息 -->
         <a-tab-pane key="security" tab="安全信息">
-          <a-tabs v-model:activeKey="securityTab" tab-position="left">
+          <a-tabs v-model:active-key="securityTab" tab-position="left">
             <!-- 修改密码 -->
             <a-tab-pane key="password" tab="修改密码">
               <a-row :gutter="24">
@@ -106,7 +102,7 @@
                     </a-form-item>
 
                     <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
-                      <a-button type="primary" @click="handleUpdatePassword" :loading="passwordLoading">
+                      <a-button type="primary" :loading="passwordLoading" @click="handleUpdatePassword">
                         <safety-certificate-outlined />
                         更新密码
                       </a-button>
@@ -120,19 +116,13 @@
             <a-tab-pane key="safeWord" tab="预留信息">
               <a-row :gutter="24">
                 <a-col :md="16" :lg="16">
-                  <a-form
-                    :label-col="{ span: 6 }"
-                    :wrapper-col="{ span: 14 }"
-                  >
+                  <a-form :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }">
                     <a-form-item label="预留信息">
-                      <a-input
-                        v-model:value="safeWord"
-                        placeholder="请输入新的预留信息"
-                      />
+                      <a-input v-model:value="safeWord" placeholder="请输入新的预留信息" />
                     </a-form-item>
 
                     <a-form-item :wrapper-col="{ offset: 6, span: 14 }">
-                      <a-button type="primary" @click="handleUpdateSafeWord" :loading="safeWordLoading">
+                      <a-button type="primary" :loading="safeWordLoading" @click="handleUpdateSafeWord">
                         <check-circle-outlined />
                         确认更新
                       </a-button>
@@ -153,11 +143,7 @@ import { defineComponent, ref, reactive, onMounted, getCurrentInstance } from 'v
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import {
-  CheckCircleOutlined,
-  UploadOutlined,
-  SafetyCertificateOutlined
-} from '@ant-design/icons-vue'
+import { CheckCircleOutlined, UploadOutlined, SafetyCertificateOutlined } from '@ant-design/icons-vue'
 import { Base64 } from 'js-base64'
 import { useUserStore } from '@/store/modules/system/user'
 import { loginApi } from '@/api/system/login-api'
@@ -220,16 +206,12 @@ export default defineComponent({
 
     // 基本信息验证规则
     const basicRules = {
-      realname: [
-        { required: true, message: '请输入用户姓名', trigger: 'blur' }
-      ]
+      realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }]
     }
 
     // 密码验证规则
     const passwordRules = {
-      originalPwd: [
-        { required: true, message: '请输入原密码', trigger: 'blur' }
-      ],
+      originalPwd: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
       newPwd: [
         { required: true, message: '请输入新密码', trigger: 'blur' },
         {
@@ -305,16 +287,16 @@ export default defineComponent({
     const handleUpdateBasic = async () => {
       try {
         await basicFormRef.value.validate()
-        
+
         proxy.$infoBox.confirmPrimary(t('current.confirmUpdateInfoTitle'), '', async () => {
           basicLoading.value = true
           try {
             await req.post('/api/current/modifyUserInfo', basicForm)
-            
+
             // 更新Store中的用户信息
             const userInfo = await loginApi.getCurrentInfo()
             userStore.setUserLoginInfo(userInfo)
-            
+
             message.success(t('common.editSuccess'))
           } catch (error) {
             message.error(error.msg || t('common.editFailed'))
@@ -333,26 +315,30 @@ export default defineComponent({
     const handleUpdatePassword = async () => {
       try {
         await passwordFormRef.value.validate()
-        
-        proxy.$infoBox.confirmPrimary(t('current.confirmUpdatePasswordTitle'), t('current.updatePasswordNeedRelogin'), async () => {
-          passwordLoading.value = true
-          try {
-            await req.post('/api/current/modifyPwd', {
-              originalPwd: Base64.encode(passwordForm.originalPwd),
-              confirmPwd: Base64.encode(passwordForm.confirmPwd)
-            })
-            
-            message.success(t('current.editSuccessRelogin'))
-            
-            // 退出登录
-            await userStore.logout()
-            router.push({ name: 'login' })
-          } catch (error) {
-            message.error(error.msg || t('common.editFailed'))
-          } finally {
-            passwordLoading.value = false
+
+        proxy.$infoBox.confirmPrimary(
+          t('current.confirmUpdatePasswordTitle'),
+          t('current.updatePasswordNeedRelogin'),
+          async () => {
+            passwordLoading.value = true
+            try {
+              await req.post('/api/current/modifyPwd', {
+                originalPwd: Base64.encode(passwordForm.originalPwd),
+                confirmPwd: Base64.encode(passwordForm.confirmPwd)
+              })
+
+              message.success(t('current.editSuccessRelogin'))
+
+              // 退出登录
+              await userStore.logout()
+              router.push({ name: 'login' })
+            } catch (error) {
+              message.error(error.msg || t('common.editFailed'))
+            } finally {
+              passwordLoading.value = false
+            }
           }
-        })
+        )
       } catch (error) {
         // 表单验证失败
       }
@@ -372,11 +358,11 @@ export default defineComponent({
         await req.post('/api/current/modifyUserInfo', {
           safeWord: safeWord.value
         })
-        
+
         // 更新Store中的用户信息
         const userInfo = await loginApi.getCurrentInfo()
         userStore.setUserLoginInfo(userInfo)
-        
+
         message.success(t('common.editSuccess'))
       } catch (error) {
         message.error(error.msg || t('common.editFailed'))
@@ -410,20 +396,20 @@ export default defineComponent({
       try {
         const formData = new FormData()
         formData.append('file', file)
-        
+
         const res = await upload.singleFile(upload.avatar, true, formData)
-        
+
         basicForm.avatarUrl = res.url
-        
+
         // 更新到服务器
         await req.post('/api/current/modifyUserInfo', {
           avatarUrl: res.url
         })
-        
+
         // 更新Store中的用户信息
         const userInfo = await loginApi.getCurrentInfo()
         userStore.setUserLoginInfo(userInfo)
-        
+
         message.success(t('current.avatarUpdated'))
       } catch (error) {
         message.error(error.msg || t('common.uploadFailed'))

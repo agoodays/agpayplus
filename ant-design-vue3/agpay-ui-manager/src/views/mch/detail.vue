@@ -1,10 +1,5 @@
-﻿<template>
-  <a-drawer
-    v-model:open="open"
-    title="商户详情"
-    :width="720"
-    @close="handleClose"
-  >
+<template>
+  <a-drawer v-model:open="localOpen" title="商户详情" :width="720" @close="handleClose">
     <a-spin :spinning="loading">
       <a-descriptions :column="2" bordered>
         <a-descriptions-item label="商户号">
@@ -62,12 +57,8 @@
         </a-descriptions-item>
 
         <a-descriptions-item label="退款方式">
-          <a-tag v-if="detailData.refundMode?.includes('plat')" color="blue">
-            平台退款
-          </a-tag>
-          <a-tag v-if="detailData.refundMode?.includes('api')" color="green">
-            接口退款
-          </a-tag>
+          <a-tag v-if="detailData.refundMode?.includes('plat')" color="blue"> 平台退款 </a-tag>
+          <a-tag v-if="detailData.refundMode?.includes('api')" color="green"> 接口退款 </a-tag>
         </a-descriptions-item>
 
         <a-descriptions-item label="状态">
@@ -110,7 +101,7 @@ const emit = defineEmits(['update:open'])
 
 // State
 const loading = ref(false)
-const open = ref(false)
+const localOpen = ref(false)
 const detailData = reactive({
   mchNo: '',
   mchName: '',
@@ -132,15 +123,18 @@ const detailData = reactive({
 })
 
 // 监听 props.open 变化
-watch(() => props.open, (val) => {
-  open.value = val
-  if (val && props.recordId) {
-    loadDetail()
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.recordId) {
+      loadDetail()
+    }
   }
-})
+)
 
-// 监听 open 变化
-watch(open, (val) => {
+// 监听 localOpen 变化
+watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
@@ -151,10 +145,10 @@ const loadDetail = async () => {
   try {
     loading.value = true
     const res = await req.getById(API_URL_MCH_LIST, props.recordId)
-    
+
     // 更新 detailData
     Object.assign(detailData, res)
-    
+
     // 处理退款方式（字符串转数组）
     if (typeof res.refundMode === 'string') {
       detailData.refundMode = res.refundMode.split(',')
@@ -171,7 +165,7 @@ const loadDetail = async () => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  open.value = false
+  emit('update:open', false)
 }
 </script>
 

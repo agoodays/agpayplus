@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <a-space>
     <a-button type="link" @click="emitView">{{ t('components.view') }}</a-button>
     <a-button type="link" @click="emitEdit">{{ t('components.edit') }}</a-button>
@@ -28,11 +28,18 @@ const props = defineProps({
 
 const emit = defineEmits(['view', 'edit', 'delete', 'more'])
 
-function emitView() { emit('view', props.record) }
-function emitEdit() { emit('edit', props.record) }
-function emitDelete() { emit('delete', props.record) }
-function onMoreClick(item) { emit('more', { item, record: props.record }) }
+function emitView() {
+  emit('view', props.record)
+}
+function emitEdit() {
+  emit('edit', props.record)
+}
+function emitDelete() {
+  emit('delete', props.record)
+}
+function onMoreClick(item) {
+  emit('more', { item, record: props.record })
+}
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

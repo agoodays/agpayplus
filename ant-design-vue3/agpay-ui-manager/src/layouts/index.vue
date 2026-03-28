@@ -7,6 +7,4 @@
 import SideLayout from './side-layout.vue'
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

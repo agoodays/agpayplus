@@ -1,10 +1,5 @@
-﻿<template>
-  <a-drawer
-    v-model:open="open"
-    title="门店详情"
-    :width="720"
-    @close="handleClose"
-  >
+<template>
+  <a-drawer v-model:open="localOpen" title="门店详情" :width="720" @close="handleClose">
     <a-spin :spinning="loading">
       <a-descriptions :column="2" bordered>
         <a-descriptions-item label="门店编号" :span="2">
@@ -39,29 +34,17 @@
         </a-descriptions-item>
 
         <a-descriptions-item label="门店LOGO" :span="2">
-          <a-image
-            v-if="detailData.storeLogo"
-            :width="100"
-            :src="detailData.storeLogo"
-          />
+          <a-image v-if="detailData.storeLogo" :width="100" :src="detailData.storeLogo" />
           <span v-else>-</span>
         </a-descriptions-item>
 
         <a-descriptions-item label="门头照" :span="2">
-          <a-image
-            v-if="detailData.storeOuterImg"
-            :width="100"
-            :src="detailData.storeOuterImg"
-          />
+          <a-image v-if="detailData.storeOuterImg" :width="100" :src="detailData.storeOuterImg" />
           <span v-else>-</span>
         </a-descriptions-item>
 
         <a-descriptions-item label="门店内景照" :span="2">
-          <a-image
-            v-if="detailData.storeInnerImg"
-            :width="100"
-            :src="detailData.storeInnerImg"
-          />
+          <a-image v-if="detailData.storeInnerImg" :width="100" :src="detailData.storeInnerImg" />
           <span v-else>-</span>
         </a-descriptions-item>
 
@@ -110,7 +93,7 @@ const emit = defineEmits(['update:open'])
 
 // State
 const loading = ref(false)
-const open = ref(false)
+const localOpen = ref(false)
 const detailData = reactive({
   storeId: '',
   storeName: '',
@@ -132,15 +115,18 @@ const detailData = reactive({
 })
 
 // 监听 props.open 变化
-watch(() => props.open, (val) => {
-  open.value = val
-  if (val && props.recordId) {
-    loadDetail()
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.recordId) {
+      loadDetail()
+    }
   }
-})
+)
 
-// 监听 open 变化
-watch(open, (val) => {
+// 监听 localOpen 变化
+watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
@@ -176,7 +162,7 @@ const getFullAddress = () => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  open.value = false
+  emit('update:open', false)
 }
 </script>
 

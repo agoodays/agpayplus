@@ -1,8 +1,8 @@
-﻿<template>
+<template>
   <div class="editor-demo-container">
     <a-space direction="vertical" style="width: 100%" :size="24">
       <!-- 基础编辑器 -->
-      <AgCard title="1. 基础富文本编辑器">
+      <a-card title="1. 基础富文本编辑器">
         <a-alert
           message="基础用法"
           description="支持文本编辑、格式化、插入图片/链接等功能"
@@ -10,22 +10,18 @@
           show-icon
           class="mb-4"
         />
-        
-        <AgEditor
-          v-model="content1"
-          :height="300"
-          placeholder="请输入内容..."
-        />
+
+        <ag-editor v-model="content1" :height="300" placeholder="请输入内容..." />
 
         <a-divider />
         <div>
           <strong>HTML 内容：</strong>
           <pre>{{ content1 }}</pre>
         </div>
-      </AgCard>
+      </a-card>
 
       <!-- 简洁模式 -->
-      <AgCard title="2. 简洁模式编辑器">
+      <a-card title="2. 简洁模式编辑器">
         <a-alert
           message="简洁模式"
           description="只包含基础的文本编辑功能，适合简单的内容编辑"
@@ -33,17 +29,12 @@
           show-icon
           class="mb-4"
         />
-        
-        <AgEditor
-          v-model="content2"
-          :height="200"
-          mode="simple"
-          placeholder="请输入简单文本..."
-        />
-      </AgCard>
+
+        <ag-editor v-model="content2" :height="200" mode="simple" placeholder="请输入简单文本..." />
+      </a-card>
 
       <!-- 自定义高度 -->
-      <AgCard title="3. 自定义高度">
+      <a-card title="3. 自定义高度">
         <a-alert
           message="自定义高度"
           description="可以通过 height 属性设置编辑器高度"
@@ -51,22 +42,18 @@
           show-icon
           class="mb-4"
         />
-        
+
         <a-radio-group v-model:value="editorHeight" button-style="solid" class="mb-3">
           <a-radio-button :value="200">200px</a-radio-button>
           <a-radio-button :value="400">400px</a-radio-button>
           <a-radio-button :value="600">600px</a-radio-button>
         </a-radio-group>
 
-        <AgEditor
-          v-model="content3"
-          :height="editorHeight"
-          placeholder="请输入内容..."
-        />
-      </AgCard>
+        <ag-editor v-model="content3" :height="editorHeight" placeholder="请输入内容..." />
+      </a-card>
 
       <!-- 实际应用 - 文章编辑 -->
-      <AgCard title="4. 实际应用 - 文章编辑">
+      <a-card title="4. 实际应用 - 文章编辑">
         <a-form
           ref="articleFormRef"
           :model="articleForm"
@@ -75,19 +62,11 @@
           :wrapper-col="{ span: 22 }"
         >
           <a-form-item label="标题" name="title">
-            <a-input
-              v-model:value="articleForm.title"
-              placeholder="请输入文章标题"
-              size="large"
-            />
+            <a-input v-model:value="articleForm.title" placeholder="请输入文章标题" size="large" />
           </a-form-item>
 
           <a-form-item label="分类" name="category">
-            <a-select
-              v-model:value="articleForm.category"
-              placeholder="请选择文章分类"
-              style="width: 200px"
-            >
+            <a-select v-model:value="articleForm.category" placeholder="请选择文章分类" style="width: 200px">
               <a-select-option value="news">新闻资讯</a-select-option>
               <a-select-option value="tech">技术文章</a-select-option>
               <a-select-option value="product">产品动态</a-select-option>
@@ -96,61 +75,33 @@
           </a-form-item>
 
           <a-form-item label="标签" name="tags">
-            <a-select
-              v-model:value="articleForm.tags"
-              mode="tags"
-              placeholder="请输入标签"
-              style="width: 100%"
-            />
+            <a-select v-model:value="articleForm.tags" mode="tags" placeholder="请输入标签" style="width: 100%" />
           </a-form-item>
 
           <a-form-item label="摘要" name="summary">
-            <a-textarea
-              v-model:value="articleForm.summary"
-              :rows="3"
-              placeholder="请输入文章摘要"
-            />
+            <a-textarea v-model:value="articleForm.summary" :rows="3" placeholder="请输入文章摘要" />
           </a-form-item>
 
           <a-form-item label="内容" name="content">
-            <AgEditor
-              v-model="articleForm.content"
-              :height="500"
-              placeholder="请输入文章内容..."
-            />
+            <ag-editor v-model="articleForm.content" :height="500" placeholder="请输入文章内容..." />
           </a-form-item>
 
           <a-form-item :wrapper-col="{ offset: 2, span: 22 }">
             <a-space>
-              <a-button type="primary" @click="handlePublish">
-                发布文章
-              </a-button>
-              <a-button @click="handleSaveDraft">
-                保存草稿
-              </a-button>
-              <a-button @click="handlePreviewArticle">
-                预览
-              </a-button>
-              <a-button @click="handleClearArticle">
-                清空
-              </a-button>
+              <a-button type="primary" @click="handlePublish"> 发布文章 </a-button>
+              <a-button @click="handleSaveDraft"> 保存草稿 </a-button>
+              <a-button @click="handlePreviewArticle"> 预览 </a-button>
+              <a-button @click="handleClearArticle"> 清空 </a-button>
             </a-space>
           </a-form-item>
         </a-form>
-      </AgCard>
+      </a-card>
 
       <!-- 实际应用 - 公告编辑 -->
-      <AgCard title="5. 实际应用 - 系统公告">
-        <a-form
-          :model="noticeForm"
-          :label-col="{ span: 2 }"
-          :wrapper-col="{ span: 22 }"
-        >
+      <a-card title="5. 实际应用 - 系统公告">
+        <a-form :model="noticeForm" :label-col="{ span: 2 }" :wrapper-col="{ span: 22 }">
           <a-form-item label="标题">
-            <a-input
-              v-model:value="noticeForm.title"
-              placeholder="请输入公告标题"
-            />
+            <a-input v-model:value="noticeForm.title" placeholder="请输入公告标题" />
           </a-form-item>
 
           <a-form-item label="类型">
@@ -162,11 +113,7 @@
           </a-form-item>
 
           <a-form-item label="内容">
-            <AgEditor
-              v-model="noticeForm.content"
-              :height="300"
-              placeholder="请输入公告内容..."
-            />
+            <ag-editor v-model="noticeForm.content" :height="300" placeholder="请输入公告内容..." />
           </a-form-item>
 
           <a-form-item label="发布范围">
@@ -180,25 +127,16 @@
 
           <a-form-item :wrapper-col="{ offset: 2, span: 22 }">
             <a-space>
-              <a-button type="primary" @click="handlePublishNotice">
-                发布公告
-              </a-button>
-              <a-button @click="handlePreviewNotice">
-                预览
-              </a-button>
+              <a-button type="primary" @click="handlePublishNotice"> 发布公告 </a-button>
+              <a-button @click="handlePreviewNotice"> 预览 </a-button>
             </a-space>
           </a-form-item>
         </a-form>
-      </AgCard>
+      </a-card>
     </a-space>
 
     <!-- 预览模态框 -->
-    <a-modal
-      v-model:open="previewOpen"
-      :title="previewTitle"
-      width="800px"
-      :footer="null"
-    >
+    <a-modal v-model:open="previewOpen" :title="previewTitle" width="800px" :footer="null">
       <div class="preview-content">
         <div v-if="previewType === 'article'">
           <h2>{{ articleForm.title }}</h2>
@@ -367,11 +305,11 @@ function getNoticeColor(value) {
 }
 
 .mb-3 {
-  margin-bottom: 12px
+  margin-bottom: 12px;
 }
 
 .mb-4 {
-  margin-bottom: 16px
+  margin-bottom: 16px;
 }
 
 pre {
@@ -379,30 +317,30 @@ pre {
   padding: 16px;
   border-radius: 4px;
   overflow: auto;
-  max-height: 300px
+  max-height: 300px;
 }
 
 .preview-content {
-  padding: 20px
+  padding: 20px;
 }
 
 .preview-content h2 {
-  margin-bottom: 16px
+  margin-bottom: 16px;
 }
 
 .preview-content .meta {
-  color: #666;
-  margin-bottom: 16px
+  color: var(--text-color-weak);
+  margin-bottom: 16px;
 }
 
 .preview-content .summary {
   padding: 12px;
-  background: #f5f5f5;
-  border-left: 3px solid #1890ff;
-  margin-bottom: 16px
+  background: var(--primary-color-weak);
+  border-left: 3px solid var(--primary-color);
+  margin-bottom: 16px;
 }
 
 .preview-content .content {
-  line-height: 1.8
+  line-height: 1.8;
 }
 </style>

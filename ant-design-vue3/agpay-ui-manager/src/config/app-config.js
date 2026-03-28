@@ -7,8 +7,8 @@ export const appDefaultConfig = {
   language: 'zh_CN',
   // 布局: side 或者 side-expand 或者 top
   layout: 'side',
-  // 侧边菜单宽度 ， 默认为200px
-  sideMenuWidth: 200,
+  // 侧边菜单宽度 ， 默认为260px
+  sideMenuWidth: 260,
   // 菜单主题
   sideMenuTheme: 'dark',
   // 主题颜色索引
@@ -31,7 +31,7 @@ export const appDefaultConfig = {
   // 主题颜色（作为回退值）。优先由运行时 CSS 变量 `--primary-color` 覆盖。
   primaryColor: '#1677ff',
   // 紧凑
-  compactFlag: false,
+  compactFlag: false
 }
 
 /**
@@ -61,10 +61,9 @@ export const defaultLayoutConfig = {
  * 组件名称 ：{ 默认跳转路径（如果后端配置则已动态配置为准）， 组件渲染 }
  * */
 export const asyncRouteDefine = {
-
   // 'CurrentUserInfo': { defaultPath: '/current/userinfo', component: () => import('@/views/current/UserinfoPage') }, // 用户设置
 
-  'MainPage': { defaultPath: '/main', component: () => import('@/views/main/main-page.vue') },
+  MainPage: { defaultPath: '/main', component: () => import('@/views/main/main-page.vue') }
   // 'SysUserPage': { defaultPath: '/users', component: () => import('@/views/sysuser/SysUserPage') },
   // 'SysUserTeamPage': { defaultPath: '/teams', component: () => import('@/views/sysUserTeam/TeamList') },
   // 'RolePage': { defaultPath: '/roles', component: () => import('@/views/role/RolePage') },

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="ag-state-switch">
     <!-- Switch 模式 -->
     <a-switch
@@ -13,27 +13,15 @@
 
     <!-- Badge 模式 -->
     <template v-else>
-      <a-badge
-        v-if="state === 1"
-        status="success"
-        :text="activeText"
-      />
-      <a-badge
-        v-else-if="state === 0"
-        status="error"
-        :text="inactiveText"
-      />
-      <a-badge
-        v-else
-        status="warning"
-        :text="unknownText"
-      />
+      <a-badge v-if="state === 1" status="success" :text="activeText" />
+      <a-badge v-else-if="state === 0" status="error" :text="inactiveText" />
+      <a-badge v-else status="warning" :text="unknownText" />
     </template>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
   // 状态值：0=停用/禁用，1=启用/激活，其他=未知
@@ -79,7 +67,7 @@ const props = defineProps({
   // 切换回调（返回 Promise）
   onChange: {
     type: Function,
-    default: () => (checked) => Promise.resolve()
+    default: () => () => Promise.resolve()
   }
 })
 
@@ -90,18 +78,21 @@ const localChecked = ref(props.state === 1)
 const loading = ref(false)
 
 // 监听外部状态变化
-watch(() => props.state, (val) => {
-  localChecked.value = val === 1
-})
+watch(
+  () => props.state,
+  (val) => {
+    localChecked.value = val === 1
+  }
+)
 
 // 处理切换
 async function handleChange(checked) {
   loading.value = true
-  
+
   try {
     // 调用父组件传入的 onChange 回调
     await props.onChange(checked ? 1 : 0)
-    
+
     // 成功后更新状态
     emit('update:state', checked ? 1 : 0)
     emit('change', checked ? 1 : 0)

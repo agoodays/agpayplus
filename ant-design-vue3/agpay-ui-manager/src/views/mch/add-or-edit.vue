@@ -1,36 +1,24 @@
-﻿<template>
+<template>
   <a-drawer
-    v-model:open="open"
+    v-model:open="localOpen"
     :title="isAdd ? '新增商户' : '修改商户'"
     :width="720"
     :mask-closable="false"
     :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
   >
-    <a-form
-      ref="formRef"
-      :model="formState"
-      :rules="rules"
-      layout="vertical"
-    >
+    <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical">
       <!-- 基本信息 -->
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="商户名称" name="mchName">
-            <a-input
-              v-model:value="formState.mchName"
-              placeholder="请输入商户名称"
-            />
+            <a-input v-model:value="formState.mchName" placeholder="请输入商户名称" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="登录名" name="loginUsername">
-            <a-input
-              v-model:value="formState.loginUsername"
-              placeholder="请输入商户登录名"
-              :disabled="!isAdd"
-            />
+            <a-input v-model:value="formState.loginUsername" placeholder="请输入商户登录名" :disabled="!isAdd" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -38,19 +26,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="商户简称" name="mchShortName">
-            <a-input
-              v-model:value="formState.mchShortName"
-              placeholder="请输入商户简称"
-            />
+            <a-input v-model:value="formState.mchShortName" placeholder="请输入商户简称" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="联系人姓名" name="contactName">
-            <a-input
-              v-model:value="formState.contactName"
-              placeholder="请输入联系人姓名"
-            />
+            <a-input v-model:value="formState.contactName" placeholder="请输入联系人姓名" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -58,19 +40,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="联系人邮箱" name="contactEmail">
-            <a-input
-              v-model:value="formState.contactEmail"
-              placeholder="请输入联系人邮箱"
-            />
+            <a-input v-model:value="formState.contactEmail" placeholder="请输入联系人邮箱" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="联系人手机号" name="contactTel">
-            <a-input
-              v-model:value="formState.contactTel"
-              placeholder="请输入联系人手机号"
-            />
+            <a-input v-model:value="formState.contactTel" placeholder="请输入联系人手机号" />
             <div class="tip-text">(同步更改登录手机号)</div>
           </a-form-item>
         </a-col>
@@ -154,11 +130,7 @@
               :disabled="!isAdd"
               @search="handleSearchAgent"
             >
-              <a-select-option
-                v-for="item in agentList"
-                :key="item.agentNo"
-                :value="item.agentNo"
-              >
+              <a-select-option v-for="item in agentList" :key="item.agentNo" :value="item.agentNo">
                 {{ item.agentName }}
               </a-select-option>
             </a-select>
@@ -175,11 +147,7 @@
               :disabled="!isAdd || formState.agentNo"
               @search="handleSearchIsv"
             >
-              <a-select-option
-                v-for="item in isvList"
-                :key="item.isvNo"
-                :value="item.isvNo"
-              >
+              <a-select-option v-for="item in isvList" :key="item.isvNo" :value="item.isvNo">
                 {{ item.isvName }}
               </a-select-option>
             </a-select>
@@ -190,18 +158,14 @@
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-item label="备注" name="remark">
-            <a-textarea
-              v-model:value="formState.remark"
-              placeholder="请输入备注"
-              :rows="3"
-            />
+            <a-textarea v-model:value="formState.remark" placeholder="请输入备注" :rows="3" />
           </a-form-item>
         </a-col>
       </a-row>
 
       <!-- 账户安全 -->
       <a-divider orientation="left">
-        <a-tag color="#FF4B33">账户安全</a-tag>
+        <a-tag color="var(--error-color)">账户安全</a-tag>
       </a-divider>
 
       <div v-if="isAdd">
@@ -228,14 +192,11 @@
 
           <a-col v-if="formState.passwordType === 'custom'" :span="12">
             <a-form-item label="登录密码" name="loginPassword">
-              <a-input-password
-                v-model:value="formState.loginPassword"
-                placeholder="请输入登录密码"
-              />
+              <a-input-password v-model:value="formState.loginPassword" placeholder="请输入登录密码" />
             </a-form-item>
             <a-button
+              style="color: var(--primary-color); border-color: var(--primary-color)"
               @click="handleGeneratePassword"
-              style="color: #4278ff; border-color: #4278ff"
             >
               <sync-outlined />
               随机生成密码
@@ -249,9 +210,7 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="">
-              <a-checkbox v-model:checked="resetPayPass">
-                重置支付密码
-              </a-checkbox>
+              <a-checkbox v-model:checked="resetPayPass"> 重置支付密码 </a-checkbox>
             </a-form-item>
           </a-col>
         </a-row>
@@ -259,17 +218,13 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="">
-              <a-checkbox v-model:checked="resetPass">
-                重置密码
-              </a-checkbox>
+              <a-checkbox v-model:checked="resetPass"> 重置密码 </a-checkbox>
             </a-form-item>
           </a-col>
 
           <a-col v-if="resetPass" :span="12">
             <a-form-item label="">
-              <a-checkbox v-model:checked="defaultPass">
-                恢复默认密码
-              </a-checkbox>
+              <a-checkbox v-model:checked="defaultPass"> 恢复默认密码 </a-checkbox>
             </a-form-item>
           </a-col>
         </a-row>
@@ -277,19 +232,13 @@
         <a-row v-if="resetPass && !defaultPass" :gutter="16">
           <a-col :span="12">
             <a-form-item label="新密码" name="newPwd">
-              <a-input-password
-                v-model:value="formState.newPwd"
-                placeholder="请输入新密码"
-              />
+              <a-input-password v-model:value="formState.newPwd" placeholder="请输入新密码" />
             </a-form-item>
           </a-col>
 
           <a-col :span="12">
             <a-form-item label="确认新密码" name="confirmPwd">
-              <a-input-password
-                v-model:value="formState.confirmPwd"
-                placeholder="请再次输入新密码"
-              />
+              <a-input-password v-model:value="formState.confirmPwd" placeholder="请再次输入新密码" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -318,12 +267,7 @@
 import { ref, reactive, watch, nextTick } from 'vue'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import {
-  QuestionCircleOutlined,
-  SyncOutlined,
-  CloseOutlined,
-  CheckOutlined
-} from '@ant-design/icons-vue'
+import { QuestionCircleOutlined, SyncOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
 import { Base64 } from 'js-base64'
 import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '@/api/manage'
 import { loginApi } from '@/api/system/login-api'
@@ -348,7 +292,7 @@ const emit = defineEmits(['update:open', 'success'])
 const formRef = ref()
 const loading = ref(false)
 const isAdd = ref(true)
-const open = ref(false)
+const localOpen = ref(false)
 
 // 代理商和服务商列表
 const agentList = ref([])
@@ -389,21 +333,19 @@ const formState = reactive({
 
 // 表单验证规则
 const rules = {
-  mchName: [
-    { required: true, message: '请输入商户名称', trigger: 'blur' }
-  ],
+  mchName: [{ required: true, message: '请输入商户名称', trigger: 'blur' }],
   loginUsername: [
     { required: true, message: '请输入登录名', trigger: 'blur' },
     { pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/, message: '请输入字母开头，长度为6-18位的登录名', trigger: 'blur' }
   ],
-  mchShortName: [
-    { required: true, message: '请输入商户简称', trigger: 'blur' }
-  ],
-  contactName: [
-    { required: true, message: '请输入联系人姓名', trigger: 'blur' }
-  ],
+  mchShortName: [{ required: true, message: '请输入商户简称', trigger: 'blur' }],
+  contactName: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
   contactEmail: [
-    { pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/, message: '请输入正确的邮箱地址', trigger: 'blur' }
+    {
+      pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/,
+      message: '请输入正确的邮箱地址',
+      trigger: 'blur'
+    }
   ],
   contactTel: [
     { required: true, message: '请输入联系人手机号', trigger: 'blur' },
@@ -471,15 +413,18 @@ const rules = {
 }
 
 // 监听 props.open 变化
-watch(() => props.open, (val) => {
-  open.value = val
-  if (val) {
-    initForm()
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val) {
+      initForm()
+    }
   }
-})
+)
 
-// 监听 open 变化
-watch(open, (val) => {
+// 监听 localOpen 变化
+watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
@@ -488,10 +433,10 @@ watch(open, (val) => {
  */
 const initForm = async () => {
   isAdd.value = !props.recordId
-  
+
   // 获取密码规则
   await fetchPasswordRules()
-  
+
   if (isAdd.value) {
     // 新增模式，重置表单
     resetForm()
@@ -524,7 +469,7 @@ const loadDetail = async () => {
     loading.value = true
     const res = await req.getById(API_URL_MCH_LIST, props.recordId)
     Object.assign(formState, res)
-    
+
     // 处理退款方式（字符串转数组）
     if (typeof res.refundMode === 'string') {
       formState.refundMode = res.refundMode.split(',')
@@ -560,11 +505,11 @@ const resetForm = () => {
     newPwd: '',
     confirmPwd: ''
   })
-  
+
   resetPass.value = false
   resetPayPass.value = false
   defaultPass.value = true
-  
+
   nextTick(() => {
     formRef.value?.clearValidate()
   })
@@ -620,17 +565,15 @@ const handleGeneratePassword = () => {
 const handleSubmit = async () => {
   try {
     await formRef.value.validate()
-    
+
     loading.value = true
-    
+
     // 构建提交数据
     const data = { ...formState }
-    
+
     // 处理退款方式（数组转字符串）
-    data.refundMode = Array.isArray(data.refundMode) 
-      ? data.refundMode.join(',') 
-      : data.refundMode
-    
+    data.refundMode = Array.isArray(data.refundMode) ? data.refundMode.join(',') : data.refundMode
+
     // 处理密码
     if (isAdd.value) {
       if (data.passwordType === 'custom') {
@@ -651,7 +594,7 @@ const handleSubmit = async () => {
         data.resetPayPass = true
       }
     }
-    
+
     // 提交数据
     if (isAdd.value) {
       await req.add(API_URL_MCH_LIST, data)
@@ -660,7 +603,7 @@ const handleSubmit = async () => {
       await req.updateById(API_URL_MCH_LIST, props.recordId, data)
       message.success(t('common.editSuccess'))
     }
-    
+
     handleClose()
     emit('success')
   } catch (error) {
@@ -679,7 +622,7 @@ const handleSubmit = async () => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  open.value = false
+  emit('update:open', false)
 }
 </script>
 

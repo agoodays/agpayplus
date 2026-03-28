@@ -1,9 +1,19 @@
-﻿<template>
+<template>
   <div class="exception-page">
     <div class="exception-content">
       <div class="exception-icon">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <text x="50%" y="50%" font-size="120" font-weight="bold" fill="#f5222d" text-anchor="middle" dominant-baseline="middle">500</text>
+          <text
+            x="50%"
+            y="50%"
+            font-size="120"
+            font-weight="bold"
+            fill="#f5222d"
+            text-anchor="middle"
+            dominant-baseline="middle"
+          >
+            500
+          </text>
         </svg>
       </div>
       <h1 class="exception-title">{{ t('exception500.title') }}</h1>

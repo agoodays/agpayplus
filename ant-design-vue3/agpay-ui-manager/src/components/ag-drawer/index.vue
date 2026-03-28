@@ -1,27 +1,22 @@
-﻿<template>
+<template>
   <a-drawer
     :open="open"
     :title="title"
     :width="computedWidth"
     :closable="closable"
-    :destroyOnClose="destroyOnClose"
+    :destroy-on-close="destroyOnClose"
     @close="handleClose"
   >
     <slot></slot>
 
-    <template #footer v-if="showFooter">
+    <template v-if="showFooter" #footer>
       <div class="drawer-footer">
         <slot name="footer">
           <a-space>
             <a-button @click="handleClose">
               {{ cancelText }}
             </a-button>
-            <a-button
-              v-if="showConfirm"
-              type="primary"
-              :loading="confirmLoading"
-              @click="handleConfirm"
-            >
+            <a-button v-if="showConfirm" type="primary" :loading="confirmLoading" @click="handleConfirm">
               {{ confirmText }}
             </a-button>
           </a-space>
@@ -103,12 +98,12 @@ const computedWidth = computed(() => {
     }
     return sizeMap[props.size]
   }
-  
+
   // 其次使用 widthRatio
   if (props.widthRatio > 0) {
     return `${props.widthRatio * 100}%`
   }
-  
+
   // 最后使用 width
   return props.width
 })
@@ -131,6 +126,6 @@ defineExpose({
 .drawer-footer {
   text-align: right;
   padding: 10px 16px;
-  border-top: 1px solid #f0f0f0
+  border-top: 1px solid #f0f0f0;
 }
 </style>

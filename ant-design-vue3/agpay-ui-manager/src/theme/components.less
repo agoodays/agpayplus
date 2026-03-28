@@ -1,0 +1,860 @@
+/**
+ * 自定义组件样式
+ * 
+ * 包含：
+ * 1. 自定义组件的样式定义
+ * 2. 基于 CSS 变量的样式实现
+ * 3. 支持主题切换
+ */
+
+// ==================== 通用组件 ====================
+
+// 自定义按钮
+.ag-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  border-radius: var(--border-radius);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  border: 1px solid transparent;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.9;
+  }
+
+  &.ag-button-primary {
+    background-color: var(--primary-color);
+    color: var(--text-on-primary);
+    border-color: var(--primary-color);
+
+    &:hover {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+  }
+
+  &.ag-button-default {
+    background-color: var(--base-bg-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+
+    &:hover {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+  }
+
+  &.ag-button-danger {
+    background-color: var(--error-color);
+    color: var(--text-on-primary);
+    border-color: var(--error-color);
+
+    &:hover {
+      background-color: var(--error-color);
+      border-color: var(--error-color);
+    }
+  }
+
+  &.ag-button-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// 自定义卡片
+.ag-card {
+  background-color: var(--base-bg-color);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  padding: 16px;
+  margin-bottom: 16px;
+
+  .ag-card-header {
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 12px;
+
+    .ag-card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+  }
+
+  .ag-card-body {
+    color: var(--text-color-weak);
+  }
+
+  .ag-card-footer {
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+    margin-top: 12px;
+    text-align: right;
+  }
+}
+
+// 自定义表单
+.ag-form {
+  .ag-form-item {
+    margin-bottom: 16px;
+
+    .ag-form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+
+    .ag-form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      color: var(--text-color);
+      background-color: var(--base-bg-color);
+      transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+
+      &:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px var(--primary-color-hover);
+      }
+    }
+
+    .ag-form-error {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--error-color);
+    }
+  }
+}
+
+// 自定义标签
+.ag-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: calc(var(--border-radius) / 1.5);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin-right: 8px;
+  margin-bottom: 8px;
+
+  &.ag-tag-primary {
+    background-color: var(--primary-color-weak);
+    color: var(--primary-color);
+  }
+
+  &.ag-tag-success {
+    background-color: rgba(82, 196, 26, 0.1);
+    color: var(--success-color);
+  }
+
+  &.ag-tag-warning {
+    background-color: rgba(250, 173, 20, 0.1);
+    color: var(--warning-color);
+  }
+
+  &.ag-tag-error {
+    background-color: rgba(255, 77, 79, 0.1);
+    color: var(--error-color);
+  }
+}
+
+// 自定义徽章
+.ag-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  background-color: var(--error-color);
+  color: var(--text-on-primary);
+
+  &.ag-badge-primary {
+    background-color: var(--primary-color);
+  }
+
+  &.ag-badge-success {
+    background-color: var(--success-color);
+  }
+
+  &.ag-badge-warning {
+    background-color: var(--warning-color);
+  }
+
+  &.ag-badge-error {
+    background-color: var(--error-color);
+  }
+}
+
+// 自定义分割线
+.ag-divider {
+  margin: 16px 0;
+  border-top: 1px solid var(--border-color);
+
+  &.ag-divider-horizontal {
+    width: 100%;
+  }
+
+  &.ag-divider-vertical {
+    display: inline-block;
+    width: 1px;
+    height: 16px;
+    margin: 0 8px;
+    border-top: none;
+    border-left: 1px solid var(--border-color);
+  }
+}
+
+// 自定义加载
+.ag-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  &.ag-loading-lg {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+
+  &.ag-loading-sm {
+    width: 16px;
+    height: 16px;
+    border-width: 1.5px;
+  }
+}
+
+// 自定义工具类
+.ag-text-primary {
+  color: var(--primary-color);
+}
+
+.ag-text-success {
+  color: var(--success-color);
+}
+
+.ag-text-warning {
+  color: var(--warning-color);
+}
+
+.ag-text-error {
+  color: var(--error-color);
+}
+
+.ag-bg-primary {
+  background-color: var(--primary-color);
+  color: var(--text-on-primary);
+}
+
+.ag-bg-success {
+  background-color: var(--success-color);
+  color: var(--text-on-primary);
+}
+
+.ag-bg-warning {
+  background-color: var(--warning-color);
+  color: var(--text-on-primary);
+}
+
+.ag-bg-error {
+  background-color: var(--error-color);
+  color: var(--text-on-primary);
+}
+
+// ==================== 布局组件 ====================
+
+// 页面容器
+.ag-page-container {
+  padding: 16px;
+  background-color: var(--layout-bg);
+  min-height: calc(100vh - 64px);
+}
+
+// 卡片容器
+.ag-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .ag-card-item {
+    flex: 1;
+    min-width: 280px;
+  }
+}
+
+// 表单容器
+.ag-form-container {
+  background-color: var(--base-bg-color);
+  border-radius: var(--border-radius);
+  padding: 24px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+// 统计卡片
+.ag-stat-card {
+  background-color: var(--base-bg-color);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  box-shadow: 0 2px 8px var(--shadow-color);
+
+  .ag-stat-title {
+    font-size: 14px;
+    color: var(--text-color-weak);
+    margin-bottom: 8px;
+  }
+
+  .ag-stat-value {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+  }
+
+  .ag-stat-desc {
+    font-size: 12px;
+    color: var(--text-color-muted);
+  }
+
+  &.ag-stat-card-primary {
+    border-left: 4px solid var(--primary-color);
+  }
+
+  &.ag-stat-card-success {
+    border-left: 4px solid var(--success-color);
+  }
+
+  &.ag-stat-card-warning {
+    border-left: 4px solid var(--warning-color);
+  }
+
+  &.ag-stat-card-error {
+    border-left: 4px solid var(--error-color);
+  }
+}
+
+// ==================== 响应式样式 ====================
+
+@media (max-width: 768px) {
+  .ag-card-container {
+    flex-direction: column;
+
+    .ag-card-item {
+      min-width: 100%;
+    }
+  }
+
+  .ag-page-container {
+    padding: 12px;
+  }
+
+  .ag-form-container {
+    padding: 16px;
+  }
+
+  .ag-stat-card {
+    padding: 16px;
+
+    .ag-stat-value {
+      font-size: 20px;
+    }
+  }
+}
+
+// ==================== 从 index.less 迁移的样式 ====================
+
+// ==================== 自定义颜色类 ====================
+
+// 主题颜色class列表, 用于文字颜色
+.ag-theme {
+  color: var(--primary-color); //主题色
+}
+.ag-back {
+  color: var(--layout-bg); //主要背景色
+}
+.ag-card-back {
+  color: var(--base-bg-color); //卡片底色
+}
+.ag-theme-mask {
+  color: rgba(22, 119, 255, 0.1); //主体遮罩色(10% 透明度)
+}
+.ag-strengthen {
+  color: var(--text-color-weak); //强化色
+}
+.ag-theme-hover {
+  color: rgba(22, 119, 255, 0.8); //主题Hover
+}
+.ag-warning {
+  color: var(--warning-color); //危险，强化警告色
+}
+.ag-inside-link {
+  color: var(--primary-color); //内部链接
+}
+.ag-external-link {
+  color: var(--error-color); //外部链接
+}
+
+// 主题颜色class列表, 用于背景颜色
+.ag-theme-back-color {
+  background-color: var(--primary-color); //主题色
+}
+.ag-back-color {
+  background-color: var(--layout-bg); //主要背景色
+}
+.ag-card-back-color {
+  background-color: var(--base-bg-color); //卡片底色
+}
+.ag-theme-mask-back-color {
+  background-color: rgba(22, 119, 255, 0.1); //主体遮罩色(10% 透明度)
+}
+.ag-strengthen-back-color {
+  background-color: var(--text-color-weak); //强化色
+}
+.ag-theme-hover-back-color {
+  background-color: rgba(22, 119, 255, 0.8); //主题Hover
+}
+.ag-warning-back-color {
+  background-color: var(--warning-color); //危险，强化警告色
+}
+.ag-inside-link-back-color {
+  background-color: var(--primary-color); //内部链接
+}
+.ag-external-link-back-color {
+  background-color: var(--error-color); //外部链接
+}
+
+// ==================== 编辑器样式 ====================
+
+.ag-editor {
+  border: 1px solid var(--border-color);
+  z-index: 10;
+  border-radius: var(--border-radius);
+}
+
+.ag-editor-toolbar {
+  border-bottom: 1px solid var(--border-color);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+
+  .w-e-toolbar {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+  }
+}
+
+.ag-editor-box {
+  overflow-y: hidden;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+// ==================== 表格样式 ====================
+
+// 添加外边框
+.ant-table {
+  border: 1px solid var(--border-color);
+  border-bottom: 0;
+  border-radius: var(--border-radius);
+}
+
+// 结合 表格组件中的 :scroll ，让表格在收缩时，展示滚动条
+.ant-table-body {
+  overflow-x: auto !important;
+}
+
+// 隐藏面包屑底下的标题
+.ant-page-header-heading {
+  display: none;
+}
+
+// 数据列表 样式
+.table-alert {
+  margin-bottom: 16px;
+}
+
+// 数据列表 操作
+.table-operator {
+  margin-bottom: 18px;
+
+  button {
+    margin-right: 8px;
+  }
+}
+
+// 数据列表 搜索条件
+.table-page-search-wrapper {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 30px 30px 0;
+
+  .ant-form-inline {
+    .ant-form-item {
+      display: flex;
+      margin-right: 0;
+
+      .ant-form-item-control-wrapper {
+        flex: 1 1;
+        display: inline-block;
+        vertical-align: middle;
+        width: 100%;
+      }
+
+      > .ant-form-item-label {
+        line-height: 32px;
+        padding-right: 8px;
+        width: auto;
+      }
+      .ant-form-item-control {
+        height: 32px;
+        line-height: 32px;
+      }
+    }
+  }
+
+  .table-page-search-submitButtons {
+    display: block;
+    margin-bottom: 24px;
+    white-space: nowrap;
+  }
+}
+
+// ==================== 侧边栏样式 ====================
+
+// 侧边栏样式
+.ant-pro-sider-menu-sider {
+  width: var(--side-menu-width) !important;
+  max-width: var(--side-menu-width) !important;
+  min-width: var(--side-menu-width) !important;
+
+  // 去掉侧边栏阴影
+  .light {
+    box-shadow: none;
+  }
+}
+
+// ==================== 卡片样式 ====================
+
+// 保持卡片内边距
+.ant-card-body {
+  padding: 16px !important;
+}
+
+// 增加内容区域的边框圆角
+.ant-card {
+  border-radius: var(--border-radius) !important;
+  overflow: hidden;
+}
+
+// ==================== 输入框样式 ====================
+
+// 登录页输入框fcous hover事件，边框为主题蓝
+.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled) {
+  border-color: var(--primary-color);
+}
+
+.ant-input:focus {
+  border-color: var(--primary-color);
+}
+
+// ==================== 抽屉样式 ====================
+
+.ant-drawer-wrapper-body {
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+// 抽屉，按钮板块，居中
+.drawer-btn-center {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  border-top: 1px solid var(--border-color);
+  padding: 10px 16px;
+  background: var(--base-bg-color);
+  text-align: center;
+  z-index: 2;
+
+  &:first-child {
+    margin-right: 80px;
+  }
+  button {
+    margin: 0;
+    padding: 3px 20px;
+  }
+}
+
+// ==================== 文本截断 ====================
+
+.els {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ==================== 内容区域样式 ====================
+
+// 内容区域样式
+.ant-pro-basicLayout-content {
+  margin: 0;
+  padding: 16px;
+}
+
+// 表格页面的间距
+.ant-table-pagination.ant-pagination {
+  margin: 20px;
+}
+
+.ant-table-align-left {
+  padding-left: 38px;
+}
+
+// 向下的30外边距
+.mg-b-30 {
+  margin-bottom: 30px;
+}
+
+// 表格，搜索框板块布局
+.table-head-ground {
+  display: flex;
+  justify-content: start;
+  flex-wrap: wrap;
+
+  .table-layer {
+    display: flex;
+    flex-wrap: wrap;
+    flex-grow: 1;
+    flex-shrink: 1;
+  }
+}
+
+.table-head-layout {
+  min-width: 220px;
+  max-width: 240px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  margin-bottom: 30px !important;
+  margin-right: 16px !important;
+}
+
+// ==================== 错误页面样式 ====================
+
+// 404 500 403
+.result-err {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  overflow: auto;
+
+  div {
+    margin: 20px 0;
+    text-align: center;
+    font-size: 16px;
+    p.big-text {
+      font-size: 36px;
+      font-weight: 700;
+    }
+  }
+}
+
+// ==================== 分割线样式 ====================
+
+.split-line {
+  border-bottom: 1px solid var(--border-color);
+  position: relative;
+  -webkit-touch-callout: none;
+  user-select: none;
+
+  .btns {
+    width: 100px;
+    height: 34px;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    position: absolute;
+    left: 50%;
+    margin-left: -50px;
+    top: 50%;
+    margin-top: -17px;
+    background-color: var(--base-bg-color);
+    font-size: 12px;
+
+    div {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      color: var(--text-color-weak);
+
+      i {
+        display: inline-block;
+        margin-left: 5px;
+      }
+    }
+  }
+
+  .btns:before {
+    content: '';
+    position: absolute;
+    width: calc(100% + 2px);
+    height: 50%;
+    background-color: var(--base-bg-color);
+    top: -1px;
+    left: -1px;
+    z-index: 1;
+  }
+}
+
+// ==================== 页面头部样式 ====================
+
+.ant-page-header {
+  padding: 0 0 0 5px !important;
+}
+
+.ant-pro-sider-menu-sider.light .ant-pro-sider-menu-logo {
+  -webkit-box-shadow: 0 0 0 0 #fff !important;
+  box-shadow: 0 0 0 0 #fff !important;
+}
+
+// ==================== 菜单样式 ====================
+
+.ant-menu {
+  padding: 0 15px !important;
+  border: none !important;
+}
+
+.ant-menu-sub.ant-menu-inline {
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+.ant-menu-item {
+  border-radius: 3px;
+}
+
+.ant-menu-item:hover {
+  background: var(--primary-color-weak);
+}
+
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background-color: var(--primary-color) !important;
+  color: #ffffff !important;
+}
+
+.ant-menu-item-selected > a,
+.ant-menu-item-selected > a:hover {
+  color: #ffffff !important;
+}
+
+.ant-menu-item-selected .ant-menu-title-content {
+  color: #ffffff !important;
+}
+
+.ant-menu-item-selected .anticon {
+  color: #ffffff !important;
+}
+
+/* 暗色模式下的菜单样式 */
+[data-theme='dark'] .ant-menu {
+  background-color: var(--layout-bg) !important;
+  color: var(--text-on-dark) !important;
+}
+
+[data-theme='dark'] .ant-menu-sub {
+  background-color: var(--layout-bg) !important;
+}
+
+[data-theme='dark'] .ant-menu-item {
+  color: var(--text-on-dark) !important;
+}
+
+[data-theme='dark'] .ant-menu-item:hover {
+  color: var(--text-on-dark) !important;
+}
+
+[data-theme='dark'] .ant-menu-item-selected {
+  background-color: var(--primary-color) !important;
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .ant-menu-item-selected .ant-menu-title-content {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .ant-menu-item-selected .anticon {
+  color: #ffffff !important;
+}
+
+[data-theme='dark'] .ant-menu-sub.ant-menu-inline {
+  background-color: var(--layout-bg) !important;
+}
+
+/* 确保所有菜单相关的 ul 元素都使用容器背景色 */
+[data-theme='dark'] ul.ant-menu {
+  background-color: var(--layout-bg) !important;
+}
+
+[data-theme='dark'] ul.ant-menu-sub {
+  background-color: var(--layout-bg) !important;
+}
+
+body .ant-menu-inline-collapsed > .ant-menu-item,
+body .ant-menu-inline-collapsed > .ant-menu-item-group > .ant-menu-item-group-list > .ant-menu-item,
+body
+  .ant-menu-inline-collapsed
+  > .ant-menu-item-group
+  > .ant-menu-item-group-list
+  > .ant-menu-submenu
+  > .ant-menu-submenu-title,
+body .ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title {
+  padding: 0 15px !important;
+}
+
+.ant-menu-vertical.ant-menu-sub,
+.ant-menu-vertical-left.ant-menu-sub,
+.ant-menu-vertical-right.ant-menu-sub {
+  min-width: 190px !important;
+}
+
+// ==================== 色弱模式 ====================
+
+.colorWeak {
+  filter: invert(80%);
+}

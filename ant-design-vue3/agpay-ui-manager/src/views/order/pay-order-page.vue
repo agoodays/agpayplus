@@ -1,12 +1,8 @@
-﻿<template>
+<template>
   <div class="pay-order-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <a-form
-        :model="searchParams"
-        layout="inline"
-        class="search-form"
-      >
+      <a-form :model="searchParams" layout="inline" class="search-form">
         <!-- 日期范围 -->
         <a-form-item label="创建时间">
           <a-range-picker
@@ -20,10 +16,7 @@
         <!-- 订单号类型 -->
         <a-form-item label="订单号">
           <a-input-group compact>
-            <a-select
-              v-model:value="orderNoType"
-              style="width: 140px"
-            >
+            <a-select v-model:value="orderNoType" style="width: 140px">
               <a-select-option value="payOrderId">支付订单号</a-select-option>
               <a-select-option value="mchOrderNo">商户订单号</a-select-option>
               <a-select-option value="channelOrderNo">渠道订单号</a-select-option>
@@ -33,7 +26,7 @@
               placeholder="请输入订单号"
               allow-clear
               style="width: 200px"
-              @pressEnter="handleSearch"
+              @press-enter="handleSearch"
             />
           </a-input-group>
         </a-form-item>
@@ -49,11 +42,7 @@
             style="width: 200px"
             @search="handleSearchMch"
           >
-            <a-select-option
-              v-for="item in mchList"
-              :key="item.mchNo"
-              :value="item.mchNo"
-            >
+            <a-select-option v-for="item in mchList" :key="item.mchNo" :value="item.mchNo">
               {{ item.mchName }}
             </a-select-option>
           </a-select>
@@ -62,12 +51,7 @@
         <!-- 展开更多 -->
         <template v-if="showMore">
           <a-form-item label="支付状态">
-            <a-select
-              v-model:value="searchParams.state"
-              placeholder="全部"
-              allow-clear
-              style="width: 140px"
-            >
+            <a-select v-model:value="searchParams.state" placeholder="全部" allow-clear style="width: 140px">
               <a-select-option :value="0">订单生成</a-select-option>
               <a-select-option :value="1">支付中</a-select-option>
               <a-select-option :value="2">支付成功</a-select-option>
@@ -79,12 +63,7 @@
           </a-form-item>
 
           <a-form-item label="回调状态">
-            <a-select
-              v-model:value="searchParams.notifyState"
-              placeholder="全部"
-              allow-clear
-              style="width: 140px"
-            >
+            <a-select v-model:value="searchParams.notifyState" placeholder="全部" allow-clear style="width: 140px">
               <a-select-option :value="0">未发送</a-select-option>
               <a-select-option :value="1">已发送</a-select-option>
             </a-select>
@@ -95,7 +74,7 @@
               v-model:value="searchParams.appId"
               placeholder="请输入应用ID"
               allow-clear
-              @pressEnter="handleSearch"
+              @press-enter="handleSearch"
             />
           </a-form-item>
 
@@ -104,7 +83,7 @@
               v-model:value="searchParams.storeId"
               placeholder="请输入门店ID"
               allow-clear
-              @pressEnter="handleSearch"
+              @press-enter="handleSearch"
             />
           </a-form-item>
         </template>
@@ -133,28 +112,18 @@
       <a-card v-if="statistics" class="statistics-card" :bordered="false">
         <a-row :gutter="16">
           <a-col :span="6">
-            <a-statistic
-              title="成交订单"
-              :value="statistics.payAmount"
-              :precision="2"
-              suffix="元"
-            >
+            <a-statistic title="成交订单" :value="statistics.payAmount" :precision="2" suffix="元">
               <template #prefix>
-                <transaction-outlined style="color: #1890ff" />
+                <transaction-outlined style="color: var(--primary-color)" />
               </template>
             </a-statistic>
             <div class="statistic-detail">{{ statistics.payCount }} 笔</div>
           </a-col>
 
           <a-col :span="6">
-            <a-statistic
-              title="手续费金额"
-              :value="statistics.mchFeeAmount"
-              :precision="2"
-              suffix="元"
-            >
+            <a-statistic title="手续费金额" :value="statistics.mchFeeAmount" :precision="2" suffix="元">
               <template #prefix>
-                <dollar-outlined style="color: #faad14" />
+                <dollar-outlined style="color: var(--warning-color)" />
               </template>
             </a-statistic>
           </a-col>
@@ -167,7 +136,7 @@
               suffix="元"
             >
               <template #prefix>
-                <wallet-outlined style="color: #52c41a" />
+                <wallet-outlined style="color: var(--success-color)" />
               </template>
             </a-statistic>
           </a-col>
@@ -178,7 +147,7 @@
               :value="statistics.refundAmount"
               :precision="2"
               suffix="元"
-              :value-style="{ color: '#cf1322' }"
+              :value-style="{ color: 'var(--error-color)' }"
             >
               <template #prefix>
                 <undo-outlined />
@@ -205,11 +174,11 @@
 
       <!-- 数据表格 -->
       <a-table
+        row-key="payOrderId"
         :columns="columns"
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
-        row-key="payOrderId"
         :scroll="{ x: 1800 }"
         @change="handleTableChange"
       >
@@ -225,9 +194,7 @@
 
         <!-- 支付金额 -->
         <template #amount="{ text }">
-          <span style="color: #1890ff; font-weight: 500">
-            ¥{{ (text / 100).toFixed(2) }}
-          </span>
+          <span style="color: var(--primary-color); font-weight: 500"> ¥{{ (text / 100).toFixed(2) }} </span>
         </template>
 
         <!-- 手续费 -->
@@ -244,21 +211,13 @@
 
         <!-- 回调状态 -->
         <template #notifyState="{ text }">
-          <a-badge
-            :status="text === 1 ? 'success' : 'default'"
-            :text="text === 1 ? '已发送' : '未发送'"
-          />
+          <a-badge :status="text === 1 ? 'success' : 'default'" :text="text === 1 ? '已发送' : '未发送'" />
         </template>
 
         <!-- 操作 -->
         <template #action="{ record }">
           <a-space>
-            <a-button
-              v-if="hasPermission('ENT_PAY_ORDER_VIEW')"
-              type="link"
-              size="small"
-              @click="handleDetail(record)"
-            >
+            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" size="small" @click="handleDetail(record)">
               详情
             </a-button>
 
@@ -276,22 +235,15 @@
     </a-card>
 
     <!-- 详情抽屉 -->
-    <detail-drawer
-      v-model:open="detailOpen"
-      :pay-order-id="currentPayOrderId"
-    />
+    <detail-drawer v-model:open="detailOpen" :pay-order-id="currentPayOrderId" />
 
     <!-- 退款弹窗 -->
-    <refund-modal
-      v-model:open="refundOpen"
-      :pay-order="currentPayOrder"
-      @success="handleRefundSuccess"
-    />
+    <refund-modal v-model:open="refundOpen" :pay-order="currentPayOrder" @success="handleRefundSuccess" />
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import {
@@ -314,7 +266,7 @@ import RefundModal from './refund-modal.vue'
 const { t } = useI18n()
 
 // 使用 Hooks
-const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
+const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
   useTable((params) => req.list(API_URL_PAY_ORDER, params))
 
 const { open: detailOpen, showModal: showDetail } = useModal()
@@ -434,7 +386,7 @@ const handleSearchMch = async (keyword) => {
     mchList.value = []
     return
   }
-  
+
   try {
     const res = await req.list(API_URL_MCH_LIST, {
       mchName: keyword,

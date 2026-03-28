@@ -1,11 +1,11 @@
 /**
  * 主题工具
- * 
+ *
  * 功能：
  * 1. 将后端配置转换为 CSS 变量
  * 2. 动态应用主题到页面
  * 3. 提供主题相关的辅助函数
- * 
+ *
  * 注意：
  * - CSS 变量定义在 src/theme/index.less
  * - 这里的 DEFAULTS 仅作为 JS 层面的回退值
@@ -19,19 +19,19 @@ const DEFAULTS = {
   primaryColor: appDefaultConfig.primaryColor,
   primaryColorHover: 'rgba(22, 119, 255, 0.08)',
   primaryColorWeak: 'rgba(22, 119, 255, 0.06)',
-  
+
   // 状态颜色
   successColor: '#52c41a',
   warningColor: '#faad14',
   errorColor: '#ff4d4f',
   infoColor: appDefaultConfig.primaryColor,
-  
+
   // 布局
   borderRadius: `${appDefaultConfig.borderRadius}px`,
   borderRadiusLg: '8px',
   sideMenuWidth: `${appDefaultConfig.sideMenuWidth}px`,
   pageWidth: appDefaultConfig.pageWidth,
-  
+
   // 背景色
   baseBgColor: '#fff',
   layoutBg: '#f5f5f5',
@@ -42,7 +42,7 @@ const DEFAULTS = {
   overlayBg: '#000',
   surfaceVariant: 'rgba(0,0,0,0.03)',
   hoverBgColor: '#dadada',
-  
+
   // 文字颜色
   textColor: 'rgba(0,0,0,0.85)',
   textColorWeak: 'rgba(0,0,0,0.45)',
@@ -51,12 +51,12 @@ const DEFAULTS = {
   textMuted: 'rgba(0,0,0,0.2)',
   textOnDark: 'rgba(255,255,255,0.87)',
   textOnPrimary: '#fff',
-  
+
   // 边框和阴影
   borderColor: '#e7eaf3',
   borderDashed: 'rgba(0,0,0,0.15)',
   shadowColor: 'rgba(0,0,0,0.1)',
-  
+
   // Ant Design 主色（保持与 primaryColor 一致）
   antPrimaryColor: appDefaultConfig.primaryColor
 }
@@ -93,21 +93,25 @@ function applyCssVars(style, vars) {
  */
 function hexToRgba(hex, alpha) {
   if (!hex) return `rgba(0, 0, 0, ${alpha})`
-  
+
   // 移除 # 号
   const h = hex.replace('#', '')
-  
+
   // 处理简写形式（如 #fff）
-  const fullHex = h.length === 3 
-    ? h.split('').map(c => c + c).join('') 
-    : h
-  
+  const fullHex =
+    h.length === 3
+      ? h
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : h
+
   // 转换为 RGB
   const bigint = parseInt(fullHex, 16)
   const r = (bigint >> 16) & 255
   const g = (bigint >> 8) & 255
   const b = bigint & 255
-  
+
   return `rgba(${r}, ${g}, ${b}, ${alpha})`
 }
 
@@ -115,10 +119,10 @@ function hexToRgba(hex, alpha) {
 
 /**
  * 应用主题配置到页面
- * 
+ *
  * @param {Object} config - 主题配置对象
  * @returns {Object} 应用后的主题值
- * 
+ *
  * @example
  * applyThemeFromConfig({
  *   primaryColor: '#1890ff',
@@ -128,29 +132,25 @@ function hexToRgba(hex, alpha) {
  */
 export function applyThemeFromConfig(config = {}) {
   const root = document.documentElement
-  
+
   // ==================== 提取配置值 ====================
-  
+
   // 主色（支持多种配置键名）
-  const primaryColor = 
-    config.primaryColor || 
-    config.theme || 
-    config.themeColor || 
-    config.themePrimary || 
-    DEFAULTS.primaryColor
-  
+  const primaryColor =
+    config.primaryColor || config.theme || config.themeColor || config.themePrimary || DEFAULTS.primaryColor
+
   // 状态颜色
   const successColor = config.successColor || DEFAULTS.successColor
   const warningColor = config.warningColor || DEFAULTS.warningColor
   const errorColor = config.errorColor || DEFAULTS.errorColor
   const infoColor = config.infoColor || primaryColor || DEFAULTS.infoColor
-  
+
   // 布局
   const borderRadius = toPx(config.borderRadius || config.roundCorner || DEFAULTS.borderRadius)
   const borderRadiusLg = toPx(config.borderRadiusLg || DEFAULTS.borderRadiusLg)
   const sideMenuWidth = toPx(config.sideMenuWidth || DEFAULTS.sideMenuWidth)
   const pageWidth = config.pageWidth || DEFAULTS.pageWidth
-  
+
   // 背景色
   const baseBgColor = config.baseBgColor || config.background || config.bodyBackground || DEFAULTS.baseBgColor
   const layoutBg = config.layoutBg || config.layoutBackground || DEFAULTS.layoutBg
@@ -161,7 +161,7 @@ export function applyThemeFromConfig(config = {}) {
   const overlayBg = config.overlayBg || config.overlay || DEFAULTS.overlayBg
   const surfaceVariant = config.surfaceVariant || config.surface || DEFAULTS.surfaceVariant
   const hoverBgColor = config.hoverBgColor || DEFAULTS.hoverBgColor
-  
+
   // 文字颜色
   const textColor = config.textColor || config.text || DEFAULTS.textColor
   const textColorWeak = config.textColorWeak || config.textWeak || DEFAULTS.textColorWeak
@@ -170,19 +170,19 @@ export function applyThemeFromConfig(config = {}) {
   const textMuted = config.textMuted || DEFAULTS.textMuted
   const textOnDark = config.textOnDark || DEFAULTS.textOnDark
   const textOnPrimary = config.textOnPrimary || DEFAULTS.textOnPrimary
-  
+
   // 边框和阴影
   const borderColor = config.borderColor || DEFAULTS.borderColor
   const borderDashed = config.borderDashed || DEFAULTS.borderDashed
   const shadowColor = config.shadowColor || DEFAULTS.shadowColor
-  
+
   // Ant Design 主色
   const antPrimaryColor = config.antPrimaryColor || config.antPrimary || primaryColor || DEFAULTS.antPrimaryColor
-  
+
   // 主色衍生色（悬停、弱化）
   const primaryColorHover = config.primaryColorHover || config.primaryHover || hexToRgba(primaryColor, 0.08)
   const primaryColorWeak = config.primaryColorWeak || config.primaryWeak || hexToRgba(primaryColor, 0.06)
-  
+
   // ==================== 应用 CSS 变量 ====================
   applyCssVars(root.style, {
     '--primary-color': primaryColor,
@@ -223,9 +223,9 @@ export function applyThemeFromConfig(config = {}) {
 
     '--ant-primary-color': antPrimaryColor
   })
-  
+
   // ==================== 返回应用的值 ====================
-  
+
   return {
     primaryColor,
     primaryColorHover,
@@ -255,7 +255,7 @@ export function resetTheme() {
 export function getCurrentTheme() {
   const root = document.documentElement
   const style = getComputedStyle(root)
-  
+
   return {
     primaryColor: style.getPropertyValue('--primary-color').trim(),
     borderRadius: style.getPropertyValue('--border-radius').trim(),
@@ -272,4 +272,3 @@ export default {
   getCurrentTheme,
   DEFAULTS
 }
-

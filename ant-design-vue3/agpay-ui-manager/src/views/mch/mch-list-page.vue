@@ -1,18 +1,14 @@
-﻿<template>
+<template>
   <div class="mch-list-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <a-form
-        :model="searchParams"
-        layout="inline"
-        class="search-form"
-      >
+      <a-form :model="searchParams" layout="inline" class="search-form">
         <a-form-item label="商户号">
           <a-input
             v-model:value="searchParams.mchNo"
             placeholder="请输入商户号"
             allow-clear
-            @pressEnter="handleSearch"
+            @press-enter="handleSearch"
           />
         </a-form-item>
 
@@ -21,29 +17,19 @@
             v-model:value="searchParams.mchName"
             placeholder="请输入商户名称"
             allow-clear
-            @pressEnter="handleSearch"
+            @press-enter="handleSearch"
           />
         </a-form-item>
 
         <a-form-item label="商户状态">
-          <a-select
-            v-model:value="searchParams.state"
-            placeholder="请选择状态"
-            style="width: 120px"
-            allow-clear
-          >
+          <a-select v-model:value="searchParams.state" placeholder="请选择状态" style="width: 120px" allow-clear>
             <a-select-option :value="1">启用</a-select-option>
             <a-select-option :value="0">禁用</a-select-option>
           </a-select>
         </a-form-item>
 
         <a-form-item label="商户类型">
-          <a-select
-            v-model:value="searchParams.type"
-            placeholder="请选择类型"
-            style="width: 120px"
-            allow-clear
-          >
+          <a-select v-model:value="searchParams.type" placeholder="请选择类型" style="width: 120px" allow-clear>
             <a-select-option :value="1">普通商户</a-select-option>
             <a-select-option :value="2">特约商户</a-select-option>
           </a-select>
@@ -64,11 +50,7 @@
       <!-- 操作按钮 -->
       <div class="table-operations">
         <a-space>
-          <a-button
-            v-if="hasPermission('ENT_MCH_INFO_ADD')"
-            type="primary"
-            @click="handleAdd"
-          >
+          <a-button v-if="hasPermission('ENT_MCH_INFO_ADD')" type="primary" @click="handleAdd">
             <plus-outlined />
             新建商户
           </a-button>
@@ -81,21 +63,18 @@
 
       <!-- 数据表格 -->
       <a-table
+        row-key="mchNo"
         :columns="columns"
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
         :scroll="{ x: 1300 }"
-        row-key="mchNo"
         @change="handleTableChange"
       >
         <!-- 商户名称 -->
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'mchName'">
-            <a
-              v-if="hasPermission('ENT_MCH_INFO_VIEW')"
-              @click="handleDetail(record)"
-            >
+            <a v-if="hasPermission('ENT_MCH_INFO_VIEW')" @click="handleDetail(record)">
               <b>{{ record.mchName }}</b>
             </a>
             <b v-else>{{ record.mchName }}</b>
@@ -119,24 +98,9 @@
           <!-- 操作 -->
           <template v-else-if="column.key === 'action'">
             <a-space>
-              <a
-                v-if="hasPermission('ENT_MCH_INFO_EDIT')"
-                @click="handleEdit(record)"
-              >
-                修改
-              </a>
-              <a
-                v-if="hasPermission('ENT_MCH_APP_CONFIG')"
-                @click="handleAppConfig(record)"
-              >
-                应用配置
-              </a>
-              <a
-                v-if="hasPermission('ENT_MCH_CONFIG_PAGE')"
-                @click="handleAdvancedConfig(record)"
-              >
-                高级功能
-              </a>
+              <a v-if="hasPermission('ENT_MCH_INFO_EDIT')" @click="handleEdit(record)"> 修改 </a>
+              <a v-if="hasPermission('ENT_MCH_APP_CONFIG')" @click="handleAppConfig(record)"> 应用配置 </a>
+              <a v-if="hasPermission('ENT_MCH_CONFIG_PAGE')" @click="handleAdvancedConfig(record)"> 高级功能 </a>
               <a-popconfirm
                 v-if="hasPermission('ENT_MCH_INFO_DEL')"
                 title="确认删除该商户吗？该操作将删除商户下所有配置及用户信息"
@@ -153,17 +117,10 @@
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <add-or-edit-modal
-      v-model:open="modalOpen"
-      :record-id="currentRecordId"
-      @success="handleModalSuccess"
-    />
+    <add-or-edit-modal v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
 
     <!-- 详情抽屉 -->
-    <detail-drawer
-      v-model:open="detailOpen"
-      :record-id="currentRecordId"
-    />
+    <detail-drawer v-model:open="detailOpen" :record-id="currentRecordId" />
   </div>
 </template>
 
@@ -172,12 +129,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import {
-  SearchOutlined,
-  RedoOutlined,
-  PlusOutlined,
-  ReloadOutlined
-} from '@ant-design/icons-vue'
+import { SearchOutlined, RedoOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import { useTable, useModal, usePermission, useDelete } from '@/hooks/common-hooks'
 import { API_URL_MCH_LIST, req } from '@/api/manage'
 import AddOrEditModal from './add-or-edit.vue'
@@ -187,7 +139,7 @@ const router = useRouter()
 const { t } = useI18n()
 
 // 使用 Hooks
-const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
+const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
   useTable((params) => req.list(API_URL_MCH_LIST, params))
 
 const { open: modalOpen, showModal, hideModal } = useModal()
@@ -304,15 +256,11 @@ const handleAdvancedConfig = (record) => {
  * 删除
  */
 const handleDelete = (record) => {
-  deleteItem(
-    t('mch.confirmDeleteMchTitle'),
-    t('mch.confirmDeleteMchContent'),
-    async () => {
-      await req.delById(API_URL_MCH_LIST, record.mchNo)
-      message.success(t('common.deleteSuccess'))
-      refresh()
-    }
-  )
+  deleteItem(t('mch.confirmDeleteMchTitle'), t('mch.confirmDeleteMchContent'), async () => {
+    await req.delById(API_URL_MCH_LIST, record.mchNo)
+    message.success(t('common.deleteSuccess'))
+    refresh()
+  })
 }
 
 /**

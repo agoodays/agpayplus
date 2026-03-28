@@ -1,18 +1,18 @@
-﻿<template>
+<template>
   <a-card :bordered="false">
-    <div style="margin-bottom:16px;">
-      <ag-search 
-        v-model:modelValue="searchForm" 
-        @search="onSearch" 
-        @reset="onReset"
+    <div style="margin-bottom: 16px">
+      <ag-search
+        v-model:model-value="searchForm"
         :collapsible="true"
         :default-collapsed="true"
+        @search="onSearch"
+        @reset="onReset"
       >
         <!-- 基础搜索条件（始终显示） -->
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <AgInput
+              <ag-input
                 v-model:value="searchForm.orderNo"
                 label="订单号"
                 placeholder="请输入订单号"
@@ -22,17 +22,22 @@
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <AgSelect v-model:value="searchForm.state" label="支付状态" placeholder="支付状态" allow-clear
-              :options="[
-                { value: '', label: '全部' },
-                { value: '0', label: '订单生成' },
-                { value: '1', label: '支付中' },
-                { value: '2', label: '支付成功' },
-                { value: '3', label: '支付失败' },
-                { value: '4', label: '已撤销' },
-                { value: '5', label: '已退款' },
-                { value: '6', label: '订单关闭' }
-              ]" />
+              <ag-select
+                v-model:value="searchForm.state"
+                label="支付状态"
+                placeholder="支付状态"
+                allow-clear
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: '0', label: '订单生成' },
+                  { value: '1', label: '支付中' },
+                  { value: '2', label: '支付成功' },
+                  { value: '3', label: '支付失败' },
+                  { value: '4', label: '已撤销' },
+                  { value: '5', label: '已退款' },
+                  { value: '6', label: '订单关闭' }
+                ]"
+              />
             </a-form-item>
           </a-col>
         </template>
@@ -41,13 +46,13 @@
         <template #advanced="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <AgDateRangePicker label="创建时间" v-model:value="searchForm.dateRange" />
+              <ag-date-range-picker v-model:value="searchForm.dateRange" label="创建时间" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <AgInputNumberRange 
-                v-model="searchForm.amountRange" 
+              <ag-input-number-range
+                v-model="searchForm.amountRange"
                 :min="0"
                 :precision="2"
                 label="金额范围"
@@ -89,89 +94,97 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgSearch, AgTable, AgInput, AgSelect, AgDateRangePicker, AgTableActions, AgInputNumberRange } from '@/components'
+import {
+  AgSearch,
+  AgTable,
+  AgInput,
+  AgSelect,
+  AgDateRangePicker,
+  AgTableActions,
+  AgInputNumberRange
+} from '@/components'
 
 // 搜索参数
-const searchForm = reactive({ 
-  orderNo: '', 
-  dateRange: '', 
+const searchForm = reactive({
+  orderNo: '',
+  dateRange: '',
   state: '',
   amountRange: [undefined, undefined]
 })
 
 // 表格列定义
 const columns = ref([
-  { 
-    title: 'ID', 
-    key: 'id', 
-    dataIndex: 'id', 
+  {
+    title: 'ID',
+    key: 'id',
+    dataIndex: 'id',
     width: 80,
     fixed: 'left'
   },
-  { 
-    title: '订单号', 
-    key: 'orderNo', 
-    dataIndex: 'orderNo', 
+  {
+    title: '订单号',
+    key: 'orderNo',
+    dataIndex: 'orderNo',
     width: 180
   },
-  { 
-    title: '商户名称', 
-    key: 'merchantName', 
-    dataIndex: 'merchantName', 
+  {
+    title: '商户名称',
+    key: 'merchantName',
+    dataIndex: 'merchantName',
     width: 150
   },
-  { 
-    title: '订单金额', 
-    key: 'amount', 
-    dataIndex: 'amount', 
+  {
+    title: '订单金额',
+    key: 'amount',
+    dataIndex: 'amount',
     width: 120
   },
-  { 
-    title: '手续费', 
-    key: 'fee', 
-    dataIndex: 'fee', 
+  {
+    title: '手续费',
+    key: 'fee',
+    dataIndex: 'fee',
     width: 100
   },
-  { 
-    title: '实际金额', 
-    key: 'actualAmount', 
-    dataIndex: 'actualAmount', 
+  {
+    title: '实际金额',
+    key: 'actualAmount',
+    dataIndex: 'actualAmount',
     width: 120
   },
-  { 
-    title: '支付状态', 
-    key: 'status', 
-    dataIndex: 'status', 
+  {
+    title: '支付状态',
+    key: 'status',
+    dataIndex: 'status',
     width: 100
   },
-  { 
-    title: '支付方式', 
-    key: 'payWay', 
-    dataIndex: 'payWay', 
+  {
+    title: '支付方式',
+    key: 'payWay',
+    dataIndex: 'payWay',
     width: 120
   },
-  { 
-    title: '支付时间', 
-    key: 'payTime', 
-    dataIndex: 'payTime', 
+  {
+    title: '支付时间',
+    key: 'payTime',
+    dataIndex: 'payTime',
     width: 180
   },
-  { 
-    title: '创建时间', 
-    key: 'createTime', 
-    dataIndex: 'createTime', 
+  {
+    title: '创建时间',
+    key: 'createTime',
+    dataIndex: 'createTime',
     width: 180
   },
-  { 
-    title: '备注', 
-    key: 'remark', 
-    dataIndex: 'remark', 
+  {
+    title: '备注',
+    key: 'remark',
+    dataIndex: 'remark',
     width: 200
   },
-  { 
-    title: '操作', 
-    key: 'actions', 
-    customRender: 'actions', 
+  {
+    title: '操作',
+    key: 'actions',
+    customRender: 'actions',
     width: 200,
     fixed: 'right'
   }
@@ -187,7 +200,7 @@ const allData = Array.from({ length: TOTAL }).map((_, i) => {
   const amount = (Math.random() * 1000 + 100).toFixed(2)
   const fee = (amount * 0.006).toFixed(2)
   const actualAmount = (amount - fee).toFixed(2)
-  
+
   return {
     id: i + 1,
     orderNo: `ORD${String(1000 + i).padStart(8, '0')}`,
@@ -197,8 +210,18 @@ const allData = Array.from({ length: TOTAL }).map((_, i) => {
     actualAmount: actualAmount,
     status: statusMap[i % statusMap.length],
     payWay: payWayMap[i % payWayMap.length],
-    payTime: i % 3 === 0 ? '2024-01-' + String(10 + i % 20).padStart(2, '0') + ' 10:' + String(i % 60).padStart(2, '0') + ':00' : '-',
-    createTime: '2024-01-' + String(10 + i % 20).padStart(2, '0') + ' ' + String(8 + i % 12).padStart(2, '0') + ':' + String(i % 60).padStart(2, '0') + ':00',
+    payTime:
+      i % 3 === 0
+        ? '2024-01-' + String(10 + (i % 20)).padStart(2, '0') + ' 10:' + String(i % 60).padStart(2, '0') + ':00'
+        : '-',
+    createTime:
+      '2024-01-' +
+      String(10 + (i % 20)).padStart(2, '0') +
+      ' ' +
+      String(8 + (i % 12)).padStart(2, '0') +
+      ':' +
+      String(i % 60).padStart(2, '0') +
+      ':00',
     remark: i % 5 === 0 ? '备注信息 ' + (i + 1) : '-'
   }
 })
@@ -220,11 +243,11 @@ function reqTableCountFunc(params) {
   return new Promise((resolve) => {
     const totalAmount = allData.reduce((s, r) => s + Number(r.amount), 0).toFixed(2)
     const totalFee = allData.reduce((s, r) => s + Number(r.fee), 0).toFixed(2)
-    const success = allData.filter(r => r.status === '支付成功').length
-    const pending = allData.filter(r => r.status === '待处理').length
-    const failed = allData.filter(r => r.status === '支付失败').length
-    
-    // setTimeout(() => resolve({ 
+    const success = allData.filter((r) => r.status === '支付成功').length
+    const pending = allData.filter((r) => r.status === '待处理').length
+    const failed = allData.filter((r) => r.status === '支付失败').length
+
+    // setTimeout(() => resolve({
     //   '总订单金额': `¥${totalAmount}`,
     //   '总手续费': `¥${totalFee}`,
     //   '支付成功': `${success}笔`,
@@ -232,22 +255,27 @@ function reqTableCountFunc(params) {
     //   '支付失败': `${failed}笔`
     // }), 300)
 
-    
-    setTimeout(() => resolve([{
-      "_groupName": "支付统计",
-      '总订单金额': `¥${totalAmount}`,
-      '总手续费': `¥${totalFee}`,
-      '支付成功': `${success}笔`,
-      '待处理': `${pending}笔`,
-      '支付失败': `${failed}笔`
-    },
-    {
-      "_groupName": "退款统计",
-      "退款金额": `¥${totalAmount}`,
-      '退款成功': `${success}笔`,
-      '退款失败': `${failed}笔`,
-      '退款中': `${pending}笔`
-    }]), 300)
+    setTimeout(
+      () =>
+        resolve([
+          {
+            _groupName: '支付统计',
+            总订单金额: `¥${totalAmount}`,
+            总手续费: `¥${totalFee}`,
+            支付成功: `${success}笔`,
+            待处理: `${pending}笔`,
+            支付失败: `${failed}笔`
+          },
+          {
+            _groupName: '退款统计',
+            退款金额: `¥${totalAmount}`,
+            退款成功: `${success}笔`,
+            退款失败: `${failed}笔`,
+            退款中: `${pending}笔`
+          }
+        ]),
+      300
+    )
   })
 }
 
@@ -291,9 +319,31 @@ function onExport(record) {
 </script>
 
 <style scoped>
-.col-settings { min-width: 320px; max-width: 480px }
-.col-item { display:flex; justify-content:space-between; align-items:center; padding:8px 4px }
-.col-main { display:flex; gap:8px; align-items:center }
-.col-width { display:flex; gap:8px; align-items:center }
-.resizer { width:8px; height:18px; background:rgba(0,0,0,0.08); cursor:col-resize; border-radius:2px }
+.col-settings {
+  min-width: 320px;
+  max-width: 480px;
+}
+.col-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px;
+}
+.col-main {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.col-width {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.resizer {
+  width: 8px;
+  height: 18px;
+  background: rgba(0, 0, 0, 0.08);
+  cursor: col-resize;
+  border-radius: 2px;
+}
 </style>

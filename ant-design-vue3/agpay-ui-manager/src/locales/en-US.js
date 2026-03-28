@@ -136,7 +136,8 @@ export default {
   },
   payConfig: {
     comingSoonTitle: 'Payment Configuration',
-    featureIntro: 'Merchant payment configuration supports setting payment interface parameters for different merchants, including Alipay, WeChat Pay, and other channels.',
+    featureIntro:
+      'Merchant payment configuration supports setting payment interface parameters for different merchants, including Alipay, WeChat Pay, and other channels.',
     features: {
       apiConfig: {
         title: 'Payment API Configuration',
@@ -162,7 +163,8 @@ export default {
   },
   transferOrder: {
     comingSoonTitle: 'Transfer Order Management',
-    featureIntro: 'Transfer order management allows viewing and managing merchant transfer orders, including merchant withdrawal and payout scenarios.',
+    featureIntro:
+      'Transfer order management allows viewing and managing merchant transfer orders, including merchant withdrawal and payout scenarios.',
     features: {
       orderList: {
         title: 'Transfer Order List',
@@ -189,7 +191,8 @@ export default {
   refund: {
     modalTitle: 'Order Refund',
     noticeTitle: 'Refund Notice',
-    noticeDesc: 'Please proceed with caution. After a successful refund, funds will be returned to the user via the original route.',
+    noticeDesc:
+      'Please proceed with caution. After a successful refund, funds will be returned to the user via the original route.',
     payOrderId: 'Pay Order ID',
     orderAmount: 'Order Amount',
     mchName: 'Merchant Name',

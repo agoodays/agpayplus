@@ -1,27 +1,46 @@
-﻿<template>
-  <div class="ag-editor">
-    <Toolbar
-      class="ag-editor-toolbar"
-      :editor="editorRef"
-      :defaultConfig="toolbarConfig"
-      :mode="mode"
-    />
+<template>
+  <div v-if="editorLoaded" class="ag-editor">
+    <Toolbar class="ag-editor-toolbar" :editor="editorRef" :default-config="toolbarConfig" :mode="mode" />
     <Editor
-      class="ag-editor-content"
-      :style="{ height: height + 'px' }"
       v-model="internalValue"
-      :defaultConfig="editorConfig"
+      class="ag-editor-content"
+      :style="{ height: editorHeight + 'px' }"
+      :default-config="mergedEditorConfig"
       :mode="mode"
-      @onCreated="handleCreated"
-      @onChange="handleChange"
+      @on-created="handleCreated"
+      @on-change="handleChange"
     />
+  </div>
+  <div v-else class="ag-editor-loading">
+    <Skeleton active :paragraph="{ rows: 10 }" />
   </div>
 </template>
 
 <script setup>
-import { ref, shallowRef, watch, onBeforeUnmount, computed } from 'vue'
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
-import '@wangeditor/editor/dist/css/style.css'
+import { ref, shallowRef, watch, onBeforeUnmount, computed, onMounted } from 'vue'
+import { Skeleton } from 'ant-design-vue'
+
+// 动态导入wangeditor
+const [Editor, Toolbar, editorLoaded] = (() => {
+  const loaded = ref(false)
+  let EditorComponent = null
+  let ToolbarComponent = null
+
+  // 动态加载
+  import('@wangeditor/editor-for-vue').then((module) => {
+    EditorComponent = module.Editor
+    ToolbarComponent = module.Toolbar
+    loaded.value = true
+  })
+
+  // 动态加载样式
+  import('@wangeditor/editor/dist/css/style.css')
+
+  return [computed(() => EditorComponent), computed(() => ToolbarComponent), loaded]
+})()
+import { upload } from '@/api/manage'
+import { appDefaultConfig } from '@/config/app-config'
+import { useUserStore } from '@/store/modules/system/user'
 
 // Props
 const props = defineProps({
@@ -63,32 +82,91 @@ const editorRef = shallowRef()
 // 内部值
 const internalValue = ref(props.modelValue)
 
-// 监听外部值变化
-watch(() => props.modelValue, (newVal) => {
-  if (newVal !== internalValue.value) {
-    internalValue.value = newVal
-  }
+// 编辑器高度（确保不小于 300px）
+const editorHeight = computed(() => {
+  return Math.max(props.height, 300)
 })
+
+// 用户 store
+const userStore = useUserStore()
 
 // 合并编辑器配置
 const mergedEditorConfig = computed(() => {
-  const config = { ...props.editorConfig }
-  
-  // 如果提供了上传配置，则合并
-  if (props.uploadConfig) {
-    config.MENU_CONF = config.MENU_CONF || {}
-    
-    if (props.uploadConfig.uploadImage) {
-      config.MENU_CONF.uploadImage = props.uploadConfig.uploadImage
-    }
-    
-    if (props.uploadConfig.uploadVideo) {
-      config.MENU_CONF.uploadVideo = props.uploadConfig.uploadVideo
+  return {
+    ...props.editorConfig,
+    MENU_CONF: {
+      ...props.editorConfig.MENU_CONF,
+      // 自定义插入图片
+      uploadImage: {
+        server: upload.form,
+        headers: getHeaders(),
+        fieldName: 'file',
+        customUpload: (file, insertFn) => {
+          upload.getFormParams(upload.form, file.name, file.size).then((res) => {
+            const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
+            const formParams = isLocalFile
+              ? res.formParams
+              : {
+                  OSSAccessKeyId: res.formParams.ossAccessKeyId,
+                  key: res.formParams.key,
+                  Signature: res.formParams.signature,
+                  policy: res.formParams.policy,
+                  success_action_status: res.formParams.successActionStatus
+                }
+            const data = Object.assign(formParams, { file: file })
+            const formActionUrl = isLocalFile ? upload.form : res.formActionUrl
+            upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
+              const ossFileUrl = isLocalFile ? response : res.ossFileUrl
+              insertFn(ossFileUrl, file.name, ossFileUrl)
+            })
+          })
+        }
+      },
+      uploadVideo: {
+        server: upload.form,
+        headers: getHeaders(),
+        fieldName: 'file',
+        customUpload: (file, insertFn) => {
+          upload.getFormParams(upload.form, file.name, file.size).then((res) => {
+            const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
+            const formParams = isLocalFile
+              ? res.formParams
+              : {
+                  OSSAccessKeyId: res.formParams.ossAccessKeyId,
+                  key: res.formParams.key,
+                  Signature: res.formParams.signature,
+                  policy: res.formParams.policy,
+                  success_action_status: res.formParams.successActionStatus
+                }
+            const data = Object.assign(formParams, { file: file })
+            const formActionUrl = isLocalFile ? upload.form : res.formActionUrl
+            upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
+              const ossFileUrl = isLocalFile ? response : res.ossFileUrl
+              insertFn(ossFileUrl, ossFileUrl)
+            })
+          })
+        }
+      }
     }
   }
-  
-  return config
 })
+
+// 获取请求头
+function getHeaders() {
+  const headers = {}
+  headers[appDefaultConfig.ACCESS_TOKEN_NAME] = `Bearer ${userStore.getToken}`
+  return headers
+}
+
+// 监听外部值变化
+watch(
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal !== internalValue.value) {
+      internalValue.value = newVal
+    }
+  }
+)
 
 // 处理编辑器创建
 function handleCreated(editor) {
@@ -124,14 +202,14 @@ defineExpose({
 
 <style scoped>
 .ag-editor {
-  border: 1px solid #ccc
+  border: 1px solid #ccc;
 }
 
 .ag-editor-toolbar {
-  border-bottom: 1px solid #ccc
+  border-bottom: 1px solid #ccc;
 }
 
 .ag-editor-content {
-  overflow-y: auto
+  overflow-y: auto;
 }
 </style>

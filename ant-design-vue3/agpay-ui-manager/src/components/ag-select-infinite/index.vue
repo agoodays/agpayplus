@@ -1,5 +1,5 @@
-﻿<template>
-  <div class="ag-select-infinite" :class="{ 'is-focused': isFocused }">
+<template>
+  <div class="ag-float-container" :class="{ 'is-focused': isFocused }">
     <a-select
       ref="selectRef"
       v-model:value="selectValue"
@@ -12,9 +12,9 @@
       :size="size"
       :loading="loading"
       :not-found-content="notFoundContent"
+      style="width: 100%"
       v-on="eventHandlers"
       @popup-scroll="handlePopupScroll"
-      style="width: 100%"
     >
       <a-select-option
         v-for="item in options"
@@ -26,7 +26,7 @@
           {{ item[fieldNames.label] }}
         </slot>
       </a-select-option>
-      
+
       <!-- 加载更多提示 -->
       <template v-if="hasMore" #dropdownRender="{ menuNode }">
         <div>
@@ -39,7 +39,7 @@
         </div>
       </template>
     </a-select>
-    
+
     <label v-if="label" class="ag-float-label" :class="labelClass">
       {{ label }}
       <span v-if="required" class="ag-required-star">*</span>
@@ -50,6 +50,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useFloatLabel } from '@/composables/useFloatLabel'
 
 const { t } = useI18n()
 
@@ -127,13 +128,17 @@ const props = defineProps({
   searchingText: {
     type: String,
     default: ''
+  },
+  // 浮动标签配置
+  floatOptions: {
+    type: Object,
+    default: () => ({})
   }
 })
 
 const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'search'])
 
 const selectRef = ref()
-const isFocused = ref(false)
 const selectValue = ref(props.modelValue ?? props.value)
 
 // 数据状态
@@ -148,32 +153,26 @@ let searchTimer = null
 // 是否有更多数据
 const hasMore = computed(() => currentPage.value < totalPages.value)
 
-// 是否有值
-const hasValue = computed(() => {
-  if (Array.isArray(selectValue.value)) {
-    return selectValue.value.length > 0
+// 自定义值检查函数
+function hasValueCheck(value) {
+  if (Array.isArray(value)) {
+    return value.length > 0
   }
-  return selectValue.value !== undefined && selectValue.value !== null && selectValue.value !== ''
-})
+  return value !== undefined && value !== null && value !== ''
+}
 
-// 标签是否应该浮动
-const shouldFloat = computed(() => {
-  return isFocused.value || hasValue.value || !!props.placeholder
-})
-
-// 标签样式类
-const labelClass = computed(() => {
-  return {
-    'is-floating': shouldFloat.value,
-    'is-disabled': props.disabled,
-    'is-required': props.required
+// 使用浮动标签 composable
+const { isFocused, labelClass, floatPlaceholder, handleFocus, handleBlur, clear } = useFloatLabel(
+  props,
+  emit,
+  selectRef,
+  hasValueCheck,
+  {
+    animationDuration: 200,
+    blurDelay: 100,
+    ...props.floatOptions
   }
-})
-
-// 浮动时的 placeholder
-const floatPlaceholder = computed(() => {
-  return shouldFloat.value ? props.placeholder : ''
-})
+)
 
 // 动态事件处理器 - 只有当 showSearch 为 true 时才包含搜索事件
 const eventHandlers = computed(() => {
@@ -183,12 +182,12 @@ const eventHandlers = computed(() => {
     change: handleChange,
     'dropdown-visible-change': handleDropdownVisibleChange
   }
-  
+
   // 只有启用搜索时才添加搜索事件
   if (props.showSearch) {
     handlers.search = handleSearch
   }
-  
+
   return handlers
 })
 
@@ -206,7 +205,7 @@ const notFoundContent = computed(() => {
 // 加载数据
 async function loadData(page = 1, keyword = '') {
   const isFirstPage = page === 1
-  
+
   if (isFirstPage) {
     loading.value = true
   } else {
@@ -271,7 +270,7 @@ function loadMore() {
 // 处理搜索
 function handleSearch(value) {
   searchKeyword.value = value
-  
+
   // 清除之前的定时器
   if (searchTimer) {
     clearTimeout(searchTimer)
@@ -293,34 +292,31 @@ function handleDropdownVisibleChange(open) {
   }
 }
 
-// 处理焦点
-function handleFocus(e) {
-  isFocused.value = true
-  emit('focus', e)
-}
-
-function handleBlur(e) {
-  isFocused.value = false
-  emit('blur', e)
-}
-
 function handleChange(value, option) {
   emit('change', value, option)
 }
 
 // 监听外部值变化（同时兼容 modelValue / value）
-watch(() => [props.modelValue, props.value], ([newModelValue, newValue]) => {
-  const resolved = newModelValue ?? newValue
-  if (resolved !== selectValue.value) {
-    selectValue.value = resolved
-  }
-}, { deep: true, immediate: true })
+watch(
+  () => [props.modelValue, props.value],
+  ([newModelValue, newValue]) => {
+    const resolved = newModelValue ?? newValue
+    if (resolved !== selectValue.value) {
+      selectValue.value = resolved
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 // 监听内部值变化
-watch(selectValue, (newVal) => {
-  emit('update:modelValue', newVal)
-  emit('update:value', newVal)
-}, { deep: true })
+watch(
+  selectValue,
+  (newVal) => {
+    emit('update:modelValue', newVal)
+    emit('update:value', newVal)
+  },
+  { deep: true }
+)
 
 // 重新加载数据（外部调用）
 function reload() {
@@ -342,7 +338,8 @@ defineExpose({
   focus,
   blur,
   reload,
-  loadMore
+  loadMore,
+  clear
 })
 
 // 组件挂载时加载首页数据
@@ -352,70 +349,3 @@ onMounted(() => {
   }
 })
 </script>
-
-<style scoped>
-.ag-select-infinite {
-  position: relative;
-}
-
-.ag-float-label {
-  position: absolute;
-  left: 11px;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 0 4px;
-  background-color: var(--base-bg-color);
-  color: rgba(0, 0, 0, 0.45);
-  pointer-events: none;
-  transition: all 0.2s ease-out;
-  z-index: 1;
-  font-size: 14px;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.ag-float-label.is-floating {
-  top: 0;
-  transform: translateY(-50%);
-  font-size: 12px;
-  color: #1890ff;
-}
-
-.ag-float-label.is-disabled {
-  color: rgba(0, 0, 0, 0.25);
-}
-
-.ag-float-label.is-disabled.is-floating {
-  color: rgba(0, 0, 0, 0.25);
-}
-
-.ag-required-star {
-  color: #ff4d4f;
-  margin-left: 2px;
-}
-
-.ag-select-infinite.is-focused .ag-float-label {
-  color: #1890ff;
-}
-
-.ag-select-infinite :deep(.ant-select-selector) {
-  padding-top: 1px !important;
-  padding-bottom: 1px !important;
-}
-
-.ag-select-infinite :deep(.ant-select-focused .ant-select-selector) {
-  border-color: #40a9ff !important;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2) !important;
-}
-
-/* Different sizes */
-.ag-select-infinite :deep(.ant-select-sm .ant-select-selector) {
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
-}
-
-.ag-select-infinite :deep(.ant-select-lg .ant-select-selector) {
-  padding-top: 6px !important;
-  padding-bottom: 6px !important;
-}
-</style>

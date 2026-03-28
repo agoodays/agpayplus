@@ -1,4 +1,4 @@
-﻿import request from '@/lib/request'
+import { request } from '@/lib/ag-axios'
 
 /**
  * 系统配置 API
@@ -14,7 +14,7 @@ export const systemConfigApi = {
       return Promise.resolve(null)
     }
 
-    return request.request({
+    return request({
       url: '/api/anon/siteInfos',
       method: 'GET',
       params: { queryConfig: 1 }

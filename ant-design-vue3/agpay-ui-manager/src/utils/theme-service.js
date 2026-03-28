@@ -12,7 +12,7 @@ import { useAppStore } from '@/store/modules/system/app'
  * 使用方式：
  * ```javascript
  * import themeService from '@/utils/themeService'
- * 
+ *
  * // 在应用启动时加载并应用主题
  * await themeService.loadAndApplyTheme()
  * ```
@@ -43,12 +43,12 @@ async function fetchSiteConfig() {
 
 /**
  * 加载并应用主题配置
- * 
+ *
  * 该方法会：
  * 1. 从后端获取站点配置（/api/anon/siteInfos?queryConfig=1）
  * 2. 将配置保存到 Pinia Store
  * 3. 应用主题和布局配置到页面
- * 
+ *
  * @returns {Promise<Object|null>} 应用后的配置对象或 null
  */
 async function loadAndApplyTheme() {
@@ -60,7 +60,7 @@ async function loadAndApplyTheme() {
   try {
     // 然后从后端获取最新配置
     const config = await fetchSiteConfig()
-    
+
     if (config) {
       console.log('主题配置已成功加载并应用')
       return config
@@ -112,4 +112,3 @@ export default themeService
 
 // 兼容旧的导出方式
 export { loadAndApplyTheme, refreshTheme, resetTheme, fetchSiteConfig }
-

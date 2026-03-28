@@ -42,7 +42,7 @@ export const getInitializedLanguage = function () {
 export const useAppConfigStore = defineStore('appConfig', {
   state: () => ({
     // 读取config下的默认配置
-    ...state,
+    ...state
   }),
   actions: {
     persistConfig() {
@@ -70,6 +70,6 @@ export const useAppConfigStore = defineStore('appConfig', {
     hideHelpDoc() {
       this.helpDocFlag = false
       this.persistConfig()
-    },
-  },
+    }
+  }
 })

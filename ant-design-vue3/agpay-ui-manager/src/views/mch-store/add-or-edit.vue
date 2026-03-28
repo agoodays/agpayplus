@@ -1,18 +1,13 @@
-﻿<template>
+<template>
   <a-drawer
-    v-model:open="open"
+    v-model:open="localOpen"
     :title="isAdd ? '新增门店' : '修改门店'"
     :width="720"
     :mask-closable="false"
     :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
   >
-    <a-form
-      ref="formRef"
-      :model="formState"
-      :rules="rules"
-      layout="vertical"
-    >
+    <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical">
       <!-- 商户号（仅新增时显示） -->
       <a-row v-if="isAdd" :gutter="16">
         <a-col :span="24">
@@ -24,11 +19,7 @@
               :filter-option="false"
               @search="handleSearchMch"
             >
-              <a-select-option
-                v-for="item in mchList"
-                :key="item.mchNo"
-                :value="item.mchNo"
-              >
+              <a-select-option v-for="item in mchList" :key="item.mchNo" :value="item.mchNo">
                 {{ item.mchName }}
               </a-select-option>
             </a-select>
@@ -40,19 +31,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="门店名称" name="storeName">
-            <a-input
-              v-model:value="formState.storeName"
-              placeholder="请输入门店名称"
-            />
+            <a-input v-model:value="formState.storeName" placeholder="请输入门店名称" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="联系人电话" name="contactPhone">
-            <a-input
-              v-model:value="formState.contactPhone"
-              placeholder="请输入联系人电话"
-            />
+            <a-input v-model:value="formState.contactPhone" placeholder="请输入联系人电话" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -115,11 +100,7 @@
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-item label="备注" name="remark">
-            <a-textarea
-              v-model:value="formState.remark"
-              placeholder="请输入备注"
-              :rows="3"
-            />
+            <a-textarea v-model:value="formState.remark" placeholder="请输入备注" :rows="3" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -141,10 +122,7 @@
 
         <a-col :span="12">
           <a-form-item label="具体位置" name="address">
-            <a-input
-              v-model:value="formState.address"
-              placeholder="请输入详细地址"
-            />
+            <a-input v-model:value="formState.address" placeholder="请输入详细地址" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -152,23 +130,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="经度" name="lng">
-            <a-input-number
-              v-model:value="formState.lng"
-              placeholder="请输入经度"
-              :precision="6"
-              style="width: 100%"
-            />
+            <a-input-number v-model:value="formState.lng" placeholder="请输入经度" :precision="6" style="width: 100%" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="纬度" name="lat">
-            <a-input-number
-              v-model:value="formState.lat"
-              placeholder="请输入纬度"
-              :precision="6"
-              style="width: 100%"
-            />
+            <a-input-number v-model:value="formState.lat" placeholder="请输入纬度" :precision="6" style="width: 100%" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -184,11 +152,7 @@
     </a-form>
 
     <!-- 图片预览 -->
-    <a-modal
-      v-model:open="previewOpen"
-      :footer="null"
-      @cancel="handleCancelPreview"
-    >
+    <a-modal v-model:open="previewOpen" :footer="null" @cancel="handleCancelPreview">
       <img :src="previewImage" style="width: 100%" alt="preview" />
     </a-modal>
 
@@ -214,12 +178,8 @@
 import { ref, reactive, watch, nextTick } from 'vue'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import {
-  PlusOutlined,
-  CloseOutlined,
-  CheckOutlined
-} from '@ant-design/icons-vue'
-import { API_URL_MCH_STORE, API_URL_MCH_LIST, req, upload } from '@/api/manage'
+import { PlusOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
+import { API_URL_MCH_STORE, API_URL_MCH_LIST, req } from '@/api/manage'
 
 const { t } = useI18n()
 
@@ -245,7 +205,7 @@ const emit = defineEmits(['update:open', 'success'])
 const formRef = ref()
 const loading = ref(false)
 const isAdd = ref(true)
-const open = ref(false)
+const localOpen = ref(false)
 const mchList = ref([])
 const areas = ref([])
 
@@ -277,33 +237,26 @@ const formState = reactive({
 
 // 表单验证规则
 const rules = {
-  mchNo: [
-    { required: true, message: '请选择商户', trigger: 'change' }
-  ],
-  storeName: [
-    { required: true, message: '请输入门店名称', trigger: 'blur' }
-  ],
-  contactPhone: [
-    { pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
-  ],
-  areas: [
-    { required: true, message: '请选择省市区', trigger: 'change', type: 'array' }
-  ],
-  address: [
-    { required: true, message: '请输入详细地址', trigger: 'blur' }
-  ]
+  mchNo: [{ required: true, message: '请选择商户', trigger: 'change' }],
+  storeName: [{ required: true, message: '请输入门店名称', trigger: 'blur' }],
+  contactPhone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
+  areas: [{ required: true, message: '请选择省市区', trigger: 'change', type: 'array' }],
+  address: [{ required: true, message: '请输入详细地址', trigger: 'blur' }]
 }
 
 // 监听 props.open 变化
-watch(() => props.open, (val) => {
-  open.value = val
-  if (val) {
-    initForm()
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val) {
+      initForm()
+    }
   }
-})
+)
 
-// 监听 open 变化
-watch(open, (val) => {
+// 监听 localOpen 变化
+watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
@@ -327,40 +280,46 @@ const loadDetail = async () => {
   try {
     loading.value = true
     const res = await req.getById(API_URL_MCH_STORE, props.recordId)
-    
+
     Object.assign(formState, res)
-    
+
     // 设置省市区
     if (res.provinceCode && res.cityCode && res.districtCode) {
       areas.value = [res.provinceCode, res.cityCode, res.districtCode]
     }
-    
+
     // 设置图片
     if (res.storeLogo) {
-      storeLogoFileList.value = [{
-        uid: '-1',
-        name: 'logo.jpg',
-        status: 'done',
-        url: res.storeLogo
-      }]
+      storeLogoFileList.value = [
+        {
+          uid: '-1',
+          name: 'logo.jpg',
+          status: 'done',
+          url: res.storeLogo
+        }
+      ]
     }
-    
+
     if (res.storeOuterImg) {
-      storeOuterImgFileList.value = [{
-        uid: '-2',
-        name: 'outer.jpg',
-        status: 'done',
-        url: res.storeOuterImg
-      }]
+      storeOuterImgFileList.value = [
+        {
+          uid: '-2',
+          name: 'outer.jpg',
+          status: 'done',
+          url: res.storeOuterImg
+        }
+      ]
     }
-    
+
     if (res.storeInnerImg) {
-      storeInnerImgFileList.value = [{
-        uid: '-3',
-        name: 'inner.jpg',
-        status: 'done',
-        url: res.storeInnerImg
-      }]
+      storeInnerImgFileList.value = [
+        {
+          uid: '-3',
+          name: 'inner.jpg',
+          status: 'done',
+          url: res.storeInnerImg
+        }
+      ]
     }
   } catch (error) {
     message.error(error.msg || t('common.loadDataFailed'))
@@ -388,12 +347,12 @@ const resetForm = () => {
     lng: null,
     lat: null
   })
-  
+
   areas.value = []
   storeLogoFileList.value = []
   storeOuterImgFileList.value = []
   storeInnerImgFileList.value = []
-  
+
   nextTick(() => {
     formRef.value?.clearValidate()
   })
@@ -445,7 +404,7 @@ const beforeUpload = (file) => {
  */
 const handleUploadChange = async (info, field) => {
   const { file, fileList } = info
-  
+
   // 更新文件列表
   if (field === 'storeLogo') {
     storeLogoFileList.value = fileList
@@ -454,7 +413,7 @@ const handleUploadChange = async (info, field) => {
   } else if (field === 'storeInnerImg') {
     storeInnerImgFileList.value = fileList
   }
-  
+
   // 上传成功后更新表单数据
   if (file.status === 'done' && file.response) {
     formState[field] = file.response.data.url
@@ -485,11 +444,11 @@ const handleCancelPreview = () => {
 const handleSubmit = async () => {
   try {
     await formRef.value.validate()
-    
+
     loading.value = true
-    
+
     const data = { ...formState }
-    
+
     // 提交数据
     if (isAdd.value) {
       await req.add(API_URL_MCH_STORE, data)
@@ -498,7 +457,7 @@ const handleSubmit = async () => {
       await req.updateById(API_URL_MCH_STORE, props.recordId, data)
       message.success(t('common.editSuccess'))
     }
-    
+
     handleClose()
     emit('success')
   } catch (error) {
@@ -517,7 +476,7 @@ const handleSubmit = async () => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  open.value = false
+  emit('update:open', false)
 }
 </script>
 

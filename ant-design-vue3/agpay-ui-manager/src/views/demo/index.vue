@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="demo-index-container">
     <a-card class="welcome-card mb-4">
       <template #title>
@@ -7,7 +7,7 @@
           <span>AgPay 组件库演示</span>
         </div>
       </template>
-      
+
       <a-alert
         message="欢迎使用 AgPay 组件库"
         description="这里展示了所有自定义组件的使用示例，点击左侧菜单查看具体组件演示"
@@ -17,35 +17,23 @@
       />
 
       <a-descriptions title="项目信息" :column="2" bordered>
-        <a-descriptions-item label="Vue 版本">
-          Vue 3.3+
-        </a-descriptions-item>
-        <a-descriptions-item label="UI 框架">
-          Ant Design Vue 4.x
-        </a-descriptions-item>
-        <a-descriptions-item label="构建工具">
-          Vite 4.x
-        </a-descriptions-item>
-        <a-descriptions-item label="状态管理">
-          Pinia
-        </a-descriptions-item>
-        <a-descriptions-item label="组件数量">
-          20 个
-        </a-descriptions-item>
-        <a-descriptions-item label="Demo 数量">
-          10 个
-        </a-descriptions-item>
+        <a-descriptions-item label="Vue 版本"> Vue 3.3+ </a-descriptions-item>
+        <a-descriptions-item label="UI 框架"> Ant Design Vue 4.x </a-descriptions-item>
+        <a-descriptions-item label="构建工具"> Vite 4.x </a-descriptions-item>
+        <a-descriptions-item label="状态管理"> Pinia </a-descriptions-item>
+        <a-descriptions-item label="组件数量"> 20 个 </a-descriptions-item>
+        <a-descriptions-item label="Demo 数量"> 10 个 </a-descriptions-item>
       </a-descriptions>
     </a-card>
 
     <a-row :gutter="[16, 16]">
       <!-- 浮动标签表单组件 -->
       <a-col :span="12">
-        <AgCard title="浮动标签表单组件" hoverable>
+        <a-card title="浮动标签表单组件" hoverable>
           <template #extra>
             <a-tag color="blue">8 个</a-tag>
           </template>
-          
+
           <a-list size="small" :data-source="floatLabelComponents">
             <template #renderItem="{ item }">
               <a-list-item>
@@ -65,16 +53,16 @@
               </a-list-item>
             </template>
           </a-list>
-        </AgCard>
+        </a-card>
       </a-col>
 
       <!-- 表格相关组件 -->
       <a-col :span="12">
-        <AgCard title="表格相关组件" hoverable>
+        <a-card title="表格相关组件" hoverable>
           <template #extra>
             <a-tag color="green">6 个</a-tag>
           </template>
-          
+
           <a-list size="small" :data-source="tableComponents">
             <template #renderItem="{ item }">
               <a-list-item>
@@ -94,16 +82,16 @@
               </a-list-item>
             </template>
           </a-list>
-        </AgCard>
+        </a-card>
       </a-col>
 
       <!-- 表单相关组件 -->
       <a-col :span="12">
-        <AgCard title="表单相关组件" hoverable>
+        <a-card title="表单相关组件" hoverable>
           <template #extra>
             <a-tag color="orange">3 个</a-tag>
           </template>
-          
+
           <a-list size="small" :data-source="formComponents">
             <template #renderItem="{ item }">
               <a-list-item>
@@ -123,16 +111,16 @@
               </a-list-item>
             </template>
           </a-list>
-        </AgCard>
+        </a-card>
       </a-col>
 
       <!-- 容器组件 -->
       <a-col :span="12">
-        <AgCard title="容器组件" hoverable>
+        <a-card title="容器组件" hoverable>
           <template #extra>
             <a-tag color="purple">3 个</a-tag>
           </template>
-          
+
           <a-list size="small" :data-source="containerComponents">
             <template #renderItem="{ item }">
               <a-list-item>
@@ -152,16 +140,16 @@
               </a-list-item>
             </template>
           </a-list>
-        </AgCard>
+        </a-card>
       </a-col>
 
       <!-- 快速开始 -->
       <a-col :span="24">
-        <AgCard title="快速开始" hoverable>
+        <a-card title="快速开始" hoverable>
           <template #extra>
             <a-tag color="cyan">教程</a-tag>
           </template>
-          
+
           <a-row :gutter="[32, 16]">
             <a-col :span="12">
               <a-steps direction="vertical" size="small" :current="0">
@@ -172,23 +160,21 @@
               </a-steps>
             </a-col>
             <a-col :span="12">
-              <a-alert
-                message="💡 推荐阅读"
-                type="info"
-                show-icon
-              >
+              <a-alert message="💡 推荐阅读" type="info" show-icon>
                 <template #description>
-                  <ul style="margin: 8px 0; padding-left: 20px;">
+                  <ul style="margin: 8px 0; padding-left: 20px">
                     <li><a href="#" @click.prevent="openDoc('COMPONENTS_OVERVIEW.md')">组件库总览</a></li>
                     <li><a href="#" @click.prevent="openDoc('QUICK_START.md')">快速开始指南</a></li>
                     <li><a href="#" @click.prevent="openDoc('FLOAT_COMPONENTS_README.md')">浮动标签完整指南</a></li>
-                    <li><a href="#" @click.prevent="openDoc('AG_SEARCH_SLOT_PROPS_SOLUTION.md')">AgSearch 简化方案</a></li>
+                    <li>
+                      <a href="#" @click.prevent="openDoc('AG_SEARCH_SLOT_PROPS_SOLUTION.md')">AgSearch 简化方案</a>
+                    </li>
                   </ul>
                 </template>
               </a-alert>
             </a-col>
           </a-row>
-        </AgCard>
+        </a-card>
       </a-col>
     </a-row>
 
@@ -196,57 +182,37 @@
     <a-row :gutter="16" class="mt-4">
       <a-col :span="6">
         <a-card>
-          <a-statistic
-            title="组件数量"
-            :value="20"
-            suffix="个"
-            :value-style="{ color: '#3f8600' }"
-          >
+          <a-statistic title="组件数量" :value="20" suffix="个" :value-style="{ color: '#3f8600' }">
             <template #prefix>
               <AppstoreOutlined />
             </template>
           </a-statistic>
         </a-card>
       </a-col>
-      
+
       <a-col :span="6">
         <a-card>
-          <a-statistic
-            title="Demo 数量"
-            :value="10"
-            suffix="个"
-            :value-style="{ color: '#1890ff' }"
-          >
+          <a-statistic title="Demo 数量" :value="10" suffix="个" :value-style="{ color: '#1890ff' }">
             <template #prefix>
               <FileTextOutlined />
             </template>
           </a-statistic>
         </a-card>
       </a-col>
-      
+
       <a-col :span="6">
         <a-card>
-          <a-statistic
-            title="文档数量"
-            :value="11"
-            suffix="份"
-            :value-style="{ color: '#cf1322' }"
-          >
+          <a-statistic title="文档数量" :value="11" suffix="份" :value-style="{ color: '#cf1322' }">
             <template #prefix>
               <CodeOutlined />
             </template>
           </a-statistic>
         </a-card>
       </a-col>
-      
+
       <a-col :span="6">
         <a-card>
-          <a-statistic
-            title="完成度"
-            :value="100"
-            suffix="%"
-            :value-style="{ color: '#52c41a' }"
-          >
+          <a-statistic title="完成度" :value="100" suffix="%" :value-style="{ color: '#52c41a' }">
             <template #prefix>
               <CheckCircleOutlined />
             </template>
@@ -262,29 +228,11 @@ import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import {
   ExperimentOutlined,
-  TableOutlined,
-  SearchOutlined,
-  FormOutlined,
-  UploadOutlined,
-  CalendarOutlined,
-  EditOutlined,
-  ControlOutlined,
-  CreditCardOutlined,
-  FontSizeOutlined,
-  LoadingOutlined,
   AppstoreOutlined,
   FileTextOutlined,
   CodeOutlined,
-  CheckCircleOutlined,
-  FieldNumberOutlined,
-  FontColorsOutlined,
-  SelectOutlined,
-  FileMarkdownOutlined,
-  BarsOutlined,
-  LayoutOutlined,
-  BorderOutlined
+  CheckCircleOutlined
 } from '@ant-design/icons-vue'
-import { AgCard } from '@/components'
 
 const router = useRouter()
 
@@ -355,7 +303,7 @@ const tableComponents = [
     path: '/demo/search-table-demo'
   },
   {
-    name: 'AgTableActions',
+    name: 'AgTableActions (ag-table-actions)',
     description: '列操作组件，统一的操作列',
     icon: 'TableOutlined',
     path: '/demo/search-table-demo'
@@ -365,19 +313,19 @@ const tableComponents = [
 // 表单相关组件
 const formComponents = [
   {
-    name: 'AgUpload',
+    name: 'AgUpload (ag-upload)',
     description: '文件上传组件，支持拖拽上传',
     icon: 'UploadOutlined',
     path: '/demo/upload-demo'
   },
   {
-    name: 'AgEditor',
+    name: 'AgEditor (ag-editor)',
     description: '富文本编辑器，基于 wangEditor',
     icon: 'EditOutlined',
     path: '/demo/editor-demo'
   },
   {
-    name: 'AgStateSwitch',
+    name: 'AgStateSwitch (ag-state-switch)',
     description: '状态开关，支持 API 集成',
     icon: 'ControlOutlined',
     path: '/demo/state-switch-demo'
@@ -421,26 +369,26 @@ function openDoc(docName) {
 }
 
 .welcome-card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1)
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .welcome-title {
   display: flex;
   align-items: center;
-  font-size: 18px
+  font-size: 18px;
 }
 
 .title-icon {
   margin-right: 8px;
   font-size: 24px;
-  color: #1890ff
+  color: #1890ff;
 }
 
 .mb-4 {
-  margin-bottom: 16px
+  margin-bottom: 16px;
 }
 
 .mt-4 {
-  margin-top: 16px
+  margin-top: 16px;
 }
 </style>

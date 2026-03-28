@@ -1,6 +1,6 @@
 <template>
   <div class="content-header">
-    <img src="@/assets/logo.svg" class="header-logo">
+    <img src="@/assets/logo.svg" class="header-logo" />
   </div>
   <div class="content-body">
     <div class="content-main justify-end">
@@ -15,15 +15,9 @@
           <span>{{ t('userLayout.footerCopyright', { year: currentYear }) }}</span>
         </div>
         <div class="top-list">
-          <div class="t-list-item">
-            <img src="@/assets/beian.png"> {{ t('userLayout.icpRecord') }}
-          </div>
-          <div class="t-list-item">
-            <img src="@/assets/pcac.png"> {{ t('userLayout.pcacRecord') }}
-          </div>
-          <div class="t-list-item">
-            <img src="@/assets/permit.png"> {{ t('userLayout.telecomPermit') }}
-          </div>
+          <div class="t-list-item"><img src="@/assets/beian.png" /> {{ t('userLayout.icpRecord') }}</div>
+          <div class="t-list-item"><img src="@/assets/pcac.png" /> {{ t('userLayout.pcacRecord') }}</div>
+          <div class="t-list-item"><img src="@/assets/permit.png" /> {{ t('userLayout.telecomPermit') }}</div>
         </div>
       </div>
     </div>
@@ -49,7 +43,7 @@ const currentYear = dayjs().year()
   right: 0;
   height: 80px;
   background-color: var(--base-bg-color);
-  backdrop-filter: blur(50px) saturate(180%)
+  backdrop-filter: blur(50px) saturate(180%);
 }
 
 .header-logo {
@@ -62,13 +56,13 @@ const currentYear = dayjs().year()
   box-sizing: border-box;
   object-fit: cover;
   padding: 80px 10vw 0;
-  min-height: 100vh
+  min-height: 100vh;
 }
 
 .content-body .content-main {
   flex-grow: 1;
   display: flex;
-  align-items: center
+  align-items: center;
 }
 
 .content-body .content-main.justify-end {
@@ -76,10 +70,10 @@ const currentYear = dayjs().year()
 }
 
 .user-layout-content {
-  transition: .3s ease
+  transition: 0.3s ease;
 }
 
-.user-layout-content .login-error-message{
+.user-layout-content .login-error-message {
   margin-bottom: 24px;
 }
 .user-layout-content .main {
@@ -95,17 +89,19 @@ const currentYear = dayjs().year()
   border: 1px solid var(--border-color);
   align-items: center;
   border-radius: var(--border-radius-lg);
-  transition: all .3s,border 0s ease
+  transition:
+    all 0.3s,
+    border 0s ease;
 }
 
 .user-layout-content .main .ant-form {
-  max-width: 300px
+  max-width: 300px;
 }
 
 .user-layout-content .main .desc {
   font-weight: 700;
   font-size: 20px;
-  letter-spacing: .04em;
+  letter-spacing: 0.04em;
   color: var(--ant-primary-color);
   margin-bottom: 50px;
   text-align: center;
@@ -116,67 +112,67 @@ const currentYear = dayjs().year()
   bottom: 0;
   padding: 0 16px;
   margin: 48px 0 24px;
-  text-align: center
+  text-align: center;
 }
 
 .user-layout-content .footer .links {
   margin-bottom: 8px;
-  font-size: 14px
+  font-size: 14px;
 }
 
-  .user-layout-content .footer .links a {
+.user-layout-content .footer .links a {
   color: var(--text-color-muted);
-  transition: all .3s
+  transition: all 0.3s;
 }
 
 .user-layout-content .footer .links a:not(:last-child) {
-  margin-right: 40px
+  margin-right: 40px;
 }
 
-  .user-layout-content .footer .copyright {
+.user-layout-content .footer .copyright {
   color: var(--text-color-muted);
-  font-size: 14px
+  font-size: 14px;
 }
 
 .code-body {
-//padding-top: 20px;
+  //padding-top: 20px;
   width: 300px;
-  overflow-x: hidden
+  overflow-x: hidden;
 }
 
 .code-layout {
   display: flex;
   width: 600px;
-  transition: .3s
+  transition: 0.3s;
 }
 
 .code-layout .code-layout-item {
-  width: 50%
+  width: 50%;
 }
 
-  .footer-info {
+.footer-info {
   padding-bottom: 25px;
   color: var(--text-color-secondary);
   font-size: 14px;
   letter-spacing: 1.5px;
-  text-align: center
+  text-align: center;
 }
 
 .footer-info span {
-  cursor: pointer
+  cursor: pointer;
 }
 
 .footer-info img {
   margin-right: 5px;
   width: 20px;
-  height: 20px
+  height: 20px;
 }
 
 .footer-info .top-list {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 20px
+  margin-top: 20px;
 }
 
 .footer-info .top-list .t-list-item {
@@ -184,10 +180,10 @@ const currentYear = dayjs().year()
   display: flex;
   align-items: center;
   margin-left: 30px;
-  cursor: pointer
+  cursor: pointer;
 }
 
-  .footer-info a {
-  color: var(--text-color-secondary)
+.footer-info a {
+  color: var(--text-color-secondary);
 }
 </style>

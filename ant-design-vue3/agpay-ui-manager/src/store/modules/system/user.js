@@ -1,6 +1,6 @@
 /*
  * 登录用户
- * 
+ *
  * 使用 pinia-plugin-persistedstate 自动持久化
  */
 import { defineStore } from 'pinia'
@@ -8,10 +8,10 @@ import { defineStore } from 'pinia'
 export const useUserStore = defineStore('userStore', {
   state: () => ({
     token: '',
-    userName: '', // 真实姓名
+    realname: '', // 真实姓名
     safeWord: '', // 预留信息
     userId: '', // 用户ID
-    avatarImgPath: '', // 头像
+    avatarUrl: '', // 头像
     allMenuRouteTree: [], // 全部动态 router
     accessList: [], // 用户权限集合
     isAdmin: '', // 是否是超级管理员
@@ -21,19 +21,32 @@ export const useUserStore = defineStore('userStore', {
     telphone: '', // 手机号
     sex: '' // 性别
   }),
-  
+
   // 🔥 启用持久化 - 自动保存到 localStorage
   persist: {
     key: 'user-store',
     storage: localStorage,
-    paths: ['token', 'userName', 'userId', 'avatarImgPath', 'allMenuRouteTree', 'accessList', 'isAdmin', 'loginUsername', 'state', 'sysType', 'telphone', 'sex']
+    paths: [
+      'token',
+      'realname',
+      'userId',
+      'avatarUrl',
+      'allMenuRouteTree',
+      'accessList',
+      'isAdmin',
+      'loginUsername',
+      'state',
+      'sysType',
+      'telphone',
+      'sex'
+    ]
   },
-  
+
   getters: {
     // ✅ 简化：persist 会自动恢复 token，无需手动读取
     getToken(state) {
       return state.token || ''
-    },
+    }
   },
 
   actions: {
@@ -45,13 +58,14 @@ export const useUserStore = defineStore('userStore', {
         resolve()
       })
     },
-    
+
     // ✅ 简化：直接修改状态，persist 会自动保存
     setUserLoginInfo(data) {
+      console.log('设置用户登录信息:', data)
       this.userId = data.sysUserId // 用户ID
-      this.userName = data.realname // 真实姓名
+      this.realname = data.realname // 真实姓名
       this.safeWord = data.safeWord // 预留信息
-      this.avatarImgPath = data.avatarUrl // 头像
+      this.avatarUrl = data.avatarUrl // 头像
       this.accessList = data.entIdList // 权限集合
       this.allMenuRouteTree = data.allMenuRouteTree // 全部路由集合
       this.isAdmin = data.isAdmin // 是否是超级管理员
@@ -61,9 +75,9 @@ export const useUserStore = defineStore('userStore', {
       this.telphone = data.telphone // 手机号
       this.sex = data.sex // 性别
     },
-    
+
     // ✅ 简化：直接修改 token，persist 会自动保存
-    setToken(token) {
+    setToken(token, isAutoLogin) {
       this.token = token || ''
     },
 
@@ -79,5 +93,5 @@ export const useUserStore = defineStore('userStore', {
       // 检查权限集合中是否包含此权限
       return this.accessList && this.accessList.includes(entId)
     }
-  },
+  }
 })

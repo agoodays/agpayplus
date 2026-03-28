@@ -32,7 +32,15 @@
   .ant-menu-light,
   .ant-menu-submenu-popup,
   .ant-select-dropdown,
-  .ant-picker-dropdown {
+  .ant-picker-dropdown,
+  .ant-modal-content,
+  .ant-drawer-content,
+  .ant-card,
+  .ant-table,
+  .ant-form,
+  .ant-message-notice-content,
+  .ant-notification-notice-content,
+  .ant-popover-inner {
     background: var(--layout-surface) !important;
     color: var(--text-color) !important;
     border-color: var(--border-color) !important;
@@ -42,15 +50,53 @@
   .ant-menu-item,
   .ant-menu-submenu-title,
   .ant-select-item,
-  .ant-picker-cell {
+  .ant-picker-cell,
+  .ant-table-cell,
+  .ant-form-item-label > label,
+  .ant-modal-title,
+  .ant-drawer-title,
+  .ant-message-notice-content,
+  .ant-notification-notice-title,
+  .ant-notification-notice-description,
+  .ant-popover-inner-title {
     color: var(--text-color) !important;
   }
 
   .ant-dropdown-menu-item:hover,
   .ant-menu-item:hover,
   .ant-select-item-option-active,
-  .ant-picker-cell:hover {
+  .ant-picker-cell:hover,
+  .ant-table-tbody > tr:hover > td,
+  .ant-message-notice-content:hover,
+  .ant-notification-notice-content:hover {
     background: var(--surface-subtle) !important;
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-input-number-input {
+    background: var(--layout-surface) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  // .ant-menu-dark .ant-menu-sub.ant-menu-inline {
+  //   background: var(--sider-bg-dark) !important;
+  // }
+
+  // 暗色模式下的按钮样式
+  .ant-btn {
+    &.ant-btn-primary {
+      background-color: var(--primary-color) !important;
+      border-color: var(--primary-color) !important;
+    }
+    &:not(.ant-btn-primary) {
+      background-color: var(--layout-surface) !important;
+      border-color: var(--border-color) !important;
+      color: var(--text-color) !important;
+    }
   }
 }
 
@@ -123,4 +169,3 @@
   background-color: var(--primary-color) !important;
   color: var(--text-on-primary, #fff) !important;
 }
-

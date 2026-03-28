@@ -1,12 +1,8 @@
-﻿<template>
+<template>
   <div class="refund-order-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <a-form
-        :model="searchParams"
-        layout="inline"
-        class="search-form"
-      >
+      <a-form :model="searchParams" layout="inline" class="search-form">
         <!-- 日期范围 -->
         <a-form-item label="创建时间">
           <a-range-picker
@@ -23,7 +19,7 @@
             v-model:value="searchParams.refundOrderId"
             placeholder="请输入退款订单号"
             allow-clear
-            @pressEnter="handleSearch"
+            @press-enter="handleSearch"
           />
         </a-form-item>
 
@@ -33,7 +29,7 @@
             v-model:value="searchParams.payOrderId"
             placeholder="请输入支付订单号"
             allow-clear
-            @pressEnter="handleSearch"
+            @press-enter="handleSearch"
           />
         </a-form-item>
 
@@ -48,11 +44,7 @@
             style="width: 200px"
             @search="handleSearchMch"
           >
-            <a-select-option
-              v-for="item in mchList"
-              :key="item.mchNo"
-              :value="item.mchNo"
-            >
+            <a-select-option v-for="item in mchList" :key="item.mchNo" :value="item.mchNo">
               {{ item.mchName }}
             </a-select-option>
           </a-select>
@@ -61,12 +53,7 @@
         <!-- 展开更多 -->
         <template v-if="showMore">
           <a-form-item label="退款状态">
-            <a-select
-              v-model:value="searchParams.state"
-              placeholder="全部"
-              allow-clear
-              style="width: 140px"
-            >
+            <a-select v-model:value="searchParams.state" placeholder="全部" allow-clear style="width: 140px">
               <a-select-option :value="0">订单生成</a-select-option>
               <a-select-option :value="1">退款中</a-select-option>
               <a-select-option :value="2">退款成功</a-select-option>
@@ -80,7 +67,7 @@
               v-model:value="searchParams.appId"
               placeholder="请输入应用ID"
               allow-clear
-              @pressEnter="handleSearch"
+              @press-enter="handleSearch"
             />
           </a-form-item>
         </template>
@@ -121,11 +108,11 @@
 
       <!-- 数据表格 -->
       <a-table
+        row-key="refundOrderId"
         :columns="columns"
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
-        row-key="refundOrderId"
         :scroll="{ x: 1600 }"
         @change="handleTableChange"
       >
@@ -141,9 +128,7 @@
 
         <!-- 退款金额 -->
         <template #refundAmount="{ text }">
-          <span style="color: #cf1322; font-weight: 500">
-            ¥{{ (text / 100).toFixed(2) }}
-          </span>
+          <span style="color: #cf1322; font-weight: 500"> ¥{{ (text / 100).toFixed(2) }} </span>
         </template>
 
         <!-- 退款状态 -->
@@ -168,10 +153,7 @@
     </a-card>
 
     <!-- 详情抽屉 -->
-    <detail-drawer
-      v-model:open="detailOpen"
-      :refund-order-id="currentRefundOrderId"
-    />
+    <detail-drawer v-model:open="detailOpen" :refund-order-id="currentRefundOrderId" />
   </div>
 </template>
 
@@ -194,7 +176,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 // 使用 Hooks
-const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
+const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
   useTable((params) => req.list(API_URL_REFUND_ORDER, params))
 
 const { open: detailOpen, showModal: showDetail } = useModal()
@@ -301,7 +283,7 @@ const handleSearchMch = async (keyword) => {
     mchList.value = []
     return
   }
-  
+
   try {
     const res = await req.list(API_URL_MCH_LIST, {
       mchName: keyword,

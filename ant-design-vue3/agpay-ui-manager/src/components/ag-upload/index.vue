@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="ag-upload">
     <a-upload
       :name="name"
@@ -9,9 +9,7 @@
       @change="handleChange"
     >
       <slot>
-        <a-button>
-          <upload-outlined /> {{ t('components.upload') }}
-        </a-button>
+        <a-button> <upload-outlined /> {{ t('components.upload') }} </a-button>
       </slot>
     </a-upload>
   </div>
@@ -22,7 +20,7 @@ import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
-const props = defineProps({
+defineProps({
   name: { type: String, default: 'file' },
   action: { type: String, default: '' },
   headers: { type: Object, default: () => ({}) },
@@ -40,5 +38,4 @@ function handleChange(info) {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

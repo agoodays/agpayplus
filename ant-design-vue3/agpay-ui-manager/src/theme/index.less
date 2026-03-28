@@ -5,6 +5,7 @@
  * 1. Ant Design Vue 样式
  * 2. Ant Design 覆盖样式
  * 3. CSS 变量定义（运行时主题）
+ * 4. 全局样式
  */
 
 // ==================== 依赖样式 ====================
@@ -15,6 +16,12 @@
 // Ant Design 组件样式覆盖
 @import 'antd-overrides.less';
 
+// 自定义组件样式
+@import 'components.less';
+
+// 浮动标签样式
+@import '../styles/float-label.less';
+
 // ==================== CSS 变量（运行时主题） ====================
 
 /**
@@ -23,39 +30,40 @@
  * 注意：
  * - 这些变量会被 theme.js 中的 applyThemeFromConfig() 动态覆盖
  * - 后端配置优先级高于这些默认值
+ * - 与 app-config.js 中的配置保持一致
  */
 :root {
   // 主色
   --primary-color: #1677ff;
   --primary-color-hover: rgba(22, 119, 255, 0.08);
   --primary-color-weak: rgba(22, 119, 255, 0.06);
-  
+
   // 状态颜色
   --success-color: #52c41a;
   --warning-color: #faad14;
   --error-color: #ff4d4f;
   --info-color: var(--primary-color);
-  
+
   // 布局
   --border-radius: 6px;
   --border-radius-lg: 8px;
-  --side-menu-width: 200px;
-  --page-width: 99%;
-  
+  --side-menu-width: 260px;
+  --page-width: 100%;
+
   // 背景色
   --base-bg-color: #fff;
   --layout-bg: #f5f5f5;
   --layout-surface: #f8f8f8;
   --sider-bg-dark: #001529;
   --sider-bg-light: #ffffff;
-  --table-row-alt-bg: #FCFCFC;
+  --table-row-alt-bg: #fcfcfc;
   --overlay-bg: #000;
   --surface-variant: rgba(0, 0, 0, 0.03);
   --surface-subtle: rgba(0, 0, 0, 0.02);
   --surface-light: rgba(0, 0, 0, 0.04);
   --surface-lighter: rgba(0, 0, 0, 0.06);
   --hover-bg-color: #dadada;
-  
+
   // 文字颜色
   --text-color: rgba(0, 0, 0, 0.85);
   --text-color-weak: rgba(0, 0, 0, 0.45);
@@ -64,14 +72,33 @@
   --text-muted: rgba(0, 0, 0, 0.2);
   --text-on-dark: rgba(255, 255, 255, 0.87);
   --text-on-primary: #fff;
-  
+
   // 边框和阴影
   --border-color: #e7eaf3;
   --border-dashed: rgba(0, 0, 0, 0.15);
   --shadow-color: rgba(0, 0, 0, 0.1);
-  
+
   // Ant Design 主色
   --ant-primary-color: var(--primary-color);
+  --ant-primary-color-hover: var(--primary-color-hover);
+  --ant-primary-color-active: var(--primary-color);
+  --ant-primary-color-outline: var(--primary-color-hover);
+  --ant-primary-1: var(--primary-color-weak);
+  --ant-primary-2: var(--primary-color-hover);
+
+  // 暗色主题相关变量
+  --dark-base-bg-color: #141414;
+  --dark-layout-bg: #141414;
+  --dark-layout-surface: #1f1f1f;
+  --dark-surface-variant: rgba(255, 255, 255, 0.08);
+  --dark-surface-subtle: rgba(255, 255, 255, 0.06);
+  --dark-surface-light: rgba(255, 255, 255, 0.12);
+  --dark-surface-lighter: rgba(255, 255, 255, 0.16);
+  --dark-text-color: rgba(255, 255, 255, 0.88);
+  --dark-text-color-weak: rgba(255, 255, 255, 0.65);
+  --dark-text-color-muted: rgba(255, 255, 255, 0.45);
+  --dark-border-color: #303030;
+  --dark-shadow-color: rgba(0, 0, 0, 0.35);
 }
 
 /**
@@ -79,20 +106,29 @@
  * 说明：
  * - 与 data-theme 联动，不依赖组件内部硬编码颜色
  * - 优先覆盖布局背景、文字和边框等核心 token
+ * - 使用预定义的暗色主题变量，保持一致性
  */
 :root[data-theme='dark'] {
-  --base-bg-color: #141414;
-  --layout-bg: #141414;
-  --layout-surface: #1f1f1f;
-  --surface-variant: rgba(255, 255, 255, 0.08);
-  --surface-subtle: rgba(255, 255, 255, 0.06);
-  --surface-light: rgba(255, 255, 255, 0.12);
-  --surface-lighter: rgba(255, 255, 255, 0.16);
-  --text-color: rgba(255, 255, 255, 0.88);
-  --text-color-weak: rgba(255, 255, 255, 0.65);
-  --text-color-muted: rgba(255, 255, 255, 0.45);
-  --border-color: #303030;
-  --shadow-color: rgba(0, 0, 0, 0.35);
+  --base-bg-color: var(--dark-base-bg-color);
+  --layout-bg: var(--dark-layout-bg);
+  --layout-surface: var(--dark-layout-surface);
+  --surface-variant: var(--dark-surface-variant);
+  --surface-subtle: var(--dark-surface-subtle);
+  --surface-light: var(--dark-surface-light);
+  --surface-lighter: var(--dark-surface-lighter);
+  --text-color: var(--dark-text-color);
+  --text-color-weak: var(--dark-text-color-weak);
+  --text-color-muted: var(--dark-text-color-muted);
+  --border-color: var(--dark-border-color);
+  --shadow-color: var(--dark-shadow-color);
+
+  // Ant Design 暗色主题变量
+  --ant-primary-color: var(--primary-color);
+  --ant-primary-color-hover: var(--primary-color-hover);
+  --ant-primary-color-active: var(--primary-color);
+  --ant-primary-color-outline: var(--primary-color-hover);
+  --ant-primary-1: var(--primary-color-weak);
+  --ant-primary-2: var(--primary-color-hover);
 }
 
 // ==================== 基础样式 ====================
@@ -115,9 +151,27 @@ body {
   background-color: var(--layout-surface);
   font-size: 14px;
   position: relative;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe UI,
+    Microsoft YaHei,
+    PingFang SC,
+    Hiragino Sans GB,
+    Helvetica Neue,
+    Helvetica,
+    Arial,
+    sans-serif,
+    Apple Color Emoji,
+    Segoe UI Emoji,
+    Segoe UI Symbol;
+  letter-spacing: 0.4px;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-#app {
+#app,
+#root {
   width: 100%;
   height: 100%;
 }
@@ -136,20 +190,123 @@ body {
 
 *::-webkit-scrollbar-track {
   background: transparent;
+  border-radius: 4px;
 }
 
 *::-webkit-scrollbar-thumb {
   background-color: var(--surface-lighter);
-  border-radius: 8px;
+  border-radius: 4px;
   border: 2px solid transparent;
   background-clip: content-box;
+  transition: background-color 0.3s ease;
 }
 
 *::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-color-muted);
 }
 
-*::-webkit-scrollbar-corner {
-  background: transparent;
+*::-webkit-scrollbar-thumb:active {
+  background-color: var(--text-color-weak);
 }
 
+*::-webkit-scrollbar-corner {
+  background: transparent;
+  border-radius: 4px;
+}
+
+// ==================== 布局样式 ====================
+
+.ant-layout {
+  .layout-basic {
+    height: 100vh;
+    min-height: 100vh;
+  }
+}
+
+// ==================== 通用样式 ====================
+
+canvas {
+  display: block;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+// ==================== 响应式样式 ====================
+
+// 小屏幕（手机）
+@media (max-width: 575px) {
+  .ant-table {
+    width: 100%;
+    overflow-x: auto;
+    &-thead > tr,
+    &-tbody > tr {
+      > th,
+      > td {
+        white-space: pre;
+        > span {
+          display: block;
+        }
+      }
+    }
+  }
+
+  .ag-layout-header-main {
+    flex-direction: column;
+    height: auto;
+    padding: 8px 16px;
+
+    .ag-layout-header-left {
+      width: 100%;
+      margin-bottom: 8px;
+
+      .ag-layout-header-breadcrumb {
+        .ag-breadcrumb {
+          line-height: 32px;
+        }
+      }
+    }
+
+    .ag-layout-header-right {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+
+  .ag-layout-content {
+    margin: 12px 8px;
+    padding: 16px;
+  }
+}
+
+// 中屏幕（平板）
+@media (max-width: 768px) {
+  .ag-layout-header-main {
+    .ag-layout-header-left {
+      .ag-layout-header-controls {
+        margin-right: 16px;
+      }
+    }
+  }
+
+  .ag-layout-content {
+    margin: 16px 12px;
+    padding: 20px;
+  }
+}
+
+// 大屏幕（桌面）
+@media (min-width: 1200px) {
+  .ag-layout-content {
+    max-width: 1140px;
+  }
+}
+
+// 超大屏幕
+@media (min-width: 1400px) {
+  .ag-layout-content {
+    max-width: 1320px;
+  }
+}

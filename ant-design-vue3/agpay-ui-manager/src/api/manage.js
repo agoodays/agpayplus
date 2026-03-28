@@ -1,4 +1,4 @@
-﻿import request from '@/lib/request'
+import { request } from '@/lib/ag-axios'
 
 /**
  * 全系列 restful api格式, 定义通用req对象
@@ -6,27 +6,27 @@
 export const req = {
   // 通用列表查询接口
   list: (url, params) => {
-    return request.request({ url: url, method: 'GET', params: params }, true, true, false)
+    return request({ url: url, method: 'GET', params: params }, true, true, false)
   },
 
   // 通用获取数据接口
   get: (url, params) => {
-    return request.request({ url: url, method: 'GET', params: params }, true, true, false)
+    return request({ url: url, method: 'GET', params: params }, true, true, false)
   },
 
   // 通用列表查询统计接口
   total: (url, params) => {
-    return request.request({ url: url + '/total', method: 'GET', params: params }, true, true, false)
+    return request({ url: url + '/total', method: 'GET', params: params }, true, true, false)
   },
 
   // 通用列表查询统计接口
   count: (url, params) => {
-    return request.request({ url: url + '/count', method: 'GET', params: params }, true, true, false)
+    return request({ url: url + '/count', method: 'GET', params: params }, true, true, false)
   },
 
   // 通用列表数据导出接口
   export: (url, bizType, params) => {
-    return request.request(
+    return request(
       { url: url + '/export/' + bizType, method: 'GET', params: params, responseType: 'blob' },
       true,
       true,
@@ -36,27 +36,27 @@ export const req = {
 
   // 通用Post接口
   post: (url, data) => {
-    return request.request({ url: url, method: 'POST', data: data }, true, true, false)
+    return request({ url: url, method: 'POST', data: data }, true, true, false)
   },
 
   // 通用新增接口
   add: (url, data) => {
-    return request.request({ url: url, method: 'POST', data: data }, true, true, false)
+    return request({ url: url, method: 'POST', data: data }, true, true, false)
   },
 
   // 通用查询单条数据接口
   getById: (url, bizId) => {
-    return request.request({ url: url + '/' + bizId, method: 'GET' }, true, true, false)
+    return request({ url: url + '/' + bizId, method: 'GET' }, true, true, false)
   },
 
   // 通用修改接口
   updateById: (url, bizId, data) => {
-    return request.request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, false)
+    return request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, false)
   },
 
   // 通用删除接口
   delById: (url, bizId) => {
-    return request.request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, false)
+    return request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, false)
   }
 }
 
@@ -64,27 +64,27 @@ export const req = {
 export const reqLoad = {
   // 通用列表查询接口
   list: (url, params) => {
-    return request.request({ url: url, method: 'GET', params: params }, true, true, true)
+    return request({ url: url, method: 'GET', params: params }, true, true, true)
   },
 
   // 通用新增接口
   add: (url, data) => {
-    return request.request({ url: url, method: 'POST', data: data }, true, true, true)
+    return request({ url: url, method: 'POST', data: data }, true, true, true)
   },
 
   // 通用查询单条数据接口
   getById: (url, bizId) => {
-    return request.request({ url: url + '/' + bizId, method: 'GET' }, true, true, true)
+    return request({ url: url + '/' + bizId, method: 'GET' }, true, true, true)
   },
 
   // 通用修改接口
   updateById: (url, bizId, data) => {
-    return request.request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, true)
+    return request({ url: url + '/' + bizId, method: 'PUT', data: data }, true, true, true)
   },
 
   // 通用删除接口
   delById: (url, bizId) => {
-    return request.request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, true)
+    return request({ url: url + '/' + bizId, method: 'DELETE' }, true, true, true)
   }
 }
 
@@ -163,31 +163,233 @@ export const upload = {
   form: '/api/ossFiles/form',
   /** 获取上传表单参数 */
   getFormParams: (url, fileName, fileSize) => {
-    return request.request({ url, method: 'GET', params: { fileName, fileSize } })
+    return request({ url, method: 'GET', params: { fileName, fileSize } })
   },
   /** 上传单个文件 */
   singleFile: (url, isLocalFile, data) => {
     const formData = new FormData()
     for (const key in data) {
-      if (data.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
         formData.append(key, data[key])
       }
     }
     const actionUrl = isLocalFile ? { url: url } : { baseURL: url }
     const options = Object.assign(actionUrl, { method: 'POST', data: formData })
-    return request.request(options)
+    return request(options)
   }
 }
 
 /** 获取权限树状结构图 **/
 export function getEntTree(sysType) {
-  return request.request({ url: '/api/sysEnts/showTree?sysType=' + sysType, method: 'GET' })
+  return request({ url: '/api/sysEnts/showTree?sysType=' + sysType, method: 'GET' })
 }
 
 /** 查询当前应用支持的支付接口 **/
 export function getIfCodeByAppId(appId) {
-  return request.request({
+  return request({
     url: '/api/mch/payConfigs/ifCodes/' + appId,
     method: 'GET'
   })
+}
+
+/** 获取渠道用户ID二维码地址 **/
+export function getChannelUserQrImgUrl(ifCode, appId, extParam) {
+  return request({
+    url: '/api/mchChannel/channelUserId',
+    method: 'GET',
+    params: { ifCode, appId, extParam }
+  })
+}
+
+/** 获取到webSocket的前缀 （ws://localhost） **/
+export function getWebSocketPrefix() {
+  // 获取网站域名 +  端口号
+  let domain = document.location.protocol + '//' + document.location.host
+
+  // 判断api_base_url 是否设置
+  if (import.meta.env.VITE_APP_API_BASE_URL && import.meta.env.VITE_APP_API_BASE_URL !== '/') {
+    domain = import.meta.env.VITE_APP_API_BASE_URL
+  }
+
+  if (domain.startsWith('https:')) {
+    return 'wss://' + domain.replace('https://', '')
+  } else {
+    return 'ws://' + domain.replace('http://', '')
+  }
+}
+
+/** 退款接口 */
+export function payOrderRefund(payOrderId, refundAmount, refundReason) {
+  return request({
+    url: '/api/payOrder/refunds/' + payOrderId,
+    method: 'POST',
+    data: { refundAmount, refundReason }
+  })
+}
+
+/** 更新用户角色信息 */
+export function uSysUserRoleRela(sysUserId, roleIdList) {
+  return request({
+    url: 'api/sysUserRoleRelas/relas/' + sysUserId,
+    method: 'POST',
+    data: { roleIds: roleIdList }
+  })
+}
+
+export function getRoleList(parameter) {
+  return request({
+    url: '/api/sysRoles',
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getIsvPayConfigUnique(infoId, ifCode) {
+  return request({
+    url: '/api/isv/payConfigs/' + infoId + '/' + ifCode,
+    method: 'get'
+  })
+}
+
+export function getMchPayConfigUnique(infoId, ifCode) {
+  return request({
+    url: '/api/mch/payConfigs/' + infoId + '/' + ifCode,
+    method: 'get'
+  })
+}
+
+export function getAvailablePayInterfaceList(mchNo, wayCode, data) {
+  return request({
+    url: '/api/mch/payPassages/availablePayInterface/' + mchNo + '/' + wayCode,
+    method: 'GET',
+    params: data
+  })
+}
+
+export function getPayTrendCount(parameter) {
+  return request({
+    url: API_URL_MAIN_STATISTIC + '/payTrendCount?recentDay=' + parameter,
+    method: 'GET'
+  })
+}
+
+export function getIsvAndMchCount() {
+  return request({
+    url: API_URL_MAIN_STATISTIC + '/isvAndMchCount',
+    method: 'GET'
+  })
+}
+
+export function getPayDayCount(parameter) {
+  return request({
+    url: API_URL_MAIN_STATISTIC + '/payDayCount?queryDateRange=' + parameter,
+    method: 'GET'
+  })
+}
+
+export function getPayCount(parameter) {
+  return request({
+    url: API_URL_MAIN_STATISTIC + '/payCount',
+    method: 'GET',
+    params: parameter
+  })
+}
+
+export function getPayType(parameter) {
+  return request({
+    url: API_URL_MAIN_STATISTIC + '/payTypeCount',
+    method: 'GET',
+    params: parameter
+  })
+}
+
+export function getMainUserInfo(parameter) {
+  return request({
+    url: API_URL_MAIN_STATISTIC + '/' + parameter,
+    method: 'GET'
+  })
+}
+
+export function updateUserPass(parameter) {
+  return request({
+    url: '/api/current/modifyPwd',
+    method: 'put',
+    data: parameter
+  })
+}
+
+export function updateUserInfo(parameter) {
+  return request({
+    url: '/api/current/user',
+    method: 'put',
+    data: parameter
+  })
+}
+
+export function getUserInfo() {
+  return request({
+    url: '/api/current/user',
+    method: 'get'
+  })
+}
+
+export function getConfigs(parameter) {
+  return request({
+    url: API_URL_SYS_CONFIG + '/' + parameter,
+    method: 'GET'
+  })
+}
+
+export function getMchConfigs(parameter, data) {
+  return request({
+    url: API_URL_MCH_CONFIG + '/' + parameter,
+    method: 'GET',
+    params: data
+  })
+}
+
+export function getEntBySysType(entId, sysType) {
+  return request({
+    url: '/api/sysEnts/bySysType',
+    method: 'GET',
+    params: { entId: entId, sysType: sysType }
+  })
+}
+
+export function mchNotifyResend(notifyId) {
+  return request({
+    url: '/api/mchNotify/resend/' + notifyId,
+    method: 'POST'
+  })
+}
+
+/** 重新发送分账 **/
+export function resendDivision(divisionId) {
+  return request({
+    url: '/api/division/records/resend/' + divisionId,
+    method: 'POST'
+  })
+}
+
+/** 查询支付宝授权地址URL **/
+export function queryAlipayIsvsubMchAuthUrl(mchAppId) {
+  return request({
+    url: '/api/mch/payConfigs/alipayIsvsubMchAuthUrls/' + mchAppId,
+    method: 'GET'
+  })
+}
+
+/** 获取支付网关系统公钥 **/
+export function getSysRSA2PublicKey() {
+  return request({ url: '/api/mchApps/sysRSA2PublicKey', method: 'GET' })
+}
+
+/** 获取地图配置 **/
+export function getMapConfig() {
+  return request({ url: '/api/mchStore/mapConfig', method: 'GET' })
+}
+
+/** 获取密码规则 **/
+export function getPwdRulesRegexp() {
+  return request({ url: '/api/anon/cipher/pwdRulesRegexp', method: 'GET' })
 }

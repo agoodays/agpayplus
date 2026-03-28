@@ -1,14 +1,11 @@
-﻿<template>
-  <a-drawer
-    v-model:open="open"
-    title="退款订单详情"
-    :width="720"
-    @close="handleClose"
-  >
+<template>
+  <a-drawer v-model:open="localOpen" title="退款订单详情" :width="720" @close="handleClose">
     <a-spin :spinning="loading">
       <a-descriptions :column="2" bordered size="small">
         <a-descriptions-item label="退款订单号" :span="2">
-          <a-typography-text copyable><b>{{ detailData.refundOrderId }}</b></a-typography-text>
+          <a-typography-text copyable
+            ><b>{{ detailData.refundOrderId }}</b></a-typography-text
+          >
         </a-descriptions-item>
 
         <a-descriptions-item label="支付订单号" :span="2">
@@ -23,7 +20,7 @@
         </a-descriptions-item>
 
         <a-descriptions-item label="退款金额">
-          <span style="color: #cf1322; font-weight: 500">
+          <span style="color: var(--error-color); font-weight: 500">
             ¥{{ (detailData.refundAmount / 100).toFixed(2) }}
           </span>
         </a-descriptions-item>
@@ -103,7 +100,7 @@ const emit = defineEmits(['update:open'])
 
 // State
 const loading = ref(false)
-const open = ref(false)
+const localOpen = ref(props.open)
 const detailData = reactive({
   refundOrderId: '',
   payOrderId: '',
@@ -124,15 +121,18 @@ const detailData = reactive({
 })
 
 // 监听 props.open 变化
-watch(() => props.open, (val) => {
-  open.value = val
-  if (val && props.refundOrderId) {
-    loadDetail()
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.refundOrderId) {
+      loadDetail()
+    }
   }
-})
+)
 
-// 监听 open 变化
-watch(open, (val) => {
+// 监听 localOpen 变化，emit update:open 事件
+watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
@@ -195,7 +195,7 @@ const getRefundType = (type) => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  open.value = false
+  emit('update:open', false)
 }
 </script>
 

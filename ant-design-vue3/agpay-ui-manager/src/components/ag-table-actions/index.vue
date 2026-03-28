@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="ag-table-action-columns">
     <template v-if="visibleActions.length <= maxShowNum">
       <!-- 直接显示所有操作 -->
@@ -7,7 +7,7 @@
     <template v-else>
       <!-- 显示前面的操作 + 更多菜单 -->
       <template v-for="(action, index) in visibleActions" :key="index">
-        <component v-if="index < maxShowNum - 1" :is="action" />
+        <component :is="action" v-if="index < maxShowNum - 1" />
       </template>
       <a-dropdown>
         <a-button type="link" size="small">
@@ -47,7 +47,7 @@ const slots = useSlots()
 const visibleActions = computed(() => {
   const defaultSlot = slots.default?.() || []
   // 过滤出有效的 VNode
-  return defaultSlot.filter(vnode => {
+  return defaultSlot.filter((vnode) => {
     // 排除注释节点和纯文本节点
     return vnode.type && typeof vnode.type !== 'symbol'
   })

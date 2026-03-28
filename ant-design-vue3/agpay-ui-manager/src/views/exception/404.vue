@@ -1,20 +1,26 @@
-﻿<template>
+<template>
   <div class="exception-page">
     <div class="exception-content">
       <div class="exception-icon">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <text x="50%" y="50%" font-size="120" font-weight="bold" fill="#faad14" text-anchor="middle" dominant-baseline="middle">404</text>
+          <text
+            x="50%"
+            y="50%"
+            font-size="120"
+            font-weight="bold"
+            fill="#faad14"
+            text-anchor="middle"
+            dominant-baseline="middle"
+          >
+            404
+          </text>
         </svg>
       </div>
       <h1 class="exception-title">页面不存在</h1>
       <p class="exception-desc">抱歉，您访问的页面不存在</p>
       <a-space>
-        <a-button type="primary" size="large" @click="handleGoHome">
-          返回首页
-        </a-button>
-        <a-button size="large" @click="handleGoBack">
-          返回上一页
-        </a-button>
+        <a-button type="primary" size="large" @click="handleGoHome"> 返回首页 </a-button>
+        <a-button size="large" @click="handleGoBack"> 返回上一页 </a-button>
       </a-space>
     </div>
   </div>

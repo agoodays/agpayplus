@@ -1,6 +1,6 @@
-﻿<template>
+<template>
   <div class="select-infinite-demo-container">
-    <a-card title="AgSelectInfinite 分页下拉选择器">
+    <a-card title="ag-select-infinite 分页下拉选择器">
       <a-alert
         message="支持分页加载和搜索的增强下拉选择器"
         description="滚动到底部自动加载下一页数据，支持关键字搜索"
@@ -12,8 +12,8 @@
       <a-row :gutter="[16, 16]">
         <!-- 基础用法 -->
         <a-col :span="12">
-          <AgCard title="基础用法" size="small">
-            <AgSelectInfinite
+          <a-card title="基础用法" size="small">
+            <ag-select-infinite
               v-model="value1"
               label="选择商户"
               placeholder="请选择商户"
@@ -21,13 +21,13 @@
               :field-names="{ label: 'name', value: 'id' }"
             />
             <div class="result">选中值: {{ value1 }}</div>
-          </AgCard>
+          </a-card>
         </a-col>
 
         <!-- 支持搜索 -->
         <a-col :span="12">
-          <AgCard title="支持搜索" size="small">
-            <AgSelectInfinite
+          <a-card title="支持搜索" size="small">
+            <ag-select-infinite
               v-model="value2"
               label="搜索用户"
               placeholder="输入关键字搜索"
@@ -35,13 +35,13 @@
               :field-names="{ label: 'realname', value: 'userId' }"
             />
             <div class="result">选中值: {{ value2 }}</div>
-          </AgCard>
+          </a-card>
         </a-col>
 
         <!-- 多选模式 -->
         <a-col :span="12">
-          <AgCard title="多选模式" size="small">
-            <AgSelectInfinite
+          <a-card title="多选模式" size="small">
+            <ag-select-infinite
               v-model="value3"
               label="选择标签"
               placeholder="可选择多个"
@@ -50,13 +50,13 @@
               :allow-clear="true"
             />
             <div class="result">选中值: {{ value3 }}</div>
-          </AgCard>
+          </a-card>
         </a-col>
 
         <!-- 自定义选项 -->
         <a-col :span="12">
-          <AgCard title="自定义选项渲染" size="small">
-            <AgSelectInfinite
+          <a-card title="自定义选项渲染" size="small">
+            <ag-select-infinite
               v-model="value4"
               label="选择商品"
               placeholder="自定义显示"
@@ -72,15 +72,15 @@
                   </div>
                 </div>
               </template>
-            </AgSelectInfinite>
+            </ag-select-infinite>
             <div class="result">选中值: {{ value4 }}</div>
-          </AgCard>
+          </a-card>
         </a-col>
 
         <!-- 必填项 -->
         <a-col :span="12">
-          <AgCard title="必填项" size="small">
-            <AgSelectInfinite
+          <a-card title="必填项" size="small">
+            <ag-select-infinite
               v-model="value5"
               label="商户类型"
               placeholder="请选择"
@@ -88,28 +88,23 @@
               :required="true"
             />
             <div class="result">选中值: {{ value5 }}</div>
-          </AgCard>
+          </a-card>
         </a-col>
 
         <!-- 禁用状态 -->
         <a-col :span="12">
-          <AgCard title="禁用状态" size="small">
-            <AgSelectInfinite
-              v-model="value6"
-              label="禁用选择"
-              :fetch-data="fetchMerchants"
-              :disabled="true"
-            />
-          </AgCard>
+          <a-card title="禁用状态" size="small">
+            <ag-select-infinite v-model="value6" label="禁用选择" :fetch-data="fetchMerchants" :disabled="true" />
+          </a-card>
         </a-col>
 
         <!-- 不同尺寸 -->
         <a-col :span="24">
-          <AgCard title="不同尺寸" size="small">
+          <a-card title="不同尺寸" size="small">
             <a-space direction="vertical" style="width: 100%" :size="16">
               <div>
                 <div class="label">小尺寸</div>
-                <AgSelectInfinite
+                <ag-select-infinite
                   v-model="value7"
                   label="小尺寸"
                   size="small"
@@ -119,7 +114,7 @@
               </div>
               <div>
                 <div class="label">中尺寸（默认）</div>
-                <AgSelectInfinite
+                <ag-select-infinite
                   v-model="value8"
                   label="中尺寸"
                   size="middle"
@@ -129,7 +124,7 @@
               </div>
               <div>
                 <div class="label">大尺寸</div>
-                <AgSelectInfinite
+                <ag-select-infinite
                   v-model="value9"
                   label="大尺寸"
                   size="large"
@@ -138,19 +133,15 @@
                 />
               </div>
             </a-space>
-          </AgCard>
+          </a-card>
         </a-col>
 
         <!-- 综合示例：表单 -->
         <a-col :span="24">
-          <AgCard title="表单中使用" size="small">
-            <a-form
-              :model="form"
-              :label-col="{ span: 4 }"
-              :wrapper-col="{ span: 16 }"
-            >
+          <a-card title="表单中使用" size="small">
+            <a-form :model="form" :label-col="{ span: 4 }" :wrapper-col="{ span: 16 }">
               <a-form-item label="所属商户" name="merchantId">
-                <AgSelectInfinite
+                <ag-select-infinite
                   v-model="form.merchantId"
                   label="选择商户"
                   placeholder="请选择商户"
@@ -161,7 +152,7 @@
               </a-form-item>
 
               <a-form-item label="负责人" name="userIds">
-                <AgSelectInfinite
+                <ag-select-infinite
                   v-model="form.userIds"
                   label="选择负责人"
                   placeholder="可选择多人"
@@ -173,7 +164,7 @@
               </a-form-item>
 
               <a-form-item label="商品" name="productId">
-                <AgSelectInfinite
+                <ag-select-infinite
                   v-model="form.productId"
                   label="选择商品"
                   placeholder="输入商品名搜索"
@@ -183,29 +174,23 @@
                   <template #option="{ option }">
                     <div class="custom-option">
                       <span>{{ option.name }}</span>
-                      <span style="color: #ff4d4f; margin-left: 8px">
-                        ¥{{ option.price }}
-                      </span>
+                      <span style="color: #ff4d4f; margin-left: 8px"> ¥{{ option.price }} </span>
                     </div>
                   </template>
-                </AgSelectInfinite>
+                </ag-select-infinite>
               </a-form-item>
 
               <a-form-item :wrapper-col="{ offset: 4, span: 16 }">
                 <a-space>
-                  <a-button type="primary" @click="handleSubmit">
-                    提交
-                  </a-button>
-                  <a-button @click="handleReset">
-                    重置
-                  </a-button>
+                  <a-button type="primary" @click="handleSubmit"> 提交 </a-button>
+                  <a-button @click="handleReset"> 重置 </a-button>
                 </a-space>
               </a-form-item>
             </a-form>
 
             <a-divider>表单数据</a-divider>
             <pre>{{ JSON.stringify(form, null, 2) }}</pre>
-          </AgCard>
+          </a-card>
         </a-col>
       </a-row>
     </a-card>
@@ -245,9 +230,7 @@ function generateMerchants(page, pageSize, keyword = '') {
 
   // 搜索过滤
   const filtered = keyword
-    ? allData.filter(item => 
-        item.name.includes(keyword) || item.code.includes(keyword)
-      )
+    ? allData.filter((item) => item.name.includes(keyword) || item.code.includes(keyword))
     : allData
 
   // 分页
@@ -270,9 +253,7 @@ function generateUsers(page, pageSize, keyword = '') {
   }))
 
   const filtered = keyword
-    ? allData.filter(item => 
-        item.realname.includes(keyword) || item.username.includes(keyword)
-      )
+    ? allData.filter((item) => item.realname.includes(keyword) || item.username.includes(keyword))
     : allData
 
   const start = (page - 1) * pageSize
@@ -292,9 +273,7 @@ function generateTags(page, pageSize, keyword = '') {
     label: `标签${i + 1}`
   }))
 
-  const filtered = keyword
-    ? allData.filter(item => item.label.includes(keyword))
-    : allData
+  const filtered = keyword ? allData.filter((item) => item.label.includes(keyword)) : allData
 
   const start = (page - 1) * pageSize
   const end = start + pageSize
@@ -316,9 +295,7 @@ function generateProducts(page, pageSize, keyword = '') {
   }))
 
   const filtered = keyword
-    ? allData.filter(item => 
-        item.name.includes(keyword) || item.code.includes(keyword)
-      )
+    ? allData.filter((item) => item.name.includes(keyword) || item.code.includes(keyword))
     : allData
 
   const start = (page - 1) * pageSize
@@ -348,27 +325,27 @@ function generateTypes(page, pageSize) {
 // 数据加载函数（模拟异步请求）
 async function fetchMerchants({ page, pageSize, keyword }) {
   // 模拟网络延迟
-  await new Promise(resolve => setTimeout(resolve, 300))
+  await new Promise((resolve) => setTimeout(resolve, 300))
   return generateMerchants(page, pageSize, keyword)
 }
 
 async function fetchUsers({ page, pageSize, keyword }) {
-  await new Promise(resolve => setTimeout(resolve, 300))
+  await new Promise((resolve) => setTimeout(resolve, 300))
   return generateUsers(page, pageSize, keyword)
 }
 
 async function fetchTags({ page, pageSize, keyword }) {
-  await new Promise(resolve => setTimeout(resolve, 200))
+  await new Promise((resolve) => setTimeout(resolve, 200))
   return generateTags(page, pageSize, keyword)
 }
 
 async function fetchProducts({ page, pageSize, keyword }) {
-  await new Promise(resolve => setTimeout(resolve, 300))
+  await new Promise((resolve) => setTimeout(resolve, 300))
   return generateProducts(page, pageSize, keyword)
 }
 
 async function fetchTypes({ page, pageSize }) {
-  await new Promise(resolve => setTimeout(resolve, 100))
+  await new Promise((resolve) => setTimeout(resolve, 100))
   return generateTypes(page, pageSize)
 }
 

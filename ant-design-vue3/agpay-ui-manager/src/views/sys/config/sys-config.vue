@@ -1,0 +1,848 @@
+<template>
+  <div style="background: #fff; border-radius: 10px">
+    <a-tabs :animated="false" @change="selectTabs">
+      <a-tab-pane key="applicationConfig" tab="域名管理">
+        <div v-if="['applicationConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+          <a-form-model ref="configFormModel">
+            <a-row>
+              <a-col v-for="(item, config) in configData" :key="config" :span="8" :offset="1">
+                <a-form-model-item :label="item.configName">
+                  <a-input
+                    v-model="item.configVal"
+                    :type="item.type === 'text' ? 'text' : 'textarea'"
+                    autocomplete="off"
+                  />
+                </a-form-model-item>
+              </a-col>
+            </a-row>
+            <a-row>
+              <a-col :span="19">
+                <a-form-item style="display: flex; justify-content: center">
+                  <a-button
+                    type="primary"
+                    icon="check-circle"
+                    :loading="btnLoading"
+                    @click="confirm($event, '域名地址')"
+                    >确认更新</a-button
+                  >
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form-model>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="mchTreatyConfig" tab="文章管理">
+        <div v-if="['mchTreatyConfig', 'agentTreatyConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+          <a-tabs v-model="groupKey" tab-position="left" @change="selectTabs">
+            <a-tab-pane key="mchTreatyConfig" tab="商户通">
+              <div v-if="['mchTreatyConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <a-row>
+                  <a-col v-for="(item, config) in configData" :key="config" :span="22" :offset="1">
+                    <a-row>
+                      <a-col :span="24"
+                        ><h2 style="text-align: center">
+                          <b>{{ item.configName }}</b>
+                        </h2></a-col
+                      >
+                      <a-col :span="24">
+                        <a-form-model-item>
+                          <ag-editor v-model="item.configVal" :height="500"></ag-editor>
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item style="display: flex; justify-content: center">
+                      <a-button
+                        type="primary"
+                        icon="check-circle"
+                        :loading="btnLoading"
+                        @click="confirm($event, '商户通条约')"
+                        >确认更新</a-button
+                      >
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+              </div>
+            </a-tab-pane>
+            <a-tab-pane key="agentTreatyConfig" tab="展业宝">
+              <div v-if="['agentTreatyConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <a-row>
+                  <a-col v-for="(item, config) in configData" :key="config" :span="22" :offset="1">
+                    <a-row>
+                      <a-col :span="24"
+                        ><h2 style="text-align: center">
+                          <b>{{ item.configName }}</b>
+                        </h2></a-col
+                      >
+                      <a-col :span="24">
+                        <a-form-model-item>
+                          <ag-editor v-model="item.configVal" :height="500"></ag-editor>
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="24">
+                    <a-form-item style="display: flex; justify-content: center">
+                      <a-button
+                        type="primary"
+                        icon="check-circle"
+                        :loading="btnLoading"
+                        @click="confirm($event, '展业宝条约')"
+                        >确认更新</a-button
+                      >
+                    </a-form-item>
+                  </a-col>
+                </a-row>
+              </div>
+            </a-tab-pane>
+          </a-tabs>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="smsConfig" tab="高级配置">
+        <div
+          v-if="['smsConfig', 'ocrConfig', 'ossConfig', 'apiMapConfig'].indexOf(groupKey) >= 0"
+          class="account-settings-info-view"
+        >
+          <a-tabs v-model="groupKey" tab-position="left" @change="selectTabs">
+            <a-tab-pane key="smsConfig" tab="短信配置">
+              <div v-if="['smsConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <a-form-model ref="configFormModel" layout="vertical">
+                  <a-row justify="space-between">
+                    <a-col :span="20" :offset="1">
+                      <a-form-model-item label="选择短信发送服务商">
+                        <a-radio-group v-model="smsConfig.smsProviderKey">
+                          <a-radio value="agpaydx"
+                            ><a-icon type="fire" theme="filled" :style="{ color: 'red' }" />吉日短信</a-radio
+                          >
+                          <a-radio value="aliyundy">阿里云短信服务</a-radio>
+                          <a-radio value="mocktest">模拟测试</a-radio>
+                        </a-radio-group>
+                      </a-form-model-item>
+                    </a-col>
+                    <a-col v-if="smsConfig.smsProviderKey === 'agpaydx'" :span="21" :offset="1">
+                      <a-alert type="info">
+                        <template #message>
+                          <span
+                            >开通吉日短信通道请联系官方：18888888888，
+                            <a href="#">点击链接</a> 可进行短信的开通和购买。</span
+                          >
+                        </template>
+                      </a-alert>
+                    </a-col>
+                  </a-row>
+                  <div v-if="smsConfig.smsProviderKey === 'agpaydx'">
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="21" :offset="1">
+                        <a-divider orientation="left">吉日短信-账号配置</a-divider>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between" :gutter="20">
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="用户名" prop="userName">
+                          <a-input v-model="smsConfig.agpaydxSmsConfig.userName" placeholder="请填写用户名" />
+                        </a-form-model-item>
+                      </a-col>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="密码" prop="accountPwd">
+                          <a-input
+                            v-model="smsConfig.agpaydxSmsConfigDesen.accountPwd"
+                            :placeholder="
+                              smsConfig.agpaydxSmsConfigDesen.accountPwd
+                                ? smsConfig.agpaydxSmsConfigDesen.accountPwd
+                                : '请填写密码'
+                            "
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between">
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="短信签名" prop="signName">
+                          <a-input v-model="smsConfig.agpaydxSmsConfig.signName" placeholder="请填写[短信签名]" />
+                        </a-form-model-item>
+                      </a-col>
+                      <a-col :span="10" :offset="1" style="padding-left: 10px; padding-right: 10px">
+                        <a-form-model-item label="短信余额（条）" prop="smsCount">
+                          <div class="ant-form-item-control-input">
+                            <div class="ant-form-item-control-input-content">
+                              <span
+                                ><span style="color: blue"><b>8888</b></span> 条
+                              </span>
+                              <span style="margin-left: 20px"> <a href="#" target="_blank"> [充值]</a></span>
+                            </div>
+                          </div>
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                  </div>
+                  <div v-if="smsConfig.smsProviderKey === 'aliyundy'">
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="21" :offset="1">
+                        <a-divider orientation="left">阿里云短信服务-账号配置</a-divider>
+                      </a-col>
+                    </a-row>
+                    <a-row>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="accessKeyId" prop="accessKeyId">
+                          <a-input v-model="smsConfig.aliyundySmsConfig.accessKeyId" placeholder="请填写" />
+                        </a-form-model-item>
+                      </a-col>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="AccessKeySecret" prop="accessKeySecret">
+                          <a-input
+                            v-model="smsConfig.aliyundySmsConfig.accessKeySecret"
+                            :placeholder="
+                              smsConfig.aliyundySmsConfigDesen.accessKeySecret
+                                ? smsConfig.aliyundySmsConfigDesen.accessKeySecret
+                                : '请填写AccessKeySecret'
+                            "
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="短信签名" prop="signName">
+                          <a-input v-model="smsConfig.aliyundySmsConfig.signName" placeholder="请填写[短信签名]" />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="21" :offset="1">
+                        <a-divider orientation="left">模板ID配置</a-divider>
+                      </a-col>
+                    </a-row>
+                    <a-row>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="【商户注册】短信模板ID" prop="registerMchTemplateId">
+                          <a-input
+                            v-model="smsConfig.aliyundySmsConfig.registerMchTemplateId"
+                            placeholder="请填写[商户注册短信模板ID]"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="【忘记密码】短信模板ID" prop="forgetPwdTemplateId">
+                          <a-input
+                            v-model="smsConfig.aliyundySmsConfig.forgetPwdTemplateId"
+                            placeholder="请填写[忘记密码短信模板ID]"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="【短信登录】短信模板ID" prop="loginMchTemplateId">
+                          <a-input
+                            v-model="smsConfig.aliyundySmsConfig.loginMchTemplateId"
+                            placeholder="请填写[短信登录短信模板ID]"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="【账号开通】短信模板ID" prop="accountOpenTemplateId">
+                          <a-input
+                            v-model="smsConfig.aliyundySmsConfig.accountOpenTemplateId"
+                            placeholder="请填写[账号开通短信模板ID]"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="【会员绑定】短信模板ID" prop="mbrTelBindTemplateId">
+                          <a-input
+                            v-model="smsConfig.aliyundySmsConfig.mbrTelBindTemplateId"
+                            placeholder="请填写[会员绑定短信模板ID]"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                  </div>
+                  <div v-if="smsConfig.smsProviderKey === 'mocktest'">
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="21" :offset="1">
+                        <a-divider orientation="left">模拟测试-账号配置</a-divider>
+                      </a-col>
+                    </a-row>
+                    <a-row>
+                      <a-col :span="10" :offset="1">
+                        <a-form-model-item label="模拟验证码(六位数字)" prop="userName">
+                          <a-input v-model="smsConfig.mocktestSmsConfig.mockCode" placeholder="请填写模拟验证码" />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                  </div>
+                  <a-row justify="space-between" type="flex">
+                    <a-col :span="21" :offset="1">
+                      <a-form-item style="display: flex; justify-content: center">
+                        <a-button
+                          type="primary"
+                          icon="check-circle"
+                          :loading="btnLoading"
+                          @click="confirm($event, '短信配置')"
+                          >确认更新</a-button
+                        >
+                      </a-form-item>
+                    </a-col>
+                  </a-row>
+                </a-form-model>
+              </div>
+            </a-tab-pane>
+            <a-tab-pane key="ocrConfig" tab="OCR配置">
+              <div v-if="['ocrConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <a-form-model ref="configFormModel" layout="vertical">
+                  <a-row justify="space-between">
+                    <a-col :span="10" :offset="1">
+                      <a-form-model-item label="启用类型">
+                        <a-radio-group v-model="ocrConfig.ocrType">
+                          <a-radio :value="1">腾讯OCR</a-radio>
+                          <a-radio :value="2">阿里OCR</a-radio>
+                          <a-radio :value="3">百度OCR</a-radio>
+                        </a-radio-group>
+                      </a-form-model-item>
+                    </a-col>
+                    <a-col :span="10" :offset="1">
+                      <a-form-model-item label="使用状态">
+                        <a-radio-group v-model="ocrConfig.ocrState">
+                          <a-radio :value="1">开启</a-radio>
+                          <a-radio :value="0">关闭</a-radio>
+                        </a-radio-group>
+                      </a-form-model-item>
+                    </a-col>
+                  </a-row>
+                  <a-row justify="space-between">
+                    <a-col :span="20" :offset="1">
+                      <a-collapse :active-key="ocrConfig.ocrType">
+                        <a-collapse-panel key="1" header="[ 腾讯OCR识别配置 ]">
+                          <a-row>
+                            <a-col :span="22" :offset="1">
+                              <a-form-model-item label="SecretId" prop="secretId">
+                                <a-input v-model="ocrConfig.tencentOcrConfig.secretId" placeholder="请填写" />
+                              </a-form-model-item>
+                            </a-col>
+                            <a-col :span="22" :offset="1">
+                              <a-form-model-item label="SecretKey" prop="secretKey">
+                                <a-input
+                                  v-model="ocrConfig.tencentOcrConfig.secretKey"
+                                  :placeholder="
+                                    ocrConfig.tencentOcrConfigDesen.secretKey
+                                      ? ocrConfig.tencentOcrConfigDesen.secretKey
+                                      : '请填写'
+                                  "
+                                />
+                              </a-form-model-item>
+                            </a-col>
+                          </a-row>
+                        </a-collapse-panel>
+                        <a-collapse-panel key="2" header="[ 阿里OCR识别配置 ]">
+                          <a-row>
+                            <a-col :span="22" :offset="1">
+                              <a-form-model-item label="AccessKey ID" prop="accessKeyId">
+                                <a-input v-model="ocrConfig.aliOcrConfig.accessKeyId" placeholder="请填写" />
+                              </a-form-model-item>
+                            </a-col>
+                            <a-col :span="22" :offset="1">
+                              <a-form-model-item label="AccessKey Secret" prop="accessKeySecret">
+                                <a-input
+                                  v-model="ocrConfig.aliOcrConfig.accessKeySecret"
+                                  :placeholder="
+                                    ocrConfig.aliOcrConfigDesen.accessKeySecret
+                                      ? ocrConfig.aliOcrConfigDesen.accessKeySecret
+                                      : '请填写'
+                                  "
+                                />
+                              </a-form-model-item>
+                            </a-col>
+                          </a-row>
+                        </a-collapse-panel>
+                        <a-collapse-panel key="3" header="[ 百度OCR识别配置 ]">
+                          <a-row>
+                            <a-col :span="22" :offset="1">
+                              <a-form-model-item label="ApiKey" prop="apiKey">
+                                <a-input v-model="ocrConfig.baiduOcrConfig.apiKey" placeholder="请填写" />
+                              </a-form-model-item>
+                            </a-col>
+                            <a-col :span="22" :offset="1">
+                              <a-form-model-item label="SecretKey" prop="aecretKey">
+                                <a-input
+                                  v-model="ocrConfig.baiduOcrConfig.aecretKey"
+                                  :placeholder="
+                                    ocrConfig.baiduOcrConfigDesen.aecretKey
+                                      ? ocrConfig.baiduOcrConfigDesen.aecretKey
+                                      : '请填写'
+                                  "
+                                />
+                              </a-form-model-item>
+                            </a-col>
+                          </a-row>
+                        </a-collapse-panel>
+                      </a-collapse>
+                    </a-col>
+                  </a-row>
+                  <a-row justify="space-between" type="flex" style="padding-top: 20px">
+                    <a-col :span="20" :offset="1">
+                      <a-form-item style="display: flex; justify-content: center">
+                        <a-button
+                          type="primary"
+                          icon="check-circle"
+                          :loading="btnLoading"
+                          @click="confirm($event, 'OCR配置')"
+                          >确认更新</a-button
+                        >
+                      </a-form-item>
+                    </a-col>
+                  </a-row>
+                </a-form-model>
+              </div>
+            </a-tab-pane>
+            <a-tab-pane key="ossConfig" tab="存储配置">
+              <div v-if="['ossConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <a-form-model ref="configFormModel" :label-col="{ span: 7 }" :wrapper-col="{ span: 15 }">
+                  <a-row>
+                    <a-col :span="12">
+                      <a-form-model-item label="选择上传服务">
+                        <a-radio-group v-model="ossConfig.ossUseType" @change="ossUseTypeChange">
+                          <a-radio value="localFile">本地存储</a-radio>
+                          <a-radio value="aliyunOss">阿里云OSS</a-radio>
+                        </a-radio-group>
+                      </a-form-model-item>
+                    </a-col>
+                    <a-col :span="20">
+                      <a-alert message="分布式环境下，需要使用云OSS存储" type="success" />
+                    </a-col>
+                  </a-row>
+                  <div v-if="ossConfig.ossUseType === 'localFile'">
+                    <!-- 本地存储配置板块 -->
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="12">
+                        <a-divider orientation="left">本地存储配置</a-divider>
+                      </a-col>
+                    </a-row>
+                    <a-row v-for="(item, config) in configData" :key="config">
+                      <a-col :span="12">
+                        <a-form-model-item v-if="item.configKey === 'ossPublicSiteUrl'" :label="item.configName">
+                          <a-input
+                            v-model="item.configVal"
+                            :type="item.type === 'text' ? 'text' : 'textarea'"
+                            autocomplete="off"
+                          />
+                          <p class="agpay-tip-text">如：https://mgr.xxx.com/api/anon/localOssFiles</p>
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                  </div>
+                  <div v-if="ossConfig.ossUseType === 'aliyunOss'">
+                    <!-- 阿里云OSS配置 -->
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="24">
+                        <a-divider orientation="left">阿里云OSS配置</a-divider>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="12">
+                        <a-form-model-item label="endpoint" prop="endpoint">
+                          <a-input
+                            v-model="ossConfig.aliyunOssConfig.endpoint"
+                            placeholder="例如： oss-cn-beijing.aliyuncs.com"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="12">
+                        <a-form-model-item label="[公共读]桶名称" prop="publicBucketName">
+                          <a-input
+                            v-model="ossConfig.aliyunOssConfig.publicBucketName"
+                            placeholder="请填写[公共读]桶名称"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="12">
+                        <a-form-model-item label="[私有]桶名称" prop="privateBucketName">
+                          <a-input
+                            v-model="ossConfig.aliyunOssConfig.privateBucketName"
+                            placeholder="请填写[私有]桶名称"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="12">
+                        <a-form-model-item label="AccessKeyId" prop="accessKeyId">
+                          <a-input v-model="ossConfig.aliyunOssConfig.accessKeyId" placeholder="请填写AccessKeyId" />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="12">
+                        <a-form-model-item label="AccessKeySecret" prop="accessKeySecret">
+                          <a-input
+                            v-model="ossConfig.aliyunOssConfig.accessKeySecret"
+                            :placeholder="
+                              ossConfig.aliyunOssConfigDesen.accessKeySecret
+                                ? ossConfig.aliyunOssConfigDesen.accessKeySecret
+                                : '请填写AccessKeySecret'
+                            "
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                    <a-row justify="space-between" type="flex">
+                      <a-col :span="12">
+                        <a-form-model-item label="请求过期时间" prop="contactTel">
+                          <a-input
+                            v-model="ossConfig.aliyunOssConfig.expireTime"
+                            placeholder="请填写请求过期时间， 默认30000， 单位： ms"
+                          />
+                        </a-form-model-item>
+                      </a-col>
+                    </a-row>
+                  </div>
+                  <a-row justify="space-between" type="flex">
+                    <a-col :span="24">
+                      <a-form-item style="display: flex; justify-content: center">
+                        <a-button
+                          type="primary"
+                          icon="check-circle"
+                          :loading="btnLoading"
+                          @click="confirm($event, '存储配置')"
+                          >确认更新</a-button
+                        >
+                      </a-form-item>
+                    </a-col>
+                  </a-row>
+                </a-form-model>
+              </div>
+            </a-tab-pane>
+            <a-tab-pane key="apiMapConfig" tab="地图配置">
+              <div v-if="['apiMapConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <a-form-model ref="configFormModel">
+                  <a-row v-for="(item, config) in configData" :key="config">
+                    <a-col :span="8">
+                      <a-form-model-item :label="item.configName">
+                        <a-input
+                          v-model="item.configVal"
+                          :type="item.type === 'text' ? 'text' : 'textarea'"
+                          :placeholder="item.configValDesen ? item.configValDesen : '请填写'"
+                          autocomplete="off"
+                        />
+                      </a-form-model-item>
+                    </a-col>
+                  </a-row>
+                  <a-row>
+                    <a-col :span="8">
+                      <a-form-item style="display: flex; justify-content: center">
+                        <a-button
+                          type="primary"
+                          icon="check-circle"
+                          :loading="btnLoading"
+                          @click="confirm($event, '地图配置')"
+                          >确认更新</a-button
+                        >
+                      </a-form-item>
+                    </a-col>
+                  </a-row>
+                </a-form-model>
+              </div>
+            </a-tab-pane>
+          </a-tabs>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="securityConfig" tab="安全配置">
+        <div v-if="['securityConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+          <a-form-model ref="configFormModel" layout="vertical">
+            <a-row>
+              <a-col :span="8" :offset="1">
+                <a-form-model-item label="登录失败次数限制">
+                  <a-input-number v-model="securityConfig.loginErrorMaxLimit.limitMinute" />分钟最多尝试
+                  <a-input-number v-model="securityConfig.loginErrorMaxLimit.maxLoginAttempts" />次（0次表示不限制）
+                </a-form-model-item>
+              </a-col>
+              <a-col :span="8" :offset="1">
+                <a-form-model-item label="密码规则">
+                  <a-checkbox
+                    v-model="requireUppercaseLowercaseDigits"
+                    style="margin-left: auto"
+                    @change="passwordRegexpChange"
+                    >是否要求大小写和数字</a-checkbox
+                  >
+                  <a-checkbox v-model="requireMinimumLength" style="margin-left: auto" @change="passwordRegexpChange"
+                    >密码最少<a-input-number
+                      v-model="minimumLength"
+                      @change="passwordMinimumLengthChange"
+                    />位</a-checkbox
+                  >
+                </a-form-model-item>
+              </a-col>
+            </a-row>
+            <a-row>
+              <a-col :span="19">
+                <a-form-item style="display: flex; justify-content: center">
+                  <a-button
+                    type="primary"
+                    icon="check-circle"
+                    :loading="btnLoading"
+                    @click="confirm($event, '安全配置')"
+                    >确认更新</a-button
+                  >
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form-model>
+        </div>
+      </a-tab-pane>
+      <!--<a-tab-pane key="" tab="···">-->
+      <!--<div class="account-settings-info-view" style="height: 300px">-->
+      <!--</div>-->
+      <!--</a-tab-pane>-->
+    </a-tabs>
+  </div>
+</template>
+<script>
+import agEditor from '@/components/ag-editor'
+import { API_URL_SYS_CONFIG, req, getConfigs } from '@/api/manage'
+
+export default {
+  components: {
+    'ag-editor': agEditor
+  },
+  data() {
+    return {
+      btnLoading: false,
+      configData: [],
+      groupKey: 'applicationConfig',
+      smsConfig: {
+        smsProviderKey: 'agpaydx',
+        agpaydxSmsConfig: {},
+        agpaydxSmsConfigDesen: {},
+        aliyundySmsConfig: {},
+        aliyundySmsConfigDesen: {},
+        mocktestSmsConfig: {}
+      },
+      ocrConfig: {
+        ocrType: 1,
+        ocrState: 1,
+        tencentOcrConfig: {},
+        tencentOcrConfigDesen: {},
+        aliOcrConfig: {},
+        aliOcrConfigDesen: {},
+        baiduOcrConfig: {},
+        baiduOcrConfigDesen: {}
+      },
+      ossConfig: {
+        ossUseType: 'localFile',
+        ossPublicSiteUrl: null,
+        aliyunOssConfig: {},
+        aliyunOssConfigDesen: {}
+      },
+      requireUppercaseLowercaseDigits: false,
+      requireMinimumLength: false,
+      minimumLength: 0,
+      securityConfig: {
+        loginErrorMaxLimit: {
+          limitMinute: 0,
+          maxLoginAttempts: 0
+        },
+        passwordRegexp: {
+          regexpRules: '',
+          errTips: ''
+        }
+      }
+    }
+  },
+  created() {
+    this.detail()
+  },
+  methods: {
+    detail() {
+      // 获取基本信息
+      const that = this
+      that.configData = []
+      getConfigs(that.groupKey).then((res) => {
+        // console.log(res)
+        that.configData = res
+        that.groupKey = res[0]?.groupKey
+        if (that.groupKey === 'ossConfig') {
+          that.setConfigVal(that, 'ossConfig', 'ossUseType', 'localFile')
+          that.setJSONConfigDesen(that, 'ossConfig', 'aliyunOssConfig', true)
+        }
+
+        if (that.groupKey === 'smsConfig') {
+          that.setConfigVal(that, 'smsConfig', 'smsProviderKey', 'agpaydx')
+          that.setJSONConfigDesen(that, 'smsConfig', 'agpaydxSmsConfig', true)
+          that.setJSONConfigDesen(that, 'smsConfig', 'aliyundySmsConfig', true)
+          that.setJSONConfigDesen(that, 'smsConfig', 'mocktestSmsConfig', false)
+        }
+
+        if (that.groupKey === 'ocrConfig') {
+          that.setConfigVal(that, 'ocrConfig', 'ocrType', 1)
+          that.setConfigVal(that, 'ocrConfig', 'ocrState', 1)
+          that.setJSONConfigDesen(that, 'ocrConfig', 'tencentOcrConfig', true)
+          that.setJSONConfigDesen(that, 'ocrConfig', 'aliOcrConfig', true)
+          that.setJSONConfigDesen(that, 'ocrConfig', 'baiduOcrConfig', true)
+        }
+
+        if (that.groupKey === 'securityConfig') {
+          that.setJSONConfigDesen(that, 'securityConfig', 'loginErrorMaxLimit', false)
+          that.setJSONConfigDesen(that, 'securityConfig', 'passwordRegexp', false)
+
+          if (that.securityConfig.passwordRegexp.regexpRules.includes('(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])')) {
+            that.requireUppercaseLowercaseDigits = true
+          }
+          that.minimumLength = that.extractMinimumLengths(that.securityConfig.passwordRegexp.regexpRules)[0]
+          if (that.minimumLength > 0) {
+            that.requireMinimumLength = true
+          }
+        }
+      })
+    },
+    isNumber(value) {
+      return typeof value === 'number'
+    },
+    setConfigVal(obj, groupKey, key, defaultVal) {
+      const configVal = obj.configData?.find(({ configKey }) => configKey === key)?.configVal
+      obj[groupKey][key] = configVal?.length > 0 ? (this.isNumber(defaultVal) ? +configVal : configVal) : defaultVal
+    },
+    setJSONConfigDesen(obj, groupKey, key, isDesen) {
+      const config = obj.configData?.find(({ configKey }) => configKey === key)
+      obj[groupKey][key] = config?.configVal?.length > 0 ? JSON.parse(config?.configVal) : {}
+      if (isDesen) {
+        obj[groupKey][`${key}Desen`] = config?.configValDesen?.length > 0 ? JSON.parse(config?.configValDesen) : {}
+      }
+    },
+    selectTabs(key) {
+      // 清空必填提示
+      if (key) {
+        this.groupKey = key
+        this.detail()
+      }
+    },
+    ossUseTypeChange(e) {
+      // console.log(e.target.value)
+      this.configData.find(({ configKey }) => configKey === 'ossUseType').configVal = e.target.value
+    },
+    extractMinimumLengths(regexpRules) {
+      const regex = /{(\d+),}/g
+      const matches = regexpRules.matchAll(regex)
+      const minimumLengths = []
+
+      for (const match of matches) {
+        const minimumLength = parseInt(match[1])
+        minimumLengths.push(minimumLength)
+      }
+
+      return minimumLengths
+    },
+    passwordMinimumLengthChange() {
+      this.requireMinimumLength = false
+      this.passwordRegexpChange()
+    },
+    passwordRegexpChange() {
+      const { requireUppercaseLowercaseDigits, requireMinimumLength, minimumLength } = this
+      console.log(requireMinimumLength)
+      if (requireUppercaseLowercaseDigits && requireMinimumLength) {
+        this.securityConfig.passwordRegexp.regexpRules = `^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{${minimumLength},}$`
+        this.securityConfig.passwordRegexp.errTips = `密码不符合规则，必须包含大小写字母和数字，最少${minimumLength}位`
+      } else if (requireUppercaseLowercaseDigits && !requireMinimumLength) {
+        this.securityConfig.passwordRegexp.regexpRules = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])$'
+        this.securityConfig.passwordRegexp.errTips = '密码不符合规则，必须包含大小写字母和数字'
+      } else if (requireMinimumLength) {
+        this.securityConfig.passwordRegexp.regexpRules = `^.{${minimumLength},}$`
+        this.securityConfig.passwordRegexp.errTips = `密码不符合规则，最少${minimumLength}位`
+      } else {
+        this.securityConfig.passwordRegexp.regexpRules = ''
+        this.securityConfig.passwordRegexp.errTips = ''
+      }
+    },
+    confirm(e, title, content) {
+      // 确认更新
+      // console.log(e)
+      const that = this
+      this.$infoBox.confirmPrimary(`确认修改${title}吗？`, content, () => {
+        that.btnLoading = true // 打开按钮上的 loading
+        const jsonObject = {}
+        for (var i in that.configData) {
+          // jsonObject[that.configData[i].configKey] = that.configData[i].configKey === 'aliyunOssConfig' ? JSON.stringify(that.ossConfig.aliyunOssConfig) : that.configData[i].configVal
+
+          const configKey = that.configData[i].configKey
+          let configVal = that.configData[i].configVal
+          switch (configKey) {
+            case 'ossUseType':
+              configVal = that.ossConfig.ossUseType
+              break
+            case 'aliyunOssConfig':
+              configVal = JSON.stringify(that.ossConfig.aliyunOssConfig)
+              break
+            case 'smsProviderKey':
+              configVal = that.smsConfig.smsProviderKey
+              break
+            case 'agpaydxSmsConfig':
+              configVal = JSON.stringify(that.smsConfig.agpaydxSmsConfig)
+              break
+            case 'aliyundySmsConfig':
+              configVal = JSON.stringify(that.smsConfig.aliyundySmsConfig)
+              break
+            case 'ocrType':
+              configVal = that.ocrConfig.ocrType
+              break
+            case 'ocrState':
+              configVal = that.ocrConfig.ocrState
+              break
+            case 'tencentOcrConfig':
+              configVal = JSON.stringify(that.ocrConfig.tencentOcrConfig)
+              break
+            case 'aliOcrConfig':
+              configVal = JSON.stringify(that.ocrConfig.aliOcrConfig)
+              break
+            case 'baiduOcrConfig':
+              configVal = JSON.stringify(that.ocrConfig.baiduOcrConfig)
+              break
+            case 'loginErrorMaxLimit':
+              configVal = JSON.stringify(that.securityConfig.loginErrorMaxLimit)
+              break
+            case 'passwordRegexp':
+              configVal = JSON.stringify(that.securityConfig.passwordRegexp)
+              break
+          }
+          jsonObject[configKey] = configVal
+        }
+        req
+          .updateById(API_URL_SYS_CONFIG, that.groupKey, jsonObject)
+          .then((res) => {
+            that.$message.success('修改成功')
+            that.btnLoading = false
+          })
+          .catch((res) => {
+            that.btnLoading = false
+          })
+      })
+    }
+  }
+}
+</script>
+<style lang="less">
+.agpay-tip-text:before {
+  content: '';
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-bottom-color: #ffeed8;
+  position: absolute;
+  top: -20px;
+  left: 30px;
+}
+.agpay-tip-text {
+  font-size: 12px !important;
+  border-radius: 5px;
+  background: #ffeed8;
+  color: #c57000 !important;
+  padding: 5px 10px;
+  display: inline-block;
+  max-width: 100%;
+  position: relative;
+  margin-top: 15px;
+  line-height: 1.5715;
+}
+</style>

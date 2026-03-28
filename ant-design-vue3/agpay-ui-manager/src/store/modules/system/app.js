@@ -219,7 +219,7 @@ export const useAppStore = defineStore('app', {
     async fetchSiteConfig() {
       try {
         const data = await systemConfigApi.getSiteConfig()
-        
+
         // 如果接口返回空，抛出并走缓存逻辑
         if (!data) {
           throw new Error('fetchSiteConfig returned null')
@@ -227,7 +227,7 @@ export const useAppStore = defineStore('app', {
 
         // 应用并持久化站点配置
         this.applyAndPersistSiteConfig(data, true)
-        
+
         return data
       } catch (error) {
         this.handleSiteConfigError(error)
@@ -249,12 +249,12 @@ export const useAppStore = defineStore('app', {
     applySiteThemeConfig(data) {
       if (!data) return
       let themeChanged = false
-      
+
       // 应用管理端主题配置
       if (data.siteInfo?.mgr) {
         themeChanged = this.applyMgrThemeConfig(data.siteInfo.mgr) || themeChanged
       }
-      
+
       // 应用其他主题配置
       if (data.themeConfig) {
         Object.assign(this.themeConfig, data.themeConfig)
@@ -272,7 +272,7 @@ export const useAppStore = defineStore('app', {
      */
     applySiteLayoutConfig(data) {
       if (!data || !data.layoutConfig) return
-      
+
       Object.assign(this.layoutConfig, data.layoutConfig)
       this.persistLayoutConfig()
     },
@@ -338,13 +338,13 @@ export const useAppStore = defineStore('app', {
       const scalarActions = [
         {
           value: primaryColor,
-          shouldApply: value => Boolean(value),
-          apply: value => this.applyPrimaryColor(value)
+          shouldApply: (value) => Boolean(value),
+          apply: (value) => this.applyPrimaryColor(value)
         },
         {
           value: borderRadius,
-          shouldApply: value => value !== undefined,
-          apply: value => this.applyBorderRadius(value)
+          shouldApply: (value) => value !== undefined,
+          apply: (value) => this.applyBorderRadius(value)
         }
       ]
 
@@ -434,7 +434,7 @@ export const useAppStore = defineStore('app', {
 
       // 应用主题配置
       this.refreshRuntimeThemeState()
-      
+
       // 尝试加载缓存的站点配置
       this.loadCachedConfig()
     },
@@ -444,12 +444,12 @@ export const useAppStore = defineStore('app', {
      */
     resetConfig() {
       this.themeConfig = { ...defaultThemeConfig }
-      
+
       this.layoutConfig = { ...defaultLayoutConfig }
-      
+
       // 清除本地存储
       this.clearPersistedConfigs()
-      
+
       // 应用默认配置
       this.refreshRuntimeThemeState()
     }

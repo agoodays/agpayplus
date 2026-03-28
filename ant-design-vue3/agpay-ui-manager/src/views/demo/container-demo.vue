@@ -1,8 +1,8 @@
-﻿<template>
+<template>
   <div class="container-demo">
     <a-space direction="vertical" style="width: 100%" :size="24">
-      <!-- AgDrawer 示例 -->
-      <AgCard title="AgDrawer - 抽屉组件">
+      <!-- ag-drawer 示例 -->
+      <a-card title="ag-drawer - 抽屉组件">
         <a-alert
           message="抽屉组件 - 支持按比例自动设置大小"
           description="支持固定宽度、百分比、预设尺寸（small/medium/large/xlarge）和自定义比例"
@@ -12,57 +12,29 @@
         />
 
         <a-space wrap>
-          <a-button type="primary" @click="basicDrawerOpen = true">
-            基础抽屉（720px）
-          </a-button>
-          <a-button @click="detailDrawerOpen = true">
-            详情抽屉（800px）
-          </a-button>
-          <a-button @click="formDrawerOpen = true">
-            表单抽屉（720px）
-          </a-button>
-          
+          <a-button type="primary" @click="basicDrawerOpen = true"> 基础抽屉（720px） </a-button>
+          <a-button @click="detailDrawerOpen = true"> 详情抽屉（800px） </a-button>
+          <a-button @click="formDrawerOpen = true"> 表单抽屉（720px） </a-button>
+
           <a-divider type="vertical" style="height: 2em" />
-          <span style="color: #1890ff; font-weight: bold">预设尺寸：</span>
-          
-          <a-button @click="smallDrawerOpen = true">
-            小尺寸（30%）
-          </a-button>
-          <a-button @click="mediumDrawerOpen = true">
-            中等（50%）
-          </a-button>
-          <a-button @click="largeDrawerOpen = true">
-            大尺寸（70%）
-          </a-button>
-          <a-button @click="xlargeDrawerOpen = true">
-            超大（90%）
-          </a-button>
-          
+          <span style="color: var(--primary-color); font-weight: bold">预设尺寸：</span>
+
+          <a-button @click="smallDrawerOpen = true"> 小尺寸（30%） </a-button>
+          <a-button @click="mediumDrawerOpen = true"> 中等（50%） </a-button>
+          <a-button @click="largeDrawerOpen = true"> 大尺寸（70%） </a-button>
+          <a-button @click="xlargeDrawerOpen = true"> 超大（90%） </a-button>
+
           <a-divider type="vertical" style="height: 2em" />
-          <span style="color: #52c41a; font-weight: bold">自定义比例：</span>
-          
-          <a-button @click="ratio40DrawerOpen = true">
-            40% 宽度
-          </a-button>
-          <a-button @click="ratio60DrawerOpen = true">
-            60% 宽度
-          </a-button>
-          <a-button @click="ratio80DrawerOpen = true">
-            80% 宽度
-          </a-button>
+          <span style="color: var(--success-color); font-weight: bold">自定义比例：</span>
+
+          <a-button @click="ratio40DrawerOpen = true"> 40% 宽度 </a-button>
+          <a-button @click="ratio60DrawerOpen = true"> 60% 宽度 </a-button>
+          <a-button @click="ratio80DrawerOpen = true"> 80% 宽度 </a-button>
         </a-space>
 
         <!-- 基础抽屉 -->
-        <AgDrawer
-          v-model:open="basicDrawerOpen"
-          title="基础抽屉（固定宽度 720px）"
-        >
-          <a-alert
-            message="固定宽度"
-            description="使用 :width='720' 设置固定像素宽度"
-            type="info"
-            class="mb-3"
-          />
+        <ag-drawer v-model:open="basicDrawerOpen" title="基础抽屉（固定宽度 720px）">
+          <a-alert message="固定宽度" description="使用 :width='720' 设置固定像素宽度" type="info" class="mb-3" />
           <p>这是一个基础的抽屉组件</p>
           <p>关闭时会自动销毁内容</p>
           <a-divider />
@@ -71,14 +43,10 @@
             <a-descriptions-item label="宽度值">720px</a-descriptions-item>
             <a-descriptions-item label="销毁策略">关闭时销毁</a-descriptions-item>
           </a-descriptions>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 小尺寸抽屉 (30%) -->
-        <AgDrawer
-          v-model:open="smallDrawerOpen"
-          title="小尺寸抽屉（30% 屏幕宽度）"
-          size="small"
-        >
+        <ag-drawer v-model:open="smallDrawerOpen" title="小尺寸抽屉（30% 屏幕宽度）" size="small">
           <a-alert
             message="预设尺寸 - Small"
             description="使用 size='small' 设置为 30% 屏幕宽度"
@@ -93,14 +61,10 @@
             <a-descriptions-item label="屏幕占比">30%</a-descriptions-item>
             <a-descriptions-item label="适用场景">简单信息展示</a-descriptions-item>
           </a-descriptions>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 中等尺寸抽屉 (50%) -->
-        <AgDrawer
-          v-model:open="mediumDrawerOpen"
-          title="中等尺寸抽屉（50% 屏幕宽度）"
-          size="medium"
-        >
+        <ag-drawer v-model:open="mediumDrawerOpen" title="中等尺寸抽屉（50% 屏幕宽度）" size="medium">
           <a-alert
             message="预设尺寸 - Medium"
             description="使用 size='medium' 设置为 50% 屏幕宽度"
@@ -115,14 +79,10 @@
             <a-descriptions-item label="屏幕占比">50%</a-descriptions-item>
             <a-descriptions-item label="适用场景">一般详情展示</a-descriptions-item>
           </a-descriptions>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 大尺寸抽屉 (70%) -->
-        <AgDrawer
-          v-model:open="largeDrawerOpen"
-          title="大尺寸抽屉（70% 屏幕宽度）"
-          size="large"
-        >
+        <ag-drawer v-model:open="largeDrawerOpen" title="大尺寸抽屉（70% 屏幕宽度）" size="large">
           <a-alert
             message="预设尺寸 - Large"
             description="使用 size='large' 设置为 70% 屏幕宽度"
@@ -140,14 +100,10 @@
               自动适应不同屏幕尺寸，在大屏和小屏上都有良好的显示效果
             </a-descriptions-item>
           </a-descriptions>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 超大尺寸抽屉 (90%) -->
-        <AgDrawer
-          v-model:open="xlargeDrawerOpen"
-          title="超大尺寸抽屉（90% 屏幕宽度）"
-          size="xlarge"
-        >
+        <ag-drawer v-model:open="xlargeDrawerOpen" title="超大尺寸抽屉（90% 屏幕宽度）" size="xlarge">
           <a-alert
             message="预设尺寸 - XLarge"
             description="使用 size='xlarge' 设置为 90% 屏幕宽度"
@@ -156,15 +112,10 @@
           />
           <p>适合展示大量信息或宽表格</p>
           <a-divider />
-          
+
           <!-- 示例表格 -->
-          <a-table
-            :dataSource="sampleData"
-            :columns="sampleColumns"
-            :pagination="false"
-            size="small"
-          />
-          
+          <a-table :data-source="sampleData" :columns="sampleColumns" :pagination="false" size="small" />
+
           <a-divider />
           <a-descriptions :column="2" bordered>
             <a-descriptions-item label="尺寸类型">预设尺寸</a-descriptions-item>
@@ -172,14 +123,10 @@
             <a-descriptions-item label="屏幕占比">90%</a-descriptions-item>
             <a-descriptions-item label="适用场景">大量信息、表格展示</a-descriptions-item>
           </a-descriptions>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 自定义比例 40% -->
-        <AgDrawer
-          v-model:open="ratio40DrawerOpen"
-          title="自定义比例 40%"
-          :widthRatio="0.4"
-        >
+        <ag-drawer v-model:open="ratio40DrawerOpen" title="自定义比例 40%" :width-ratio="0.4">
           <a-alert
             message="自定义比例"
             description="使用 :widthRatio='0.4' 设置为 40% 屏幕宽度"
@@ -193,14 +140,10 @@
             <a-descriptions-item label="比例值">0.4</a-descriptions-item>
             <a-descriptions-item label="屏幕占比">40%</a-descriptions-item>
           </a-descriptions>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 自定义比例 60% -->
-        <AgDrawer
-          v-model:open="ratio60DrawerOpen"
-          title="自定义比例 60%"
-          :widthRatio="0.6"
-        >
+        <ag-drawer v-model:open="ratio60DrawerOpen" title="自定义比例 60%" :width-ratio="0.6">
           <a-alert
             message="自定义比例"
             description="使用 :widthRatio='0.6' 设置为 60% 屏幕宽度"
@@ -214,14 +157,10 @@
             <a-descriptions-item label="比例值">0.6</a-descriptions-item>
             <a-descriptions-item label="屏幕占比">60%</a-descriptions-item>
           </a-descriptions>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 自定义比例 80% -->
-        <AgDrawer
-          v-model:open="ratio80DrawerOpen"
-          title="自定义比例 80%"
-          :widthRatio="0.8"
-        >
+        <ag-drawer v-model:open="ratio80DrawerOpen" title="自定义比例 80%" :width-ratio="0.8">
           <a-alert
             message="自定义比例"
             description="使用 :widthRatio='0.8' 设置为 80% 屏幕宽度"
@@ -235,52 +174,32 @@
             <a-descriptions-item label="比例值">0.8</a-descriptions-item>
             <a-descriptions-item label="屏幕占比">80%</a-descriptions-item>
           </a-descriptions>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 详情抽屉 -->
-        <AgDrawer
-          v-model:open="detailDrawerOpen"
-          title="订单详情"
-          :width="800"
-        >
+        <ag-drawer v-model:open="detailDrawerOpen" title="订单详情" :width="800">
           <a-spin :spinning="detailLoading">
-            <a-descriptions
-              title="订单信息"
-              :column="2"
-              bordered
-            >
-              <a-descriptions-item label="订单号">
-                ORD202401001
-              </a-descriptions-item>
-              <a-descriptions-item label="订单金额">
-                ?999.00
-              </a-descriptions-item>
+            <a-descriptions title="订单信息" :column="2" bordered>
+              <a-descriptions-item label="订单号"> ORD202401001 </a-descriptions-item>
+              <a-descriptions-item label="订单金额"> ?999.00 </a-descriptions-item>
               <a-descriptions-item label="订单状态">
                 <a-tag color="success">已支付</a-tag>
               </a-descriptions-item>
-              <a-descriptions-item label="支付时间">
-                2024-01-01 10:00:00
-              </a-descriptions-item>
-              <a-descriptions-item label="商户名称">
-                示例商户
-              </a-descriptions-item>
-              <a-descriptions-item label="支付方式">
-                微信支付
-              </a-descriptions-item>
-              <a-descriptions-item label="备注" :span="2">
-                这是一笔测试订单
-              </a-descriptions-item>
+              <a-descriptions-item label="支付时间"> 2024-01-01 10:00:00 </a-descriptions-item>
+              <a-descriptions-item label="商户名称"> 示例商户 </a-descriptions-item>
+              <a-descriptions-item label="支付方式"> 微信支付 </a-descriptions-item>
+              <a-descriptions-item label="备注" :span="2"> 这是一笔测试订单 </a-descriptions-item>
             </a-descriptions>
           </a-spin>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 表单抽屉 -->
-        <AgDrawer
+        <ag-drawer
           v-model:open="formDrawerOpen"
           title="添加商户"
           :width="720"
-          :showConfirm="true"
-          :confirmLoading="drawerSubmitLoading"
+          :show-confirm="true"
+          :confirm-loading="drawerSubmitLoading"
           @confirm="handleDrawerSubmit"
         >
           <a-form
@@ -317,21 +236,17 @@
               <a-textarea v-model:value="drawerForm.address" :rows="3" placeholder="请输入地址" />
             </a-form-item>
           </a-form>
-        </AgDrawer>
+        </ag-drawer>
 
         <!-- 大尺寸抽屉 -->
-        <AgDrawer
-          v-model:open="largeDrawerOpen"
-          title="大尺寸抽屉"
-          :width="1200"
-        >
+        <ag-drawer v-model:open="largeDrawerOpen" title="大尺寸抽屉" :width="1200">
           <p>这是一个宽度为 1200px 的大尺寸抽屉</p>
           <p>适合展示大量信息或复杂的内容</p>
-        </AgDrawer>
-      </AgCard>
+        </ag-drawer>
+      </a-card>
 
       <!-- AgModal 示例 -->
-      <AgCard title="AgModal - 模态框组件">
+      <a-card title="AgModal - 模态框组件">
         <a-alert
           message="模态框组件"
           description="在页面中央弹出的对话框，适合确认操作、表单提交等场景"
@@ -341,34 +256,18 @@
         />
 
         <a-space>
-          <a-button type="primary" @click="basicModalOpen = true">
-            基础模态框
-          </a-button>
-          <a-button @click="formModalOpen = true">
-            表单模态框
-          </a-button>
-          <a-button danger @click="deleteModalOpen = true">
-            删除确认
-          </a-button>
-          <a-button @click="customModalOpen = true">
-            自定义按钮
-          </a-button>
+          <a-button type="primary" @click="basicModalOpen = true"> 基础模态框 </a-button>
+          <a-button @click="formModalOpen = true"> 表单模态框 </a-button>
+          <a-button danger @click="deleteModalOpen = true"> 删除确认 </a-button>
+          <a-button @click="customModalOpen = true"> 自定义按钮 </a-button>
         </a-space>
 
         <!-- 基础模态框 -->
-        <AgModal
-          v-model:open="basicModalOpen"
-          title="基础模态框"
-          @ok="handleBasicModalOk"
-        >
+        <AgModal v-model:open="basicModalOpen" title="基础模态框" @ok="handleBasicModalOk">
           <p>这是一个基础的模态框组件</p>
           <p>点击确定或取消按钮可以关闭模态框</p>
           <a-divider />
-          <a-alert
-            message="提示"
-            description="模态框关闭时会自动销毁内容"
-            type="info"
-          />
+          <a-alert message="提示" description="模态框关闭时会自动销毁内容" type="info" />
         </AgModal>
 
         <!-- 表单模态框 -->
@@ -376,7 +275,7 @@
           v-model:open="formModalOpen"
           title="添加用户"
           :width="600"
-          :confirmLoading="modalSubmitLoading"
+          :confirm-loading="modalSubmitLoading"
           @ok="handleModalSubmit"
         >
           <a-form
@@ -415,9 +314,9 @@
         <AgModal
           v-model:open="deleteModalOpen"
           title="确认删除"
-          :maskClosable="false"
-          okText="确认删除"
-          :confirmLoading="deleteLoading"
+          :mask-closable="false"
+          ok-text="确认删除"
+          :confirm-loading="deleteLoading"
           @ok="handleDelete"
         >
           <a-alert
@@ -428,17 +327,11 @@
             class="mb-3"
           />
 
-          <a-checkbox v-model:checked="deleteConfirmed">
-            我已了解风险，确认删除
-          </a-checkbox>
+          <a-checkbox v-model:checked="deleteConfirmed"> 我已了解风险，确认删除 </a-checkbox>
         </AgModal>
 
         <!-- 自定义按钮模态框 -->
-        <AgModal
-          v-model:open="customModalOpen"
-          title="审核"
-          :width="500"
-        >
+        <AgModal v-model:open="customModalOpen" title="审核" :width="500">
           <a-form layout="vertical">
             <a-form-item label="审核意见">
               <a-textarea v-model:value="auditOpinion" :rows="4" placeholder="请输入审核意见" />
@@ -453,10 +346,10 @@
             </a-space>
           </template>
         </AgModal>
-      </AgCard>
+      </a-card>
 
       <!-- 实际应用示例 -->
-      <AgCard title="实际应用示例 - 商户列表">
+      <a-card title="实际应用示例 - 商户列表">
         <a-space class="mb-3">
           <a-button type="primary" @click="showAddMerchant">
             <PlusOutlined />
@@ -464,11 +357,7 @@
           </a-button>
         </a-space>
 
-        <a-table
-          :dataSource="merchants"
-          :columns="merchantColumns"
-          :pagination="false"
-        >
+        <a-table :data-source="merchants" :columns="merchantColumns" :pagination="false">
           <template #bodyCell="{ column, record }">
             <template v-if="column.key === 'status'">
               <a-tag :color="record.status === 1 ? 'success' : 'default'">
@@ -479,12 +368,12 @@
               <a-space>
                 <a @click="showMerchantDetail(record)">详情</a>
                 <a @click="showEditMerchant(record)">编辑</a>
-                <a style="color: #ff4d4f" @click="showDeleteMerchant(record)">删除</a>
+                <a style="color: var(--error-color)" @click="showDeleteMerchant(record)">删除</a>
               </a-space>
             </template>
           </template>
         </a-table>
-      </AgCard>
+      </a-card>
     </a-space>
   </div>
 </template>
@@ -620,7 +509,7 @@ async function handleDrawerSubmit() {
     drawerSubmitLoading.value = true
 
     // 模拟 API 调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     console.log('提交表单:', drawerForm)
     message.success('添加成功')
@@ -657,7 +546,7 @@ async function handleModalSubmit() {
     modalSubmitLoading.value = true
 
     // 模拟 API 调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     console.log('提交用户:', modalForm)
     message.success('添加成功')
@@ -690,7 +579,7 @@ async function handleDelete() {
 
   try {
     // 模拟 API 调用
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await new Promise((resolve) => setTimeout(resolve, 1000))
 
     message.success('删除成功')
     deleteModalOpen.value = false
@@ -710,7 +599,7 @@ async function handleApprove() {
 
   try {
     // 模拟 API 调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     message.success('审核通过')
     customModalOpen.value = false
@@ -728,7 +617,7 @@ async function handleReject() {
 
   try {
     // 模拟 API 调用
-    await new Promise(resolve => setTimeout(resolve, 500))
+    await new Promise((resolve) => setTimeout(resolve, 500))
 
     message.success('已驳回')
     customModalOpen.value = false
@@ -774,10 +663,10 @@ function showDeleteMerchant(record) {
 }
 
 .mb-3 {
-  margin-bottom: 12px
+  margin-bottom: 12px;
 }
 
 .mb-4 {
-  margin-bottom: 16px
+  margin-bottom: 16px;
 }
 </style>

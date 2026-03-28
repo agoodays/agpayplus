@@ -1,27 +1,18 @@
-﻿<template>
+<template>
   <a-drawer
-    v-model:open="open"
+    v-model:open="localOpen"
     :title="isAdd ? '新增应用' : '修改应用'"
     :width="720"
     :mask-closable="false"
     :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
   >
-    <a-form
-      ref="formRef"
-      :model="formState"
-      :rules="rules"
-      layout="vertical"
-    >
+    <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical">
       <!-- 基本信息 -->
       <a-row :gutter="16">
         <a-col v-if="!isAdd" :span="12">
           <a-form-item label="应用AppId" name="appId">
-            <a-input
-              v-model:value="formState.appId"
-              placeholder="应用AppId"
-              disabled
-            />
+            <a-input v-model:value="formState.appId" placeholder="应用AppId" disabled />
           </a-form-item>
         </a-col>
 
@@ -35,11 +26,7 @@
               :disabled="!isAdd"
               @search="handleSearchMch"
             >
-              <a-select-option
-                v-for="item in mchList"
-                :key="item.mchNo"
-                :value="item.mchNo"
-              >
+              <a-select-option v-for="item in mchList" :key="item.mchNo" :value="item.mchNo">
                 {{ item.mchName }}
               </a-select-option>
             </a-select>
@@ -48,10 +35,7 @@
 
         <a-col :span="12">
           <a-form-item label="应用名称" name="appName">
-            <a-input
-              v-model:value="formState.appName"
-              placeholder="请输入应用名称"
-            />
+            <a-input v-model:value="formState.appName" placeholder="请输入应用名称" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -59,10 +43,7 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="备注" name="remark">
-            <a-input
-              v-model:value="formState.remark"
-              placeholder="请输入备注"
-            />
+            <a-input v-model:value="formState.remark" placeholder="请输入备注" />
           </a-form-item>
         </a-col>
 
@@ -88,9 +69,7 @@
       </a-row>
 
       <!-- 签名配置 -->
-      <a-divider orientation="left" style="color: #1a66ff">
-        签名配置
-      </a-divider>
+      <a-divider orientation="left" style="color: var(--primary-color)"> 签名配置 </a-divider>
 
       <a-row :gutter="16">
         <a-col :span="24">
@@ -117,17 +96,8 @@
         <a-row :gutter="16">
           <a-col :span="24">
             <a-form-item label="设置MD5秘钥" name="appSecret">
-              <a-textarea
-                v-model:value="formState.appSecret"
-                :placeholder="appSecretPlaceholder"
-                :rows="3"
-              />
-              <a-button
-                type="primary"
-                ghost
-                style="margin-top: 8px"
-                @click="handleGenerateSecret"
-              >
+              <a-textarea v-model:value="formState.appSecret" :placeholder="appSecretPlaceholder" :rows="3" />
+              <a-button type="primary" ghost style="margin-top: 8px" @click="handleGenerateSecret">
                 <sync-outlined />
                 随机生成私钥
               </a-button>
@@ -141,11 +111,7 @@
         <a-row :gutter="16">
           <a-col :span="24">
             <a-form-item label="设置RSA2应用公钥" name="appRsa2PublicKey">
-              <a-textarea
-                v-model:value="formState.appRsa2PublicKey"
-                placeholder="请输入RSA2应用公钥"
-                :rows="4"
-              />
+              <a-textarea v-model:value="formState.appRsa2PublicKey" placeholder="请输入RSA2应用公钥" :rows="4" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -153,11 +119,7 @@
         <a-row :gutter="16">
           <a-col :span="24">
             <a-form-item label="支付网关系统公钥（回调验签使用）">
-              <a-textarea
-                :value="sysRSA2PublicKey"
-                disabled
-                :rows="6"
-              />
+              <a-textarea :value="sysRSA2PublicKey" disabled :rows="6" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -186,13 +148,9 @@
 import { ref, reactive, watch, computed, nextTick } from 'vue'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import {
-  QuestionCircleOutlined,
-  SyncOutlined,
-  CloseOutlined,
-  CheckOutlined
-} from '@ant-design/icons-vue'
-import { API_URL_MCH_APP, API_URL_MCH_LIST, req, getSysRSA2PublicKey } from '@/api/manage'
+import { QuestionCircleOutlined, SyncOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
+import { API_URL_MCH_APP, API_URL_MCH_LIST, req } from '@/api/manage'
+import { basicApi } from '@/api/system/basic-api'
 
 // Props & Emits
 const props = defineProps({
@@ -216,7 +174,7 @@ const emit = defineEmits(['update:open', 'success'])
 const formRef = ref()
 const loading = ref(false)
 const isAdd = ref(true)
-const open = ref(false)
+const localOpen = ref(false)
 const mchList = ref([])
 const sysRSA2PublicKey = ref('')
 const originalAppSecret = ref('')
@@ -238,20 +196,14 @@ const { t } = useI18n()
 
 // MD5秘钥占位符
 const appSecretPlaceholder = computed(() => {
-  return isAdd.value ? '请输入MD5秘钥' : (originalAppSecret.value || '请输入MD5秘钥')
+  return isAdd.value ? '请输入MD5秘钥' : originalAppSecret.value || '请输入MD5秘钥'
 })
 
 // 表单验证规则
 const rules = computed(() => ({
-  mchNo: [
-    { required: true, message: '请选择商户', trigger: 'change' }
-  ],
-  appName: [
-    { required: true, message: '请输入应用名称', trigger: 'blur' }
-  ],
-  appSignType: [
-    { required: true, message: '请选择签名方式', trigger: 'change', type: 'array' }
-  ],
+  mchNo: [{ required: true, message: '请选择商户', trigger: 'change' }],
+  appName: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
+  appSignType: [{ required: true, message: '请选择签名方式', trigger: 'change', type: 'array' }],
   appSecret: [
     {
       validator: (rule, value) => {
@@ -283,15 +235,18 @@ const rules = computed(() => ({
 }))
 
 // 监听 props.open 变化
-watch(() => props.open, (val) => {
-  open.value = val
-  if (val) {
-    initForm()
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val) {
+      initForm()
+    }
   }
-})
+)
 
-// 监听 open 变化
-watch(open, (val) => {
+// 监听 localOpen 变化
+watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
@@ -324,7 +279,7 @@ const initForm = async () => {
  */
 const loadSysRSA2PublicKey = async () => {
   try {
-    const key = await getSysRSA2PublicKey()
+    const key = await basicApi.getSysRSA2PublicKey()
     sysRSA2PublicKey.value = key
   } catch (error) {
     console.error('加载系统RSA2公钥失败:', error)
@@ -338,15 +293,15 @@ const loadDetail = async () => {
   try {
     loading.value = true
     const res = await req.getById(API_URL_MCH_APP, props.recordId)
-    
+
     Object.assign(formState, res)
-    
+
     // 保存原始密钥，用于占位符显示
     originalAppSecret.value = res.appSecret || ''
-    
+
     // 清空密钥输入框（编辑时不显示原密钥）
     formState.appSecret = ''
-    
+
     // 处理签名方式（字符串转数组）
     if (typeof res.appSignType === 'string') {
       formState.appSignType = res.appSignType.split(',')
@@ -373,9 +328,9 @@ const resetForm = () => {
     appSecret: '',
     appRsa2PublicKey: ''
   })
-  
+
   originalAppSecret.value = ''
-  
+
   nextTick(() => {
     formRef.value?.clearValidate()
   })
@@ -416,22 +371,22 @@ const handleGenerateSecret = () => {
 const handleSubmit = async () => {
   try {
     await formRef.value.validate()
-    
+
     loading.value = true
-    
+
     // 构建提交数据
     const data = { ...formState }
-    
+
     // 处理签名方式（数组转字符串）
     if (Array.isArray(data.appSignType)) {
       data.appSignType = data.appSignType.join(',')
     }
-    
+
     // 编辑模式下，如果没有输入新密钥，则删除该字段
     if (!isAdd.value && !data.appSecret) {
       delete data.appSecret
     }
-    
+
     // 提交数据
     if (isAdd.value) {
       await req.add(API_URL_MCH_APP, data)
@@ -440,7 +395,7 @@ const handleSubmit = async () => {
       await req.updateById(API_URL_MCH_APP, props.recordId, data)
       message.success(t('common.editSuccess'))
     }
-    
+
     handleClose()
     emit('success')
   } catch (error) {
@@ -459,12 +414,12 @@ const handleSubmit = async () => {
  * 关闭抽屉
  */
 const handleClose = () => {
-  open.value = false
+  emit('update:open', false)
 }
 </script>
 
 <style lang="less" scoped>
 :deep(.ant-divider-inner-text) {
-  color: #1a66ff;
+  color: var(--primary-color);
 }
 </style>

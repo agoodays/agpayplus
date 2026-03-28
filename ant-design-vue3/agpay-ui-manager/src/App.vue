@@ -1,8 +1,5 @@
 <template>
-  <a-config-provider
-    :locale="locale"
-    :theme="antdThemeConfig"
-  >
+  <a-config-provider :locale="locale" :theme="antdThemeConfig">
     <!-- 全局 Loading -->
     <a-spin :spinning="spinning" size="large">
       <!-- 路由视图 -->
@@ -14,7 +11,7 @@
 <script setup>
 import { computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { theme as antdTheme } from 'ant-design-vue'
+import { theme as antdTheme, ConfigProvider, Spin } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import enUS from 'ant-design-vue/es/locale/en_US'
 import { useSpinStore } from '@/store/modules/system/spin'
@@ -70,4 +67,3 @@ if (import.meta.env.DEV) {
 <style scoped>
 /* App.vue 根组件样式 */
 </style>
-

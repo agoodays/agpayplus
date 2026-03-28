@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div v-if="visible" class="global-load">
     <div class="global-load-content">
       <a-spin size="large" />
@@ -31,9 +31,12 @@ const props = defineProps({
 const visible = ref(props.visible)
 
 // 监听 props 变化
-watch(() => props.visible, (val) => {
-  visible.value = val
-})
+watch(
+  () => props.visible,
+  (val) => {
+    visible.value = val
+  }
+)
 </script>
 
 <style lang="less" scoped>

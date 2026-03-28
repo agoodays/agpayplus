@@ -1,12 +1,8 @@
-﻿<template>
+<template>
   <div class="mch-store-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <a-form
-        :model="searchParams"
-        layout="inline"
-        class="search-form"
-      >
+      <a-form :model="searchParams" layout="inline" class="search-form">
         <a-form-item label="商户号">
           <a-select
             v-model:value="searchParams.mchNo"
@@ -18,11 +14,7 @@
             @search="handleSearchMch"
             @change="handleSearch"
           >
-            <a-select-option
-              v-for="item in mchList"
-              :key="item.mchNo"
-              :value="item.mchNo"
-            >
+            <a-select-option v-for="item in mchList" :key="item.mchNo" :value="item.mchNo">
               {{ item.mchName }}
             </a-select-option>
           </a-select>
@@ -33,7 +25,7 @@
             v-model:value="searchParams.storeId"
             placeholder="请输入门店编号"
             allow-clear
-            @pressEnter="handleSearch"
+            @press-enter="handleSearch"
           />
         </a-form-item>
 
@@ -42,7 +34,7 @@
             v-model:value="searchParams.storeName"
             placeholder="请输入门店名称"
             allow-clear
-            @pressEnter="handleSearch"
+            @press-enter="handleSearch"
           />
         </a-form-item>
 
@@ -63,11 +55,7 @@
       <!-- 操作按钮 -->
       <div class="table-operations">
         <a-space>
-          <a-button
-            v-if="hasPermission('ENT_MCH_STORE_ADD')"
-            type="primary"
-            @click="handleAdd"
-          >
+          <a-button v-if="hasPermission('ENT_MCH_STORE_ADD')" type="primary" @click="handleAdd">
             <plus-outlined />
             新建
           </a-button>
@@ -80,27 +68,20 @@
 
       <!-- 数据表格 -->
       <a-table
+        row-key="storeId"
         :columns="columns"
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
-        row-key="storeId"
         :scroll="{ x: 1200 }"
         @change="handleTableChange"
       >
         <!-- 门店名称 -->
         <template #storeName="{ record }">
-          <b
-            v-if="!hasPermission('ENT_MCH_STORE_VIEW')"
-            :title="record.storeName"
-          >
+          <b v-if="!hasPermission('ENT_MCH_STORE_VIEW')" :title="record.storeName">
             {{ record.storeName }}
           </b>
-          <a
-            v-else
-            :title="record.storeName"
-            @click="handleDetail(record)"
-          >
+          <a v-else :title="record.storeName" @click="handleDetail(record)">
             <b>{{ record.storeName }}</b>
           </a>
         </template>
@@ -116,12 +97,7 @@
         <!-- 操作 -->
         <template #action="{ record }">
           <a-space>
-            <a-button
-              v-if="hasPermission('ENT_MCH_STORE_EDIT')"
-              type="link"
-              size="small"
-              @click="handleEdit(record)"
-            >
+            <a-button v-if="hasPermission('ENT_MCH_STORE_EDIT')" type="link" size="small" @click="handleEdit(record)">
               修改
             </a-button>
 
@@ -139,9 +115,7 @@
               title="确认删除该门店吗？"
               @confirm="handleDelete(record)"
             >
-              <a-button type="link" size="small" danger>
-                删除
-              </a-button>
+              <a-button type="link" size="small" danger> 删除 </a-button>
             </a-popconfirm>
           </a-space>
         </template>
@@ -149,17 +123,10 @@
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <add-or-edit-modal
-      v-model:open="modalOpen"
-      :record-id="currentRecordId"
-      @success="handleModalSuccess"
-    />
+    <add-or-edit-modal v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
 
     <!-- 详情抽屉 -->
-    <detail-drawer
-      v-model:open="detailOpen"
-      :record-id="currentRecordId"
-    />
+    <detail-drawer v-model:open="detailOpen" :record-id="currentRecordId" />
 
     <!-- 应用分配弹窗 -->
     <bind-app-modal
@@ -175,13 +142,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { message } from 'ant-design-vue'
-import {
-  SearchOutlined,
-  RedoOutlined,
-  PlusOutlined,
-  ReloadOutlined
-} from '@ant-design/icons-vue'
+import { SearchOutlined, RedoOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import { useTable, useModal, usePermission, useDelete } from '@/hooks/common-hooks'
 import { API_URL_MCH_STORE, API_URL_MCH_LIST, req } from '@/api/manage'
 import AddOrEditModal from './add-or-edit.vue'
@@ -191,7 +152,7 @@ import BindAppModal from './bind-app.vue'
 const route = useRoute()
 
 // 使用 Hooks
-const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
+const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
   useTable((params) => req.list(API_URL_MCH_STORE, params))
 
 const { open: modalOpen, showModal, hideModal } = useModal()
@@ -277,7 +238,7 @@ const handleSearchMch = async (keyword) => {
     mchList.value = []
     return
   }
-  
+
   try {
     const res = await req.list(API_URL_MCH_LIST, {
       mchName: keyword,

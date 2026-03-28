@@ -6,7 +6,7 @@ import { defineStore } from 'pinia'
 
 export const useSpinStore = defineStore('spin', {
   state: () => ({
-    loading: false,
+    loading: false
   }),
 
   actions: {
@@ -15,6 +15,6 @@ export const useSpinStore = defineStore('spin', {
     },
     show() {
       this.loading = true
-    },
-  },
+    }
+  }
 })

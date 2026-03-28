@@ -1,23 +1,38 @@
 <template>
-  <a-alert class="login-error-message" v-if="loginErrorInfo" :message="loginErrorInfo" type="error" show-icon />
+  <a-alert v-if="loginErrorInfo" class="login-error-message" :message="loginErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">{{ t('auth.loginTitle') }}</div>
-    <a-form class="user-layout-login" ref="loginForm" :model="loginObject" :rules="rules" @finish="onFinish" @finishFailed="onFinishFailed">
+    <a-form
+      ref="loginForm"
+      class="user-layout-login"
+      :model="loginObject"
+      :rules="rules"
+      @finish="onFinish"
+      @finish-failed="onFinishFailed"
+    >
       <a-form-item name="username">
-        <ag-input size="large" type="text" :label="t('auth.loginNameOrPhone')" v-model:value="loginObject.username"/>
+        <ag-input v-model:value="loginObject.username" size="large" type="text" :label="t('auth.loginNameOrPhone')" />
       </a-form-item>
       <a-form-item name="password">
-        <ag-input type="password" size="large" :label="t('auth.password')" v-model:value="loginObject.password"/>
+        <ag-input v-model:value="loginObject.password" type="password" size="large" :label="t('auth.password')" />
       </a-form-item>
       <div class="code-body">
         <div class="code-layout">
           <div class="code code-layout-item">
             <a-form-item name="vercode">
-              <ag-input v-model:value="loginObject.vercode" class="code-input" size="large" type="text" :label="t('auth.captcha')"/>
+              <ag-input
+                v-model:value="loginObject.vercode"
+                class="code-input"
+                size="large"
+                type="text"
+                :label="t('auth.captcha')"
+              />
             </a-form-item>
             <div class="code-img">
-              <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()"/>
-              <div class="vercode-mask" v-show="isOverdue" @click="refVercode()">{{ t('auth.captchaExpiredRefresh') }}</div>
+              <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()" />
+              <div v-show="isOverdue" class="vercode-mask" @click="refVercode()">
+                {{ t('auth.captchaExpiredRefresh') }}
+              </div>
             </div>
           </div>
         </div>
@@ -30,7 +45,9 @@
         <a class="forget-password" href="/forget">{{ t('auth.forgotPassword') }}</a>
       </a-form-item>
       <a-form-item class="submit">
-        <a-button size="large" type="primary" html-type="submit" class="login-button" :loading="loading" >{{ t('auth.login') }}</a-button>
+        <a-button size="large" type="primary" html-type="submit" class="login-button" :loading="loading">{{
+          t('auth.login')
+        }}</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -42,9 +59,7 @@ import { reactive, ref, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { notification } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import {
-  AgInput
-} from '@/components'
+import { AgInput } from '@/components'
 import { timeFix } from '@/utils/time-util'
 import { loginApi } from '@/api/system/login-api'
 import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
@@ -74,7 +89,7 @@ const loginObject = reactive({
 const rules = {
   username: [{ required: true, message: t('auth.pleaseInputLoginNameOrPhone'), trigger: 'blur' }],
   password: [{ required: true, message: t('auth.pleaseInputPassword'), trigger: 'blur' }],
-  vercode: [{ required: true, message: t('auth.pleaseInputCaptcha'), trigger: 'blur' }],
+  vercode: [{ required: true, message: t('auth.pleaseInputCaptcha'), trigger: 'blur' }]
 }
 
 let timer = null
@@ -104,7 +119,7 @@ const refVercode = async () => {
 
     isOverdue.value = false
     if (timer) clearInterval(timer)
-    
+
     // 设置验证码过期定时器
     let expireTime = res.expireTime
     timer = setInterval(() => {
@@ -122,26 +137,36 @@ const refVercode = async () => {
 const onFinish = async (values) => {
   loading.value = true
   loginErrorInfo.value = ''
-  
+
   try {
     // 合并登录参数
     const loginParams = {
       ...loginObject,
       ...values
     }
-    
+
     // 调用登录 API
+    console.log('开始登录，参数:', loginParams)
     const res = await loginApi.login(loginParams)
-    
+    console.log('登录成功，返回:', res)
+
     // 保存 Token
-    userStore.setToken(res[ACCESS_TOKEN_NAME] || res.iToken, loginObject.isAutoLogin)
-    
+    const token = res[ACCESS_TOKEN_NAME] || res.iToken
+    console.log('保存 Token:', token)
+    userStore.setToken(token, loginObject.isAutoLogin)
+    console.log('保存 Token 后:', userStore.getToken)
+
     // 获取用户信息
+    console.log('开始获取用户信息')
     const userInfo = await loginApi.getCurrentInfo()
-    userStore.setUserLoginInfo(userInfo)
+    console.log('获取用户信息成功:', userInfo)
     
+    // 保存用户信息
+    userStore.setUserLoginInfo(userInfo)
+    console.log('保存用户信息后:', userStore)
+
     // 登录成功
-    loginSuccess(res)
+    loginSuccess(res, userInfo)
   } catch (error) {
     console.error('登录失败:', error)
     loginErrorInfo.value = error.msg || t('auth.loginFailedRetry')
@@ -152,12 +177,40 @@ const onFinish = async (values) => {
   }
 }
 
-const loginSuccess = (res) => {
+const loginSuccess = (res, userInfo) => {
   const redirect = route.query.redirect
   
-  // 跳转到重定向页面或首页
-  router.push({ path: redirect || '/' })
-  
+  // 查找第一个可用的菜单路径
+  let targetPath = redirect || '/'
+  if (userInfo && userInfo.allMenuRouteTree && userInfo.allMenuRouteTree.length > 0) {
+    // 优先查找主页
+    const mainMenu = userInfo.allMenuRouteTree.find(item => item.entId === 'ENT_C_MAIN' && item.menuUri)
+    if (mainMenu) {
+      targetPath = mainMenu.menuUri
+    } else {
+      // 查找第一个菜单链接
+      const findFirstMenu = (menus) => {
+        for (const item of menus) {
+          if (item.menuUri && item.entType === 'ML') {
+            return item.menuUri
+          }
+          if (item.children) {
+            const found = findFirstMenu(item.children)
+            if (found) return found
+          }
+        }
+        return ''
+      }
+      const firstMenuUri = findFirstMenu(userInfo.allMenuRouteTree)
+      if (firstMenuUri) {
+        targetPath = firstMenuUri
+      }
+    }
+  }
+
+  // 跳转到目标页面
+  router.push({ path: targetPath })
+
   // 延迟显示欢迎信息
   setTimeout(() => {
     const userName = userStore.realname || userStore.loginUsername || ''
@@ -170,12 +223,12 @@ const loginSuccess = (res) => {
       }
     })
   }, 1000)
-  
+
   // 清除错误信息
   loginErrorInfo.value = ''
 }
 
-const onFinishFailed = errorInfo => {
+const onFinishFailed = (errorInfo) => {
   console.log('Failed:', errorInfo)
 }
 
@@ -194,7 +247,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="less" scoped>
-  .user-layout-login {
+.user-layout-login {
   label {
     font-size: 14px;
   }
@@ -214,7 +267,7 @@ onUnmounted(() => {
     margin-top: 24px;
     line-height: 22px;
 
-      .item-icon {
+    .item-icon {
       font-size: 24px;
       color: var(--text-color-muted);
       margin-left: 16px;
@@ -240,7 +293,7 @@ onUnmounted(() => {
       margin-left: 10px;
       position: relative;
       background-color: var(--surface-variant);
-      img{
+      img {
         width: 120px;
         height: 40px;
       }
@@ -258,7 +311,7 @@ onUnmounted(() => {
   height: 100%;
   background: var(--overlay-bg);
   opacity: 0.8;
-  text-align:center;
+  text-align: center;
   line-height: 40px;
   color: var(--text-on-dark);
   &:hover {

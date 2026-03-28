@@ -1,4 +1,4 @@
-﻿# 浮动标签组件系列
+# 浮动标签组件系列
 
 ## 📝 概述
 
@@ -48,6 +48,7 @@
 | disabled | 是否禁用 | boolean | false |
 | required | 是否必填（显示星号） | boolean | false |
 | size | 尺寸 | 'small' \| 'middle' \| 'large' | 'middle' |
+| floatOptions | 浮动标签配置 | object | {} |
 
 ### 共同 Events
 | 事件名 | 说明 | 参数 |
@@ -57,11 +58,19 @@
 | focus | 获取焦点 | (e) |
 | blur | 失去焦点 | (e) |
 
+### floatOptions 配置选项
+| 选项 | 说明 | 类型 | 默认值 |
+|-----|------|------|-------|
+| animationDuration | 动画持续时间（毫秒） | number | 200 |
+| floatDelay | 浮动延迟（毫秒） | number | 0 |
+| blurDelay | 失焦延迟（毫秒） | number | 100 |
+
 ### 共同 Methods
 | 方法名 | 说明 |
 |-------|------|
 | focus() | 使组件获取焦点 |
 | blur() | 使组件失去焦点 |
+| clear() | 清空组件值 |
 
 ## 💡 快速使用
 

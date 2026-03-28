@@ -1,6 +1,6 @@
 /**
  * localStorage 工具类
- * 
+ *
  * 功能：
  * 1. 自动序列化/反序列化对象
  * 2. 支持设置过期时间
@@ -45,7 +45,7 @@ export const localRead = (key, defaultValue = null) => {
     // 尝试解析为对象
     try {
       const data = JSON.parse(item)
-      
+
       // 检查是否是新格式（带过期时间）
       if (data && typeof data === 'object' && 'value' in data) {
         // 检查是否过期
@@ -55,7 +55,7 @@ export const localRead = (key, defaultValue = null) => {
         }
         return data.value
       }
-      
+
       // 兼容旧格式（直接存储的值）
       return data
     } catch {
@@ -141,12 +141,12 @@ export const localSize = () => {
 export const localClearExpired = () => {
   let count = 0
   const keys = localKeys()
-  
-  keys.forEach(key => {
+
+  keys.forEach((key) => {
     try {
       const item = localStorage.getItem(key)
       const data = JSON.parse(item)
-      
+
       // 检查是否是带过期时间的格式
       if (data && typeof data === 'object' && 'expires' in data) {
         if (data.expires > 0 && Date.now() > data.expires) {
@@ -158,7 +158,7 @@ export const localClearExpired = () => {
       // 忽略解析错误
     }
   })
-  
+
   return count
 }
 
@@ -175,4 +175,3 @@ export default {
   size: localSize,
   clearExpired: localClearExpired
 }
-

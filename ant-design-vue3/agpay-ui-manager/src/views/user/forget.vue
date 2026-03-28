@@ -1,41 +1,59 @@
 <template>
-  <a-alert class="forget-error-message" v-if="forgetErrorInfo" :message="forgetErrorInfo" type="error" show-icon />
+  <a-alert v-if="forgetErrorInfo" class="forget-error-message" :message="forgetErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">{{ t('auth.forgetTitle') }}</div>
-    <a-form class="user-layout-forget" ref="forgetForm" :model="forgetObject" :rules="rules">
+    <a-form ref="forgetForm" class="user-layout-forget" :model="forgetObject" :rules="rules">
       <a-form-item name="phone">
-        <a-input size="large" type="text" :placeholder="t('auth.pleaseInputPhone')" v-model:value="forgetObject.phone"/>
+        <a-input
+          v-model:value="forgetObject.phone"
+          size="large"
+          type="text"
+          :placeholder="t('auth.pleaseInputPhone')"
+        />
       </a-form-item>
       <div class="code-body">
         <div class="code-layout">
           <div class="code code-layout-item">
             <a-form-item name="code">
-              <a-input class="code-input" size="large" type="text" :placeholder="t('auth.pleaseInputSmsCode')" v-model:value="forgetObject.code"/>
+              <a-input
+                v-model:value="forgetObject.code"
+                class="code-input"
+                size="large"
+                type="text"
+                :placeholder="t('auth.pleaseInputSmsCode')"
+              />
             </a-form-item>
             <div class="send-button-wrap">
-              <a-button
-                  type="primary"
-                  @click="sendCode()"
-                  class="send-code-button"
-                  :disabled="codeExpireTime > 0"
-              >
-                {{ codeExpireTime > 0 ? t('auth.resendInSeconds', { seconds: codeExpireTime }) : t('auth.sendSmsCode') }}
+              <a-button type="primary" class="send-code-button" :disabled="codeExpireTime > 0" @click="sendCode()">
+                {{
+                  codeExpireTime > 0 ? t('auth.resendInSeconds', { seconds: codeExpireTime }) : t('auth.sendSmsCode')
+                }}
               </a-button>
             </div>
           </div>
         </div>
       </div>
       <a-form-item name="password">
-        <a-input-password size="large" :placeholder="t('auth.pleaseInputNewPassword')" v-model:value="forgetObject.password"/>
+        <a-input-password
+          v-model:value="forgetObject.password"
+          size="large"
+          :placeholder="t('auth.pleaseInputNewPassword')"
+        />
       </a-form-item>
       <a-form-item name="confirmPwd">
-        <a-input-password size="large" :placeholder="t('auth.pleaseInputConfirmPassword')" v-model:value="forgetObject.confirmPwd"/>
+        <a-input-password
+          v-model:value="forgetObject.confirmPwd"
+          size="large"
+          :placeholder="t('auth.pleaseInputConfirmPassword')"
+        />
       </a-form-item>
       <a-form-item>
-        <a class="forge-password" href="/login" >{{ t('auth.goLogin') }}</a>
+        <a class="forge-password" href="/login">{{ t('auth.goLogin') }}</a>
       </a-form-item>
       <a-form-item class="submit">
-        <a-button size="large" type="primary" class="forget-button" :loading="loading" @click="onSubmit">{{ t('auth.retrievePassword') }}</a-button>
+        <a-button size="large" type="primary" class="forget-button" :loading="loading" @click="onSubmit">{{
+          t('auth.retrievePassword')
+        }}</a-button>
       </a-form-item>
     </a-form>
   </div>
@@ -140,19 +158,19 @@ const sendCode = async () => {
   try {
     // 先验证手机号
     await forgetForm.value.validateFields('phone')
-    
+
     // 发送验证码
-    await loginApi.sendcode({ 
-      phone: forgetObject.phone, 
-      smsType: 'retrieve' 
+    await loginApi.sendcode({
+      phone: forgetObject.phone,
+      smsType: 'retrieve'
     })
-    
+
     message.success(t('auth.smsCodeSent'))
-    
+
     // 开始倒计时
     codeExpireTime.value = 60
     if (timer) clearInterval(timer)
-    
+
     timer = setInterval(() => {
       codeExpireTime.value--
       if (codeExpireTime.value <= 0) {
@@ -176,18 +194,18 @@ const onSubmit = async () => {
   try {
     // 验证表单
     await forgetForm.value.validate()
-    
+
     loading.value = true
     forgetErrorInfo.value = ''
-    
+
     const forgetParams = {
       phone: forgetObject.phone,
       code: forgetObject.code,
       confirmPwd: forgetObject.confirmPwd
     }
-    
+
     await loginApi.forget(forgetParams)
-    
+
     // 找回成功
     retrieveSuccess()
   } catch (error) {
@@ -207,7 +225,7 @@ const onSubmit = async () => {
 const retrieveSuccess = () => {
   // 跳转到登录页
   router.push({ path: '/login' })
-  
+
   // 延迟显示成功信息
   setTimeout(() => {
     notification.success({
@@ -215,7 +233,7 @@ const retrieveSuccess = () => {
       description: t('auth.passwordResetSuccess')
     })
   }, 500)
-  
+
   forgetErrorInfo.value = ''
 }
 
@@ -233,7 +251,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="less" scoped>
-  .user-layout-forget {
+.user-layout-forget {
   label {
     font-size: 14px;
   }
@@ -255,7 +273,7 @@ onUnmounted(() => {
     margin-top: 24px;
     line-height: 22px;
 
-      .item-icon {
+    .item-icon {
       font-size: 24px;
       color: var(--text-color-muted);
       margin-left: 16px;
@@ -279,7 +297,7 @@ onUnmounted(() => {
       width: 137px;
       height: 40px;
       background-color: var(--surface-variant);
-      img{
+      img {
         width: 137px;
         height: 40px;
       }

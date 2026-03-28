@@ -1,27 +1,27 @@
-﻿<template>
+<template>
   <a-modal
     :open="open"
     :title="title"
     :width="width"
     :closable="closable"
-    :maskClosable="maskClosable"
-    :destroyOnClose="destroyOnClose"
-    :confirmLoading="confirmLoading"
-    :okText="okText"
-    :cancelText="cancelText"
+    :mask-closable="maskClosable"
+    :destroy-on-close="destroyOnClose"
+    :confirm-loading="confirmLoading"
+    :ok-text="okText"
+    :cancel-text="cancelText"
     @ok="handleOk"
     @cancel="handleCancel"
   >
     <template v-if="$slots.footer" #footer>
       <slot name="footer"></slot>
     </template>
-    
+
     <slot></slot>
   </a-modal>
 </template>
 
 <script setup>
-const props = defineProps({
+defineProps({
   open: {
     type: Boolean,
     default: false

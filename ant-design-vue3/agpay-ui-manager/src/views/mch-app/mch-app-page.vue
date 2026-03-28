@@ -1,12 +1,8 @@
-﻿<template>
+<template>
   <div class="mch-app-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <a-form
-        :model="searchParams"
-        layout="inline"
-        class="search-form"
-      >
+      <a-form :model="searchParams" layout="inline" class="search-form">
         <a-form-item label="商户号">
           <a-select
             v-model:value="searchParams.mchNo"
@@ -18,11 +14,7 @@
             @search="handleSearchMch"
             @change="handleSearch"
           >
-            <a-select-option
-              v-for="item in mchList"
-              :key="item.mchNo"
-              :value="item.mchNo"
-            >
+            <a-select-option v-for="item in mchList" :key="item.mchNo" :value="item.mchNo">
               {{ item.mchName }}
             </a-select-option>
           </a-select>
@@ -33,7 +25,7 @@
             v-model:value="searchParams.appId"
             placeholder="请输入应用AppId"
             allow-clear
-            @pressEnter="handleSearch"
+            @press-enter="handleSearch"
           />
         </a-form-item>
 
@@ -42,17 +34,12 @@
             v-model:value="searchParams.appName"
             placeholder="请输入应用名称"
             allow-clear
-            @pressEnter="handleSearch"
+            @press-enter="handleSearch"
           />
         </a-form-item>
 
         <a-form-item label="状态">
-          <a-select
-            v-model:value="searchParams.state"
-            placeholder="请选择状态"
-            style="width: 120px"
-            allow-clear
-          >
+          <a-select v-model:value="searchParams.state" placeholder="请选择状态" style="width: 120px" allow-clear>
             <a-select-option :value="1">启用</a-select-option>
             <a-select-option :value="0">禁用</a-select-option>
           </a-select>
@@ -75,11 +62,7 @@
       <!-- 操作按钮 -->
       <div class="table-operations">
         <a-space>
-          <a-button
-            v-if="hasPermission('ENT_MCH_APP_ADD')"
-            type="primary"
-            @click="handleAdd"
-          >
+          <a-button v-if="hasPermission('ENT_MCH_APP_ADD')" type="primary" @click="handleAdd">
             <plus-outlined />
             新建
           </a-button>
@@ -92,11 +75,11 @@
 
       <!-- 数据表格 -->
       <a-table
+        row-key="appId"
         :columns="columns"
         :data-source="dataSource"
         :loading="loading"
         :pagination="pagination"
-        row-key="appId"
         :scroll="{ x: 1200 }"
         @change="handleTableChange"
       >
@@ -107,10 +90,7 @@
 
         <!-- 状态 -->
         <template #state="{ record }">
-          <a-badge
-            :status="record.state === 0 ? 'error' : 'processing'"
-            :text="record.state === 0 ? '禁用' : '启用'"
-          />
+          <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
         </template>
 
         <!-- 默认应用 -->
@@ -124,12 +104,7 @@
         <!-- 操作 -->
         <template #action="{ record }">
           <a-space>
-            <a-button
-              v-if="hasPermission('ENT_MCH_APP_EDIT')"
-              type="link"
-              size="small"
-              @click="handleEdit(record)"
-            >
+            <a-button v-if="hasPermission('ENT_MCH_APP_EDIT')" type="link" size="small" @click="handleEdit(record)">
               修改
             </a-button>
 
@@ -156,9 +131,7 @@
               title="确认删除该应用吗？"
               @confirm="handleDelete(record)"
             >
-              <a-button type="link" size="small" danger>
-                删除
-              </a-button>
+              <a-button type="link" size="small" danger> 删除 </a-button>
             </a-popconfirm>
           </a-space>
         </template>
@@ -180,12 +153,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import {
-  SearchOutlined,
-  RedoOutlined,
-  PlusOutlined,
-  ReloadOutlined
-} from '@ant-design/icons-vue'
+import { SearchOutlined, RedoOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import { useTable, useModal, usePermission, useDelete } from '@/hooks/common-hooks'
 import { API_URL_MCH_APP, API_URL_MCH_LIST, req } from '@/api/manage'
 import AddOrEditModal from './add-or-edit.vue'
@@ -194,7 +162,7 @@ const route = useRoute()
 const { t } = useI18n()
 
 // 使用 Hooks
-const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } = 
+const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
   useTable((params) => req.list(API_URL_MCH_APP, params))
 
 const { open: modalOpen, showModal, hideModal } = useModal()
@@ -277,7 +245,7 @@ const handleSearchMch = async (keyword) => {
     mchList.value = []
     return
   }
-  
+
   try {
     const res = await req.list(API_URL_MCH_LIST, {
       mchName: keyword,
@@ -322,7 +290,7 @@ const handleDelete = async (record) => {
 /**
  * Oauth2配置
  */
-const handleOauth2Config = (record) => {
+const handleOauth2Config = () => {
   message.info(t('mchApp.oauth2ComingSoon'))
   // TODO: 实现 Oauth2 配置功能
 }
@@ -330,7 +298,7 @@ const handleOauth2Config = (record) => {
 /**
  * 支付配置
  */
-const handlePayConfig = (record) => {
+const handlePayConfig = () => {
   message.info(t('mchApp.payConfigComingSoon'))
   // TODO: 实现支付配置功能
 }

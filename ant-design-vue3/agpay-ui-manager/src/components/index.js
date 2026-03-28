@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 通用组件索引文件
  * 用于统一导出所有通用组件
  */
@@ -37,6 +37,3 @@ export { default as GlobalLoad } from './global-load/index.vue'
 // - 支持 v-model
 // - 完整的 TypeScript 类型支持
 // - 详细的文档和示例
-
-
-

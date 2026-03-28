@@ -1,11 +1,7 @@
-﻿<template>
+<template>
   <div class="pay-config-page">
     <a-card :bordered="false">
-      <a-result
-        status="info"
-        :title="t('payConfig.comingSoonTitle')"
-        :sub-title="t('common.comingSoon')"
-      >
+      <a-result status="info" :title="t('payConfig.comingSoonTitle')" :sub-title="t('common.comingSoon')">
         <template #extra>
           <a-space direction="vertical" size="large" style="width: 100%">
             <a-alert

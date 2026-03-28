@@ -1,11 +1,7 @@
-﻿<template>
+<template>
   <div class="transfer-order-page">
     <a-card :bordered="false">
-      <a-result
-        status="info"
-        :title="t('transferOrder.comingSoonTitle')"
-        :sub-title="t('common.comingSoon')"
-      >
+      <a-result status="info" :title="t('transferOrder.comingSoonTitle')" :sub-title="t('common.comingSoon')">
         <template #extra>
           <a-space direction="vertical" size="large" style="width: 100%">
             <a-alert
@@ -21,7 +17,7 @@
                   <a-list-item>
                     <a-list-item-meta>
                       <template #avatar>
-                        <check-circle-outlined style="color: #52c41a; font-size: 20px" />
+                        <check-circle-outlined style="color: var(--success-color); font-size: 20px" />
                       </template>
                       <template #title>
                         {{ item.title }}
