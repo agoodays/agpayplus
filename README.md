@@ -1,4 +1,4 @@
-﻿# 聚合支付平台
+# 聚合支付平台
 AgPay 是一套适合互联网企业使用的支付系统，支持多渠道服务商和普通商户模式。已对接微信支付官方、支付宝官方、云闪付、随行付、乐刷、嘉联、汇付斗拱、银盛等接口，支持聚合码支付。AgPay 基于.Net 9，使用 Web API 开发，实现权限管理功能，是一套非常实用的 Web 开发框架。AgPay 对应的前端项目，包括运营平台、代理商系统、商户系统、聚合码收银台。前端技术以 Vue 为主，框架使用 Ant Design Vue 开发。
 
 数字化聚合支付平台，多渠道接口、交易、退款、分账、转账。支持 SAAS 模式，支持服务商模式，多个服务商独立运营，支持多级代理商，每级代理支持分润，为商户提供线上线下支付产品，支持 Docker 一键部署。
@@ -271,19 +271,10 @@ docker compose logs -f
 
 | 文档 | 说明 |
 |------|------|
-| **[DEPLOYMENT_USAGE_GUIDE.md](DEPLOYMENT_USAGE_GUIDE.md)** | 📘 完整部署与更新指南（首选阅读，包含首次部署/更新/回滚/CI/CD） |
-| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | 📖 常用命令速查：一键命令、示例和操作速查表（运维速查表） |
-| **[README_DOCKER.md](README_DOCKER.md)** | 🚀 Docker 快速上手：5 分钟部署示例和常见问题 |
-| **[DEPLOYMENT_CHECKLIST.md](DEPLOYMENT_CHECKLIST.md)** | ✅ 上线前检查清单（生产环境准备、配置与校验） |
-| **[DATABASE_SETUP.md](DATABASE_SETUP.md)** | 🗄️ 数据库搭建与初始化（MySQL 配置、初始化脚本、远程访问） |
-| **[MYSQL_MIGRATION.md](MYSQL_MIGRATION.md)** | 🔄 MySQL 数据迁移指南与卷到宿主机迁移说明 |
-| **[TROUBLESHOOTING.md](TROUBLESHOOTING.md)** | 🔧 故障排查指南（日志、常见问题及解决步骤） |
-| **[DOCKER_MIRROR_GUIDE.md](DOCKER_MIRROR_GUIDE.md)** | 🌐 镜像源与加速配置，提升拉取速度的建议 |
-| **[DOCKER_COMPOSE_DYNAMIC_CONFIG.md](DOCKER_COMPOSE_DYNAMIC_CONFIG.md)** | ⚙️ 动态配置与多环境并行运行说明（CI/CD、标签管理） |
-| **[CASHIER_DEPLOYMENT.md](CASHIER_DEPLOYMENT.md)** | 💳 收银台（Cashier）部署与集成说明 |
-| **[FEATURES_UPDATE.md](FEATURES_UPDATE.md)** | ✨ 功能变更与更新记录（添加/变更功能摘要） |
-| **[IMPLEMENTATION_REPORT.md](IMPLEMENTATION_REPORT.md)** | 📝 实现说明与设计记录（供开发/审计参考） |
-| **[README_DEPLOYMENT.md](README_DEPLOYMENT.md)** | 📚 部署脚本说明与示例（轻量参考） |
+| **[GETTING_STARTED.md](GETTING_STARTED.md)** | 🚀 快速上手指南：快速部署、更新和管理 AgPay+ 系统 |
+| **[DEPLOYMENT_USAGE_GUIDE.md](DEPLOYMENT_USAGE_GUIDE.md)** | 📘 完整部署与更新指南：包含首次部署/更新/回滚/CI/CD |
+| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | 📖 常用命令速查：一键命令、示例和操作速查表 |
+| **[ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md)** | ⚙️ 环境变量说明：详细的环境变量配置指南 |
 
 额外模块与子项目说明：
 
@@ -812,11 +803,7 @@ agpayplus> docker compose -p agpay-prod --env-file .env.production up -d
 
 - 📖 [快速参考手册](QUICK_REFERENCE.md) - 常用命令速查
 - 📘 [完整使用指南](DEPLOYMENT_USAGE_GUIDE.md) - 详细的部署和更新说明
-- 📖 [Docker 快速指南](README_DOCKER.md) - Docker 快速上手
-- 📊 [数据库搭建](DATABASE_SETUP.md) - MySQL 环境配置
-- ✅ [部署检查清单](DEPLOYMENT_CHECKLIST.md) - 上线前检查
-- 💳 [收银台部署](CASHIER_DEPLOYMENT.md) - 收银台集成
-- 🔧 [故障排查指南](TROUBLESHOOTING.md) - 常见问题解决
+- ⚙️ [环境变量说明](ENVIRONMENT_VARIABLES.md) - 详细的环境变量配置指南
 - 📝 [接口文档](https://www.yuque.com/xiangyisheng/agooday/cweewhugp7h7hvml) - API 接口说明
 
 ---

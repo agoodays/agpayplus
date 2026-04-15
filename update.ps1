@@ -1,4 +1,4 @@
-﻿# ========================================
+# ========================================
 # AgPay+ 服务更新脚本 (Windows)
 # ========================================
 # 功能：
@@ -158,7 +158,10 @@ function Invoke-DockerCompose {
 }
 
 # 备份目录
-$BackupDir = Join-Path $ScriptDir ".backup"
+$BackupDir = Get-EnvValue "BACKUP_PATH"
+if (-not $BackupDir) {
+    $BackupDir = Join-Path $ScriptDir ".backup"
+}
 $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $BackupPath = Join-Path $BackupDir "${Environment}_update_${Timestamp}"
 
@@ -285,11 +288,13 @@ Copy-Item "$ScriptDir\docker-compose.yml" "$BackupPath\docker-compose.yml.backup
 $Timestamp | Out-File "$BackupDir\latest_$Environment" -Encoding utf8
 Write-Success "备份完成: $BackupPath"
 
-# 清理旧备份（保留最近 5 个）
+# 清理旧备份
+$BackupRetention = Get-EnvValue "BACKUP_RETENTION"
+$RetentionCount = if ($BackupRetention) { [int]$BackupRetention } else { 5 }
 $Backups = Get-ChildItem $BackupDir -Directory | Where-Object { $_.Name -match "^${Environment}_update_" } | Sort-Object Name -Descending
-if ($Backups.Count -gt 5) {
+if ($Backups.Count -gt $RetentionCount) {
     Write-Host "  清理旧备份..." -ForegroundColor Gray
-    $Backups | Select-Object -Skip 5 | Remove-Item -Recurse -Force
+    $Backups | Select-Object -Skip $RetentionCount | Remove-Item -Recurse -Force
 }
 
 # ========================================

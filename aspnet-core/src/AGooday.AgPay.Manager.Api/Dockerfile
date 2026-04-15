@@ -43,6 +43,10 @@ EXPOSE 9817
 # 设置 ASP.NET Core 监听的 URL（HTTP 和 HTTPS）
 ENV ASPNETCORE_URLS=http://+:5817;https://+:9817
 
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:5817/health || exit 1
+
 # 使用 .NET SDK 镜像进行构建和发布
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release

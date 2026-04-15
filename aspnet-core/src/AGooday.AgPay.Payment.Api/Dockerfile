@@ -86,6 +86,10 @@ EXPOSE 5819
 EXPOSE 9819
 ENV ASPNETCORE_URLS=http://+:5819;https://+:9819
 
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:5819/health || exit 1
+
 # ========================================
 # 阶段 3: 构建 .NET 后端
 # ========================================
@@ -148,12 +152,10 @@ COPY --from=publish /app/publish .
 # 如果 BUILD_CASHIER=false，cashier 应该已经存在于 wwwroot/cashier 中
 RUN if [ "$BUILD_CASHIER" = "true" ]; then \
         echo "📦 Copying newly built cashier"; \
+        cp -r /cashier/dist ./wwwroot/cashier; \
     else \
         echo "📦 Using existing cashier from publish"; \
     fi
-
-# 复制 cashier（仅在构建时）
-COPY --from=cashier-builder /cashier/dist ./wwwroot/cashier
 
 # 显示构建信息
 RUN echo "========================================" && \
