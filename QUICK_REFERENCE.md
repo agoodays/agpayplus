@@ -1,8 +1,23 @@
-﻿# AgPay+ 部署快速参考
+# AgPay+ 部署快速参考
 
 > 快速查找命令和操作指南
 
----
+## 📋 目录
+
+1. [快速命令](#-快速命令)
+2. [服务列表](#-服务列表)
+3. [环境选项](#-环境选项)
+4. [常用场景](#-常用场景)
+5. [查看和管理](#-查看和管理)
+6. [故障处理](#-故障处理)
+7. [访问地址](#-访问地址)
+8. [证书管理](#-证书管理)
+9. [文件和目录](#-文件和目录)
+10. [提示和技巧](#-提示和技巧)
+11. [帮助和文档](#-帮助和文档)
+12. [一键命令](#-一键命令)
+
+***
 
 ## 🚀 快速命令
 
@@ -48,21 +63,21 @@
 .\rollback.ps1 -Backup "20240315_143022"  # Windows
 ```
 
----
+***
 
 ## 📋 服务列表
 
-| 服务名 | 说明 | 端口 |
-|-------|------|------|
-| `agpay-ui-manager` | 运营平台前端 | 8817 |
-| `agpay-ui-agent` | 代理商系统前端 | 8816 |
-| `agpay-ui-merchant` | 商户系统前端 | 8818 |
-| `agpay-manager-api` | 运营平台 API | 5817/9817 |
-| `agpay-agent-api` | 代理商系统 API | 5816/9816 |
-| `agpay-merchant-api` | 商户系统 API | 5818/9818 |
-| `agpay-payment-api` | 支付网关 API | 5819/9819 |
+| 服务名                  | 说明        | 端口        |
+| -------------------- | --------- | --------- |
+| `agpay-ui-manager`   | 运营平台前端    | 8817      |
+| `agpay-ui-agent`     | 代理商系统前端   | 8816      |
+| `agpay-ui-merchant`  | 商户系统前端    | 8818      |
+| `agpay-manager-api`  | 运营平台 API  | 5817/9817 |
+| `agpay-agent-api`    | 代理商系统 API | 5816/9816 |
+| `agpay-merchant-api` | 商户系统 API  | 5818/9818 |
+| `agpay-payment-api`  | 支付网关 API  | 5819/9819 |
 
----
+***
 
 ## ⚙️ 环境选项
 
@@ -72,7 +87,7 @@
 --env production     # 生产环境（默认）
 ```
 
----
+***
 
 ## 🎯 常用场景
 
@@ -126,7 +141,7 @@
 .\update.ps1 -Environment development -Services "agpay-ui-manager" -Force
 ```
 
----
+***
 
 ## 🔍 查看和管理
 
@@ -179,7 +194,7 @@ docker compose stop
 .\rollback.ps1 -List
 ```
 
----
+***
 
 ## 🔧 故障处理
 
@@ -189,6 +204,19 @@ docker compose stop
 # 清理缓存重新构建
 docker builder prune -f
 docker compose build --no-cache
+```
+
+### 健康检查
+
+```bash
+# 查看服务健康状态
+docker compose ps --format "{{.Service}}: {{.State}}"
+
+# 查看健康检查详情
+docker inspect --format '{{json .State.Health}}' <container_id>
+
+# 手动检查服务健康状态
+docker exec <container_id> curl -f http://localhost:5817/health
 ```
 
 ### 端口冲突
@@ -242,21 +270,21 @@ docker system prune -a --volumes
 ./deploy.sh
 ```
 
----
+***
 
 ## 📱 访问地址
 
 假设 `IPORDOMAIN=yourdomain.com`：
 
-- **运营平台**: https://yourdomain.com:8817
-- **代理商系统**: https://yourdomain.com:8816
-- **商户系统**: https://yourdomain.com:8818
-- **支付网关**: https://yourdomain.com:9819
-- **收银台**: https://yourdomain.com:9819/cashier
-- **日志查看**: http://yourdomain.com:5341 (Seq)
-- **RabbitMQ**: http://yourdomain.com:15672
+- **运营平台**: <https://yourdomain.com:8817>
+- **代理商系统**: <https://yourdomain.com:8816>
+- **商户系统**: <https://yourdomain.com:8818>
+- **支付网关**: <https://yourdomain.com:9819>
+- **收银台**: <https://yourdomain.com:9819/cashier>
+- **日志查看**: <http://yourdomain.com:5341> (Seq)
+- **RabbitMQ**: <http://yourdomain.com:15672>
 
----
+***
 
 ## 🔐 证书管理
 
@@ -275,7 +303,7 @@ docker system prune -a --volumes
 - **Linux**: `~/.aspnet/https/agpayplusapi.pfx`
 - **Windows**: `%USERPROFILE%\.aspnet\https\agpayplusapi.pfx`
 
----
+***
 
 ## 📂 文件和目录
 
@@ -310,7 +338,7 @@ generate-cert-windows.ps1           # 证书生成（Windows）
 └── latest_development
 ```
 
----
+***
 
 ## 💡 提示和技巧
 
@@ -370,14 +398,12 @@ docker compose restart agpay-manager-api agpay-agent-api agpay-merchant-api agpa
 docker compose logs -f agpay-manager-api agpay-agent-api merchant-api agpay-payment-api
 ```
 
----
+***
 
 ## 🔗 帮助和文档
 
 - **完整文档**: [DEPLOYMENT_USAGE_GUIDE.md](./DEPLOYMENT_USAGE_GUIDE.md)
-- **故障排查**: [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
-- **镜像源配置**: [DOCKER_MIRROR_GUIDE.md](./DOCKER_MIRROR_GUIDE.md)
-- **Cashier 说明**: [CASHIER_DEPLOYMENT.md](./CASHIER_DEPLOYMENT.md)
+- **环境变量说明**: [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md)
 
 ### 查看脚本帮助
 
@@ -393,7 +419,7 @@ Get-Help .\update.ps1
 Get-Help .\rollback.ps1
 ```
 
----
+***
 
 ## ⚡ 一键命令
 
@@ -435,7 +461,5 @@ docker system prune -a -f; `
 .\deploy.ps1 -Environment production
 ```
 
----
+***
 
-**快速参考版本**: 2.0  
-**最后更新**: 2024-03-15

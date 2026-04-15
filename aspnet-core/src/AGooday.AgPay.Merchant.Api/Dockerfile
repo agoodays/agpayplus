@@ -33,6 +33,10 @@ EXPOSE 5818
 EXPOSE 9818
 ENV ASPNETCORE_URLS=http://+:5818;https://+:9818
 
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:5818/health || exit 1
+
 # 此阶段用于生成服务项目
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release

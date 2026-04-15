@@ -1,4 +1,5 @@
-﻿# ========================================
+﻿#!/usr/bin/env pwsh
+# ========================================
 # AgPay+ 回滚脚本 (Windows)
 # ========================================
 # 功能：
@@ -6,36 +7,37 @@
 # - 支持指定服务回滚
 # - 支持指定备份版本
 # - 多环境支持
+# - 自动模式（不需要确认）
 # ========================================
 # 使用方法：
-# .\rollback.ps1                            # 回滚所有服务（生产环境）
-# .\rollback.ps1 -Environment development   # 回滚开发环境
-# .\rollback.ps1 -Services "agpay-manager-api"    # 仅回滚指定服务
-# .\rollback.ps1 -Backup "20240101_120000"  # 回滚到指定备份
-# .\rollback.ps1 -List                      # 列出所有备份
-# .\rollback.ps1 --Help                       # 查看帮助
+# .\rollback.ps1                              # 回滚所有服务（生产环境）
+# .\rollback.ps1 -Environment development      # 回滚开发环境
+# .\rollback.ps1 -Services agpay-manager-api  # 仅回滚指定服务
+# .\rollback.ps1 -Backup 20240101_120000       # 回滚到指定备份
+# .\rollback.ps1 -List                        # 列出所有备份
+# .\rollback.ps1 -Help                         # 查看帮助
 # ========================================
 
 [CmdletBinding()]
 param(
-    [Parameter(HelpMessage="显示帮助信息")]
+    [Parameter(HelpMessage='显示帮助信息')]
     [Alias("?", "h")]
     [switch]$Help,
-    
-    [Parameter(HelpMessage="环境: development, staging, production")]
-    [ValidateSet("development", "staging", "production")]
+
+    [Parameter(HelpMessage='环境: development, staging, production')]
+    [ValidateSet("development", "staging", "production", "dev", "prod")]
     [string]$Environment = "production",
-    
-    [Parameter(HelpMessage="要回滚的服务列表")]
+
+    [Parameter(HelpMessage='要回滚的服务列表（逗号分隔）')]
     [string[]]$Services = @(),
-    
-    [Parameter(HelpMessage="指定要回滚的备份版本")]
-    [string]$Backup = "",
-    
-    [Parameter(HelpMessage="列出所有可用备份")]
+
+    [Parameter(HelpMessage='指定备份版本（时间戳格式）')]
+    [string]$Backup,
+
+    [Parameter(HelpMessage='列出所有可用备份')]
     [switch]$List,
-    
-    [Parameter(HelpMessage="自动模式（不需要确认）")]
+
+    [Parameter(HelpMessage='自动模式（不需要确认）')]
     [switch]$Auto
 )
 
@@ -46,14 +48,17 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 # 颜色输出函数
 # ========================================
 function Write-ColorOutput {
-    param([string]$Message, [string]$Color = "White")
+    param(
+        [string]$Message,
+        [string]$Color = "White"
+    )
     Write-Host $Message -ForegroundColor $Color
 }
 
-function Write-Success { param([string]$msg) Write-ColorOutput "  ✅ $msg" "Green" }
-function Write-Error { param([string]$msg) Write-ColorOutput "  ❌ $msg" "Red" }
-function Write-Warning { param([string]$msg) Write-ColorOutput "  ⚠️  $msg" "Yellow" }
-function Write-Info { param([string]$msg) Write-ColorOutput "  ℹ️  $msg" "Cyan" }
+function Write-Info { param([string]$msg) Write-ColorOutput $msg "Cyan" }
+function Write-Success { param([string]$msg) Write-ColorOutput $msg "Green" }
+function Write-Error { param([string]$msg) Write-ColorOutput $msg "Red" }
+function Write-Warning { param([string]$msg) Write-ColorOutput $msg "Yellow" }
 function Write-Step { param([string]$msg) Write-ColorOutput $msg "Yellow" }
 function Write-Header { param([string]$msg) Write-ColorOutput $msg "Cyan" }
 
@@ -65,42 +70,48 @@ function Show-Help {
     Write-Header "  AgPay+ 回滚脚本 (Windows)"
     Write-Header "========================================"
     Write-Host ""
-    Write-ColorOutput "功能：" "Green"
+    Write-Info "功能："
     Write-Host "  • 回滚到上一个备份版本"
     Write-Host "  • 支持指定服务回滚"
     Write-Host "  • 支持指定备份版本"
     Write-Host "  • 多环境支持"
     Write-Host ""
-    Write-ColorOutput "使用方法：" "Green"
-    Write-Host "  .\rollback.ps1 [参数]"
+    Write-Info "使用方法: .\rollback.ps1 [选项]"
     Write-Host ""
-    Write-ColorOutput "参数：" "Green"
-    Write-ColorOutput "  -Environment <环境>      " "Yellow"; Write-Host "  指定环境（默认: production）"
-    Write-ColorOutput "  -Services <服务列表>      " "Yellow"; Write-Host "  指定要回滚的服务"
-    Write-ColorOutput "  -Backup <版本>           " "Yellow"; Write-Host "  指定备份版本（时间戳格式）"
-    Write-ColorOutput "  -List                    " "Yellow"; Write-Host "  列出所有可用备份"
-    Write-ColorOutput "  -Auto                    " "Yellow"; Write-Host "  自动模式（不需要确认）"
+    Write-Info "选项:"
+    Write-Host "  --Help, -h, -?            显示此帮助信息"
+    Write-Host "  -Environment <环境>        指定环境 (development/staging/production)"
+    Write-Host "  -Services <服务列表>       指定要回滚的服务（逗号分隔）"
+    Write-Host "  -Backup <版本>            指定备份版本（时间戳格式）"
+    Write-Host "  -List                     列出所有可用备份"
+    Write-Host "  -Auto                     自动模式（不需要确认）"
     Write-Host ""
-    Write-ColorOutput "示例：" "Green"
-    Write-ColorOutput "  # 列出所有备份" "Gray"
+    Write-Info "示例:"
+    Write-Host "  # 列出所有备份"
     Write-Host "  .\rollback.ps1 -List"
     Write-Host ""
-    Write-ColorOutput "  # 回滚所有服务到最新备份" "Gray"
+    Write-Host "  # 回滚所有服务到最新备份"
     Write-Host "  .\rollback.ps1"
     Write-Host ""
-    Write-ColorOutput "  # 回滚指定服务" "Gray"
-    Write-Host "  .\rollback.ps1 -Services `"agpay-manager-api`""
+    Write-Host "  # 回滚指定服务"
+    Write-Host "  .\rollback.ps1 -Services agpay-manager-api"
     Write-Host ""
-    Write-ColorOutput "  # 回滚到指定备份版本" "Gray"
-    Write-Host "  .\rollback.ps1 -Backup `"20240101_120000`""
+    Write-Host "  # 回滚到指定备份版本"
+    Write-Host "  .\rollback.ps1 -Backup 20240101_120000"
     Write-Host ""
-    Write-ColorOutput "  # 自动回滚（部署失败时使用）" "Gray"
-    Write-Host "  .\rollback.ps1 -Auto -Services `"agpay-manager-api`""
+    Write-Host "  # 自动回滚（部署失败时使用）"
+    Write-Host "  .\rollback.ps1 -Auto -Services agpay-manager-api"
     Write-Host ""
+    Write-Info "环境说明："
+    Write-Host "  • development  - 开发环境（配置文件: .env.development）"
+    Write-Host "  • staging      - 预发布环境（配置文件: .env.staging）"
+    Write-Host "  • production   - 生产环境（配置文件: .env.production）"
+    Write-Host ""
+    Write-Header "========================================"
 }
 
 # ========================================
-# .env 文件解析函数
+# 读取环境变量函数
 # ========================================
 function Get-EnvValue {
     param(
@@ -109,78 +120,99 @@ function Get-EnvValue {
     )
     
     if (-not (Test-Path $EnvFile)) {
-        return ""
+        return $null
     }
     
-    $content = Get-Content $EnvFile
-    foreach ($line in $content) {
-        if ($line -match "^\s*$Key\s*=\s*(.+)$") {
-            $value = $matches[1].Trim()
-            $value = $value -replace '^["'']|["'']$', ''
-            $value = $value -replace '#.*$', ''
-            $value = $value.Trim()
-            return $value
+    $lines = Get-Content $EnvFile -Encoding UTF8
+    foreach ($line in $lines) {
+        $line = $line.Trim()
+        # 跳过注释和空行
+        if ($line -match '^\s*#|^\s*$') {
+            continue
+        }
+        # 检查行是否匹配 key=value 模式
+        if ($line -match '^\s*([^=]+)\s*=\s*(.*)$') {
+            $envKey = $matches[1].Trim()
+            $envValue = $matches[2].Trim()
+            
+            # 如果存在引号则移除
+            if ($envValue -match '^"(.*)"$') {
+                $envValue = $matches[1]
+            } elseif ($envValue -match "^'(.*)'$") {
+                $envValue = $matches[1]
+            }
+            
+            # 移除行内注释
+            $envValue = $envValue -replace '\s*#.*$', ''
+            
+            # 展开环境变量
+            $envValue = [Environment]::ExpandEnvironmentVariables($envValue)
+            
+            if ($envKey -eq $Key) {
+                return $envValue
+            }
         }
     }
-    return ""
-}
-
-# ========================================
-# 检测 Docker Compose 命令
-# ========================================
-function Get-DockerCompose {
-    try { docker compose version > $null 2>&1; if ($LASTEXITCODE -eq 0) { return @('docker','compose') } } catch {}
-    try { docker-compose version > $null 2>&1; if ($LASTEXITCODE -eq 0) { return @('docker-compose') } } catch {}
+    
     return $null
 }
 
-$DockerCompose = Get-DockerCompose
-
-function Invoke-DockerCompose {
-    param([string[]]$Arguments)
-    if (-not $DockerCompose) { Write-Error "Docker Compose command not found"; return $null }
-
-    $exe = $DockerCompose[0]
-    $argList = @()
-    if ($DockerCompose.Count -gt 1) { $argList += $DockerCompose[1..($DockerCompose.Count-1)] }
-    if ($Arguments) { $argList += $Arguments }
-
-    # Create unique temp files for stdout/stderr to avoid collisions
-    $tempDir = [System.IO.Path]::GetTempPath()
-    $outFile = Join-Path $tempDir ([System.Guid]::NewGuid().ToString() + ".out")
-    $errFile = Join-Path $tempDir ([System.Guid]::NewGuid().ToString() + ".err")
-    New-Item -Path $outFile -ItemType File -Force | Out-Null
-    New-Item -Path $errFile -ItemType File -Force | Out-Null
+# ========================================
+# 检测 Docker Compose
+# ========================================
+function Detect-DockerCompose {
+    # 尝试 docker compose (v2)
+    $dockerComposeV2 = @("docker", "compose")
     try {
-        $proc = Start-Process -FilePath $exe -ArgumentList $argList -NoNewWindow -RedirectStandardOutput $outFile -RedirectStandardError $errFile -Wait -PassThru
-        $Global:LastDockerComposeExitCode = $proc.ExitCode
-        $stdout = ""
-        $stderr = ""
-        if (Test-Path $outFile) { $stdout = Get-Content $outFile -Raw }
-        if (Test-Path $errFile) { $stderr = Get-Content $errFile -Raw }
-        if ($stdout -and $stderr) { $result = "$stdout`n$stderr" } elseif ($stdout) { $result = $stdout } else { $result = $stderr }
+        $result = & $dockerComposeV2 --version 2>$null
+        if ($result) {
+            Write-Info "使用 Docker Compose V2: docker compose"
+            return $dockerComposeV2
+        }
     } catch {
-        Write-Error "Failed to execute Docker Compose: $_"
-        $Global:LastDockerComposeExitCode = 1
-        $result = $null
-    } finally {
-        Remove-Item $outFile,$errFile -ErrorAction SilentlyContinue
+        # 忽略错误
     }
-
-    return $result
+    
+    # 尝试 docker-compose (v1)
+    $dockerComposeV1 = @("docker-compose")
+    try {
+        $result = & $dockerComposeV1 --version 2>$null
+        if ($result) {
+            Write-Info "使用 Docker Compose V1: docker-compose"
+            return $dockerComposeV1
+        }
+    } catch {
+        # 忽略错误
+    }
+    
+    Write-Error "未找到 Docker Compose。请安装 Docker Compose。"
+    exit 1
 }
 
+# ========================================
+# 调用 Docker Compose
+# ========================================
+function Invoke-DockerCompose {
+    param(
+        [string[]]$Arguments
+    )
+    
+    try {
+        $result = & $DockerCompose @Arguments 2>&1
+        return $result
+    } catch {
+        Write-Error "执行 Docker Compose 失败: $($_.Exception.Message)"
+        return $null
+    }
+}
+
+# 检测 Docker Compose
+$DockerCompose = Detect-DockerCompose
+
 # 备份目录
-$BackupDir = Join-Path $ScriptDir ".backup"
-
-# ========================================
-# 主程序开始
-# ========================================
-
-# 显示帮助信息
-if ($Help) {
-    Show-Help
-    exit 0
+$BackupDir = Get-EnvValue "BACKUP_PATH"
+if (-not $BackupDir) {
+    $BackupDir = "$ScriptDir\.backup"
 }
 
 # ========================================
@@ -193,43 +225,47 @@ function Show-Backups {
     Write-Host ""
     
     if (-not (Test-Path $BackupDir)) {
-        Write-Warning "暂无备份"
+        Write-Warning "  ⚠️  暂无备份"
         return
     }
     
     # 按环境分组显示
     foreach ($env in @("production", "staging", "development")) {
-        $backups = Get-ChildItem $BackupDir -Directory | Where-Object { $_.Name -match "^${env}_" } | Sort-Object Name -Descending
+        $backups = @()
+        Get-ChildItem -Path $BackupDir -Directory | ForEach-Object {
+            if ($_.Name -like "${env}_*") {
+                $backups += $_
+            }
+        }
+        $backups = $backups | Sort-Object CreationTime -Descending
         
         if ($backups.Count -gt 0) {
-            Write-ColorOutput "$env 环境:" "Yellow"
+            Write-Info "$env 环境:"
             foreach ($backup in $backups) {
                 $backupTime = $backup.Name -replace "^${env}_update_", "" -replace "^${env}_", ""
-                $backupSize = "{0:N2} MB" -f ((Get-ChildItem $backup.FullName -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB)
+                $backupSize = (Get-ChildItem -Path $backup.FullName -Recurse | Measure-Object -Property Length -Sum).Sum / 1MB
+                $backupSize = [math]::Round($backupSize, 2)
                 
                 # 检查是否是最新备份
                 $latestMarker = ""
                 $latestFile = Join-Path $BackupDir "latest_$env"
                 if (Test-Path $latestFile) {
-                    $latest = Get-Content $latestFile
-                    if ($backup.Name -match $latest) {
+                    $latest = Get-Content $latestFile -Raw
+                    if ($backup.Name -like "*$latest*") {
                         $latestMarker = " (最新)"
                     }
                 }
                 
-                Write-Host "  " -NoNewline
-                Write-ColorOutput $backupTime "Gray" -NoNewline
-                Write-Host "  " -NoNewline
-                Write-ColorOutput "[$backupSize]" "Blue" -NoNewline
-                if ($latestMarker) { Write-Host $latestMarker }
-                else { Write-Host "" }
+                Write-ColorOutput "  $backupTime  [$backupSize MB]$latestMarker" "Gray"
                 
                 # 显示包含的服务
-                    $services = Get-ChildItem "$($backup.FullName)\*.tar*" -ErrorAction SilentlyContinue | ForEach-Object { $_.BaseName }
-                if ($services) {
-                    Write-Host "    服务: " -NoNewline; Write-ColorOutput ($services -join ", ") "Gray"
+                $services = Get-ChildItem -Path $backup.FullName -Name "*.tar*" | ForEach-Object {
+                    $_.Replace(".tar", "").Replace(".tar.gz", "")
+                }
+                if ($services.Count -gt 0) {
+                    Write-ColorOutput "    服务: $($services -join ', ')" "Gray"
                 } else {
-                    Write-Host "    服务: " -NoNewline; Write-ColorOutput "无镜像" "Gray"
+                    Write-ColorOutput "    服务: 无镜像" "Gray"
                 }
             }
             Write-Host ""
@@ -248,24 +284,24 @@ if ($List) {
 # ========================================
 # 环境验证
 # ========================================
-$EnvFile = Join-Path $ScriptDir ".env.$Environment"
+$EnvFile = "$ScriptDir\.env.$Environment"
 if (-not (Test-Path $EnvFile)) {
-    Write-Error "环境配置文件不存在: $EnvFile"
+    Write-Error "❌ 环境配置文件不存在: $EnvFile"
     Write-Warning "可用环境: development, staging, production"
     exit 1
 }
 
 # 复制环境配置到 .env
-Copy-Item $EnvFile "$ScriptDir\.env" -Force
+Copy-Item -Path $EnvFile -Destination "$ScriptDir\.env" -Force
 
 Write-Header "========================================"
 Write-Header "  AgPay+ 回滚脚本"
 Write-Header "========================================"
-Write-Host "环境: " -NoNewline; Write-ColorOutput $Environment "Blue"
+Write-Info "环境: $Environment"
 if ($Services.Count -gt 0) {
-    Write-Host "服务: " -NoNewline; Write-ColorOutput ($Services -join ", ") "Blue"
+    Write-Info "服务: $($Services -join ', ')"
 } else {
-    Write-Host "服务: " -NoNewline; Write-ColorOutput "所有服务" "Blue"
+    Write-Info "服务: 所有服务"
 }
 Write-Header "========================================"
 Write-Host ""
@@ -276,7 +312,7 @@ Write-Host ""
 Write-Step "[1/5] 检查备份..."
 
 if (-not (Test-Path $BackupDir)) {
-    Write-Error "备份目录不存在"
+    Write-Error "  ❌ 备份目录不存在"
     exit 1
 }
 
@@ -291,46 +327,52 @@ if ($Backup) {
     }
     
     if (-not (Test-Path $BackupPath)) {
-        Write-Error "指定的备份不存在: $Backup"
-        Write-Warning "使用 -List 查看所有可用备份"
+        Write-Error "  ❌ 指定的备份不存在: $Backup"
+        Write-Warning "  使用 -List 查看所有可用备份"
         exit 1
     }
 } else {
     # 使用最新的备份
     $latestFile = Join-Path $BackupDir "latest_$Environment"
     if (Test-Path $latestFile) {
-        $latestTimestamp = Get-Content $latestFile
-        $BackupPath = Join-Path $BackupDir "${Environment}_update_${latestTimestamp}"
+        $latestTimestamp = Get-Content $latestFile -Raw
+        $BackupPath = Join-Path $BackupDir "${Environment}_update_$latestTimestamp"
         
         if (-not (Test-Path $BackupPath)) {
-            $BackupPath = Join-Path $BackupDir "${Environment}_${latestTimestamp}"
+            $BackupPath = Join-Path $BackupDir "${Environment}_$latestTimestamp"
         }
     } else {
         # 查找最新的备份目录
-        $latestBackup = Get-ChildItem $BackupDir -Directory | Where-Object { $_.Name -match "^${Environment}_" } | Sort-Object Name -Descending | Select-Object -First 1
+        $latestBackup = Get-ChildItem -Path $BackupDir -Directory | 
+            Where-Object { $_.Name -like "${Environment}_*" } | 
+            Sort-Object CreationTime -Descending | 
+            Select-Object -First 1
+        
         if ($latestBackup) {
             $BackupPath = $latestBackup.FullName
         }
     }
     
-    if (-not $BackupPath -or -not (Test-Path $BackupPath)) {
-        Write-Error "找不到可用的备份"
-        Write-Warning "使用 -List 查看所有可用备份"
+    if (-not (Test-Path $BackupPath)) {
+        Write-Error "  ❌ 找不到可用的备份"
+        Write-Warning "  使用 -List 查看所有可用备份"
         exit 1
     }
 }
 
-Write-Success "找到备份: $(Split-Path $BackupPath -Leaf)"
+Write-Success "  ✅ 找到备份: $(Split-Path $BackupPath -Leaf)"
 
 # 列出备份中的服务
-Write-Host "  备份中的服务:" -ForegroundColor Gray
-$backupServices = Get-ChildItem "$BackupPath\*.tar*" -ErrorAction SilentlyContinue | ForEach-Object { $_.BaseName }
-if ($backupServices) {
-    foreach ($svc in $backupServices) {
-        Write-Host "    - $svc" -ForegroundColor Gray
+Write-Info "  备份中的服务:"
+$services = Get-ChildItem -Path $BackupPath -Name "*.tar*" | ForEach-Object {
+    $_.Replace(".tar", "").Replace(".tar.gz", "")
+}
+if ($services.Count -gt 0) {
+    foreach ($svc in $services) {
+        Write-ColorOutput "    - $svc" "Gray"
     }
 } else {
-    Write-Warning "备份中没有镜像文件"
+    Write-Warning "  ⚠️  备份中没有镜像文件"
 }
 
 # ========================================
@@ -341,19 +383,19 @@ if (-not $Auto) {
     Write-Header "========================================"
     Write-Header "  准备回滚"
     Write-Header "========================================"
-    Write-Host "环境: " -NoNewline; Write-ColorOutput $Environment "Cyan"
-    Write-Host "备份: " -NoNewline; Write-ColorOutput (Split-Path $BackupPath -Leaf) "Cyan"
+    Write-Info "环境: $Environment"
+    Write-Info "备份: $(Split-Path $BackupPath -Leaf)"
     if ($Services.Count -gt 0) {
-        Write-Host "服务: " -NoNewline; Write-ColorOutput ($Services -join ", ") "Cyan"
+        Write-Info "服务: $($Services -join ', ')"
     } else {
-        Write-Host "服务: " -NoNewline; Write-ColorOutput "所有服务" "Cyan"
+        Write-Info "服务: 所有服务"
     }
-    Write-ColorOutput "警告: 这将覆盖当前运行的服务" "Red"
+    Write-Warning "警告: 这将覆盖当前运行的服务"
     Write-Header "========================================"
     Write-Host ""
     
-    $confirmation = Read-Host "确认回滚？[y/N]"
-    if ($confirmation -ne 'y' -and $confirmation -ne 'Y') {
+    $response = Read-Host "确认回滚？(Y/N)"
+    if ($response -ne "Y" -and $response -ne "y") {
         Write-Error "回滚已取消"
         exit 0
     }
@@ -367,10 +409,10 @@ Write-Step "[2/5] 恢复环境配置..."
 
 $envBackup = Join-Path $BackupPath ".env.backup"
 if (Test-Path $envBackup) {
-    Copy-Item $envBackup "$ScriptDir\.env" -Force
-    Write-Success "环境配置已恢复"
+    Copy-Item -Path $envBackup -Destination "$ScriptDir\.env" -Force
+    Write-Success "  ✅ 环境配置已恢复"
 } else {
-    Write-Warning "备份中没有环境配置文件，使用当前配置"
+    Write-Warning "  ⚠️  备份中没有环境配置文件，使用当前配置"
 }
 
 # ========================================
@@ -382,41 +424,38 @@ Write-Step "[3/5] 加载备份镜像..."
 if ($Services.Count -gt 0) {
     # 仅加载指定服务的镜像
     foreach ($service in $Services) {
-        $tarFile = Join-Path $BackupPath ("${service}.tar")
-        $tgzFile = Join-Path $BackupPath ("${service}.tar.gz")
+        $tarFile = Join-Path $BackupPath "${service}.tar"
+        $tgzFile = Join-Path $BackupPath "${service}.tar.gz"
         if (Test-Path $tarFile) {
-            Write-Host "  加载: $service" -ForegroundColor Gray
-            docker load -i $tarFile
+            Write-Info "  加载: $service"
+            docker load -i "$tarFile"
         } elseif (Test-Path $tgzFile) {
-            if (Get-Command gzip -ErrorAction SilentlyContinue) {
-                Write-Host "  加载: $service (gz)" -ForegroundColor Gray
-                & gzip -dc $tgzFile | docker load
-            } else {
-                Write-Error "无法加载 ${tgzFile}，系统缺少 gzip，请安装或解压后手动加载"
-            }
+            Write-Info "  加载: $service (gz)"
+            gunzip -c "$tgzFile" | docker load
         } else {
-            Write-Warning "服务 $service 的备份不存在"
+            Write-Warning "  ⚠️  服务 $service 的备份不存在"
         }
     }
 } else {
     # 加载所有备份的镜像 (.tar 优先)
-    $imageFiles = @(Get-ChildItem "$BackupPath\*.tar" -ErrorAction SilentlyContinue) + @(Get-ChildItem "$BackupPath\*.tar.gz" -ErrorAction SilentlyContinue)
+    $imageFiles = @()
+    $imageFiles += Get-ChildItem -Path $BackupPath -Name "*.tar" | ForEach-Object { Join-Path $BackupPath $_ }
+    $imageFiles += Get-ChildItem -Path $BackupPath -Name "*.tar.gz" | ForEach-Object { Join-Path $BackupPath $_ }
+    
     foreach ($imageFile in $imageFiles) {
-        $service = $imageFile.BaseName
-        Write-Host "  加载: $service" -ForegroundColor Gray
-        if ($imageFile.Extension -ieq ".tar") {
-            docker load -i $imageFile.FullName
-        } elseif ($imageFile.Extension -ieq ".gz") {
-            if (Get-Command gzip -ErrorAction SilentlyContinue) {
-                & gzip -dc $imageFile.FullName | docker load
-            } else {
-                Write-Error "无法加载 ${imageFile.FullName}，系统缺少 gzip，请安装或解压后手动加载"
+        if (Test-Path $imageFile) {
+            $service = (Split-Path $imageFile -Leaf) -replace "\.tar.*", ""
+            Write-Info "  加载: $service"
+            if ($imageFile -like "*.tar") {
+                docker load -i "$imageFile"
+            } elseif ($imageFile -like "*.tar.gz") {
+                gunzip -c "$imageFile" | docker load
             }
         }
     }
 }
 
-Write-Success "镜像加载完成"
+Write-Success "  ✅ 镜像加载完成"
 
 # ========================================
 # 重启服务
@@ -426,15 +465,15 @@ Write-Step "[4/5] 重启服务..."
 
 if ($Services.Count -gt 0) {
     foreach ($service in $Services) {
-        Write-Info "重启 $service..."
-        Invoke-DockerCompose -Arguments @('stop',$service)
-        Invoke-DockerCompose -Arguments @('rm','-f',$service)
-        Invoke-DockerCompose -Arguments @('up','-d',$service)
+        Write-Info "  重启 $service..."
+        Invoke-DockerCompose -Arguments @("stop", $service)
+        Invoke-DockerCompose -Arguments @("rm", "-f", $service)
+        Invoke-DockerCompose -Arguments @("up", "-d", $service)
     }
 } else {
-    Write-Info "重启所有服务..."
-    Invoke-DockerCompose -Arguments @('down') | Out-Null
-    Invoke-DockerCompose -Arguments @('up','-d') | Out-Null
+    Write-Info "  重启所有服务..."
+    Invoke-DockerCompose -Arguments @("down") 2>$null
+    Invoke-DockerCompose -Arguments @("up", "-d")
 }
 
 # ========================================
@@ -443,17 +482,19 @@ if ($Services.Count -gt 0) {
 Write-Host ""
 Write-Step "[5/5] 健康检查..."
 
-Write-Host "  等待服务启动..." -ForegroundColor Gray
+Write-Info "  等待服务启动..."
 Start-Sleep -Seconds 10
 
 if ($Services.Count -gt 0) {
     $checkServices = $Services
 } else {
     $rawServices = Invoke-DockerCompose -Arguments @('ps','--services')
+    # 过滤警告行和空行
     $checkServices = @()
     if ($rawServices) {
         $rawServices -split "`n" | ForEach-Object {
             $line = $_.Trim()
+            # 只接受看起来像服务名称的行（单词、点、破折号、下划线）
             if ($line -and ($line -match '^[\w\-.]+$')) { $checkServices += $line }
         }
     }
@@ -462,6 +503,7 @@ if ($Services.Count -gt 0) {
 $failedServices = @()
 foreach ($service in $checkServices) {
     $rawStatus = Invoke-DockerCompose -Arguments @('ps',$service,'--format','{{.State}}')
+    # 解析状态：优先使用已知状态值，否则选择最后一个非空行
     $status = $null
     if ($rawStatus) {
         $lines = $rawStatus -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ }
@@ -470,14 +512,16 @@ foreach ($service in $checkServices) {
     }
 
     if ($status -eq 'running') {
-        Write-Success "$($service): $($status)"
+        Write-Success "  ✅ $service: $status"
     } else {
-        Write-Error "$($service): $($status)"
+        Write-Error "  ❌ $service: $status"
         $failedServices += $service
         
         # 显示失败的服务日志
-        Write-Host "    最近日志:" -ForegroundColor Gray
-        Invoke-DockerCompose -Arguments @('logs','--tail=20',$service) | ForEach-Object { Write-Host "      $_" -ForegroundColor Gray }
+        Write-ColorOutput "    最近日志:" "Gray"
+        Invoke-DockerCompose -Arguments @('logs','--tail=10',$service) | ForEach-Object {
+            Write-ColorOutput "      $_" "Gray"
+        }
     }
 }
 
@@ -491,8 +535,16 @@ if ($failedServices.Count -gt 0) {
     Write-ColorOutput "========================================" "Red"
     Write-ColorOutput "失败的服务: $($failedServices -join ', ')" "Red"
     Write-Host ""
-    Write-Warning "请检查日志:"
-    Write-Host "  $DockerCompose logs -f" -ForegroundColor Gray
+    Write-Warning "  请检查日志:"
+    # 根据实际可用的 docker compose 形式显示命令提示（`docker compose` 或 `docker-compose`）
+    if ($DockerCompose -and $DockerCompose.Count -gt 1) {
+        $cmdPrefix = "$($DockerCompose[0]) $($DockerCompose[1..($DockerCompose.Count-1)] -join ' ')."
+    } elseif ($DockerCompose) {
+        $cmdPrefix = $DockerCompose[0]
+    } else {
+        $cmdPrefix = 'docker compose'
+    }
+    Write-ColorOutput "  $cmdPrefix logs -f" "Gray"
     Write-Host ""
     exit 1
 } else {
@@ -500,32 +552,34 @@ if ($failedServices.Count -gt 0) {
     Write-ColorOutput "  🎉 回滚成功！" "Green"
     Write-ColorOutput "========================================" "Green"
     Write-Host ""
-    Write-ColorOutput "环境信息：" "Cyan"
+    Write-Info "环境信息："
     Write-Host "  环境: " -NoNewline; Write-ColorOutput $Environment "Yellow"
     Write-Host "  备份: " -NoNewline; Write-ColorOutput (Split-Path $BackupPath -Leaf) "Yellow"
     Write-Host ""
     
     # 读取访问地址
-    $IpOrDomain = Get-EnvValue "IPORDOMAIN"
-    Write-ColorOutput "访问地址：" "Cyan"
-    Write-Host "  运营平台: " -NoNewline; Write-ColorOutput "https://${IpOrDomain}:8817" "Blue"
-    Write-Host "  代理商系统: " -NoNewline; Write-ColorOutput "https://${IpOrDomain}:8816" "Blue"
-    Write-Host "  商户系统: " -NoNewline; Write-ColorOutput "https://${IpOrDomain}:8818" "Blue"
-    Write-Host "  支付网关: " -NoNewline; Write-ColorOutput "https://${IpOrDomain}:9819" "Blue"
+    $ipOrDomain = Get-EnvValue "IPORDOMAIN"
+    Write-Info "访问地址："
+    Write-Host "  管理平台: " -NoNewline; Write-ColorOutput "https://${ipOrDomain}:8817" "Blue"
+    Write-Host "  代理商系统: " -NoNewline; Write-ColorOutput "https://${ipOrDomain}:8816" "Blue"
+    Write-Host "  商户系统: " -NoNewline; Write-ColorOutput "https://${ipOrDomain}:8818" "Blue"
+    Write-Host "  支付网关: " -NoNewline; Write-ColorOutput "https://${ipOrDomain}:9819" "Blue"
+    Write-Host "  日志查看器: " -NoNewline; Write-ColorOutput "http://${ipOrDomain}:5341" "Blue"; Write-Host " (Seq)"
     Write-Host ""
     
-    Write-ColorOutput "常用命令：" "Cyan"
+    Write-Info "常用命令："
+    # 根据实际可用的 docker compose 形式显示命令提示（`docker compose` 或 `docker-compose`）
     if ($DockerCompose -and $DockerCompose.Count -gt 1) {
-        $cmdPrefix = "$($DockerCompose[0]) $($DockerCompose[1..($DockerCompose.Count-1)] -join ' ')"
+        $cmdPrefix = "$($DockerCompose[0]) $($DockerCompose[1..($DockerCompose.Count-1)] -join ' ')."
     } elseif ($DockerCompose) {
         $cmdPrefix = $DockerCompose[0]
     } else {
         $cmdPrefix = 'docker compose'
     }
-
-    Write-Host "  查看状态: " -NoNewline; Write-ColorOutput "$cmdPrefix ps" "Gray"
-    Write-Host "  查看日志: " -NoNewline; Write-ColorOutput "$cmdPrefix logs -f <服务名>" "Gray"
-    Write-Host "  查看备份: " -NoNewline; Write-ColorOutput ".\rollback.ps1 -List" "Gray"
+    
+    Write-ColorOutput "  查看状态: $cmdPrefix ps" "Gray"
+    Write-ColorOutput "  查看日志: $cmdPrefix logs -f [服务名]" "Gray"
+    Write-ColorOutput "  查看备份: .\rollback.ps1 -List" "Gray"
     Write-Host ""
     Write-ColorOutput "========================================" "Green"
 }

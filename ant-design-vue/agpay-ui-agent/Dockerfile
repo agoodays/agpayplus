@@ -53,4 +53,9 @@ COPY --from=build-stage /app/dist /usr/share/nginx/html
 COPY agpay-ui-agent/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
+
+# 健康检查
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost/ || exit 1
+
 CMD ["nginx", "-g", "daemon off;"]

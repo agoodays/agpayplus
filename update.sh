@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 # ========================================
 # AgPay+ 服务更新脚本 (Linux/macOS)
 # ========================================
@@ -38,7 +38,10 @@ GRAY='\033[0;37m'
 NC='\033[0m' # No Color
 
 # 备份目录
-BACKUP_DIR="${SCRIPT_DIR}/.backup"
+BACKUP_DIR=$(get_env_value "BACKUP_PATH")
+if [ -z "$BACKUP_DIR" ]; then
+    BACKUP_DIR="${SCRIPT_DIR}/.backup"
+fi
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_PATH="${BACKUP_DIR}/${ENVIRONMENT}_update_${TIMESTAMP}"
 
@@ -279,11 +282,13 @@ cp "$SCRIPT_DIR/docker-compose.yml" "$BACKUP_PATH/docker-compose.yml.backup"
 echo "$TIMESTAMP" > "$BACKUP_DIR/latest_${ENVIRONMENT}"
 echo -e "${GREEN}  ✅ 备份完成: $BACKUP_PATH${NC}"
 
-# 清理旧备份（保留最近 5 个）
+# 清理旧备份
+BACKUP_RETENTION=$(get_env_value "BACKUP_RETENTION")
+RETENTION_COUNT=${BACKUP_RETENTION:-5}
 BACKUP_COUNT=$(ls -1 "$BACKUP_DIR" | grep -E "^${ENVIRONMENT}_update_" | wc -l)
-if [ "$BACKUP_COUNT" -gt 5 ]; then
+if [ "$BACKUP_COUNT" -gt "$RETENTION_COUNT" ]; then
     echo -e "${GRAY}  清理旧备份...${NC}"
-    ls -1t "$BACKUP_DIR" | grep -E "^${ENVIRONMENT}_update_" | tail -n +6 | xargs -I {} rm -rf "$BACKUP_DIR/{}"
+    ls -1t "$BACKUP_DIR" | grep -E "^${ENVIRONMENT}_update_" | tail -n +$((RETENTION_COUNT + 1)) | xargs -I {} rm -rf "$BACKUP_DIR/{}"
 fi
 
 # ========================================
