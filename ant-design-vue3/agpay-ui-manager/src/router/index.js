@@ -72,9 +72,11 @@ function generateRoutes(menuTree) {
 
   function walk(nodes) {
     nodes.forEach((node) => {
-      // 跳过目录节点
-      if (node.entType !== 'ML') {
-        if (node.children) walk(node.children)
+      // 先处理子节点
+      if (node.children) walk(node.children)
+      
+      // 跳过无路径的节点
+      if (!node.menuUri) {
         return
       }
 
@@ -118,11 +120,10 @@ function generateRoutes(menuTree) {
           title: node.entName,
           i18nKey: node.menuI18nKey || node.i18nKey,
           icon: node.menuIcon || node.icon,
-          keepAlive: false
+          keepAlive: false,
+          showInMenu: node.entType === 'ML' // 标记是否在左侧菜单显示
         }
       })
-
-      if (node.children) walk(node.children)
     })
   }
 
@@ -139,21 +140,21 @@ let routesInitialized = false
 const routes = [
   {
     path: '/',
-    name: 'user',
+    name: '用户',
     component: UserLayout,
     children: [
-      { path: 'login', name: 'login', component: () => import('@/views/user/login.vue') },
-      { path: 'forget', name: 'forget', component: () => import('@/views/user/forget.vue') }
+      { path: 'login', name: '登录', component: () => import('@/views/user/login.vue') },
+      { path: 'forget', name: '注册', component: () => import('@/views/user/forget.vue') }
     ]
   },
   {
     path: '/exception',
-    name: 'exception',
+    name: '异常',
     component: UserLayout,
     children: [
-      { path: '403', name: 'exception403', component: () => import('@/views/exception/403.vue') },
-      { path: '404', name: 'exception404', component: () => import('@/views/exception/404.vue') },
-      { path: '500', name: 'exception500', component: () => import('@/views/exception/500.vue') }
+      { path: '403', name: '异常403', component: () => import('@/views/exception/403.vue') },
+      { path: '404', name: '异常404', component: () => import('@/views/exception/404.vue') },
+      { path: '500', name: '异常500', component: () => import('@/views/exception/500.vue') }
     ]
   }
 ]
@@ -223,7 +224,8 @@ function initDevMode() {
   userStore.setToken('dev-bypass-token')
   userStore.setUserLoginInfo({
     ...devUserInfo,
-    allMenuRouteTree: devMenuTree
+    allMenuRouteTree: devMenuTree,
+    entIdList: ['ENT_DEMO', 'ENT_DEMO_INDEX', 'ENT_DEMO_SEARCH_TABLE', 'ENT_DEMO_REFACTOR_TABLE', 'ENT_DEMO_STATE_SWITCH', 'ENT_DEMO_FORM', 'ENT_DEMO_FLOAT_INPUT', 'ENT_DEMO_SELECT_INFINITE', 'ENT_DEMO_CARD', 'ENT_DEMO_UPLOAD', 'ENT_DEMO_EDITOR', 'ENT_DEMO_CONTAINER']
   })
 
   registerDynamicRoutes(devMenuTree)
@@ -241,7 +243,8 @@ function checkDevModeState() {
     devLog('⚠️', '恢复用户信息')
     userStore.setUserLoginInfo({
       ...devUserInfo,
-      allMenuRouteTree: devMenuTree
+      allMenuRouteTree: devMenuTree,
+      entIdList: ['ENT_DEMO', 'ENT_DEMO_INDEX', 'ENT_DEMO_SEARCH_TABLE', 'ENT_DEMO_REFACTOR_TABLE', 'ENT_DEMO_STATE_SWITCH', 'ENT_DEMO_FORM', 'ENT_DEMO_FLOAT_INPUT', 'ENT_DEMO_SELECT_INFINITE', 'ENT_DEMO_CARD', 'ENT_DEMO_UPLOAD', 'ENT_DEMO_EDITOR', 'ENT_DEMO_CONTAINER']
     })
   }
 
@@ -323,7 +326,9 @@ router.beforeEach((to, from, next) => {
   }
 
   // 获取用户信息
+  console.log('检查用户信息:', userStore.userId)
   if (!userStore.userId) {
+    // 本地存储没有用户信息，调用API获取
     loginApi
       .getCurrentInfo()
       .then((bizData) => {
@@ -344,17 +349,25 @@ router.beforeEach((to, from, next) => {
           next({ ...to, replace: true })
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('获取用户信息失败:', error)
         userStore.logout()
         next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath } })
       })
     return
   }
 
+  // 确保路由已注册
+  if (!routesInitialized && userStore.allMenuRouteTree && userStore.allMenuRouteTree.length > 0) {
+    registerDynamicRoutes(userStore.allMenuRouteTree)
+    next({ ...to, replace: true })
+    return
+  }
+
   // 首页重定向
   if (to.path === '/') {
     const firstUri = findFirstAvailableUri(userStore.allMenuRouteTree)
-    if (firstUri) {
+    if (firstUri && firstUri !== to.path) {
       next({ path: firstUri })
     } else {
       next()

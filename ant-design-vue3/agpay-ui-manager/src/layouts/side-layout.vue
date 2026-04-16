@@ -212,10 +212,6 @@ watch(
 )
 
 onMounted(() => {
-  console.log('SideLayout 组件初始化')
-  console.log('当前路由:', route.path)
-  console.log('用户状态:', userStore)
-  console.log('菜单数据:', userStore.allMenuRouteTree)
   handleWindowResize()
   window.addEventListener('resize', onWindowResize)
   updateMenuKeys(route.path)
@@ -368,7 +364,7 @@ const handleReload = () => {
 
 // 个人中心
 const handleUserCenter = () => {
-  router.push({ path: '/current/userinfoPage' })
+  router.push({ path: '/current/userinfo' })
 }
 
 // 账户设置
@@ -389,7 +385,7 @@ const handleLogout = () => {
     t('layout.confirmLogoutContent', { name: username }),
     async () => {
       await userStore.logout()
-      router.push({ name: 'login' })
+      router.push({ path: '/login', replace: true })
     }
   )
 }

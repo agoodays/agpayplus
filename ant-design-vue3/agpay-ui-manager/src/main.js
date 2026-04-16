@@ -93,13 +93,14 @@ async function initializeApp() {
 
   // 初始化本地存储和其他配置
   Initializer()
+  
+  app.use(store)
+  app.use(router)
 
   // 加载站点配置和主题
   await themeService.loadAndApplyTheme()
 
   // 使用插件
-  app.use(router)
-  app.use(store)
   app.use(i18n)
   app.use(Antd)
 

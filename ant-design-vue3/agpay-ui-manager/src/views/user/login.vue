@@ -146,27 +146,14 @@ const onFinish = async (values) => {
     }
 
     // 调用登录 API
-    console.log('开始登录，参数:', loginParams)
     const res = await loginApi.login(loginParams)
-    console.log('登录成功，返回:', res)
 
     // 保存 Token
     const token = res[ACCESS_TOKEN_NAME] || res.iToken
-    console.log('保存 Token:', token)
     userStore.setToken(token, loginObject.isAutoLogin)
-    console.log('保存 Token 后:', userStore.getToken)
-
-    // 获取用户信息
-    console.log('开始获取用户信息')
-    const userInfo = await loginApi.getCurrentInfo()
-    console.log('获取用户信息成功:', userInfo)
-    
-    // 保存用户信息
-    userStore.setUserLoginInfo(userInfo)
-    console.log('保存用户信息后:', userStore)
 
     // 登录成功
-    loginSuccess(res, userInfo)
+    loginSuccess(res)
   } catch (error) {
     console.error('登录失败:', error)
     loginErrorInfo.value = error.msg || t('auth.loginFailedRetry')
@@ -177,39 +164,11 @@ const onFinish = async (values) => {
   }
 }
 
-const loginSuccess = (res, userInfo) => {
+const loginSuccess = (res) => {
   const redirect = route.query.redirect
-  
-  // 查找第一个可用的菜单路径
-  let targetPath = redirect || '/'
-  if (userInfo && userInfo.allMenuRouteTree && userInfo.allMenuRouteTree.length > 0) {
-    // 优先查找主页
-    const mainMenu = userInfo.allMenuRouteTree.find(item => item.entId === 'ENT_C_MAIN' && item.menuUri)
-    if (mainMenu) {
-      targetPath = mainMenu.menuUri
-    } else {
-      // 查找第一个菜单链接
-      const findFirstMenu = (menus) => {
-        for (const item of menus) {
-          if (item.menuUri && item.entType === 'ML') {
-            return item.menuUri
-          }
-          if (item.children) {
-            const found = findFirstMenu(item.children)
-            if (found) return found
-          }
-        }
-        return ''
-      }
-      const firstMenuUri = findFirstMenu(userInfo.allMenuRouteTree)
-      if (firstMenuUri) {
-        targetPath = firstMenuUri
-      }
-    }
-  }
 
   // 跳转到目标页面
-  router.push({ path: targetPath })
+  router.push({ path: redirect || '/' })
 
   // 延迟显示欢迎信息
   setTimeout(() => {
