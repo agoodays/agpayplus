@@ -636,12 +636,10 @@ const handleLogout = () => {
 
     .ag-layout-content {
       flex: 1;
-      // margin: 24px 16px;
-      // padding: 24px;
+      margin: 0;
+      padding: 0;
       overflow: auto;
-      // max-width: var(--page-width);
-      // margin-left: auto;
-      // margin-right: auto;
+      width: 100%;
     }
 
     .ag-layout-footer {

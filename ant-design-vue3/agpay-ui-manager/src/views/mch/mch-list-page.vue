@@ -1,119 +1,110 @@
 <template>
   <div class="mch-list-page">
     <a-card :bordered="false">
-      <!-- 搜索表单 -->
-      <a-form :model="searchParams" layout="inline" class="search-form">
-        <a-form-item label="商户号">
-          <a-input
-            v-model:value="searchParams.mchNo"
-            placeholder="请输入商户号"
-            allow-clear
-            @press-enter="handleSearch"
-          />
-        </a-form-item>
-
-        <a-form-item label="商户名称">
-          <a-input
-            v-model:value="searchParams.mchName"
-            placeholder="请输入商户名称"
-            allow-clear
-            @press-enter="handleSearch"
-          />
-        </a-form-item>
-
-        <a-form-item label="商户状态">
-          <a-select v-model:value="searchParams.state" placeholder="请选择状态" style="width: 120px" allow-clear>
-            <a-select-option :value="1">启用</a-select-option>
-            <a-select-option :value="0">禁用</a-select-option>
-          </a-select>
-        </a-form-item>
-
-        <a-form-item label="商户类型">
-          <a-select v-model:value="searchParams.type" placeholder="请选择类型" style="width: 120px" allow-clear>
-            <a-select-option :value="1">普通商户</a-select-option>
-            <a-select-option :value="2">特约商户</a-select-option>
-          </a-select>
-        </a-form-item>
-
-        <a-form-item>
-          <a-button type="primary" @click="handleSearch">
-            <search-outlined />
-            查询
-          </a-button>
-          <a-button style="margin-left: 8px" @click="handleReset">
-            <redo-outlined />
-            重置
-          </a-button>
-        </a-form-item>
-      </a-form>
+      <div style="margin-bottom: 16px">
+        <ag-search
+          v-model:model-value="searchForm"
+          :collapsible="true"
+          :default-collapsed="true"
+          @search="onSearch"
+          @reset="onReset"
+        >
+          <!-- 基础搜索条件（始终显示） -->
+          <template #base="{ colSpan }">
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input
+                  v-model:value="searchForm.mchNo"
+                  label="商户号"
+                  placeholder="请输入商户号"
+                  :allow-clear="true"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input
+                  v-model:value="searchForm.mchName"
+                  label="商户名称"
+                  placeholder="请输入商户名称"
+                  :allow-clear="true"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-select
+                  v-model:value="searchForm.state"
+                  label="商户状态"
+                  placeholder="请选择状态"
+                  allow-clear
+                  :options="[
+                    { value: '', label: '全部' },
+                    { value: '1', label: '启用' },
+                    { value: '0', label: '禁用' }
+                  ]"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-select
+                  v-model:value="searchForm.type"
+                  label="商户类型"
+                  placeholder="请选择类型"
+                  allow-clear
+                  :options="[
+                    { value: '', label: '全部' },
+                    { value: '1', label: '普通商户' },
+                    { value: '2', label: '特约商户' }
+                  ]"
+                />
+              </a-form-item>
+            </a-col>
+          </template>
+        </ag-search>
+      </div>
 
       <!-- 操作按钮 -->
-      <div class="table-operations">
+      <div class="table-operations" style="margin-bottom: 16px">
         <a-space>
           <a-button v-if="hasPermission('ENT_MCH_INFO_ADD')" type="primary" @click="handleAdd">
             <plus-outlined />
             新建商户
           </a-button>
-          <a-button @click="refresh">
-            <reload-outlined />
-            刷新
-          </a-button>
         </a-space>
       </div>
 
       <!-- 数据表格 -->
-      <a-table
-        row-key="mchNo"
+      <ag-table
         :columns="columns"
-        :data-source="dataSource"
-        :loading="loading"
-        :pagination="pagination"
-        :scroll="{ x: 1300 }"
-        @change="handleTableChange"
+        :on-load="reqTableDataFunc"
+        :search-data="searchForm"
+        state-key="mch_list_table_columns"
       >
-        <!-- 商户名称 -->
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'mchName'">
-            <a v-if="hasPermission('ENT_MCH_INFO_VIEW')" @click="handleDetail(record)">
-              <b>{{ record.mchName }}</b>
-            </a>
-            <b v-else>{{ record.mchName }}</b>
-          </template>
-
-          <!-- 状态 -->
-          <template v-else-if="column.key === 'state'">
-            <a-badge
-              :status="record.state === 0 ? 'error' : 'processing'"
-              :text="record.state === 0 ? '禁用' : '启用'"
-            />
-          </template>
-
-          <!-- 商户类型 -->
-          <template v-else-if="column.key === 'type'">
-            <a-tag :color="record.type === 1 ? 'green' : 'orange'">
-              {{ record.type === 1 ? '普通商户' : '特约商户' }}
-            </a-tag>
-          </template>
-
-          <!-- 操作 -->
-          <template v-else-if="column.key === 'action'">
-            <a-space>
-              <a v-if="hasPermission('ENT_MCH_INFO_EDIT')" @click="handleEdit(record)"> 修改 </a>
-              <a v-if="hasPermission('ENT_MCH_APP_CONFIG')" @click="handleAppConfig(record)"> 应用配置 </a>
-              <a v-if="hasPermission('ENT_MCH_CONFIG_PAGE')" @click="handleAdvancedConfig(record)"> 高级功能 </a>
-              <a-popconfirm
-                v-if="hasPermission('ENT_MCH_INFO_DEL')"
-                title="确认删除该商户吗？该操作将删除商户下所有配置及用户信息"
-                ok-text="确定"
-                cancel-text="取消"
-                @confirm="handleDelete(record)"
-              >
-                <a style="color: red">删除</a>
-              </a-popconfirm>
-            </a-space>
-          </template>
+        <template #actions="{ record }">
+          <ag-table-actions :max-show-num="4">
+            <a-button type="link" size="small" @click="handleDetail(record)">查看</a-button>
+            <a-button type="link" size="small" @click="handleEdit(record)">修改</a-button>
+            <a-button type="link" size="small" @click="handleAppConfig(record)">应用配置</a-button>
+            <a-button type="link" size="small" @click="handleAdvancedConfig(record)">高级功能</a-button>
+            <a-popconfirm v-if="hasPermission('ENT_MCH_INFO_DEL')" title="确认删除该商户吗？该操作将删除商户下所有配置及用户信息" @confirm="() => handleDelete(record)">
+              <a-button type="link" size="small" danger>删除</a-button>
+            </a-popconfirm>
+          </ag-table-actions>
         </template>
-      </a-table>
+        <template #state="{ record }">
+          <a-badge
+            :status="record.state === 0 ? 'error' : 'processing'"
+            :text="record.state === 0 ? '禁用' : '启用'"
+          />
+        </template>
+        <template #type="{ record }">
+          <a-tag :color="record.type === 1 ? 'green' : 'orange'">
+            {{ record.type === 1 ? '普通商户' : '特约商户' }}
+          </a-tag>
+        </template>
+      </ag-table>
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
@@ -125,22 +116,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
-import { SearchOutlined, RedoOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons-vue'
-import { useTable, useModal, usePermission, useDelete } from '@/hooks/common-hooks'
+import { PlusOutlined } from '@ant-design/icons-vue'
+import { useModal, usePermission, useDelete } from '@/hooks/common-hooks'
 import { API_URL_MCH_LIST, req } from '@/api/manage'
 import AddOrEditModal from './add-or-edit.vue'
 import DetailDrawer from './detail.vue'
+import { AgSearch, AgTable, AgInput, AgSelect, AgTableActions } from '@/components'
 
 const router = useRouter()
 const { t } = useI18n()
 
-// 使用 Hooks
-const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
-  useTable((params) => req.list(API_URL_MCH_LIST, params))
+// 搜索参数
+const searchForm = reactive({
+  mchNo: '',
+  mchName: '',
+  state: '',
+  type: ''
+})
 
 const { open: modalOpen, showModal, hideModal } = useModal()
 const { open: detailOpen, showModal: showDetail } = useModal()
@@ -150,63 +146,90 @@ const { handleDelete: deleteItem } = useDelete()
 const currentRecordId = ref('')
 
 // 表格列定义
-const columns = [
+const columns = ref([
   {
-    key: 'mchName',
     title: '商户名称',
+    key: 'mchName',
     dataIndex: 'mchName',
     width: 200,
     fixed: 'left',
     ellipsis: true
   },
   {
-    key: 'mchNo',
     title: '商户号',
+    key: 'mchNo',
     dataIndex: 'mchNo',
     width: 140
   },
   {
-    key: 'contactTel',
     title: '手机号',
+    key: 'contactTel',
     dataIndex: 'contactTel',
     width: 140
   },
   {
-    key: 'agentNo',
     title: '代理商号',
+    key: 'agentNo',
     dataIndex: 'agentNo',
     width: 140
   },
   {
-    key: 'isvNo',
     title: '服务商号',
+    key: 'isvNo',
     dataIndex: 'isvNo',
     width: 140
   },
   {
-    key: 'state',
     title: '状态',
-    width: 80
+    key: 'state',
+    width: 80,
+    customRender: 'state'
   },
   {
-    key: 'type',
     title: '商户类型',
-    width: 100
+    key: 'type',
+    width: 100,
+    customRender: 'type'
   },
   {
-    key: 'createdAt',
     title: '创建日期',
+    key: 'createdAt',
     dataIndex: 'createdAt',
     width: 180
   },
   {
-    key: 'action',
     title: '操作',
+    key: 'actions',
+    customRender: 'actions',
     width: 200,
     fixed: 'right',
     align: 'center'
   }
-]
+])
+
+// 请求表格数据函数
+function reqTableDataFunc(params) {
+  // 将状态和类型转换为数字
+  if (searchForm.state) {
+    params.state = parseInt(searchForm.state)
+  }
+  if (searchForm.type) {
+    params.type = parseInt(searchForm.type)
+  }
+  return req.list(API_URL_MCH_LIST, params)
+}
+
+function onSearch(vals) {
+  // AgSearch 已更新 searchForm，通过 searchForm 触发查询
+  message.success('开始搜索')
+}
+
+function onReset() {
+  searchForm.mchNo = ''
+  searchForm.mchName = ''
+  searchForm.state = ''
+  searchForm.type = ''
+}
 
 /**
  * 新增
@@ -259,7 +282,6 @@ const handleDelete = (record) => {
   deleteItem(t('mch.confirmDeleteMchTitle'), t('mch.confirmDeleteMchContent'), async () => {
     await req.delById(API_URL_MCH_LIST, record.mchNo)
     message.success(t('common.deleteSuccess'))
-    refresh()
   })
 }
 
@@ -268,18 +290,14 @@ const handleDelete = (record) => {
  */
 const handleModalSuccess = () => {
   hideModal()
-  refresh()
 }
 </script>
 
 <style lang="less" scoped>
 .mch-list-page {
-  .search-form {
-    margin-bottom: 16px;
-  }
-
-  .table-operations {
-    margin-bottom: 16px;
-  }
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
 </style>

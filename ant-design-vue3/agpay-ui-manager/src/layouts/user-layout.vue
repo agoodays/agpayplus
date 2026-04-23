@@ -95,7 +95,9 @@ const currentYear = dayjs().year()
 }
 
 .user-layout-content .main .ant-form {
-  max-width: 300px;
+  // max-width: 300px;
+  padding: 15px;
+  border-radius: var(--border-radius-lg);
 }
 
 .user-layout-content .main .desc {

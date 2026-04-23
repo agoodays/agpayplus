@@ -450,17 +450,25 @@ const displayColumns = computed(() => {
         fixed: state.columnFixed[col.key] || col.fixed
       }
 
-      // 处理自定义slots
-      if (c.customRender && typeof c.customRender === 'string') {
-        const slotName = c.customRender
-        // 避免每次渲染都创建新函数
-        if (!c._customRenderCache) {
-          c._customRenderCache = ({ text, record, index }) => {
-            const slot = slots[slotName]
-            return slot ? slot({ text, record, index }) : text
+      // 处理自定义渲染
+      if (c.customRender) {
+        if (typeof c.customRender === 'string') {
+          // 字符串形式：使用插槽
+          const slotName = c.customRender
+          if (!c._customRenderCache) {
+            c._customRenderCache = ({ text, record, index }) => {
+              const slot = slots[slotName]
+              return slot ? slot({ text, record, index }) : text
+            }
           }
+          c.customRender = c._customRenderCache
+        } else if (typeof c.customRender === 'function') {
+          // 函数形式：直接使用
+          if (!c._customRenderCache) {
+            c._customRenderCache = c.customRender
+          }
+          c.customRender = c._customRenderCache
         }
-        c.customRender = c._customRenderCache
       }
 
       return c
