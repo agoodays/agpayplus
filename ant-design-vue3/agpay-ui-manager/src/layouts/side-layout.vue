@@ -120,7 +120,16 @@ import { appDefaultConfig } from '@/config/app-config'
 
 function getIconComponent(iconName) {
   if (!iconName) return null
-  return antIcons[iconName]
+  // 将短横线分隔的名称转换为驼峰命名
+  const camelCaseName = iconName.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
+  // 首字母大写
+  let PascalCaseName = camelCaseName.charAt(0).toUpperCase() + camelCaseName.slice(1)
+  // 检查是否已经包含 Outlined 后缀
+  if (!PascalCaseName.endsWith('Outlined')) {
+    PascalCaseName += 'Outlined'
+  }
+  console.log(PascalCaseName)
+  return antIcons[PascalCaseName]
 }
 
 function resolveMenuTitle(menu) {
