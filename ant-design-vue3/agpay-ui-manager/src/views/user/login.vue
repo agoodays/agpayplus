@@ -16,24 +16,19 @@
       <a-form-item name="password">
         <ag-input v-model:value="loginObject.password" type="password" size="large" :label="t('auth.password')" />
       </a-form-item>
-      <div class="code-body">
-        <div class="code-layout">
-          <div class="code code-layout-item">
-            <a-form-item name="vercode">
-              <ag-input
-                v-model:value="loginObject.vercode"
-                class="code-input"
-                size="large"
-                type="text"
-                :label="t('auth.captcha')"
-              />
-            </a-form-item>
-            <div class="code-img">
-              <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()" />
-              <div v-show="isOverdue" class="vercode-mask" @click="refVercode()">
-                {{ t('auth.captchaExpiredRefresh') }}
-              </div>
-            </div>
+      <div class="vercode-container">
+        <a-form-item name="vercode">
+          <ag-input
+            v-model:value="loginObject.vercode"
+            size="large"
+            type="text"
+            :label="t('auth.captcha')"
+          />
+        </a-form-item>
+        <div class="code-img">
+          <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()" />
+          <div v-show="isOverdue" class="vercode-mask" @click="refVercode()">
+            {{ t('auth.captchaExpiredRefresh') }}
           </div>
         </div>
       </div>
@@ -243,14 +238,19 @@ onUnmounted(() => {
       float: right;
     }
   }
-  .code {
+  .vercode-container {
     display: flex;
-    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    .ant-form-item {
+      flex: 1;
+      margin-bottom: 0;
+    }
     .code-img {
       width: 120px;
       height: 40px;
-      margin-left: 10px;
       position: relative;
+      z-index: 1;
       background-color: var(--surface-variant);
       img {
         width: 120px;
