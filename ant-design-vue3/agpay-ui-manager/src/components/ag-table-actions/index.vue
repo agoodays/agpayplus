@@ -67,11 +67,15 @@ const moreActions = computed(() => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
+  gap: 4px;
   flex-wrap: nowrap;
+  overflow: visible;
 }
 
 .ag-table-action-columns :deep(.ant-btn-link) {
-  padding: 4px 8px;
+  padding: 2px 4px;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 12px;
 }
 </style>

@@ -2,111 +2,108 @@
   <div class="pay-order-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <a-form :model="searchParams" layout="inline" class="search-form">
-        <!-- 日期范围 -->
-        <a-form-item label="创建时间">
-          <a-range-picker
-            v-model:value="dateRange"
-            :show-time="{ format: 'HH:mm:ss' }"
-            format="YYYY-MM-DD HH:mm:ss"
-            @change="handleDateChange"
-          />
-        </a-form-item>
+      <div style="margin-bottom: 16px">
+        <ag-search
+          v-model:model-value="searchForm"
+          :collapsible="true"
+          :default-collapsed="false"
+          @search="onSearch"
+          @reset="onReset"
+        >
+          <!-- 基础搜索条件 -->
+          <template #base="{ colSpan }">
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-date-range-picker
+                  v-model:value="searchForm.dateRange"
+                  label="创建时间"
+                  :show-time="{ format: 'HH:mm:ss' }"
+                  format="YYYY-MM-DD HH:mm:ss"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input
+                  v-model:value="searchForm.payOrderId"
+                  label="支付订单号"
+                  placeholder="请输入订单号"
+                  :allow-clear="true"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input
+                  v-model:value="searchForm.mchOrderNo"
+                  label="商户订单号"
+                  placeholder="请输入商户订单号"
+                  :allow-clear="true"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-select
+                  v-model:value="searchForm.state"
+                  label="支付状态"
+                  placeholder="请选择状态"
+                  allow-clear
+                  :options="[
+                    { value: '', label: '全部' },
+                    { value: '0', label: '订单生成' },
+                    { value: '1', label: '支付中' },
+                    { value: '2', label: '支付成功' },
+                    { value: '3', label: '支付失败' },
+                    { value: '4', label: '已撤销' },
+                    { value: '5', label: '已退款' },
+                    { value: '6', label: '订单关闭' }
+                  ]"
+                />
+              </a-form-item>
+            </a-col>
+          </template>
 
-        <!-- 订单号类型 -->
-        <a-form-item label="订单号">
-          <a-input-group compact>
-            <a-select v-model:value="orderNoType" style="width: 140px">
-              <a-select-option value="payOrderId">支付订单号</a-select-option>
-              <a-select-option value="mchOrderNo">商户订单号</a-select-option>
-              <a-select-option value="channelOrderNo">渠道订单号</a-select-option>
-            </a-select>
-            <a-input
-              v-model:value="searchParams[orderNoType]"
-              placeholder="请输入订单号"
-              allow-clear
-              style="width: 200px"
-              @press-enter="handleSearch"
-            />
-          </a-input-group>
-        </a-form-item>
-
-        <!-- 商户号 -->
-        <a-form-item label="商户号">
-          <a-select
-            v-model:value="searchParams.mchNo"
-            placeholder="请选择商户"
-            show-search
-            :filter-option="false"
-            allow-clear
-            style="width: 200px"
-            @search="handleSearchMch"
-          >
-            <a-select-option v-for="item in mchList" :key="item.mchNo" :value="item.mchNo">
-              {{ item.mchName }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-
-        <!-- 展开更多 -->
-        <template v-if="showMore">
-          <a-form-item label="支付状态">
-            <a-select v-model:value="searchParams.state" placeholder="全部" allow-clear style="width: 140px">
-              <a-select-option :value="0">订单生成</a-select-option>
-              <a-select-option :value="1">支付中</a-select-option>
-              <a-select-option :value="2">支付成功</a-select-option>
-              <a-select-option :value="3">支付失败</a-select-option>
-              <a-select-option :value="4">已撤销</a-select-option>
-              <a-select-option :value="5">已退款</a-select-option>
-              <a-select-option :value="6">订单关闭</a-select-option>
-            </a-select>
-          </a-form-item>
-
-          <a-form-item label="回调状态">
-            <a-select v-model:value="searchParams.notifyState" placeholder="全部" allow-clear style="width: 140px">
-              <a-select-option :value="0">未发送</a-select-option>
-              <a-select-option :value="1">已发送</a-select-option>
-            </a-select>
-          </a-form-item>
-
-          <a-form-item label="应用ID">
-            <a-input
-              v-model:value="searchParams.appId"
-              placeholder="请输入应用ID"
-              allow-clear
-              @press-enter="handleSearch"
-            />
-          </a-form-item>
-
-          <a-form-item label="门店ID">
-            <a-input
-              v-model:value="searchParams.storeId"
-              placeholder="请输入门店ID"
-              allow-clear
-              @press-enter="handleSearch"
-            />
-          </a-form-item>
-        </template>
-
-        <!-- 操作按钮 -->
-        <a-form-item>
-          <a-space>
-            <a-button type="primary" @click="handleSearch">
-              <search-outlined />
-              查询
-            </a-button>
-            <a-button @click="handleReset">
-              <redo-outlined />
-              重置
-            </a-button>
-            <a-button type="link" @click="showMore = !showMore">
-              {{ showMore ? '收起' : '展开' }}
-              <down-outlined v-if="!showMore" />
-              <up-outlined v-else />
-            </a-button>
-          </a-space>
-        </a-form-item>
-      </a-form>
+          <!-- 高级搜索条件 -->
+          <template #advanced="{ colSpan }">
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-select
+                  v-model:value="searchForm.notifyState"
+                  label="回调状态"
+                  placeholder="请选择状态"
+                  allow-clear
+                  :options="[
+                    { value: '', label: '全部' },
+                    { value: '0', label: '未发送' },
+                    { value: '1', label: '已发送' }
+                  ]"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input
+                  v-model:value="searchForm.appId"
+                  label="应用ID"
+                  placeholder="请输入应用ID"
+                  :allow-clear="true"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input
+                  v-model:value="searchForm.storeId"
+                  label="门店ID"
+                  placeholder="请输入门店ID"
+                  :allow-clear="true"
+                />
+              </a-form-item>
+            </a-col>
+          </template>
+        </ag-search>
+      </div>
 
       <!-- 统计信息 -->
       <a-card v-if="statistics" class="statistics-card" :bordered="false">
@@ -158,64 +155,53 @@
         </a-row>
       </a-card>
 
-      <!-- 操作按钮 -->
-      <div class="table-operations">
-        <a-space>
-          <a-button @click="refresh">
-            <reload-outlined />
-            刷新
-          </a-button>
-          <a-button @click="handleExport">
-            <download-outlined />
-            导出
-          </a-button>
-        </a-space>
-      </div>
-
       <!-- 数据表格 -->
-      <a-table
-        row-key="payOrderId"
+      <ag-table
+        ref="tableRef"
         :columns="columns"
-        :data-source="dataSource"
-        :loading="loading"
-        :pagination="pagination"
-        :scroll="{ x: 1800 }"
-        @change="handleTableChange"
+        :show-auto-refresh="true"
+        :on-load="loadData"
+        :on-load-statistics="loadStatistics"
+        :search-data="searchForm"
+        :on-download="handleExport"
+        :show-download="true"
+        :enable-statistics="true"
+        state-key="pay_order_table_columns"
       >
         <!-- 支付订单号 -->
-        <template #payOrderId="{ text }">
-          <a-typography-text copyable>{{ text }}</a-typography-text>
+        <template #payOrderId="{ record }">
+          <a-typography-text copyable>{{ record.payOrderId }}</a-typography-text>
         </template>
 
         <!-- 商户订单号 -->
-        <template #mchOrderNo="{ text }">
-          <a-typography-text copyable>{{ text }}</a-typography-text>
+        <template #mchOrderNo="{ record }">
+          <a-typography-text copyable>{{ record.mchOrderNo }}</a-typography-text>
         </template>
 
         <!-- 支付金额 -->
-        <template #amount="{ text }">
-          <span style="color: var(--primary-color); font-weight: 500"> ¥{{ (text / 100).toFixed(2) }} </span>
+        <template #amount="{ record }">
+          <span style="color: var(--primary-color); font-weight: 500"> ¥{{ (record.amount / 100).toFixed(2) }} </span>
         </template>
 
         <!-- 手续费 -->
-        <template #mchFeeAmount="{ text }">
-          <span>¥{{ (text / 100).toFixed(2) }}</span>
+        <template #mchFeeAmount="{ record }">
+          <span>¥{{ (record.mchFeeAmount / 100).toFixed(2) }}</span>
         </template>
 
         <!-- 支付状态 -->
-        <template #state="{ text }">
-          <a-tag :color="getStateColor(text)">
-            {{ getStateText(text) }}
+        <template #state="{ record }">
+          <a-tag :color="getStateColor(record.state)">
+            {{ getStateText(record.state) }}
           </a-tag>
         </template>
 
         <!-- 回调状态 -->
-        <template #notifyState="{ text }">
-          <a-badge :status="text === 1 ? 'success' : 'default'" :text="text === 1 ? '已发送' : '未发送'" />
+        <template #notifyState="{ record }">
+          <a-badge :status="record.notifyState === 1 ? 'success' : 'default'" :text="record.notifyState === 1 ? '已发送' : '未发送'" />
         </template>
 
         <!-- 操作 -->
-        <template #action="{ record }">
+        <template #actions="{ record }">
           <a-space>
             <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" size="small" @click="handleDetail(record)">
               详情
@@ -231,7 +217,7 @@
             </a-button>
           </a-space>
         </template>
-      </a-table>
+      </ag-table>
     </a-card>
 
     <!-- 详情抽屉 -->
@@ -243,177 +229,153 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import { useI18n } from 'vue-i18n'
 import {
-  SearchOutlined,
-  RedoOutlined,
-  DownOutlined,
-  UpOutlined,
-  ReloadOutlined,
-  DownloadOutlined,
   TransactionOutlined,
   DollarOutlined,
   WalletOutlined,
   UndoOutlined
 } from '@ant-design/icons-vue'
-import { useTable, useModal, usePermission } from '@/hooks/common-hooks'
+import { useModal, usePermission } from '@/hooks/common-hooks'
 import { API_URL_PAY_ORDER, API_URL_MCH_LIST, req } from '@/api/manage'
 import DetailDrawer from './detail-drawer.vue'
 import RefundModal from './refund-modal.vue'
+import { AgSearch, AgTable, AgInput, AgSelect, AgDateRangePicker } from '@/components'
 
 const { t } = useI18n()
-
-// 使用 Hooks
-const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
-  useTable((params) => req.list(API_URL_PAY_ORDER, params))
 
 const { open: detailOpen, showModal: showDetail } = useModal()
 const { open: refundOpen, showModal: showRefund } = useModal()
 const { hasPermission } = usePermission()
 
 // State
-const showMore = ref(false)
-const dateRange = ref([])
-const orderNoType = ref('payOrderId')
-const mchList = ref([])
+const tableRef = ref(null)
 const currentPayOrderId = ref('')
 const currentPayOrder = ref(null)
 const statistics = ref(null)
 
-// 表格列定义
-const columns = [
-  {
-    title: '支付订单号',
-    dataIndex: 'payOrderId',
-    key: 'payOrderId',
-    width: 180,
-    fixed: 'left',
-    slots: { customRender: 'payOrderId' }
-  },
-  {
-    title: '商户订单号',
-    dataIndex: 'mchOrderNo',
-    key: 'mchOrderNo',
-    width: 180,
-    slots: { customRender: 'mchOrderNo' }
-  },
-  {
-    title: '商户名称',
-    dataIndex: 'mchName',
-    key: 'mchName',
-    width: 150,
-    ellipsis: true
-  },
-  {
-    title: '支付金额',
-    dataIndex: 'amount',
-    key: 'amount',
-    width: 120,
-    align: 'right',
-    slots: { customRender: 'amount' }
-  },
-  {
-    title: '手续费',
-    dataIndex: 'mchFeeAmount',
-    key: 'mchFeeAmount',
-    width: 100,
-    align: 'right',
-    slots: { customRender: 'mchFeeAmount' }
-  },
-  {
-    title: '支付方式',
-    dataIndex: 'wayName',
-    key: 'wayName',
-    width: 120
-  },
-  {
-    title: '支付状态',
-    dataIndex: 'state',
-    key: 'state',
-    width: 100,
-    slots: { customRender: 'state' }
-  },
-  {
-    title: '回调状态',
-    dataIndex: 'notifyState',
-    key: 'notifyState',
-    width: 100,
-    slots: { customRender: 'notifyState' }
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createdAt',
-    key: 'createdAt',
-    width: 180
-  },
-  {
-    title: '操作',
-    key: 'action',
-    width: 150,
-    fixed: 'right',
-    slots: { customRender: 'action' }
-  }
-]
-
-/**
- * 初始化
- */
-onMounted(() => {
-  handleSearch()
-  loadStatistics()
+// 搜索表单
+const searchForm = reactive({
+  dateRange: '',
+  payOrderId: '',
+  mchOrderNo: '',
+  channelOrderNo: '',
+  state: '',
+  notifyState: '',
+  appId: '',
+  storeId: ''
 })
 
-/**
- * 日期范围变化
- */
-const handleDateChange = (dates) => {
-  if (dates && dates.length === 2) {
-    searchParams.createdStart = dates[0].format('YYYY-MM-DD HH:mm:ss')
-    searchParams.createdEnd = dates[1].format('YYYY-MM-DD HH:mm:ss')
-  } else {
-    searchParams.createdStart = ''
-    searchParams.createdEnd = ''
+// 请求表格数据函数
+const loadData = (params) => {
+  // 构建请求参数
+  const requestParams = {
+    pageNumber: params.pageNumber,
+    pageSize: params.pageSize
   }
+  
+  // 处理日期范围
+  if (searchForm.dateRange && searchForm.dateRange.length === 2) {
+    requestParams.createdStart = searchForm.dateRange[0]
+    requestParams.createdEnd = searchForm.dateRange[1]
+  }
+  
+  // 处理订单号
+  if (searchForm.payOrderId) {
+    requestParams.payOrderId = searchForm.payOrderId
+  }
+  if (searchForm.mchOrderNo) {
+    requestParams.mchOrderNo = searchForm.mchOrderNo
+  }
+  if (searchForm.channelOrderNo) {
+    requestParams.channelOrderNo = searchForm.channelOrderNo
+  }
+  
+  // 处理数字类型字段
+  if (searchForm.state) {
+    requestParams.state = parseInt(searchForm.state)
+  }
+  if (searchForm.notifyState) {
+    requestParams.notifyState = parseInt(searchForm.notifyState)
+  }
+  
+  // 处理其他字段
+  if (searchForm.appId) {
+    requestParams.appId = searchForm.appId
+  }
+  if (searchForm.storeId) {
+    requestParams.storeId = searchForm.storeId
+  }
+  
+  console.log('请求参数:', requestParams)
+  return req.list(API_URL_PAY_ORDER, requestParams)
 }
 
-/**
- * 搜索商户
- */
-const handleSearchMch = async (keyword) => {
-  if (!keyword) {
-    mchList.value = []
-    return
-  }
+// 请求统计数据函数
+const loadStatistics = (params) => {  
+  // 构建请求参数
+  const requestParams = null
 
-  try {
-    const res = await req.list(API_URL_MCH_LIST, {
-      mchName: keyword,
-      pageSize: 20
-    })
-    mchList.value = res.records || []
-  } catch (error) {
-    console.error('搜索商户失败:', error)
+  // 处理日期范围
+  if (searchForm.dateRange && searchForm.dateRange.length === 2) {
+    requestParams.createdStart = searchForm.dateRange[0]
+    requestParams.createdEnd = searchForm.dateRange[1]
   }
+  
+  // 处理订单号
+  if (searchForm.payOrderId) {
+    requestParams.payOrderId = searchForm.payOrderId
+  }
+  if (searchForm.mchOrderNo) {
+    requestParams.mchOrderNo = searchForm.mchOrderNo
+  }
+  if (searchForm.channelOrderNo) {
+    requestParams.channelOrderNo = searchForm.channelOrderNo
+  }
+  
+  // 处理数字类型字段
+  if (searchForm.state) {
+    requestParams.state = parseInt(searchForm.state)
+  }
+  if (searchForm.notifyState) {
+    requestParams.notifyState = parseInt(searchForm.notifyState)
+  }
+  
+  // 处理其他字段
+  if (searchForm.appId) {
+    requestParams.appId = searchForm.appId
+  }
+  if (searchForm.storeId) {
+    requestParams.storeId = searchForm.storeId
+  }
+  
+  console.log('统计请求参数:', requestParams)
+  return req.count(API_URL_PAY_ORDER , requestParams)
 }
 
-/**
- * 加载统计数据
- */
-const loadStatistics = async () => {
-  try {
-    const res = await req.getById(API_URL_PAY_ORDER + '/statistics', searchParams)
-    statistics.value = res || {
-      payAmount: 0,
-      payCount: 0,
-      mchFeeAmount: 0,
-      refundAmount: 0,
-      refundCount: 0
-    }
-  } catch (error) {
-    console.error('加载统计数据失败:', error)
-  }
+function onSearch() {
+  message.success('开始搜索')
+  refresh()
+}
+
+function onReset() {
+  searchForm.dateRange = ''
+  searchForm.payOrderId = ''
+  searchForm.mchOrderNo = ''
+  searchForm.channelOrderNo = ''
+  searchForm.state = ''
+  searchForm.notifyState = ''
+  searchForm.appId = ''
+  searchForm.storeId = ''
+}
+
+function refresh() {
+  // 调用 ag-table 的 reload 方法，触发搜索数据和数据统计
+  tableRef.value.reload()
+  // 调用 ag-table 的 reloadStatistics 方法，触发数据统计
+  tableRef.value.reloadStatistics()
 }
 
 /**
@@ -469,7 +431,6 @@ const handleRefund = (record) => {
  */
 const handleRefundSuccess = () => {
   refresh()
-  loadStatistics()
 }
 
 /**
@@ -478,6 +439,81 @@ const handleRefundSuccess = () => {
 const handleExport = () => {
   message.info(t('common.exportInDevelopment'))
 }
+
+// 表格列定义
+const columns = [
+  {
+    title: '支付订单号',
+    key: 'payOrderId',
+    dataIndex: 'payOrderId',
+    width: 180,
+    fixed: 'left',
+    customRender: 'payOrderId'
+  },
+  {
+    title: '商户订单号',
+    key: 'mchOrderNo',
+    dataIndex: 'mchOrderNo',
+    width: 180,
+    customRender: 'mchOrderNo'
+  },
+  {
+    title: '商户名称',
+    key: 'mchName',
+    dataIndex: 'mchName',
+    width: 150,
+    ellipsis: true
+  },
+  {
+    title: '支付金额',
+    key: 'amount',
+    dataIndex: 'amount',
+    width: 120,
+    align: 'right',
+    customRender: 'amount'
+  },
+  {
+    title: '手续费',
+    key: 'mchFeeAmount',
+    dataIndex: 'mchFeeAmount',
+    width: 100,
+    align: 'right',
+    customRender: 'mchFeeAmount'
+  },
+  {
+    title: '支付方式',
+    key: 'wayName',
+    dataIndex: 'wayName',
+    width: 120
+  },
+  {
+    title: '支付状态',
+    key: 'state',
+    dataIndex: 'state',
+    width: 100,
+    customRender: 'state'
+  },
+  {
+    title: '回调状态',
+    key: 'notifyState',
+    dataIndex: 'notifyState',
+    width: 100,
+    customRender: 'notifyState'
+  },
+  {
+    title: '创建时间',
+    key: 'createdAt',
+    dataIndex: 'createdAt',
+    width: 180
+  },
+  {
+    title: '操作',
+    key: 'actions',
+    width: 150,
+    fixed: 'right',
+    customRender: 'actions'
+  }
+]
 </script>
 
 <style lang="less" scoped>
@@ -514,6 +550,19 @@ const handleExport = () => {
 
   .table-operations {
     margin-bottom: 16px;
+  }
+
+  // 调整复制图标的垂直对齐
+  :deep(.ant-typography) {
+    display: flex;
+    align-items: center;
+    line-height: 1;
+
+    .ant-typography-copy {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+    }
   }
 }
 </style>

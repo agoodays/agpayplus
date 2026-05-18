@@ -669,7 +669,24 @@ CREATE TABLE `t_pay_order` (
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
   PRIMARY KEY (`pay_order_id`),
   UNIQUE KEY `Uni_MchNo_MchOrderNo` (`mch_no`, `mch_order_no`),
-  INDEX `Idx_CreatedAt` (`created_at`)
+  -- 按商户号和状态查询索引
+  INDEX `Idx_MchNo_State` (`mch_no`, `state`),
+  -- 按应用ID查询索引
+  INDEX `Idx_AppId` (`app_id`),
+  -- 按支付方式查询索引
+  INDEX `Idx_WayCode` (`way_code`),
+  -- 按成功时间查询索引
+  INDEX `Idx_SuccessTime` (`success_time`),
+  -- 按代理商号查询索引
+  INDEX `Idx_AgentNo` (`agent_no`),
+  -- 按服务商号查询索引
+  INDEX `Idx_IsvNo` (`isv_no`),
+  -- 按渠道订单号查询索引
+  INDEX `Idx_ChannelOrderNo` (`channel_order_no`),
+  -- 按创建时间索引
+  INDEX `Idx_CreatedAt` (`created_at`),
+  -- 按创建时间和状态查询索引
+  INDEX `Idx_CreatedAt_State` (created_at, state)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='支付订单表';
 
 -- 支付订单分润表

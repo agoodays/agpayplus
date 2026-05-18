@@ -73,6 +73,7 @@ builder.Configuration.GetSection("OSS:AliyunOss").Bind(AliyunOssConfig.Oss);
 #endregion
 
 #region CORS
+#if !DEBUG
 // 从 appsettings.json 中读取 CORS 配置
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
 // 添加 CORS 服务
@@ -84,7 +85,18 @@ services.AddCors(o =>
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()
+    )); 
+#else
+// 开发环境允许所有来源
+services.AddCors(o =>
+    o.AddPolicy("CorsPolicy",
+        builder => builder
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
     ));
+#endif
 #endregion
 
 services.AddMemoryCache();

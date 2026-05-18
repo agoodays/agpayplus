@@ -679,10 +679,10 @@ function reload(goToFirst = false) {
 function reloadStatistics() {
   if (!props.onLoadStatistics) return
 
-  const pagination = paginationConfig.value
+  // const pagination = paginationConfig.value
   const params = {
-    pageNumber: pagination?.current || 1,
-    pageSize: pagination?.pageSize || 10,
+    // pageNumber: pagination?.current || 1,
+    // pageSize: pagination?.pageSize || 10,
     ...props.searchData
   }
 
@@ -732,9 +732,9 @@ function handlePageChange(page) {
     return
   }
 
-  // 非受控模式：更新内部 pagination 状态并重新加载
+  // 非受控模式：更新内部 pagination 状态
+  // 注意：这里不直接调用 reload，因为 handleTableChange 会处理
   state.pagination.current = page
-  reload()
 }
 
 function handlePageSizeChange(current, pageSize) {
@@ -743,10 +743,10 @@ function handlePageSizeChange(current, pageSize) {
     return
   }
 
-  // 非受控模式：更新内部 pagination 并回到第一页加载（通常页面大小变化时回到第一页）
+  // 非受控模式：更新内部 pagination 状态
+  // 注意：这里不直接调用 reload，因为 handleTableChange 会处理
   state.pagination.current = current || 1
   state.pagination.pageSize = pageSize
-  reload(true)
 }
 
 function handleTableChange(pagination, filters, sorter) {
@@ -890,20 +890,20 @@ watch(
   { deep: true, flush: 'post' }
 )
 
-// 搜索条件变化时重新加载数据（使用防抖优化）
-const debouncedReload = debounce(() => {
-  if (props.onLoad) {
-    reload(true)
-  }
-}, DEBOUNCE_DELAY)
+// // 搜索条件变化时重新加载数据（使用防抖优化）
+// const debouncedReload = debounce(() => {
+//   if (props.onLoad) {
+//     reload(true)
+//   }
+// }, DEBOUNCE_DELAY)
 
-watch(
-  () => props.searchData,
-  () => {
-    debouncedReload()
-  },
-  { deep: true, flush: 'post' }
-)
+// watch(
+//   () => props.searchData,
+//   () => {
+//     debouncedReload()
+//   },
+//   { deep: true, flush: 'post' }
+// )
 
 // 统计面板展开/收起
 watch(
@@ -938,6 +938,11 @@ onMounted(() => {
   // 如果提供了数据加载函数，初始化时加载
   if (props.onLoad) {
     reload(true)
+  }
+
+  // 如果提供了数据统计加载函数，初始化时也加载
+  if (props.onLoadStatistics) {
+    reloadStatistics()
   }
 
   // 初始化自动刷新状态

@@ -128,7 +128,6 @@ function getIconComponent(iconName) {
   if (!PascalCaseName.endsWith('Outlined')) {
     PascalCaseName += 'Outlined'
   }
-  console.log(PascalCaseName)
   return antIcons[PascalCaseName]
 }
 

@@ -86,16 +86,18 @@
   //   background: var(--sider-bg-dark) !important;
   // }
 
-  // 暗色模式下的按钮样式
+  // 暗色模式下的按钮样式（不包含 link 类型）
   .ant-btn {
-    &.ant-btn-primary {
-      background-color: var(--primary-color) !important;
-      border-color: var(--primary-color) !important;
-    }
-    &:not(.ant-btn-primary) {
-      background-color: var(--layout-surface) !important;
-      border-color: var(--border-color) !important;
-      color: var(--text-color) !important;
+    &:not(.ant-btn-link) {
+      &.ant-btn-primary {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+      }
+      &:not(.ant-btn-primary) {
+        background-color: var(--layout-surface) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+      }
     }
   }
 }
