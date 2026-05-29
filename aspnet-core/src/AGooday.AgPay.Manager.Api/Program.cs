@@ -28,6 +28,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -140,6 +141,10 @@ services.AddControllers(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 services.AddEndpointsApiExplorer();
+
+// .NET 9 内置 OpenAPI — 供 Scalar 使用
+services.AddOpenApi();
+
 services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "AGooday.AgPay.Manager.Api", Version = "1.0" });
@@ -271,6 +276,10 @@ app.UseRequestResponseLogging();
 //{
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.MapOpenApi();
+app.MapScalarApiReference();
+
 //dotnet add package IGeekFan.AspNetCore.Knife4jUI
 //app.UseKnife4UI(c =>
 //{
