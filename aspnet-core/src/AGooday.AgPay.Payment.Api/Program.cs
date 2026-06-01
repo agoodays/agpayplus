@@ -153,18 +153,25 @@ OSSNativeInjectorBootStrapper.RegisterServices(services);
 #endregion
 
 #region CORS
-// 从 appsettings.json 中读取 CORS 配置
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
-// 添加 CORS 服务
+// 1. 读取生产环境的白名单配置
+var prodOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>();
+
 services.AddCors(o =>
-    o.AddPolicy("CorsPolicy",
-        builder => builder
-            .WithOrigins(allowedOrigins)
-            //.AllowAnyOrigin()
+    o.AddPolicy("CorsPolicy", builder =>
+    {
+        builder
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials()
-    ));
+            .AllowCredentials(); // 统一开启凭证支持
+
+#if DEBUG
+        // 开发环境：动态放行所有来源（完美实现“不限制”）
+        builder.SetIsOriginAllowed(origin => true);
+#else
+        // 生产环境：严格校验白名单
+        builder.WithOrigins(prodOrigins);
+#endif
+    }));
 #endregion
 
 #region SMS
