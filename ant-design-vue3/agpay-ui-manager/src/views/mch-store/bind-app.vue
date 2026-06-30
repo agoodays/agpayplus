@@ -27,10 +27,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
+import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
 import { message, Modal } from 'ant-design-vue'
+import { reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { API_URL_MCH_APP, API_URL_MCH_STORE, req } from '@/api/manage'
 
 const { t } = useI18n()
 
@@ -100,10 +101,7 @@ const initForm = async () => {
 const loadAppList = async () => {
   try {
     loading.value = true
-    const res = await req.list(API_URL_MCH_APP, {
-      pageSize: -1,
-      mchNo: props.mchNo
-    })
+    const res = await mchAppApi.queryByMchNo(props.mchNo)
     appList.value = res.records || []
   } catch (error) {
     console.error('加载应用列表失败:', error)
@@ -130,7 +128,7 @@ const handleSubmit = () => {
           bindAppId: formState.bindAppId || null
         }
 
-        await req.updateById(API_URL_MCH_STORE, props.storeId, data)
+        await mchStoreApi.updateById(props.storeId, data)
         message.success(t('mchStore.bindAppSuccess'))
 
         handleClose()

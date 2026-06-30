@@ -113,29 +113,26 @@
     </a-row>
   </a-drawer>
 </template>
-<script>
-import { API_URL_DIVISION_RECEIVER, req } from '@/api/manage'
+<script setup>
+import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
+import { ref } from 'vue'
 
-export default {
-  data() {
-    return {
-      visible: false,
-      detailData: {}
-    }
-  },
-  methods: {
-    show: function (recordId) {
-      const that = this
-      req.getById(API_URL_DIVISION_RECEIVER, recordId).then((res) => {
-        that.detailData = res
-      })
-      this.visible = true
-    },
-    // 抽屉关闭
-    onClose() {
-      this.visible = false
-      this.$emit('close')
-    }
-  }
+const emit = defineEmits(['close'])
+
+const visible = ref(false)
+const detailData = ref({})
+
+const show = (recordId) => {
+  divisionReceiverApi.getById(recordId).then((res) => {
+    detailData.value = res || {}
+  })
+  visible.value = true
 }
+
+const onClose = () => {
+  visible.value = false
+  emit('close')
+}
+
+defineExpose({ show })
 </script>

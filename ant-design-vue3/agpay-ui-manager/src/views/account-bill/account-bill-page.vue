@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :btn-loading="btnLoading" @search="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
@@ -231,9 +231,9 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput } from '@/components'
-import { API_URL_ACCOUNT_BILL_LIST, req } from '@/api/manage'
+import { accountBillApi } from '@/api/business/account-bill/account-bill-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { onMounted, reactive, ref } from 'vue'
 
 // 表格列配置
 const tableColumns = [
@@ -288,7 +288,7 @@ const queryFunc = () => {
 
 // 对接table接口函数
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_ACCOUNT_BILL_LIST, params)
+  return accountBillApi.queryPage(params)
 }
 
 // 搜索函数
@@ -299,7 +299,7 @@ const searchFunc = () => {
 
 // 详情函数
 const detailFunc = (recordId) => {
-  req.getById(API_URL_ACCOUNT_BILL_LIST, recordId).then((res) => {
+  accountBillApi.getById(recordId).then((res) => {
     Object.assign(detailData, res)
   })
   visible.value = true

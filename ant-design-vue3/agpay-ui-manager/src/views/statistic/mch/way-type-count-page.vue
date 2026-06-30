@@ -1,6 +1,6 @@
 <template>
   <a-card>
-    <ag-search v-model="searchData" :loading="btnLoading" @search="queryFunc">
+    <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
       <template #formItem>
         <a-form-item label="" class="table-head-layout">
           <ag-date-range-picker v-model:value="searchData.queryDateRange" />
@@ -169,9 +169,9 @@
   </a-card>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { AgSearch, AgTable, AgDateRangePicker, AgInput } from '@/components'
-import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
+import { statisticApi } from '@/api/business/statistic/statistic-api'
+import { AgDateRangePicker, AgSearch, AgTable } from '@/components'
+import { onMounted, reactive, ref } from 'vue'
 
 // 定义组件属性
 const props = defineProps({
@@ -264,13 +264,13 @@ const queryFunc = () => {
 
 // 表格接口数据请求
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_ORDER_STATISTIC, params)
+  return statisticApi.queryOrderStatistic(params)
 }
 
 // 下载数据方法
 const reqDownloadDataFunc = (params) => {
-  req
-    .export(API_URL_ORDER_STATISTIC, 'excel', params)
+  statisticApi
+    .exportExcel(params)
     .then((res) => {
       // 将响应中的二进制数据转换为Blob对象
       const blob = new Blob([res])

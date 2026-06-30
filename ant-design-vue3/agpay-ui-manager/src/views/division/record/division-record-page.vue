@@ -44,7 +44,7 @@
             </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" icon="search" :loading="btnLoading" @click="queryFunc">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => (searchData = {})">重置</a-button>
+              <a-button style="margin-left: 8px" icon="reload" @click="resetFunc">重置</a-button>
             </span>
           </div>
         </a-form>
@@ -123,16 +123,9 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { AgTable, AgTableActions, AgSelect, AgInput, AgDateRangePicker } from '@/components'
-import {
-  API_URL_PAY_ORDER_DIVISION_RECORD_LIST,
-  API_URL_IFDEFINES_LIST,
-  API_URL_MCH_LIST,
-  req,
-  resendDivision
-} from '@/api/manage'
-import moment from 'moment'
+import { divisionRecordApi } from '@/api/business/division/division-record-api'
+import { AgDateRangePicker, AgInput, AgSelect, AgTable, AgTableActions } from '@/components'
+import { onMounted, reactive, ref } from 'vue'
 import Detail from './detail.vue'
 
 // 表格列配置
@@ -179,12 +172,8 @@ const searchData = reactive({
   queryDateRange: 'today'
 })
 const ifDefineList = ref([])
-const createdStart = ref('') // 选择开始时间
-const createdEnd = ref('') // 选择结束时间
-
-// 搜索商户
 const searchMch = (params) => {
-  return req.list(API_URL_MCH_LIST, params)
+  return divisionRecordApi.listMch(params)
 }
 
 // 查询函数
@@ -195,20 +184,22 @@ const queryFunc = () => {
 
 // 对接table接口函数
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_PAY_ORDER_DIVISION_RECORD_LIST, params)
+  return divisionRecordApi.queryPage(params)
 }
 
 // 查询支付接口定义列表
 const reqIfDefineListFunc = () => {
-  req.list(API_URL_IFDEFINES_LIST, { state: 1 }).then((res) => {
+  divisionRecordApi.listIfDefine({ state: 1 }).then((res) => {
     ifDefineList.value = res
   })
 }
 
-// 搜索函数
-const searchFunc = () => {
-  // 点击查询按钮事件
-  infoTable.value.loadData()
+const resetFunc = () => {
+  Object.keys(searchData).forEach((key) => {
+    searchData[key] = ''
+  })
+  searchData.queryDateRange = 'today'
+  queryFunc()
 }
 
 // 详情函数
@@ -219,28 +210,11 @@ const detailFunc = (recordId) => {
 // 重新分账
 const redivFunc = (recordId) => {
   window.$infoBox.confirmPrimary('确定重新分账?', '重新分账将重新触发分账操作,可能会导致重复分账', () => {
-    resendDivision(recordId).then((res) => {
+    divisionRecordApi.resendDivision(recordId).then(() => {
       infoTable.value.loadData()
       window.$message.warning('等待接口返回状态')
     })
   })
-}
-
-// 日期选择变化
-const onChange = (date, dateString) => {
-  searchData.createdStart = dateString[0] // 开始时间
-  searchData.createdEnd = dateString[1] // 结束时间
-}
-
-// 禁用日期
-const disabledDate = (current) => {
-  // 今天之后的日期不可选
-  return current && current > moment().endOf('day')
-}
-
-// 关闭
-const onClose = () => {
-  // 这里的visible可能需要在实际使用中定义
 }
 
 // 组件挂载时

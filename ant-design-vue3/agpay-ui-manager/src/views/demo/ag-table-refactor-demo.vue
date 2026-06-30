@@ -137,12 +137,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
-import { message } from 'ant-design-vue'
-import dayjs from 'dayjs'
-import { SearchOutlined, ReloadOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { orderApi } from '@/api/business/order/order-api'
 import { AgTable } from '@/components'
-import { req } from '@/api/manage'
+import { DeleteOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, reactive, ref } from 'vue'
 
 // ==================== 搜索表单 ====================
 const searchForm = reactive({
@@ -163,7 +162,7 @@ const tableSearchParams = computed(() => ({
 // onLoad 函数，ag-table 会传入分页等参数作为参数对象
 async function loadTable(params) {
   // params 可能包含: pageNumber, pageSize, sort, filters, ...
-  const res = await req.list('/order/list', params)
+  const res = await orderApi.queryPayOrderPage(params)
   // req.list 已通过全局 request 处理并返回 data 字段内容
   // 适配后端返回格式为 { total, records } 或 { total, list }
   return {
@@ -249,8 +248,8 @@ const handleEdit = (record) => {
 
 const handleSaveEdit = async () => {
   try {
-    await api.update('/order/edit', editForm.value)
-    message.success('编辑成功')
+    // 示例页只演示交互流程，不直接改动真实订单数据。
+    message.success('示例：已保存编辑内容')
     editOpen.value = false
     tableRef.value.reload()
   } catch (error) {
@@ -279,8 +278,7 @@ const handleAdd = () => {
 
 const handleDelete = async (record) => {
   try {
-    await api.delete(`/order/${record.id}`)
-    message.success('删除成功')
+    message.success(`示例：已删除订单 ${record.orderNo || record.id}`)
     // 重新加载表格
     tableRef.value.reload()
   } catch (error) {
@@ -290,10 +288,7 @@ const handleDelete = async (record) => {
 
 const handleBatchDelete = async () => {
   try {
-    await api.batchDelete('/order/batch-delete', {
-      ids: selectedRowKeys.value
-    })
-    message.success('批量删除成功')
+    message.success(`示例：已批量删除 ${selectedRowKeys.value.length} 条记录`)
     selectedRowKeys.value = []
     tableRef.value.reload()
   } catch (error) {

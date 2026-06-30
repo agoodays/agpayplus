@@ -38,7 +38,7 @@
             </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" icon="search" :loading="btnLoading" @click="searchFunc">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => (searchData = {})">重置</a-button>
+              <a-button style="margin-left: 8px" icon="reload" @click="resetFunc">重置</a-button>
             </span>
           </div>
         </a-form>
@@ -134,9 +134,9 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted, nextTick, defineAsyncComponent } from 'vue'
-import { AgTable, AgTableActions, AgSelect, AgInput } from '@/components'
-import { API_URL_DIVISION_RECEIVER, API_URL_IFDEFINES_LIST, API_URL_MCH_LIST, req } from '@/api/manage'
+import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
+import { AgInput, AgSelect, AgTable, AgTableActions } from '@/components'
+import { defineAsyncComponent, nextTick, onMounted, reactive, ref } from 'vue'
 
 // 动态导入组件
 const ReceiverAdd = defineAsyncComponent(() => import('./receiver-add.vue'))
@@ -191,26 +191,33 @@ const ifDefineList = ref([])
 
 // 搜索商户
 const searchMch = (params) => {
-  return req.list(API_URL_MCH_LIST, params)
+  return divisionReceiverApi.listMch(params)
 }
 
 // 对接table接口函数
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_DIVISION_RECEIVER, params)
+  return divisionReceiverApi.queryPage(params)
 }
 
 // 查询支付接口定义列表
 const reqIfDefineListFunc = () => {
-  req.list(API_URL_IFDEFINES_LIST, { state: 1 }).then((res) => {
+  divisionReceiverApi.listIfDefine({ state: 1 }).then((res) => {
     ifDefineList.value = res
   })
 }
 
 // 搜索函数
 const searchFunc = () => {
-  // 点击查询按钮事件
-  btnLoading.value = true // 开启查询按钮上的loading
+  btnLoading.value = true
   infoTable.value.loadData()
+}
+
+const resetFunc = () => {
+  Object.keys(searchData).forEach((key) => {
+    searchData[key] = ''
+  })
+  searchData.appId = ''
+  searchFunc()
 }
 
 // 新增函数

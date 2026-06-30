@@ -81,9 +81,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { mchApi } from '@/api/business/mch/mch-api'
 import { message } from 'ant-design-vue'
-import { API_URL_MCH_LIST, req } from '@/api/manage'
+import { reactive, ref, watch } from 'vue'
 
 // Props & Emits
 const props = defineProps({
@@ -144,7 +144,7 @@ watch(localOpen, (val) => {
 const loadDetail = async () => {
   try {
     loading.value = true
-    const res = await req.getById(API_URL_MCH_LIST, props.recordId)
+    const res = await mchApi.getById(props.recordId)
 
     // 更新 detailData
     Object.assign(detailData, res)

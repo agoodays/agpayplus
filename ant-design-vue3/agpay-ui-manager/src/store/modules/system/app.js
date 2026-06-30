@@ -1,12 +1,10 @@
-import { defineStore } from 'pinia'
 import { systemConfigApi } from '@/api/system/system-config-api'
+import { defaultLayoutConfig, defaultThemeConfig } from '@/config/app-config'
 import localStorageKeyConst from '@/constants/local-storage-key-const'
-import { defaultThemeConfig, defaultLayoutConfig } from '@/config/app-config'
+import { defineStore } from 'pinia'
 
 export const useAppStore = defineStore('app', {
   state: () => ({
-    // 全局加载状态
-    globalLoading: false,
     // 站点信息
     siteInfo: null,
     // 系统配置
@@ -18,15 +16,6 @@ export const useAppStore = defineStore('app', {
     // 布局配置
     layoutConfig: { ...defaultLayoutConfig }
   }),
-
-  getters: {
-    getGlobalLoading: (state) => state.globalLoading,
-    getSiteInfo: (state) => state.siteInfo,
-    getSysConfig: (state) => state.sysConfig,
-    getDefaultConfig: (state) => state.defaultConfig,
-    getThemeConfig: (state) => state.themeConfig,
-    getLayoutConfig: (state) => state.layoutConfig
-  },
 
   actions: {
     /**
@@ -199,20 +188,6 @@ export const useAppStore = defineStore('app', {
     },
 
     /**
-     * 显示全局加载
-     */
-    showLoading() {
-      this.globalLoading = true
-    },
-
-    /**
-     * 隐藏全局加载
-     */
-    hideLoading() {
-      this.globalLoading = false
-    },
-
-    /**
      * 获取站点配置信息（包含主题、布局等）
      * 从 /anon/siteInfos?queryConfig=1 接口获取
      */
@@ -303,28 +278,6 @@ export const useAppStore = defineStore('app', {
     },
 
     /**
-     * 获取站点信息（兼容旧方法）
-     * @deprecated 使用 fetchSiteConfig 替代
-     */
-    async fetchSiteInfo() {
-      return this.fetchSiteConfig()
-    },
-
-    /**
-     * 获取默认配置（兼容旧方法）
-     * @deprecated 配置已包含在 fetchSiteConfig 中
-     */
-    async fetchDefaultConfig() {
-      // 如果已经有配置，直接返回
-      if (this.defaultConfig) {
-        return this.defaultConfig
-      }
-      // 否则调用 fetchSiteConfig
-      const data = await this.fetchSiteConfig()
-      return data.defaultConfig
-    },
-
-    /**
      * 设置主题颜色
      */
     setThemeColor(color) {
@@ -335,24 +288,8 @@ export const useAppStore = defineStore('app', {
      * 应用主题标量（颜色、圆角等）
      */
     applyThemeScalars({ primaryColor, borderRadius }) {
-      const scalarActions = [
-        {
-          value: primaryColor,
-          shouldApply: (value) => Boolean(value),
-          apply: (value) => this.applyPrimaryColor(value)
-        },
-        {
-          value: borderRadius,
-          shouldApply: (value) => value !== undefined,
-          apply: (value) => this.applyBorderRadius(value)
-        }
-      ]
-
-      scalarActions.forEach(({ value, shouldApply, apply }) => {
-        if (shouldApply(value)) {
-          apply(value)
-        }
-      })
+      if (primaryColor) this.applyPrimaryColor(primaryColor)
+      if (borderRadius !== undefined) this.applyBorderRadius(borderRadius)
     },
 
     /**
@@ -455,7 +392,5 @@ export const useAppStore = defineStore('app', {
     }
   },
 
-  persist: {
-    enabled: false // 使用自定义的 localStorage 管理
-  }
+  persist: false
 })

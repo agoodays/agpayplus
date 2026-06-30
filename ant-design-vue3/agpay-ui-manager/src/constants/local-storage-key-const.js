@@ -22,6 +22,10 @@ export default {
   USER_TAG_NAV: `${KEY_PREFIX}user_tag_nav`,
   // app config 配置信息
   APP_CONFIG: `${KEY_PREFIX}app_config`,
+  // 主题配置
+  THEME_CONFIG: `${KEY_PREFIX}theme_config`,
+  // 布局配置
+  LAYOUT_CONFIG: `${KEY_PREFIX}layout_config`,
   // 首页快捷入口
   HOME_QUICK_ENTRY: `${KEY_PREFIX}home_quick_entry`,
   // 通知信息已读

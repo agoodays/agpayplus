@@ -45,90 +45,78 @@
   </a-drawer>
 </template>
 
-<script>
-import { API_URL_DIVISION_RECEIVER, API_URL_DIVISION_RECEIVER_GROUP, req } from '@/api/manage'
-export default {
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
+<script setup>
+import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
+import { ref } from 'vue'
 
-  data() {
-    return {
-      confirmLoading: false, // 显示确定按钮loading图标
-      isShow: false, // 是否显示弹层/抽屉
-      saveObject: {}, // 数据对象
-      recordId: null, // 更新对象ID
-      allReceiverGroup: [], // 当前商户所有的接收账号的分组情况
-      rules: {
-        receiverAlias: [{ required: true, message: '请输入别名', trigger: 'blur' }],
-        receiverGroupId: [{ required: true, message: '请选择分组', trigger: 'blur' }],
-        divisionProfit: [{ required: true, message: '请录入默认分账比例', trigger: 'blur' }],
-        state: [{ required: true, message: '请选择状态', trigger: 'blur' }]
-      }
-    }
-  },
-  created() {},
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.saveObject = {} // 数据清空
-      this.confirmLoading = false // 关闭loading
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
 
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
+const emit = defineEmits(['close'])
 
-      const that = this
+const infoFormModel = ref()
+const confirmLoading = ref(false)
+const isShow = ref(false)
+const saveObject = ref({})
+const recordId = ref(null)
+const allReceiverGroup = ref([])
 
-      that.recordId = recordId
-
-      // 查询账号信息
-      req.getById(API_URL_DIVISION_RECEIVER, recordId).then((res) => {
-        res.divisionProfit = (res.divisionProfit * 100).toFixed(2)
-        that.saveObject = res
-      })
-
-      // 请求接口，获取所有分组信息，只有此处进行pageSize=-1传参
-      req.list(API_URL_DIVISION_RECEIVER_GROUP, { pageSize: -1 }).then((res) => {
-        that.allReceiverGroup = res.records
-      })
-
-      this.isShow = true
-    },
-
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          that.confirmLoading = true // 显示loading
-
-          var reqObject = {
-            receiverAlias: that.saveObject.receiverAlias,
-            receiverGroupId: that.saveObject.receiverGroupId,
-            divisionProfit: that.saveObject.divisionProfit,
-            state: that.saveObject.state
-          }
-
-          req
-            .updateById(API_URL_DIVISION_RECEIVER, that.recordId, reqObject)
-            .then((res) => {
-              that.$message.success('修改成功')
-              that.isShow = false
-              that.callbackFunc() // 刷新列表
-            })
-            .catch((res) => {
-              that.confirmLoading = false
-            })
-        }
-      })
-    },
-    // 抽屉关闭
-    onClose() {
-      this.isShow = false
-      this.$emit('close')
-    }
-  }
+const rules = {
+  receiverAlias: [{ required: true, message: '请输入别名', trigger: 'blur' }],
+  receiverGroupId: [{ required: true, message: '请选择分组', trigger: 'blur' }],
+  divisionProfit: [{ required: true, message: '请录入默认分账比例', trigger: 'blur' }],
+  state: [{ required: true, message: '请选择状态', trigger: 'blur' }]
 }
+
+const show = (id) => {
+  saveObject.value = {}
+  confirmLoading.value = false
+  infoFormModel.value?.resetFields?.()
+  recordId.value = id
+
+  divisionReceiverApi.getById(id).then((res) => {
+    const current = res || {}
+    current.divisionProfit = (current.divisionProfit * 100).toFixed(2)
+    saveObject.value = current
+  })
+
+  divisionReceiverApi.listReceiverGroup({ pageSize: -1 }).then((res) => {
+    allReceiverGroup.value = res.records || []
+  })
+
+  isShow.value = true
+}
+
+const handleOkFunc = () => {
+  infoFormModel.value.validate((valid) => {
+    if (valid) {
+      confirmLoading.value = true
+      const reqObject = {
+        receiverAlias: saveObject.value.receiverAlias,
+        receiverGroupId: saveObject.value.receiverGroupId,
+        divisionProfit: saveObject.value.divisionProfit,
+        state: saveObject.value.state
+      }
+
+      divisionReceiverApi
+        .updateById(recordId.value, reqObject)
+        .then(() => {
+          window.$message.success('修改成功')
+          isShow.value = false
+          props.callbackFunc()
+        })
+        .catch(() => {
+          confirmLoading.value = false
+        })
+    }
+  })
+}
+
+const onClose = () => {
+  isShow.value = false
+  emit('close')
+}
+
+defineExpose({ show })
 </script>

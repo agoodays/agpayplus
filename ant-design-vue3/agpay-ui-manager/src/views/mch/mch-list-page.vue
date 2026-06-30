@@ -116,16 +116,16 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { useI18n } from 'vue-i18n'
+import { mchApi } from '@/api/business/mch/mch-api'
+import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { useDelete, useModal, usePermission } from '@/hooks/common-hooks'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { useModal, usePermission, useDelete } from '@/hooks/common-hooks'
-import { API_URL_MCH_LIST, req } from '@/api/manage'
+import { message } from 'ant-design-vue'
+import { reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import AddOrEditModal from './add-or-edit.vue'
 import DetailDrawer from './detail.vue'
-import { AgSearch, AgTable, AgInput, AgSelect, AgTableActions } from '@/components'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -216,7 +216,7 @@ function reqTableDataFunc(params) {
   if (searchForm.type) {
     params.type = parseInt(searchForm.type)
   }
-  return req.list(API_URL_MCH_LIST, params)
+  return mchApi.queryPage(params)
 }
 
 function onSearch(vals) {
@@ -280,7 +280,7 @@ const handleAdvancedConfig = (record) => {
  */
 const handleDelete = (record) => {
   deleteItem(t('mch.confirmDeleteMchTitle'), t('mch.confirmDeleteMchContent'), async () => {
-    await req.delById(API_URL_MCH_LIST, record.mchNo)
+    await mchApi.delById(record.mchNo)
     message.success(t('common.deleteSuccess'))
   })
 }

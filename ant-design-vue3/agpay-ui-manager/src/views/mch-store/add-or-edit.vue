@@ -175,11 +175,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, nextTick } from 'vue'
+import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
+import { CheckOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { PlusOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
-import { API_URL_MCH_STORE, API_URL_MCH_LIST, req } from '@/api/manage'
 
 const { t } = useI18n()
 
@@ -279,7 +279,7 @@ const initForm = async () => {
 const loadDetail = async () => {
   try {
     loading.value = true
-    const res = await req.getById(API_URL_MCH_STORE, props.recordId)
+    const res = await mchStoreApi.getById(props.recordId)
 
     Object.assign(formState, res)
 
@@ -363,7 +363,7 @@ const resetForm = () => {
  */
 const handleSearchMch = async (keyword) => {
   try {
-    const res = await req.list(API_URL_MCH_LIST, {
+    const res = await mchStoreApi.queryMchPage({
       mchName: keyword,
       pageSize: 20
     })
@@ -451,10 +451,10 @@ const handleSubmit = async () => {
 
     // 提交数据
     if (isAdd.value) {
-      await req.add(API_URL_MCH_STORE, data)
+      await mchStoreApi.add(data)
       message.success(t('common.addSuccess'))
     } else {
-      await req.updateById(API_URL_MCH_STORE, props.recordId, data)
+      await mchStoreApi.updateById(props.recordId, data)
       message.success(t('common.editSuccess'))
     }
 

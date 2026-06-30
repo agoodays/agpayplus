@@ -185,9 +185,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, defineProps } from 'vue'
-import { req, getPwdRulesRegexp, API_URL_SYS_USER_LIST, API_URL_UR_TEAM_LIST } from '@/api/manage'
+import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
 import { Base64 } from '@/lib/encrypt'
+import { onMounted, reactive, ref } from 'vue'
 
 const props = defineProps({
   callbackFunc: { type: Function, default: () => ({}) }
@@ -308,12 +308,12 @@ const genRandomPassword = () => {
     const minLength = lengthMatch ? parseInt(lengthMatch[1], 10) : passwordLength // 默认最小长度为 6
     const maxLength = lengthMatch && lengthMatch[2] ? parseInt(lengthMatch[2], 10) : minLength // 如果没有最大长度，则使用最小长度
 
-    const passwordLength = Math.min(maxLength, minLength) // 使用最小长度或最大长度
+    const generatedLength = Math.min(maxLength, minLength) // 使用最小长度或最大长度
 
     // 循环生成密码，直到符合规则
     do {
       password = ''
-      for (let i = 0; i < passwordLength; i++) {
+      for (let i = 0; i < generatedLength; i++) {
         password += characters.charAt(Math.floor(Math.random() * characters.length))
       }
     } while (!regex.test(password)) // 验证生成的密码是否符合规则
@@ -327,7 +327,7 @@ const handleOkFunc = () => {
   infoForm.value.validate().then(() => {
     confirmLoading.value = true // 显示loading
     if (isAdd.value) {
-      req.add(API_URL_SYS_USER_LIST, saveObject).then(res => {
+      sysUserApi.add(saveObject).then(res => {
         import('ant-design-vue').then(({ message }) => {
           message.success('新增成功')
           isShow.value = false
@@ -339,7 +339,7 @@ const handleOkFunc = () => {
     } else {
       sysPassword.confirmPwd = Base64.encode(sysPassword.confirmPwd)
       Object.assign(saveObject, sysPassword) // 拼接对象
-      req.updateById(API_URL_SYS_USER_LIST, recordId.value, saveObject).then(res => {
+      sysUserApi.updateById(recordId.value, saveObject).then(res => {
         import('ant-design-vue').then(({ message }) => {
           message.success('修改成功')
           isShow.value = false
@@ -428,13 +428,13 @@ const show = (recordIdParam, sysType, belongInfoId) => {
     })
   }
 
-  req.list(API_URL_UR_TEAM_LIST, { pageSize: -1, sysType: sysType, belongInfoId: belongInfoId }).then(res => { // 用户团队下拉选择列表
+  sysUserApi.queryTeamPage({ pageSize: -1, sysType: sysType, belongInfoId: belongInfoId }).then(res => { // 用户团队下拉选择列表
     teamList.value = res.records
   })
   if (!isAdd.value) { // 修改信息 延迟展示弹层
     resetIsShow.value = true // 展示重置密码板块
     recordId.value = recordIdParam
-    req.getById(API_URL_SYS_USER_LIST, recordIdParam).then(res => { 
+    sysUserApi.getById(recordIdParam).then(res => { 
       Object.assign(saveObject, res) 
     })
     isShow.value = true
@@ -444,9 +444,11 @@ const show = (recordIdParam, sysType, belongInfoId) => {
 }
 
 onMounted(() => {
-  getPwdRulesRegexp().then((res) => {
+  sysUserApi.queryPwdRulesRegexp().then((res) => {
     passwordRules.regexpRules = res.regexpRules
     passwordRules.errTips = res.errTips
   })
 })
+
+defineExpose({ show })
 </script>

@@ -67,10 +67,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, nextTick } from 'vue'
+import { orderApi } from '@/api/business/order/order-api'
 import { message, Modal } from 'ant-design-vue'
+import { nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { API_URL_REFUND_ORDER, req } from '@/api/manage'
 
 const { t } = useI18n()
 
@@ -171,7 +171,7 @@ const handleSubmit = () => {
             remark: formState.remark
           }
 
-          await req.add(API_URL_REFUND_ORDER, data)
+          await orderApi.createRefund(data)
           message.success(t('refund.submitSuccess'))
 
           handleClose()

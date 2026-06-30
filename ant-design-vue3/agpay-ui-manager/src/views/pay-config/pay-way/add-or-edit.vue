@@ -26,8 +26,8 @@
   </a-modal>
 </template>
 <script setup>
-import { ref, reactive, defineProps } from 'vue'
-import { API_URL_PAYWAYS_LIST, req } from '@/api/manage'
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
+import { reactive, ref } from 'vue'
 
 const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
@@ -62,7 +62,7 @@ const show = (wayCodeParam) => {
 
   if (!isAdd.value) { // 修改信息 延迟展示弹层
     wayCode.value = wayCodeParam
-    req.getById(API_URL_PAYWAYS_LIST, wayCodeParam).then(res => { 
+    payConfigApi.getPayWayById(wayCodeParam).then(res => { 
       Object.assign(saveObject, res) 
     })
     isShow.value = true
@@ -74,7 +74,7 @@ const show = (wayCodeParam) => {
 const handleOkFunc = () => {
   infoForm.value.validate().then(() => {
     if (isAdd.value) {
-      req.add(API_URL_PAYWAYS_LIST, saveObject).then(res => {
+      payConfigApi.addPayWay(saveObject).then(res => {
         import('ant-design-vue').then(({ message }) => {
           message.success('新增成功')
           isShow.value = false
@@ -82,7 +82,7 @@ const handleOkFunc = () => {
         })
       })
     } else {
-      req.updateById(API_URL_PAYWAYS_LIST, wayCode.value, saveObject).then(res => {
+      payConfigApi.updatePayWayById(wayCode.value, saveObject).then(res => {
         import('ant-design-vue').then(({ message }) => {
           message.success('修改成功')
           isShow.value = false
@@ -94,4 +94,6 @@ const handleOkFunc = () => {
     console.error('验证失败:', error)
   })
 }
+
+defineExpose({ show })
 </script>

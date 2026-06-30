@@ -38,8 +38,8 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { API_URL_IFDEFINES_LIST, req } from '@/api/manage'
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
+import { reactive, ref } from 'vue'
 import PayIfDefineAddOrEdit from './add-or-edit.vue'
 
 const infoCard = ref(null)
@@ -54,7 +54,7 @@ const agpayCard = reactive({
 
 // 请求支付接口定义数据
 const reqCardListFunc = () => {
-  return req.list(API_URL_IFDEFINES_LIST)
+  return payConfigApi.queryIfDefineList()
 }
 
 // 刷新card列表
@@ -70,7 +70,7 @@ const del = (ifCode) => {
   import('ant-design-vue').then(({ message }) => {
     import('@/utils/info-box').then(({ infoBox }) => {
       infoBox.confirmDanger('确认删除？', '', () => {
-        return req.delById(API_URL_IFDEFINES_LIST, ifCode).then(res => {
+        return payConfigApi.delIfDefineById(ifCode).then(res => {
           message.success('删除成功！')
           refCardList()
         })

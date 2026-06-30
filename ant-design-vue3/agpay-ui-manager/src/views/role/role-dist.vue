@@ -6,99 +6,93 @@
   </div>
 </template>
 
-<script>
-import { getEntTree, API_URL_ROLE_ENT_RELA_LIST, req } from '@/api/manage'
-export default {
-  data() {
-    return {
-      hasEnt: this.$access('ENT_UR_ROLE_DIST'),
-      recordId: null, // 更新对象ID
-      treeData: [],
-      replaceFields: { key: 'entId', title: 'entName' }, // 配置替换字段
-      checkedKeys: [], // 已选中的节点
-      allEntList: {} // 由于antd vue关联操作，无法直接获取到父ID, 需要内部自行维护一套数据结构 {entId: {pid, children}}
+<script setup>
+import { roleApi } from '@/api/business/role/role-api'
+import { reactive, ref } from 'vue'
+
+const hasEnt = window.$access('ENT_UR_ROLE_DIST')
+const recordId = ref(null)
+const treeData = ref([])
+const replaceFields = { key: 'entId', title: 'entName' }
+const checkedKeys = ref([])
+const allEntList = reactive({})
+
+const recursionTreeData = (entTreeData, func) => {
+  for (let i = 0; i < entTreeData.length; i++) {
+    const thisEnt = entTreeData[i]
+    if (thisEnt.children && thisEnt.children.length > 0) {
+      recursionTreeData(thisEnt.children, func)
     }
-  },
-  methods: {
-    initTree: function (recordId, sysType) {
-      // 弹层打开事件
-      const that = this
-
-      // 判断是否有权限访问
-      if (!this.hasEnt) {
-        return false
-      }
-
-      // 重置数据
-      that.checkedKeys = []
-      that.treeData = []
-      that.allEntList = {}
-
-      that.recordId = recordId
-
-      sysType = sysType?.length > 0 ? sysType : 'MGR'
-      // 获取全部权限的树状结构
-      getEntTree(sysType).then((res) => {
-        that.treeData = res
-
-        // 存储所有的菜单权限集合
-        this.recursionTreeData(res, (item) => {
-          that.allEntList[item.entId] = { pid: item.pid, children: item.children || [] }
-        })
-
-        // 查询所有的已分配的权限集合 (默认为 0 ， 无数据)
-        req.list(API_URL_ROLE_ENT_RELA_LIST, { roleId: recordId || 'NONE', pageSize: -1 }).then((res2) => {
-          const checkedEntIdList = [] // 所有已分配的权限集合（兼容antd vue 仅保留子节点）
-
-          res2.records.map((item) => {
-            if (that.allEntList[item.entId] && that.allEntList[item.entId].children.length <= 0) {
-              // 说明是子节点
-              checkedEntIdList.push(item.entId)
-            }
-          })
-
-          that.checkedKeys = checkedEntIdList
-        })
-      })
-    },
-
-    getSelectedEntIdList: function () {
-      // 获取已选择的列表集合
-      // 判断是否有权限访问
-      if (!this.hasEnt) {
-        return false
-      }
-      const that = this
-      const reqData = []
-
-      this.checkedKeys.map((item) => {
-        const pidList = [] // 当前权限的所有的父节点IDList
-        that.getAllPid(item, pidList)
-        pidList.map((pid) => {
-          if (reqData.indexOf(pid) < 0) {
-            reqData.push(pid)
-          }
-        })
-      })
-      return reqData
-    },
-    // 递归遍历树状结构数据
-    recursionTreeData(entTreeData, func) {
-      for (let i = 0; i < entTreeData.length; i++) {
-        const thisEnt = entTreeData[i]
-        if (thisEnt.children && thisEnt.children.length > 0) {
-          this.recursionTreeData(thisEnt.children, func)
-        }
-        func(thisEnt)
-      }
-    },
-    getAllPid(entId, array) {
-      // 获取所有的PID
-      if (this.allEntList[entId] && entId !== 'ROOT') {
-        array.push(entId)
-        this.getAllPid(this.allEntList[entId].pid, array)
-      }
-    }
+    func(thisEnt)
   }
 }
+
+const clearAllEntList = () => {
+  Object.keys(allEntList).forEach((key) => {
+    delete allEntList[key]
+  })
+}
+
+const initTree = async (currentRecordId, sysType) => {
+  if (!hasEnt) {
+    return false
+  }
+
+  checkedKeys.value = []
+  treeData.value = []
+  clearAllEntList()
+
+  recordId.value = currentRecordId
+
+  const currentSysType = sysType?.length > 0 ? sysType : 'MGR'
+  const entTree = await roleApi.queryEntTree(currentSysType)
+  treeData.value = entTree
+
+  recursionTreeData(entTree, (item) => {
+    allEntList[item.entId] = { pid: item.pid, children: item.children || [] }
+  })
+
+  const relaRes = await roleApi.queryRoleEntRelaList(currentRecordId)
+  const checkedEntIdList = []
+
+  relaRes.records.forEach((item) => {
+    if (allEntList[item.entId] && allEntList[item.entId].children.length <= 0) {
+      checkedEntIdList.push(item.entId)
+    }
+  })
+
+  checkedKeys.value = checkedEntIdList
+  return true
+}
+
+const getAllPid = (entId, array) => {
+  if (allEntList[entId] && entId !== 'ROOT') {
+    array.push(entId)
+    getAllPid(allEntList[entId].pid, array)
+  }
+}
+
+const getSelectedEntIdList = () => {
+  if (!hasEnt) {
+    return false
+  }
+  const reqData = []
+
+  checkedKeys.value.forEach((item) => {
+    const pidList = []
+    getAllPid(item, pidList)
+    pidList.forEach((pid) => {
+      if (reqData.indexOf(pid) < 0) {
+        reqData.push(pid)
+      }
+    })
+  })
+
+  return reqData
+}
+
+defineExpose({
+  initTree,
+  getSelectedEntIdList
+})
 </script>

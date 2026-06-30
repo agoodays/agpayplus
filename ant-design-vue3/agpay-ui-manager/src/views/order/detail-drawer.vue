@@ -89,9 +89,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { orderApi } from '@/api/business/order/order-api'
 import { message } from 'ant-design-vue'
-import { API_URL_PAY_ORDER, req } from '@/api/manage'
+import { reactive, ref, watch } from 'vue'
 
 // Props & Emits
 const props = defineProps({
@@ -153,7 +153,7 @@ watch(localOpen, (val) => {
 const loadDetail = async () => {
   try {
     loading.value = true
-    const res = await req.getById(API_URL_PAY_ORDER, props.payOrderId)
+    const res = await orderApi.getPayOrderById(props.payOrderId)
     Object.assign(detailData, res)
   } catch (error) {
     console.error('加载详情失败:', error)

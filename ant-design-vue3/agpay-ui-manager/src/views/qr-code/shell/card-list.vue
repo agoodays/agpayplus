@@ -68,9 +68,9 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, computed } from 'vue'
+import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
 import { AgCard, AgInput } from '@/components'
-import { API_URL_QRC_SHELL_LIST, req } from '@/api/manage'
+import { reactive, ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 
 // 响应式数据
@@ -89,7 +89,7 @@ const agpayCard = reactive({
 
 // 请求卡片列表数据
 const reqCardListFunc = (params) => {
-  return req.list(API_URL_QRC_SHELL_LIST, params)
+  return qrcShellApi.queryCardList(params)
 }
 
 // 刷新card列表
@@ -123,14 +123,13 @@ const addFunc = () => {
 // 编辑函数
 const editFunc = (recordId) => {
   // 业务通用【修改】 函数
-  console.log(recordId)
   infoAddOrEdit.value.show(recordId)
 }
 
 // 删除函数
 const delFunc = (recordId) => {
   window.$infoBox.confirmDanger('确认删除？', '', () => {
-    req.delById(API_URL_QRC_SHELL_LIST, recordId).then((res) => {
+    qrcShellApi.delById(recordId).then(() => {
       window.$message.success('删除成功！')
       refCardList()
     })

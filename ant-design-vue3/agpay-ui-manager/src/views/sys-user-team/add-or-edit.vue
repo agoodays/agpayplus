@@ -6,7 +6,7 @@
     class="drawer-width"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    width="40%"
+    :width="drawerWidth"
     @close="onClose"
   >
     <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
@@ -34,104 +34,115 @@
       </a-row>
     </a-form-model>
     <div class="drawer-btn-center">
-      <a-button icon="close" :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
+      <a-button :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
+        <template #icon><close-outlined /></template>
         取消
       </a-button>
-      <a-button type="primary" icon="check" :loading="btnLoading" @click="onSubmit"> 保存 </a-button>
+      <a-button type="primary" :loading="btnLoading" @click="onSubmit">
+        <template #icon><check-outlined /></template>
+        保存
+      </a-button>
     </div>
   </a-drawer>
 </template>
 
-<script>
-import { API_URL_UR_TEAM_LIST, req } from '@/api/manage'
-export default {
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
+<script setup>
+import { teamApi } from '@/api/business/sys-user-team/team-api'
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
-  data() {
-    const checkStatRangeType = (rule, value, callback) => {
-      // 是否选择了统计周期
-      if (this.isAdd && !value) {
-        callback(new Error('请选择统计周期'))
-      }
-      callback()
-    }
-    return {
-      btnLoading: false,
-      isAdd: true, // 新增 or 修改页面标志
-      saveObject: {}, // 数据对象
-      recordId: null, // 更新对象ID
-      visible: false, // 是否显示弹层/抽屉
-      rules: {
-        teamName: [{ required: true, message: '请输入团队名称', trigger: 'blur' }],
-        teamNo: [{ required: true, message: '请输入团队编号', trigger: 'blur' }],
-        statRangeType: [{ required: true, validator: checkStatRangeType, trigger: 'blur' }]
-      }
-    }
-  },
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.saveObject = { statRangeType: 'year' }
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
-      const that = this
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        console.log(555)
-        that.recordId = recordId
-        req.getById(API_URL_UR_TEAM_LIST, recordId).then((res) => {
-          that.saveObject = res
-        })
-        this.visible = true
-      } else {
-        that.visible = true // 立马展示弹层信息
-      }
-    },
-    onSubmit: function () {
-      // 点击【保存】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          // 请求接口
-          if (that.isAdd) {
-            this.btnLoading = true
-            req
-              .add(API_URL_UR_TEAM_LIST, that.saveObject)
-              .then((res) => {
-                that.$message.success('新增成功')
-                that.visible = false
-                that.callbackFunc() // 刷新列表
-                that.btnLoading = false
-              })
-              .catch((res) => {
-                that.btnLoading = false
-              })
-          } else {
-            req
-              .updateById(API_URL_UR_TEAM_LIST, that.recordId, that.saveObject)
-              .then((res) => {
-                that.$message.success('修改成功')
-                that.visible = false
-                that.callbackFunc() // 刷新列表
-                that.btnLoading = false
-              })
-              .catch((res) => {
-                that.btnLoading = false
-              })
-          }
-        }
-      })
-    },
-    onClose() {
-      this.visible = false
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const infoFormModel = ref()
+const btnLoading = ref(false)
+const isAdd = ref(true)
+const saveObject = ref({})
+const recordId = ref(null)
+const visible = ref(false)
+const viewportWidth = ref(window.innerWidth)
+const drawerWidth = computed(() => (viewportWidth.value < 992 ? '92%' : '40%'))
+
+const onResize = () => {
+  viewportWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', onResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onResize)
+})
+
+const checkStatRangeType = (_rule, value, callback) => {
+  if (isAdd.value && !value) {
+    callback(new Error('请选择统计周期'))
+    return
+  }
+  callback()
+}
+
+const rules = {
+  teamName: [{ required: true, message: '请输入团队名称', trigger: 'blur' }],
+  teamNo: [{ required: true, message: '请输入团队编号', trigger: 'blur' }],
+  statRangeType: [{ required: true, validator: checkStatRangeType, trigger: 'blur' }]
+}
+
+async function show(id) {
+  isAdd.value = !id
+  saveObject.value = { statRangeType: 'year' }
+  recordId.value = id || null
+  infoFormModel.value?.resetFields?.()
+  visible.value = true
+
+  if (!isAdd.value && recordId.value) {
+    try {
+      const res = await teamApi.getById(recordId.value)
+      saveObject.value = res || { statRangeType: 'year' }
+    } catch (_e) {
+      message.error('加载团队信息失败，请重试')
     }
   }
 }
+
+function validateForm() {
+  return new Promise((resolve) => {
+    infoFormModel.value?.validate((valid) => {
+      resolve(valid)
+    })
+  })
+}
+
+async function onSubmit() {
+  if (btnLoading.value) return
+
+  const valid = await validateForm()
+  if (!valid) return
+
+  btnLoading.value = true
+  try {
+    if (isAdd.value) {
+      await teamApi.add(saveObject.value)
+      message.success('新增成功')
+    } else {
+      await teamApi.updateById(recordId.value, saveObject.value)
+      message.success('修改成功')
+    }
+    visible.value = false
+    props.callbackFunc()
+  } finally {
+    btnLoading.value = false
+  }
+}
+
+function onClose() {
+  visible.value = false
+}
+
+defineExpose({ show })
 </script>
 
 <style lang="less">

@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :btn-loading="btnLoading" @search="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
@@ -48,12 +48,12 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput } from '@/components'
-import { API_URL_ARTICLE_LIST, req, reqLoad } from '@/api/manage'
+import { noticeApi } from '@/api/business/notice/notice-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 import InfoDetail from './detail.vue'
-import moment from 'moment'
 
 // 表格列配置
 const tableColumns = [
@@ -65,78 +65,48 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
-// 默认查询参数对象模板
 const defaultSearchData = {
   articleType: 1 // 文章类型: 1-公告
 }
 
-// 响应式数据
-const infoTable = ref(null)
-const infoAddOrEdit = ref(null)
-const infoDetail = ref(null)
 const btnLoading = ref(false)
-const searchData = reactive({ ...defaultSearchData })
+
+const {
+  infoTable,
+  infoAddOrEdit,
+  infoDetail,
+  searchData,
+  reloadTable,
+  openCreate,
+  openEdit,
+  openDetail,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: (recordId) => noticeApi.delById(recordId),
+  deleteConfirmTitle: '确定删除吗',
+  deleteConfirmContent: '',
+  deleteSuccessMessage: '删除成功'
+})
+
+Object.assign(searchData, defaultSearchData)
 
 // 查询函数
 const queryFunc = () => {
   btnLoading.value = true
-  infoTable.value.loadData()
+  reloadTable()
 }
 
 // 对接table接口函数
-const reqTableDataFunc = (params) => {
-  return req.list(API_URL_ARTICLE_LIST, params)
-}
+const reqTableDataFunc = (params) => noticeApi.queryPage(params)
 
 // 搜索函数
-const searchFunc = () => {
-  // 点击查询按钮事件
-  infoTable.value.loadData()
-}
+const searchFunc = () => reloadTable()
 
-// 新增函数
-const addFunc = () => {
-  // 业务通道.公告管理 新增
-  infoAddOrEdit.value.show()
-}
+const addFunc = () => openCreate()
 
-// 编辑函数
-const editFunc = (recordId) => {
-  // 业务通道.公告管理 编辑
-  infoAddOrEdit.value.show(recordId)
-}
+const editFunc = (recordId) => openEdit(recordId)
 
-// 详情函数
-const detailFunc = (recordId) => {
-  // 查看详情页面
-  infoDetail.value.show(recordId)
-}
+const detailFunc = (recordId) => openDetail(recordId)
 
-// 删除公告
-const delFunc = (recordId) => {
-  window.$infoBox.confirmDanger('确定删除吗', '', () => {
-    reqLoad.delById(API_URL_ARTICLE_LIST, recordId).then((res) => {
-      infoTable.value.loadData()
-      window.$message.success('删除成功')
-    })
-  })
-}
-
-// 日期选择变化
-const onChange = (date, dateString) => {
-  searchData.createdStart = dateString[0] // 开始时间
-  searchData.createdEnd = dateString[1] // 结束时间
-}
-
-// 禁用日期
-const disabledDate = (current) => {
-  // 今天之后的日期不可选
-  return current && current > moment().endOf('day')
-}
-
-// 组件挂载时
-onMounted(() => {
-  // 组件初始化时将默认数据赋值给 searchData
-  Object.assign(searchData, defaultSearchData)
-})
+const delFunc = (recordId) => confirmDelete(recordId)
 </script>

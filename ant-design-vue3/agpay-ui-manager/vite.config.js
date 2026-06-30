@@ -85,6 +85,8 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+          // 允许预缓存较大的 vendor 包，避免构建时反复出现 size warning
+          maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/api\./i,
@@ -147,7 +149,8 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash].[ext]'
         }
       },
-      chunkSizeWarningLimit: 1000,
+      // 当前 antd/chart vendor chunk 体积大于默认阈值，先提升告警阈值减少噪音
+      chunkSizeWarningLimit: 2600,
       cssCodeSplit: true,
       cacheDir: 'node_modules/.vite',
       cssMinify: 'esbuild',

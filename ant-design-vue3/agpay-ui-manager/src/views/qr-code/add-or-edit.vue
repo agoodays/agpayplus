@@ -119,123 +119,124 @@
     </div>
   </a-drawer>
 </template>
-<script>
-import { API_URL_QRC_SHELL_LIST, API_URL_QRC_LIST, req } from '@/api/manage'
-export default {
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
+<script setup>
+import { qrcApi } from '@/api/business/qr-code/qrc-api'
+import { message } from 'ant-design-vue'
+import { ref } from 'vue'
 
-  data() {
-    return {
-      isAdd: true, // 新增 or 修改页面标志
-      visible: false, // 是否显示弹层/抽屉
-      btnLoading: false,
-      shellList: null, // 代理商下拉列表
-      recordId: null, // 更新对象ID
-      saveObject: {}, // 数据对象
-      rules: {
-        batchId: [{ required: true, message: '请输入批次号', trigger: 'blur' }],
-        addNum: [
-          { required: true, message: '请输入创建数量', trigger: 'blur' },
-          {
-            validator: (rule, value, callBack) => {
-              if (value < 1 || value > 500) {
-                callBack('数量请介于1-500之间')
-              }
-              callBack()
-            },
-            trigger: 'blur'
-          }
-        ]
-      }
-    }
-  },
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.saveObject = {
-        batchId: null,
-        addNum: 1,
-        state: 1,
-        fixedFlag: 0,
-        entryPage: 'default',
-        alipayWayCode: 'ALI_JSAPI'
-      } // 数据清空
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
 
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
-
-      const that = this
-      if (this.isAdd) {
-        req.list(API_URL_QRC_SHELL_LIST, { pageSize: -1, state: 1 }).then((res) => {
-          // 模板下拉选择列表
-          that.shellList = res.records
-        })
-        req.get(API_URL_QRC_LIST + '/batchIdDistinctCount').then((res) => {
-          // 模板下拉选择列表
-          that.saveObject.batchId = +res
-          console.log(this.saveObject.batchId)
-        })
-      }
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        that.recordId = recordId
-        req.getById(API_URL_QRC_LIST, recordId).then((res) => {
-          that.saveObject = { ...res, fixedPayAmount: (res.fixedPayAmount / 100).toFixed(2) }
-        })
-        this.visible = true
-      } else {
-        that.visible = true // 立马展示弹层信息
-      }
-    },
-    onClose() {
-      this.visible = false
-    },
-    onToday() {
-      const today = new Date()
-      const year = today.getFullYear().toString() // .substr(-2)
-      const month = (today.getMonth() + 1).toString().padStart(2, '0')
-      const day = today.getDate().toString().padStart(2, '0')
-      this.saveObject.batchId = +`${year}${month}${day}00`
-      this.$forceUpdate()
-    },
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          // 请求接口
-          const params = { ...that.saveObject, fixedPayAmount: (that.saveObject.fixedPayAmount || 0) * 100 }
-          if (that.isAdd) {
-            req.add(API_URL_QRC_LIST, params).then((res) => {
-              that.$message.success('新增成功')
-              that.visible = false
-              that.callbackFunc() // 刷新列表
-            })
-          } else {
-            req.updateById(API_URL_QRC_LIST, that.recordId, params).then((res) => {
-              that.$message.success('修改成功')
-              that.visible = false
-              that.callbackFunc() // 刷新列表
-            })
-          }
-        }
-      })
-    },
-    onPreview(url) {
-      this.$viewerApi({
-        images: [url],
-        options: {
-          initialViewIndex: 0
-        }
-      })
-    }
+function createDefaultSaveObject() {
+  return {
+    batchId: null,
+    addNum: 1,
+    state: 1,
+    fixedFlag: 0,
+    entryPage: 'default',
+    alipayWayCode: 'ALI_JSAPI'
   }
 }
+
+const infoFormModel = ref(null)
+const isAdd = ref(true)
+const visible = ref(false)
+const btnLoading = ref(false)
+const shellList = ref(null)
+const recordId = ref(null)
+const saveObject = ref(createDefaultSaveObject())
+
+const rules = {
+  batchId: [{ required: true, message: '请输入批次号', trigger: 'blur' }],
+  addNum: [
+    { required: true, message: '请输入创建数量', trigger: 'blur' },
+    {
+      validator: (_rule, value, callback) => {
+        if (value < 1 || value > 500) {
+          callback('数量请介于1-500之间')
+          return
+        }
+        callback()
+      },
+      trigger: 'blur'
+    }
+  ]
+}
+
+async function show(currentRecordId) {
+  isAdd.value = !currentRecordId
+  saveObject.value = createDefaultSaveObject()
+  infoFormModel.value?.resetFields?.()
+
+  if (isAdd.value) {
+    const [shellRes, batchIdRes] = await Promise.all([
+      qrcApi.listShells({ pageSize: -1, state: 1 }),
+      qrcApi.getBatchIdDistinctCount()
+    ])
+    shellList.value = shellRes.records
+    saveObject.value.batchId = +batchIdRes
+    visible.value = true
+    return
+  }
+
+  recordId.value = currentRecordId
+  const res = await qrcApi.getById(currentRecordId)
+  saveObject.value = { ...res, fixedPayAmount: (res.fixedPayAmount / 100).toFixed(2) }
+  visible.value = true
+}
+
+function onClose() {
+  visible.value = false
+}
+
+function onToday() {
+  const today = new Date()
+  const year = today.getFullYear().toString()
+  const month = (today.getMonth() + 1).toString().padStart(2, '0')
+  const day = today.getDate().toString().padStart(2, '0')
+  saveObject.value.batchId = +`${year}${month}${day}00`
+}
+
+function validateForm() {
+  return new Promise((resolve) => {
+    if (!infoFormModel.value?.validate) {
+      resolve(true)
+      return
+    }
+    infoFormModel.value.validate((valid) => resolve(valid))
+  })
+}
+
+async function handleOkFunc() {
+  const valid = await validateForm()
+  if (!valid) return
+
+  const params = { ...saveObject.value, fixedPayAmount: (saveObject.value.fixedPayAmount || 0) * 100 }
+  if (isAdd.value) {
+    await qrcApi.add(params)
+    message.success('新增成功')
+  } else {
+    await qrcApi.updateById(recordId.value, params)
+    message.success('修改成功')
+  }
+  visible.value = false
+  props.callbackFunc()
+}
+
+function onPreview(url) {
+  window.$viewerApi({
+    images: [url],
+    options: {
+      initialViewIndex: 0
+    }
+  })
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 
 <style lang="less">

@@ -78,153 +78,138 @@
   </a-drawer>
 </template>
 
-<script>
-import { getEntTree, API_URL_ENT_LIST, req } from '@/api/manage'
-export default {
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
-  data() {
-    return {
-      visible: false, // 是否显示弹层/抽屉
-      sysType: 'MGR', // 默认查询运营平台
-      addLoading: false,
-      deleteLoading: false,
-      hasEnt: this.$access('ENT_UR_ROLE_DIST'),
-      treeData: [],
-      replaceFields: { key: 'entId', title: 'entName' }, // 配置替换字段
-      checkedKeys: [], // 已选中的节点
-      allEntList: {}, // 由于antd vue关联操作，无法直接获取到父ID, 需要内部自行维护一套数据结构 {entId: {pid, children}}
-      matchRule: {}
-    }
-  },
-  methods: {
-    show: function () {
-      // 弹层打开事件
-      this.entTree(this.sysType)
-      this.visible = true
-    },
-    onClose() {
-      this.visible = false
-    },
-    onEpUserEntChange: function (e) {
-      const that = this
-      if (e.target.checked) {
-        that.matchRule.epUserEnt = true
-      } else {
-        that.matchRule.epUserEnt = null
-      }
-    },
-    onMchTypeChange(value) {
-      if (this.matchRule.mchType === value) {
-        this.matchRule.mchType = null
-      } else {
-        this.matchRule.mchType = value
-      }
-      this.$forceUpdate()
-    },
-    handleOkFunc: function (opType) {
-      // 点击【确认】按钮事件
-      const that = this
-      // 显示loading
-      if (opType === 'add') {
-        that.addLoading = true
-      } else {
-        that.deleteLoading = true
-      }
-      // 请求接口
-      const selectedEntIdList = that.getSelectedEntIdList()
-      const matchRule = this.matchRule
-      console.log(matchRule)
-      req
-        .updateById(API_URL_ENT_LIST, 'setMatchRule', {
-          sysType: that.sysType,
-          opType: opType,
-          entIds: selectedEntIdList,
-          matchRule: matchRule
-        })
-        .then((res) => {
-          that.$message.success(opType === 'add' ? '添加成功' : '删除成功')
-          if (opType === 'add') {
-            that.addLoading = false
-          } else {
-            that.deleteLoading = false
-          }
-          that.isShow = false
-          that.callbackFunc() // 刷新列表
-        })
-        .catch((res) => {
-          if (opType === 'add') {
-            that.addLoading = false
-          } else {
-            that.deleteLoading = false
-          }
-        })
-    },
-    entTree: function (sysType) {
-      // 弹层打开事件
-      const that = this
+<script setup>
+import { entApi } from '@/api/business/ent/ent-api'
+import { ref } from 'vue'
 
-      // 判断是否有权限访问
-      if (!this.hasEnt) {
-        return false
-      }
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
 
-      // 重置数据
-      that.checkedKeys = []
-      that.treeData = []
-      that.allEntList = {}
+const visible = ref(false)
+const sysType = ref('MGR')
+const addLoading = ref(false)
+const deleteLoading = ref(false)
+const hasEnt = window.$access?.('ENT_UR_ROLE_DIST') ?? false
+const treeData = ref([])
+const replaceFields = { key: 'entId', title: 'entName' }
+const checkedKeys = ref([])
+const allEntList = ref({})
+const matchRule = ref({})
 
-      sysType = sysType?.length > 0 ? sysType : 'MGR'
-      // 获取全部权限的树状结构
-      getEntTree(sysType).then((res) => {
-        that.treeData = res
+const show = () => {
+  entTree(sysType.value)
+  visible.value = true
+}
 
-        // 存储所有的菜单权限集合
-        this.recursionTreeData(res, (item) => {
-          that.allEntList[item.entId] = { pid: item.pid, children: item.children || [] }
-        })
-      })
-    },
-    getSelectedEntIdList: function () {
-      // 获取已选择的列表集合
-      // 判断是否有权限访问
-      if (!this.hasEnt) {
-        return false
-      }
-      const that = this
-      const reqData = []
+const onClose = () => {
+  visible.value = false
+}
 
-      this.checkedKeys.map((item) => {
-        const pidList = [] // 当前权限的所有的父节点IDList
-        that.getAllPid(item, pidList)
-        pidList.map((pid) => {
-          if (reqData.indexOf(pid) < 0) {
-            reqData.push(pid)
-          }
-        })
-      })
-      return reqData
-    },
-    // 递归遍历树状结构数据
-    recursionTreeData(entTreeData, func) {
-      for (let i = 0; i < entTreeData.length; i++) {
-        const thisEnt = entTreeData[i]
-        if (thisEnt.children && thisEnt.children.length > 0) {
-          this.recursionTreeData(thisEnt.children, func)
-        }
-        func(thisEnt)
-      }
-    },
-    getAllPid(entId, array) {
-      // 获取所有的PID
-      if (this.allEntList[entId] && entId !== 'ROOT') {
-        array.push(entId)
-        this.getAllPid(this.allEntList[entId].pid, array)
-      }
-    }
+const onEpUserEntChange = (e) => {
+  if (e.target.checked) {
+    matchRule.value.epUserEnt = true
+  } else {
+    matchRule.value.epUserEnt = null
   }
 }
+
+const onMchTypeChange = (value) => {
+  if (matchRule.value.mchType === value) {
+    matchRule.value.mchType = null
+  } else {
+    matchRule.value.mchType = value
+  }
+}
+
+const handleOkFunc = (opType) => {
+  if (opType === 'add') {
+    addLoading.value = true
+  } else {
+    deleteLoading.value = true
+  }
+
+  const selectedEntIdList = getSelectedEntIdList()
+  entApi
+    .setMatchRule({
+      sysType: sysType.value,
+      opType,
+      entIds: selectedEntIdList,
+      matchRule: matchRule.value
+    })
+    .then(() => {
+      window.$message.success(opType === 'add' ? '添加成功' : '删除成功')
+      if (opType === 'add') {
+        addLoading.value = false
+      } else {
+        deleteLoading.value = false
+      }
+      visible.value = false
+      props.callbackFunc()
+    })
+    .catch(() => {
+      if (opType === 'add') {
+        addLoading.value = false
+      } else {
+        deleteLoading.value = false
+      }
+    })
+}
+
+const entTree = (currentSysType) => {
+  if (!hasEnt) {
+    return false
+  }
+
+  checkedKeys.value = []
+  treeData.value = []
+  allEntList.value = {}
+
+  const resolvedSysType = currentSysType?.length > 0 ? currentSysType : 'MGR'
+  entApi.queryEntTree(resolvedSysType).then((res) => {
+    treeData.value = res
+    recursionTreeData(res, (item) => {
+      allEntList.value[item.entId] = { pid: item.pid, children: item.children || [] }
+    })
+  })
+}
+
+const getSelectedEntIdList = () => {
+  if (!hasEnt) {
+    return false
+  }
+
+  const reqData = []
+  checkedKeys.value.map((item) => {
+    const pidList = []
+    getAllPid(item, pidList)
+    pidList.map((pid) => {
+      if (reqData.indexOf(pid) < 0) {
+        reqData.push(pid)
+      }
+    })
+  })
+  return reqData
+}
+
+const recursionTreeData = (entTreeData, func) => {
+  for (let i = 0; i < entTreeData.length; i++) {
+    const thisEnt = entTreeData[i]
+    if (thisEnt.children && thisEnt.children.length > 0) {
+      recursionTreeData(thisEnt.children, func)
+    }
+    func(thisEnt)
+  }
+}
+
+const getAllPid = (entId, array) => {
+  if (allEntList.value[entId] && entId !== 'ROOT') {
+    array.push(entId)
+    getAllPid(allEntList.value[entId].pid, array)
+  }
+}
+
+defineExpose({ show })
 </script>
 
 <style scoped>

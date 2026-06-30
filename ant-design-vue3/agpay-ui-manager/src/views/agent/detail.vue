@@ -285,96 +285,98 @@
   </a-drawer>
 </template>
 
-<script>
-import { API_URL_AGENT_LIST, req } from '@/api/manage'
+<script setup>
+import { agentApi } from '@/api/business/agent/agent-api'
 import 'viewerjs/dist/viewer.css'
-export default {
-  name: 'Detail',
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
-  data() {
-    return {
-      btnLoading: false,
-      detailData: {}, // 数据对象
-      recordId: null, // 更新对象ID
-      visible: false, // 是否显示弹层/抽屉
-      isvList: null, // 服务商下拉列表
-      imgLabel: '联系人'
-    }
-  },
-  created() {},
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.detailData = {
-        state: 1,
-        addAgentFlag: 1,
-        type: 1,
-        settAccountTypeName: '个人微信',
-        settAccountNoLabel: '个人微信号'
-      } // 数据清空
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
-      const that = this
-      that.recordId = recordId
-      req.getById(API_URL_AGENT_LIST, recordId).then((res) => {
-        that.detailData = res
-        switch (that.detailData.settAccountType) {
-          case 'WX_CASH':
-            that.detailData.settAccountTypeName = '个人微信'
-            that.detailData.settAccountNoLabel = '个人微信号'
-            break
-          case 'ALIPAY_CASH':
-            that.detailData.settAccountTypeName = '个人支付宝'
-            that.detailData.settAccountNoLabel = '支付宝账号'
-            break
-          case 'BANK_PRIVATE':
-            that.detailData.settAccountTypeName = '对私账户'
-            that.detailData.settAccountNoLabel = '收款银行卡号'
-            break
-          case 'BANK_PUBLIC':
-            that.detailData.settAccountTypeName = '对公账户'
-            that.detailData.settAccountNoLabel = '对公账号'
-            break
-        }
-        if (that.detailData.agentType === 2) {
-          this.imgLabel = '法人'
-        } else {
-          this.imgLabel = '联系人'
-        }
-      })
-      this.visible = true
-    },
-    onClose() {
-      this.visible = false
-    },
-    imgPreview(info) {
-      // console.log(info)
-      this.$viewerApi({
-        images: [info.url],
-        options: {
-          initialViewIndex: 0
-        }
-      })
-    },
-    getDefaultFileList(url) {
-      if (!url) {
-        return []
-      }
-      return [
-        {
-          uid: '-1',
-          name: url.split('/').pop(),
-          status: 'done',
-          url: url,
-          thumbUrl: url
-        }
-      ]
-    }
+import { getCurrentInstance, ref } from 'vue'
+
+defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const visible = ref(false)
+const detailData = ref({})
+const recordId = ref(null)
+const imgLabel = ref('联系人')
+
+const { proxy } = getCurrentInstance()
+
+function buildDefaultDetailData() {
+  return {
+    state: 1,
+    addAgentFlag: 1,
+    type: 1,
+    settAccountTypeName: '个人微信',
+    settAccountNoLabel: '个人微信号'
   }
 }
+
+function normalizeSettleLabels(target) {
+  switch (target.settAccountType) {
+    case 'WX_CASH':
+      target.settAccountTypeName = '个人微信'
+      target.settAccountNoLabel = '个人微信号'
+      break
+    case 'ALIPAY_CASH':
+      target.settAccountTypeName = '个人支付宝'
+      target.settAccountNoLabel = '支付宝账号'
+      break
+    case 'BANK_PRIVATE':
+      target.settAccountTypeName = '对私账户'
+      target.settAccountNoLabel = '收款银行卡号'
+      break
+    case 'BANK_PUBLIC':
+      target.settAccountTypeName = '对公账户'
+      target.settAccountNoLabel = '对公账号'
+      break
+  }
+}
+
+function show(currentRecordId) {
+  detailData.value = buildDefaultDetailData()
+  recordId.value = currentRecordId
+  visible.value = true
+
+  agentApi.getById(currentRecordId).then((res) => {
+    const next = { ...res }
+    normalizeSettleLabels(next)
+    detailData.value = next
+    imgLabel.value = next.agentType === 2 ? '法人' : '联系人'
+  })
+}
+
+function onClose() {
+  visible.value = false
+}
+
+function imgPreview(info) {
+  proxy?.$viewerApi({
+    images: [info.url],
+    options: {
+      initialViewIndex: 0
+    }
+  })
+}
+
+function getDefaultFileList(url) {
+  if (!url) {
+    return []
+  }
+  return [
+    {
+      uid: '-1',
+      name: url.split('/').pop(),
+      status: 'done',
+      url,
+      thumbUrl: url
+    }
+  ]
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 
 <style lang="less">

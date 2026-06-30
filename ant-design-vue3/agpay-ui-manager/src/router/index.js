@@ -2,18 +2,18 @@
  * 路由配置
  * 支持生产模式和开发模式（VITE_BYPASS_LOGIN）
  */
-import nProgress from 'nprogress'
-import 'nprogress/nprogress.css'
-import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
-import UserLayout from '@/layouts/user-layout.vue'
-import AgLayout from '@/layouts/index.vue'
-import { useUserStore } from '@/store/modules/system/user'
-import { setDocumentTitle } from '../utils/dom-util'
-import { translateWithFallback } from '@/utils/i18n-util'
-import { PAGE_PATH_404, PAGE_PATH_LOGIN } from '@/constants/common-const'
 import { loginApi } from '@/api/system/login-api'
 import { asyncRouteDefine } from '@/config/app-config'
 import { devMenuTree, devUserInfo } from '@/config/dev-menu-config'
+import { PAGE_PATH_404, PAGE_PATH_LOGIN } from '@/constants/common-const'
+import AgLayout from '@/layouts/index.vue'
+import UserLayout from '@/layouts/user-layout.vue'
+import { useUserStore } from '@/store/modules/system/user'
+import { translateWithFallback } from '@/utils/i18n-util'
+import nProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
+import { setDocumentTitle } from '../utils/dom-util'
 
 // ==================== 常量配置 ====================
 
@@ -22,6 +22,13 @@ const modules = import.meta.glob('../views/**/*.vue')
 
 // 无需登录验证的路由白名单
 const ALLOW_LIST = ['login', 'forget', 'register', 'registerResult']
+
+// 开发模式演示权限点（两处初始化共用，避免重复维护）
+const DEV_ENT_IDS = [
+  'ENT_DEMO', 'ENT_DEMO_INDEX', 'ENT_DEMO_SEARCH_TABLE', 'ENT_DEMO_REFACTOR_TABLE',
+  'ENT_DEMO_STATE_SWITCH', 'ENT_DEMO_FORM', 'ENT_DEMO_FLOAT_INPUT', 'ENT_DEMO_SELECT_INFINITE',
+  'ENT_DEMO_CARD', 'ENT_DEMO_UPLOAD', 'ENT_DEMO_EDITOR', 'ENT_DEMO_CONTAINER'
+]
 
 // 开发模式日志开关
 const DEV_LOG_ENABLED = import.meta.env.MODE === 'development'
@@ -139,6 +146,18 @@ let routesInitialized = false
 
 const routes = [
   {
+    path: '/main',
+    component: AgLayout,
+    children: [
+      {
+        path: '',
+        name: 'MainFallback',
+        component: () => import('@/views/main/main-page.vue'),
+        meta: { title: '首页' }
+      }
+    ]
+  },
+  {
     path: '/',
     name: '用户',
     component: UserLayout,
@@ -225,7 +244,7 @@ function initDevMode() {
   userStore.setUserLoginInfo({
     ...devUserInfo,
     allMenuRouteTree: devMenuTree,
-    entIdList: ['ENT_DEMO', 'ENT_DEMO_INDEX', 'ENT_DEMO_SEARCH_TABLE', 'ENT_DEMO_REFACTOR_TABLE', 'ENT_DEMO_STATE_SWITCH', 'ENT_DEMO_FORM', 'ENT_DEMO_FLOAT_INPUT', 'ENT_DEMO_SELECT_INFINITE', 'ENT_DEMO_CARD', 'ENT_DEMO_UPLOAD', 'ENT_DEMO_EDITOR', 'ENT_DEMO_CONTAINER']
+    entIdList: DEV_ENT_IDS
   })
 
   registerDynamicRoutes(devMenuTree)
@@ -244,7 +263,7 @@ function checkDevModeState() {
     userStore.setUserLoginInfo({
       ...devUserInfo,
       allMenuRouteTree: devMenuTree,
-      entIdList: ['ENT_DEMO', 'ENT_DEMO_INDEX', 'ENT_DEMO_SEARCH_TABLE', 'ENT_DEMO_REFACTOR_TABLE', 'ENT_DEMO_STATE_SWITCH', 'ENT_DEMO_FORM', 'ENT_DEMO_FLOAT_INPUT', 'ENT_DEMO_SELECT_INFINITE', 'ENT_DEMO_CARD', 'ENT_DEMO_UPLOAD', 'ENT_DEMO_EDITOR', 'ENT_DEMO_CONTAINER']
+      entIdList: DEV_ENT_IDS
     })
   }
 
@@ -326,7 +345,7 @@ router.beforeEach((to, from, next) => {
   }
 
   // 获取用户信息
-  console.log('检查用户信息:', userStore.userId)
+  devLog('🔍', '检查用户信息:', userStore.userId)
   if (!userStore.userId) {
     // 本地存储没有用户信息，调用API获取
     loginApi

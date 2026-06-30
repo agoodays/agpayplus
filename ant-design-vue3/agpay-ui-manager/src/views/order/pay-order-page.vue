@@ -229,20 +229,20 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { message } from 'ant-design-vue'
-import { useI18n } from 'vue-i18n'
-import {
-  TransactionOutlined,
-  DollarOutlined,
-  WalletOutlined,
-  UndoOutlined
-} from '@ant-design/icons-vue'
+import { orderApi } from '@/api/business/order/order-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable } from '@/components'
 import { useModal, usePermission } from '@/hooks/common-hooks'
-import { API_URL_PAY_ORDER, API_URL_MCH_LIST, req } from '@/api/manage'
+import {
+    DollarOutlined,
+    TransactionOutlined,
+    UndoOutlined,
+    WalletOutlined
+} from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import DetailDrawer from './detail-drawer.vue'
 import RefundModal from './refund-modal.vue'
-import { AgSearch, AgTable, AgInput, AgSelect, AgDateRangePicker } from '@/components'
 
 const { t } = useI18n()
 
@@ -310,13 +310,13 @@ const loadData = (params) => {
   }
   
   console.log('请求参数:', requestParams)
-  return req.list(API_URL_PAY_ORDER, requestParams)
+  return orderApi.queryPayOrderPage(requestParams)
 }
 
 // 请求统计数据函数
 const loadStatistics = (params) => {  
   // 构建请求参数
-  const requestParams = null
+  const requestParams = {}
 
   // 处理日期范围
   if (searchForm.dateRange && searchForm.dateRange.length === 2) {
@@ -352,7 +352,7 @@ const loadStatistics = (params) => {
   }
   
   console.log('统计请求参数:', requestParams)
-  return req.count(API_URL_PAY_ORDER , requestParams)
+  return orderApi.queryPayOrderCount(requestParams)
 }
 
 function onSearch() {

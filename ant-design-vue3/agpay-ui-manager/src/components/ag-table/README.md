@@ -18,6 +18,8 @@
 - 导出按钮回调（可选）
 - 列显示/隐藏、排序、宽度与固定列设置
 - 列配置本地持久化（`stateKey`）
+- 请求并发保护（仅采纳最后一次请求结果）
+- 加载生命周期钩子（before/after，可取消）
 
 ## 📦 推荐用法（非受控）
 
@@ -102,7 +104,15 @@ function handleChange(payload) {
 | showDownload | 显示导出按钮 | `Boolean` | `false` |
 | enableStatistics | 启用统计展示 | `Boolean` | `false` |
 | onLoad | 数据加载函数 | `Function` | `null` |
+| onBeforeLoad | 列表加载前钩子（返回 `false` 可取消） | `Function` | `null` |
+| onBeforeLoadTimeout | 列表前置钩子超时（ms，0=不限制） | `Number` | `0` |
+| onBeforeLoadTimeoutHit | 列表前置钩子超时命中回调 | `Function` | `null` |
+| onAfterLoad | 列表加载后钩子（含成功/失败/过期信息） | `Function` | `null` |
 | onLoadStatistics | 统计加载函数 | `Function` | `null` |
+| onBeforeLoadStatistics | 统计加载前钩子（返回 `false` 可取消） | `Function` | `null` |
+| onBeforeLoadStatisticsTimeout | 统计前置钩子超时（ms，0=不限制） | `Number` | `0` |
+| onBeforeLoadStatisticsTimeoutHit | 统计前置钩子超时命中回调 | `Function` | `null` |
+| onAfterLoadStatistics | 统计加载后钩子（含成功/失败/过期信息） | `Function` | `null` |
 | onDownload | 导出回调函数 | `Function` | `null` |
 | searchData | 查询参数 | `Object` | `null` |
 | initialStatistics | 初始统计数据 | `Object \| Array` | `null` |
@@ -130,6 +140,49 @@ function handleChange(payload) {
 - 新页面优先采用非受控模式，减少重复分页与请求样板代码。
 - 使用 `stateKey` 区分不同页面列配置，避免互相覆盖。
 - `customRender` 建议与业务字段同名，提升可维护性。
+
+## 🔄 并发与钩子说明
+
+- `onLoad` 与 `onLoadStatistics` 默认启用并发保护：快速筛选、翻页或重复触发时，旧请求返回不会覆盖最新结果。
+- `onBeforeLoad` / `onBeforeLoadStatistics` 返回 `false` 时，本次请求会被取消。
+- 可通过 `onBeforeLoadTimeout` / `onBeforeLoadStatisticsTimeout` 设置前置钩子超时（毫秒）；超时后默认放行请求。
+- 可通过 `onBeforeLoadTimeoutHit` / `onBeforeLoadStatisticsTimeoutHit` 监听超时命中事件（便于埋点上报）。
+- `onAfterLoad` / `onAfterLoadStatistics` 会收到流程结果，包含 `success`、`cancelled`、`stale` 字段。
+
+### 钩子参数（示例）
+
+```js
+function onBeforeLoad({ requestId, params, goToFirst }) {
+  // 返回 false 将取消本次请求
+  return true
+}
+
+function onAfterLoad({ requestId, params, result, error, success, cancelled, stale }) {
+  // stale=true 表示旧请求结果，已被忽略
+  // cancelled=true 表示 before 钩子主动取消
+}
+```
+
+### 页面接入示例
+
+```vue
+<AgTable
+  :columns="columns"
+  :search-data="searchForm"
+  :on-load="loadTable"
+  :on-before-load="beforeLoad"
+  :on-before-load-timeout="1500"
+  :on-before-load-timeout-hit="handleBeforeLoadTimeout"
+  :on-after-load="afterLoad"
+/>
+```
+
+```js
+function handleBeforeLoadTimeout({ hookName, timeoutMs, requestId, params }) {
+  // 示例：上报监控系统
+  console.warn('hook timeout', hookName, timeoutMs, requestId, params)
+}
+```
 
 ## 🔗 相关文档
 

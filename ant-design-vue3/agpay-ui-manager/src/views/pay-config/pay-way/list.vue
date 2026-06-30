@@ -5,7 +5,7 @@
         :search-data="searchData"
         :open-is-show-more="false"
         :is-show-more="isShowMore"
-        :btn-loading="btnLoading"
+        :search-loading="btnLoading"
         @update-search-data="handleSearchFormData"
         @set-is-show-more="setIsShowMore"
         @query-func="queryFunc">
@@ -70,8 +70,8 @@
 
 </template>
 <script setup>
-import { ref, reactive } from 'vue'
-import { API_URL_PAYWAYS_LIST, req } from '@/api/manage'
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
+import { reactive, ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 
 const tableColumns = [
@@ -97,7 +97,7 @@ const setIsShowMore = (value) => {
 
 // 请求table接口数据
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_PAYWAYS_LIST, params)
+  return payConfigApi.queryPayWayList(params)
 }
 
 const queryFunc = () => { // 点击【查询】按钮点击事件
@@ -117,7 +117,7 @@ const delFunc = (wayCode) => {
   import('ant-design-vue').then(({ message }) => {
     import('@/utils/info-box').then(({ infoBox }) => {
       infoBox.confirmDanger('确认删除？', '', () => {
-        return req.delById(API_URL_PAYWAYS_LIST, wayCode).then(res => {
+        return payConfigApi.delPayWayById(wayCode).then(res => {
           message.success('删除成功！')
           infoTable.value?.refTable(false)
         })

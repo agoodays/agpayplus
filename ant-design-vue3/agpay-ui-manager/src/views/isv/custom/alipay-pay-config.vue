@@ -137,204 +137,215 @@
   </a-drawer>
 </template>
 
-<script>
-import AgCard from '@/components/ag-card'
+<script setup>
+import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
 import AgUpload from '@/components/ag-upload'
-import { API_URL_ISV_PAYCONFIGS_LIST, req, getIsvPayConfigUnique, upload } from '@/api/manage'
-export default {
-  components: {
-    'ag-card': AgCard,
-    'ag-upload': AgUpload
-  },
-  props: {
-    callbackFunc: { type: Function, default: () => ({}) }
-  },
+import { message } from 'ant-design-vue'
+import { computed, ref } from 'vue'
 
-  data() {
-    return {
-      btnLoading: false,
-      visible: false, // 抽屉开关
-      isAdd: true,
-      action: upload.cert, // 上传文件地址
-      saveObject: {}, // 保存的对象
-      ifParams: {}, // 参数配置对象
-      rules: {
-        ifRate: [
-          {
-            required: false,
-            pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/,
-            message: '请输入0-100之间的数字，最多四位小数',
-            trigger: 'blur'
-          }
-        ]
-      },
-      ifParamsRules: {
-        pid: [{ required: true, message: '请输入合作伙伴身份（PID）', trigger: 'blur' }],
-        appId: [{ required: true, message: '请输入应用AppID', trigger: 'blur' }],
-        privateKey: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.isAdd && !value) {
-                callback(new Error('请输入应用私钥'))
-              }
-              callback()
-            }
-          }
-        ],
-        alipayPublicKey: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.useCert === 0 && this.isAdd && !value) {
-                callback(new Error('请输入支付宝公钥'))
-              }
-              callback()
-            }
-          }
-        ],
-        appPublicCert: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.useCert === 1 && !this.ifParams.appPublicCert) {
-                callback(new Error('请上传应用公钥证书（.crt格式）'))
-              }
-              callback()
-            }
-          }
-        ],
-        alipayPublicCert: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.useCert === 1 && !this.ifParams.alipayPublicCert) {
-                callback(new Error('请上传支付宝公钥证书（.crt格式）'))
-              }
-              callback()
-            }
-          }
-        ],
-        alipayRootCert: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.useCert === 1 && !this.ifParams.alipayRootCert) {
-                callback(new Error('请上传支付宝根证书（.crt格式）'))
-              }
-              callback()
-            }
-          }
-        ]
-      }
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const infoFormModel = ref(null)
+const isvParamFormModel = ref(null)
+const btnLoading = ref(false)
+const visible = ref(false)
+const isAdd = ref(true)
+const action = isvPayConfigApi.certUploadAction
+const saveObject = ref({})
+const ifParams = ref({})
+
+const rules = {
+  ifRate: [
+    {
+      required: false,
+      pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/,
+      message: '请输入0-100之间的数字，最多四位小数',
+      trigger: 'blur'
     }
-  },
-  methods: {
-    // 弹层打开事件
-    show: function (isvNo, record) {
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
-      if (this.$refs.isvParamFormModel !== undefined) {
-        this.$refs.isvParamFormModel.resetFields()
-      }
+  ]
+}
 
-      // 数据初始化
-      this.saveObject = {
-        infoId: isvNo,
-        ifCode: record.ifCode,
-        state: record.ifConfigState === 0 ? 0 : 1
-      }
-
-      // 参数配置对象，数据初始化
-      this.ifParams = {
-        sandbox: 0,
-        signType: 'RSA2',
-        useCert: 0,
-        privateKey: '',
-        privateKey_ph: '请输入',
-        alipayPublicKey: '',
-        alipayPublicKey_ph: '请输入'
-      }
-      this.visible = true
-      this.getIsvPayConfig()
-    },
-    // 支付参数配置
-    getIsvPayConfig() {
-      const that = this
-      // 获取支付参数
-      getIsvPayConfigUnique(that.saveObject.infoId, that.saveObject.ifCode).then((res) => {
-        if (res && res.ifParams) {
-          that.saveObject = res
-          that.ifParams = JSON.parse(res.ifParams)
-
-          that.ifParams.privateKey_ph = that.ifParams.privateKey
-          that.ifParams.privateKey = ''
-
-          that.ifParams.alipayPublicKey_ph = that.ifParams.alipayPublicKey
-          that.ifParams.alipayPublicKey = ''
-
-          that.isAdd = false
-        } else if (res === undefined) {
-          that.isAdd = true
+const ifParamsRules = computed(() => ({
+  pid: [{ required: true, message: '请输入合作伙伴身份（PID）', trigger: 'blur' }],
+  appId: [{ required: true, message: '请输入应用AppID', trigger: 'blur' }],
+  privateKey: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (isAdd.value && !value) {
+          callback(new Error('请输入应用私钥'))
+          return
         }
-      })
-    },
-    // 表单提交
-    onSubmit() {
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        this.$refs.isvParamFormModel.validate((valid2) => {
-          if (valid && valid2) {
-            // 验证通过
-            that.btnLoading = true
-            const reqParams = {}
-            reqParams.infoId = that.saveObject.infoId
-            reqParams.ifCode = that.saveObject.ifCode
-            reqParams.ifRate = that.saveObject.ifRate
-            reqParams.state = that.saveObject.state
-            reqParams.remark = that.saveObject.remark
-            // 支付参数配置不能为空
-            if (Object.keys(that.ifParams).length === 0) {
-              this.$message.error('参数不能为空！')
-              return
-            }
-            // 脱敏数据为空时，删除该key
-            that.clearEmptyKey('privateKey')
-            that.clearEmptyKey('alipayPublicKey')
-            reqParams.ifParams = JSON.stringify(that.ifParams)
-            // 请求接口
-            if (Object.keys(reqParams).length === 0) {
-              this.$message.error('参数不能为空！')
-              return
-            }
-            req.add(API_URL_ISV_PAYCONFIGS_LIST, reqParams).then((res) => {
-              that.$message.success('保存成功')
-              that.visible = false
-              that.btnLoading = false
-              that.callbackFunc()
-            })
-          }
-        })
-      })
-    },
-    // 脱敏数据为空时，删除对应key
-    clearEmptyKey(key) {
-      if (!this.ifParams[key]) {
-        this.ifParams[key] = undefined
+        callback()
       }
-      this.ifParams[key + '_ph'] = undefined
-    },
-    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
-    uploadSuccess(name, fileList) {
-      const [firstItem] = fileList
-      this.ifParams[name] = firstItem?.url
-      this.$forceUpdate()
-    },
-    onClose() {
-      this.visible = false
     }
+  ],
+  alipayPublicKey: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (ifParams.value.useCert === 0 && isAdd.value && !value) {
+          callback(new Error('请输入支付宝公钥'))
+          return
+        }
+        callback()
+      }
+    }
+  ],
+  appPublicCert: [
+    {
+      trigger: 'blur',
+      validator: (_rule, _value, callback) => {
+        if (ifParams.value.useCert === 1 && !ifParams.value.appPublicCert) {
+          callback(new Error('请上传应用公钥证书（.crt格式）'))
+          return
+        }
+        callback()
+      }
+    }
+  ],
+  alipayPublicCert: [
+    {
+      trigger: 'blur',
+      validator: (_rule, _value, callback) => {
+        if (ifParams.value.useCert === 1 && !ifParams.value.alipayPublicCert) {
+          callback(new Error('请上传支付宝公钥证书（.crt格式）'))
+          return
+        }
+        callback()
+      }
+    }
+  ],
+  alipayRootCert: [
+    {
+      trigger: 'blur',
+      validator: (_rule, _value, callback) => {
+        if (ifParams.value.useCert === 1 && !ifParams.value.alipayRootCert) {
+          callback(new Error('请上传支付宝根证书（.crt格式）'))
+          return
+        }
+        callback()
+      }
+    }
+  ]
+}))
+
+function parseJsonObject(rawValue) {
+  if (!rawValue) return {}
+  try {
+    const parsed = JSON.parse(rawValue)
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch (_error) {
+    return {}
   }
 }
+
+async function show(isvNo, record) {
+  infoFormModel.value?.resetFields?.()
+  isvParamFormModel.value?.resetFields?.()
+
+  saveObject.value = {
+    infoId: isvNo,
+    ifCode: record.ifCode,
+    state: record.ifConfigState === 0 ? 0 : 1
+  }
+
+  ifParams.value = {
+    sandbox: 0,
+    signType: 'RSA2',
+    useCert: 0,
+    privateKey: '',
+    privateKey_ph: '请输入',
+    alipayPublicKey: '',
+    alipayPublicKey_ph: '请输入'
+  }
+
+  visible.value = true
+  await getIsvPayConfig()
+}
+
+async function getIsvPayConfig() {
+  const res = await isvPayConfigApi.getUnique(saveObject.value.infoId, saveObject.value.ifCode)
+  if (res?.ifParams) {
+    saveObject.value = res
+    const parsed = parseJsonObject(res.ifParams)
+    ifParams.value = {
+      ...parsed,
+      privateKey: '',
+      privateKey_ph: parsed.privateKey,
+      alipayPublicKey: '',
+      alipayPublicKey_ph: parsed.alipayPublicKey
+    }
+    isAdd.value = false
+    return
+  }
+  isAdd.value = true
+}
+
+function validateForm(formRef) {
+  return new Promise((resolve) => {
+    if (!formRef.value?.validate) {
+      resolve(true)
+      return
+    }
+    formRef.value.validate((valid) => resolve(valid))
+  })
+}
+
+function clearEmptyKey(key) {
+  if (!ifParams.value[key]) {
+    ifParams.value[key] = undefined
+  }
+  ifParams.value[key + '_ph'] = undefined
+}
+
+async function onSubmit() {
+  const valid = await validateForm(infoFormModel)
+  const valid2 = await validateForm(isvParamFormModel)
+  if (!valid || !valid2) return
+
+  btnLoading.value = true
+  try {
+    if (Object.keys(ifParams.value).length === 0) {
+      message.error('参数不能为空！')
+      return
+    }
+
+    clearEmptyKey('privateKey')
+    clearEmptyKey('alipayPublicKey')
+
+    const reqParams = {
+      infoId: saveObject.value.infoId,
+      ifCode: saveObject.value.ifCode,
+      ifRate: saveObject.value.ifRate,
+      state: saveObject.value.state,
+      remark: saveObject.value.remark,
+      ifParams: JSON.stringify(ifParams.value)
+    }
+
+    await isvPayConfigApi.save(reqParams)
+    message.success('保存成功')
+    visible.value = false
+    props.callbackFunc()
+  } finally {
+    btnLoading.value = false
+  }
+}
+
+function uploadSuccess(name, fileList) {
+  const [firstItem] = fileList
+  ifParams.value[name] = firstItem?.url
+}
+
+function onClose() {
+  visible.value = false
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 <style lang="less" scoped></style>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :btn-loading="btnLoading" @search="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
@@ -191,10 +191,10 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { AgSearch, AgTable, AgTableActions, AgSelect, AgInput, AgDateRangePicker } from '@/components'
-import { API_URL_ORDER_STATISTIC, API_URL_MCH_LIST, req } from '@/api/manage'
+import { statisticApi } from '@/api/business/statistic/statistic-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import moment from 'moment'
+import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import InfoDetail from './detail.vue'
 
@@ -283,7 +283,7 @@ const countInitData = reactive({
 
 // 搜索商户
 const searchMch = (params) => {
-  return req.list(API_URL_MCH_LIST, params)
+  return statisticApi.listMch(params)
 }
 
 // 查询函数
@@ -295,18 +295,18 @@ const queryFunc = () => {
 
 // 表格接口方法
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_ORDER_STATISTIC, params)
+  return statisticApi.queryOrderStatistic(params)
 }
 
 // 表格计数方法
 const reqTableCountFunc = (params) => {
-  return req.total(API_URL_ORDER_STATISTIC, params)
+  return statisticApi.queryOrderStatisticTotal(params)
 }
 
 // 下载数据方法
 const reqDownloadDataFunc = (params) => {
-  req
-    .export(API_URL_ORDER_STATISTIC, 'excel', params)
+  statisticApi
+    .exportExcel(params)
     .then((res) => {
       // 将响应数据的流转为Blob对象
       const blob = new Blob([res])

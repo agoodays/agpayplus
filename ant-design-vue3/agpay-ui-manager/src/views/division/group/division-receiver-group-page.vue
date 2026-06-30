@@ -25,7 +25,7 @@
             </a-form-item>
             <span class="table-page-search-submitButtons">
               <a-button type="primary" icon="search" :loading="btnLoading" @click="searchFunc">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => (searchData = {})">重置</a-button>
+              <a-button style="margin-left: 8px" icon="reload" @click="resetFunc">重置</a-button>
             </span>
           </div>
         </a-form>
@@ -78,9 +78,10 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive } from 'vue'
-import { AgTable, AgTableActions, AgSelect, AgInput } from '@/components'
-import { API_URL_DIVISION_RECEIVER_GROUP, API_URL_MCH_LIST, req } from '@/api/manage'
+import { divisionGroupApi } from '@/api/business/division/division-group-api'
+import { AgInput, AgSelect, AgTable, AgTableActions } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 
 // 表格列配置
@@ -101,50 +102,39 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
-// 响应式数据
-const infoTable = ref(null)
-const infoAddOrEdit = ref(null)
-const searchData = reactive({})
 const btnLoading = ref(false)
 
+const { infoTable, infoAddOrEdit, searchData, reloadTable, openCreate, openEdit, confirmDelete } = useCrudTablePage({
+  deleteAction: (recordId) => divisionGroupApi.delById(recordId),
+  deleteConfirmTitle: '确定删除吗',
+  deleteConfirmContent: '',
+  deleteSuccessMessage: '删除成功'
+})
+
 // 搜索商户
-const searchMch = (params) => {
-  return req.list(API_URL_MCH_LIST, params)
-}
+const searchMch = (params) => divisionGroupApi.listMch(params)
 
 // 对接table接口函数
-const reqTableDataFunc = (params) => {
-  return req.list(API_URL_DIVISION_RECEIVER_GROUP, params)
-}
+const reqTableDataFunc = (params) => divisionGroupApi.queryPage(params)
 
 // 搜索函数
 const searchFunc = () => {
-  // 点击查询按钮事件
-  btnLoading.value = true // 开启查询按钮上的loading
-  infoTable.value.loadData()
+  btnLoading.value = true
+  reloadTable()
+}
+
+const resetFunc = () => {
+  Object.keys(searchData).forEach((key) => {
+    delete searchData[key]
+  })
 }
 
 // 新增函数
-const addFunc = () => {
-  // 业务通道.分组管理 新增
-  infoAddOrEdit.value.show()
-}
+const addFunc = () => openCreate()
 
 // 编辑函数
-const editFunc = (recordId) => {
-  // 业务通道.分组管理 编辑
-  infoAddOrEdit.value.show(recordId)
-}
+const editFunc = (recordId) => openEdit(recordId)
 
 // 删除函数
-const delFunc = (recordId) => {
-  // 业务通道.分组管理 删除
-  window.$infoBox.confirmDanger('确定删除吗', '', () => {
-    // 需要加按钮的loading 返回 promise对象 否则要直接返回null
-    return req.delById(API_URL_DIVISION_RECEIVER_GROUP, recordId).then((res) => {
-      window.$message.success('删除成功')
-      infoTable.value.loadData()
-    })
-  })
-}
+const delFunc = (recordId) => confirmDelete(recordId)
 </script>

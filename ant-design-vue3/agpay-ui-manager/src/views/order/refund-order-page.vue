@@ -158,26 +158,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { message } from 'ant-design-vue'
+import { orderApi } from '@/api/business/order/order-api'
+import { useModal, usePermission, useTable } from '@/hooks/common-hooks'
 import {
-  SearchOutlined,
-  RedoOutlined,
-  DownOutlined,
-  UpOutlined,
-  ReloadOutlined,
-  DownloadOutlined
+    DownloadOutlined,
+    DownOutlined,
+    RedoOutlined,
+    ReloadOutlined,
+    SearchOutlined,
+    UpOutlined
 } from '@ant-design/icons-vue'
-import { useTable, useModal, usePermission } from '@/hooks/common-hooks'
-import { API_URL_REFUND_ORDER, API_URL_MCH_LIST, req } from '@/api/manage'
-import DetailDrawer from './refund-detail-drawer.vue'
+import { message } from 'ant-design-vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import DetailDrawer from './refund-detail-drawer.vue'
 
 const { t } = useI18n()
 
 // 使用 Hooks
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
-  useTable((params) => req.list(API_URL_REFUND_ORDER, params))
+  useTable((params) => orderApi.queryRefundOrderPage(params))
 
 const { open: detailOpen, showModal: showDetail } = useModal()
 const { hasPermission } = usePermission()
@@ -285,7 +285,7 @@ const handleSearchMch = async (keyword) => {
   }
 
   try {
-    const res = await req.list(API_URL_MCH_LIST, {
+    const res = await orderApi.queryMchPage({
       mchName: keyword,
       pageSize: 20
     })

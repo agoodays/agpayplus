@@ -61,7 +61,6 @@ export const useUserStore = defineStore('userStore', {
 
     // ✅ 简化：直接修改状态，persist 会自动保存
     setUserLoginInfo(data) {
-      console.log('设置用户登录信息:', data)
       this.userId = data.sysUserId // 用户ID
       this.realname = data.realname // 真实姓名
       this.safeWord = data.safeWord // 预留信息

@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :btn-loading="btnLoading" @search="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
@@ -169,10 +169,11 @@
     </a-card>
   </div>
 </template>
-<script>
-import { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput } from '@/components'
-
-import { API_URL_ORDER_STATISTIC, req } from '@/api/manage'
+<script setup>
+import { statisticApi } from '@/api/business/statistic/statistic-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -210,95 +211,72 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-export default {
-  name: 'AgentCountPage',
-  components: { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput },
-  data() {
-    const queryDateRange = this.$route.query.queryDateRange || 'today'
-    const isvNo = this.$route.query.isvNo || ''
+const route = useRoute()
+const router = useRouter()
 
-    return {
-      btnLoading: false,
-      tableColumns: tableColumns,
-      defaultSearchData: {
-        method: 'agent',
-        isvNo: isvNo,
-        queryDateRange: queryDateRange
-      },
-      searchData: {},
-      detailQueryDateRange: queryDateRange,
-      countInitData: {
-        allAmount: 0.0,
-        allCount: 0,
-        payAmount: 0.0,
-        payCount: 0,
-        fee: 0.0,
-        refundAmount: 0.0,
-        refundCount: 0,
-        refundFeeAmount: 0.0,
-        round: 0.0
+const infoTable = ref(null)
+const btnLoading = ref(false)
+const queryDateRange = route.query.queryDateRange || 'today'
+const isvNo = route.query.isvNo || ''
+const detailQueryDateRange = ref(queryDateRange)
+
+const defaultSearchData = {
+  method: 'agent',
+  isvNo,
+  queryDateRange
+}
+
+const searchData = reactive({ ...defaultSearchData })
+
+const countInitData = {
+  allAmount: 0.0,
+  allCount: 0,
+  payAmount: 0.0,
+  payCount: 0,
+  fee: 0.0,
+  refundAmount: 0.0,
+  refundCount: 0,
+  refundFeeAmount: 0.0,
+  round: 0.0
+}
+
+const reqTableDataFunc = (params) => statisticApi.queryOrderStatistic(params)
+
+const reqDownloadDataFunc = (params) => {
+  statisticApi
+    .exportExcel(params)
+    .then((res) => {
+      const blob = new Blob([res])
+      const fileName = '代理商统计.xlsx'
+      if ('download' in document.createElement('a')) {
+        const elink = document.createElement('a')
+        elink.download = fileName
+        elink.style.display = 'none'
+        elink.href = URL.createObjectURL(blob)
+        document.body.appendChild(elink)
+        elink.click()
+        URL.revokeObjectURL(elink.href)
+        document.body.removeChild(elink)
+      } else {
+        navigator.msSaveBlob(blob, fileName)
       }
-    }
-  },
-  computed: {},
-  created() {
-    // 初始化时将默认参数赋值给 searchData
-    // 使用对象展开运算符 Object.assign 来复制对象
-    this.searchData = { ...this.defaultSearchData }
-    // 等价于: this.searchData = Object.assign({}, this.defaultSearchData);
-  },
-  mounted() {},
-  methods: {
-    queryFunc() {
-      this.btnLoading = true
-      this.detailQueryDateRange = this.searchData.queryDateRange
-      this.$refs.infoTable.reload()
-    },
-    // 对接table接口函数
-    reqTableDataFunc: (params) => {
-      return req.list(API_URL_ORDER_STATISTIC, params)
-    },
-    reqTableCountFunc: (params) => {
-      return req.total(API_URL_ORDER_STATISTIC, params)
-    },
-    reqDownloadDataFunc: (params) => {
-      req
-        .export(API_URL_ORDER_STATISTIC, 'excel', params)
-        .then((res) => {
-          // 将响应中的二进制数据转换为Blob对象
-          const blob = new Blob([res])
-          const fileName = '代理商统计.xlsx' // 要保存的文件名
-          if ('download' in document.createElement('a')) {
-            // 非IE下载
-            // 创建一个a标签，设置download属性和href属性，然后触发click事件来下载文件
-            const elink = document.createElement('a')
-            elink.download = fileName
-            elink.style.display = 'none'
-            elink.href = URL.createObjectURL(blob) // 使用URL.createObjectURL(blob) URL地址作为a标签的href值
-            document.body.appendChild(elink)
-            elink.click()
-            URL.revokeObjectURL(elink.href) // 释放URL 对象
-            document.body.removeChild(elink)
-          } else {
-            // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
-          }
-        })
-        .catch((error) => {
-          console.error(error)
-        })
-    },
-    searchFunc: function () {
-      // 点击查询按钮事件
-      this.$refs.infoTable.reload()
-    },
-    detailFunc: function (agentNo) {
-      this.$router.push({
-        path: '/statistic/mch',
-        query: { agentNo: agentNo, queryDateRange: this.detailQueryDateRange }
-      })
-    }
-  }
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
+const queryFunc = () => {
+  btnLoading.value = true
+  detailQueryDateRange.value = searchData.queryDateRange
+  infoTable.value?.reload()
+}
+
+const detailFunc = (agentNo) => {
+  router.push({
+    path: '/statistic/mch',
+    query: { agentNo, queryDateRange: detailQueryDateRange.value }
+  })
 }
 </script>
 <style lang="less" scoped>

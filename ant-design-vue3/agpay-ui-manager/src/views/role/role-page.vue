@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :btn-loading="btnLoading" @search="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
@@ -78,9 +78,11 @@
     <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="queryFunc" />
   </div>
 </template>
-<script>
-import { AgSearch, AgTable, AgTableActions, AgInput } from '@/components'
-import { API_URL_ROLE_LIST, req } from '@/api/manage'
+<script setup>
+import { roleApi } from '@/api/business/role/role-api'
+import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 
 // eslint-disable-next-line no-unused-vars
@@ -104,52 +106,27 @@ const defaultSearchData = {
   sysType: 'MGR' // 所属系统: MGR-运营平台, AGENT-代理商, MCH-商户
 }
 
-export default {
-  name: 'RolePage',
-  components: {
-    'ag-search': AgSearch,
-    'ag-table': AgTable,
-    'ag-table-actions': AgTableActions,
-    'ag-input': AgInput,
-    InfoAddOrEdit
-  },
-  data() {
-    return {
-      btnLoading: false,
-      tableColumns: tableColumns,
-      searchData: defaultSearchData
-    }
-  },
-  mounted() {},
-  methods: {
-    // 对接table接口函数
-    reqTableDataFunc: (params) => {
-      return req.list(API_URL_ROLE_LIST, params)
-    },
-    queryFunc: function () {
-      // 点击查询按钮事件
-      this.btnLoading = true // 开启查询按钮上的loading
-      this.$refs.infoTable.loadData()
-    },
-    addFunc: function () {
-      // 业务通道.角色管理 新增
-      this.$refs.infoAddOrEdit.show()
-    },
-    editFunc: function (recordId, sysType) {
-      // 业务通道.角色管理 编辑
-      this.$refs.infoAddOrEdit.show(recordId, sysType)
-    },
-    delFunc: function (recordId) {
-      // 业务通道.角色管理 删除
-      const that = this
-      this.$infoBox.confirmDanger('确定删除吗', '', () => {
-        // 需要加按钮的loading 返回 promise对象 否则要直接返回null
-        return req.delById(API_URL_ROLE_LIST, recordId).then((res) => {
-          that.$message.success('删除成功')
-          that.$refs.infoTable.loadData()
-        })
-      })
-    }
-  }
+const btnLoading = ref(false)
+
+const { infoTable, infoAddOrEdit, searchData, reloadTable, openCreate, confirmDelete } = useCrudTablePage({
+  deleteAction: (recordId) => roleApi.delById(recordId),
+  deleteConfirmTitle: '确定删除吗',
+  deleteConfirmContent: '',
+  deleteSuccessMessage: '删除成功'
+})
+
+Object.assign(searchData, defaultSearchData)
+
+const reqTableDataFunc = (params) => roleApi.queryPage(params)
+
+const queryFunc = () => {
+  btnLoading.value = true
+  reloadTable()
 }
+
+const addFunc = () => openCreate()
+
+const editFunc = (recordId, sysType) => infoAddOrEdit.value?.show(recordId, sysType)
+
+const delFunc = (recordId) => confirmDelete(recordId)
 </script>

@@ -433,361 +433,395 @@
   </a-drawer>
 </template>
 
-<script>
+<script setup>
+import { agentApi } from '@/api/business/agent/agent-api'
+import { isvApi } from '@/api/business/isv/isv-api'
+import { basicApi } from '@/api/system/basic-api'
 import AgSelect from '@/components/ag-select'
-import { API_URL_AGENT_LIST, API_URL_ISV_LIST, req, upload, getPwdRulesRegexp } from '@/api/manage'
-import agUpload from '@/components/ag-upload'
+import AgUpload from '@/components/ag-upload'
+import { upload } from '@/lib/ag-axios'
 import { Base64 } from 'js-base64'
-import 'viewerjs/dist/viewer.css'
-export default {
-  name: 'AddOrEdit',
-  components: {
-    'ag-upload': agUpload,
-    AgSelect
-  },
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
-  data() {
-    const checkIsvNo = (rule, value, callback) => {
-      // 校验类型为特约代理商是否选择了服务商
-      if (!value) {
-        callback(new Error('请选择服务商'))
-      }
-      callback()
+import { computed, reactive, ref } from 'vue'
+
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const infoFormModel = ref(null)
+const visible = ref(false)
+const isAdd = ref(true)
+const recordId = ref(null)
+const btnLoading = ref(false)
+const newPwd = ref('')
+const resetIsShow = ref(false)
+const imgLabel = ref('联系人')
+const settAccountNoLabel = ref('个人微信号')
+
+const passwordLength = ref(6)
+const includeUpperCase = ref(true)
+const includeNumber = ref(false)
+const includeSymbol = ref(false)
+
+const passwordRules = reactive({
+  regexpRules: '',
+  errTips: ''
+})
+
+const action = upload.form
+
+const agentTypeList = [
+  { agentType: 1, agentTypeName: '个人' },
+  { agentType: 2, agentTypeName: '企业' }
+]
+
+const baseSettAccountTypeList = [
+  { settAccountType: 'WX_CASH', settAccountTypeName: '个人微信' },
+  { settAccountType: 'ALIPAY_CASH', settAccountTypeName: '个人支付宝' },
+  { settAccountType: 'BANK_PRIVATE', settAccountTypeName: '对私账户' }
+]
+
+const settAccountTypeList = ref([...baseSettAccountTypeList])
+
+const sysPassword = reactive({
+  resetPayPass: false,
+  resetPass: false,
+  defaultPass: true,
+  confirmPwd: ''
+})
+
+const cashoutFeeRule = reactive({
+  freeLimit: 0,
+  applyLimit: 0,
+  feeType: 'FIX',
+  fixFee: 0,
+  feeRate: 0
+})
+
+const saveObject = ref({})
+
+const rules = computed(() => ({
+  agentName: [{ required: true, message: '请输入代理商名称', trigger: 'blur' }],
+  loginUsername: [
+    {
+      required: true,
+      pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/,
+      message: '请输入字母开头，长度为6-18位的登录名',
+      trigger: 'blur'
     }
-    const passwordRules = {
-      regexpRules: '',
-      errTips: ''
-    }
-    getPwdRulesRegexp().then((res) => {
-      passwordRules.regexpRules = res.regexpRules
-      passwordRules.errTips = res.errTips
-    })
-
-    return {
-      passwordLength: 6, // 密码长度
-      passwordRules,
-      includeUpperCase: true, // 包含大写字母
-      includeNumber: false, // 包含数字
-      includeSymbol: false, // 包含符号
-      newPwd: '', //  新密码
-      resetIsShow: false, // 重置密码是否展现
-      sysPassword: {
-        resetPayPass: false, // 重置支付密码
-        resetPass: false, // 重置密码
-        defaultPass: true, // 使用默认密码
-        confirmPwd: '' //  确认密码
-      },
-      cashoutFeeRule: {
-        // 设置提现手续费规则
-        freeLimit: 0,
-        applyLimit: 0,
-        feeType: 'FIX',
-        fixFee: 0,
-        feeRate: 0
-      },
-      btnLoading: false,
-      isAdd: true, // 新增 or 修改页面标志
-      saveObject: {}, // 数据对象
-      recordId: null, // 更新对象ID
-      visible: false, // 是否显示弹层/抽屉
-      agentTypeList: [
-        { agentType: 1, agentTypeName: '个人' },
-        { agentType: 2, agentTypeName: '企业' }
-      ],
-      settAccountTypeList: [
-        { settAccountType: 'WX_CASH', settAccountTypeName: '个人微信' },
-        { settAccountType: 'ALIPAY_CASH', settAccountTypeName: '个人支付宝' },
-        { settAccountType: 'BANK_PRIVATE', settAccountTypeName: '对私账户' }
-        // ,{ settAccountType: 'BANK_PUBLIC', settAccountTypeName: '对公账户' }
-      ],
-      action: upload.form, // 上传文件地址
-      imgLabel: '联系人',
-      settAccountNoLabel: '个人微信号',
-      rules: {
-        agentName: [{ required: true, message: '请输入代理商名称', trigger: 'blur' }],
-        loginUsername: [
-          {
-            required: true,
-            pattern: /^[a-zA-Z][a-zA-Z0-9]{5,17}$/,
-            message: '请输入字母开头，长度为6-18位的登录名',
-            trigger: 'blur'
-          }
-        ],
-        loginPassword: [
-          { required: true, message: '请输入登录密码', trigger: 'blur' },
-          {
-            validator: (rule, value, callBack) => {
-              if (this.saveObject.passwordType === 'custom') {
-                if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-                  const regex = new RegExp(passwordRules.regexpRules)
-                  const isMatch = regex.test(this.saveObject.loginPassword)
-                  if (!isMatch) {
-                    callBack(passwordRules.errTips)
-                  }
-                }
-              }
-              callBack()
+  ],
+  loginPassword: [
+    { required: true, message: '请输入登录密码', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (saveObject.value.passwordType === 'custom') {
+          if (passwordRules.regexpRules && passwordRules.errTips) {
+            const regex = new RegExp(passwordRules.regexpRules)
+            const isMatch = regex.test(saveObject.value.loginPassword)
+            if (!isMatch) {
+              callback(passwordRules.errTips)
+              return
             }
-          }
-        ], // 登录密码
-        agentShortName: [{ required: true, message: '请输入代理商简称', trigger: 'blur' }],
-        contactName: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
-        isvNo: [{ required: true, validator: checkIsvNo, trigger: 'blur' }],
-        contactEmail: [
-          {
-            required: false,
-            pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/,
-            message: '请输入正确的邮箱地址',
-            trigger: 'blur'
-          }
-        ],
-        contactTel: [{ required: true, pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }],
-        newPwd: [
-          {
-            required: true,
-            trigger: 'blur',
-            validator: (rule, value, callBack) => {
-              if (!this.newPwd) {
-                callBack('请输入新密码')
-                return
-              }
-              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-                const regex = new RegExp(passwordRules.regexpRules)
-                const isMatch = regex.test(this.newPwd)
-                if (!isMatch) {
-                  callBack(passwordRules.errTips)
-                }
-              }
-              callBack()
-            }
-          }
-        ], // 新密码
-        confirmPwd: [
-          {
-            required: true,
-            trigger: 'blur',
-            validator: (rule, value, callBack) => {
-              if (!this.sysPassword.confirmPwd) {
-                callBack('请输入确认新密码')
-                return
-              }
-              if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
-                const regex = new RegExp(passwordRules.regexpRules)
-                const isMatch = regex.test(this.sysPassword.confirmPwd)
-                if (!isMatch) {
-                  callBack(passwordRules.errTips)
-                }
-              }
-              this.newPwd === this.sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
-              callBack()
-            }
-          }
-        ] // 确认新密码
-      }
-    }
-  },
-  created() {},
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.saveObject = {
-        state: 1,
-        addAgentFlag: 1,
-        agentType: 1,
-        settAccountType: 'WX_CASH',
-        cashoutFeeRuleType: 1,
-        isNotify: 0,
-        passwordType: 'default',
-        loginPassword: ''
-      } // 数据清空
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
-      const that = this
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        that.resetIsShow = true // 展示重置密码板块
-        that.recordId = recordId
-        req.getById(API_URL_AGENT_LIST, recordId).then((res) => {
-          that.saveObject = res
-        })
-        this.visible = true
-      } else {
-        that.visible = true // 立马展示弹层信息
-      }
-    },
-    searchAgent(params) {
-      return req.list(API_URL_AGENT_LIST, params)
-    },
-    searchIsv(params) {
-      return req.list(API_URL_ISV_LIST, params)
-    },
-    // 随机生成密码
-    genRandomPassword: function () {
-      if (!this.passwordLength) return
-
-      let password = ''
-      let characters = 'abcdefghijklmnopqrstuvwxyz'
-
-      // 根据用户选择动态添加字符集
-      if (this.includeUpperCase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-      if (this.includeNumber) characters += '0123456789'
-      if (this.includeSymbol) characters += '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
-
-      // 如果密码规则未定义，使用默认逻辑生成密码
-      if (!this.passwordRules.regexpRules) {
-        for (let i = 0; i < this.passwordLength; i++) {
-          password += characters.charAt(Math.floor(Math.random() * characters.length))
-        }
-      } else {
-        // 使用密码规则生成密码
-        const regex = new RegExp(this.passwordRules.regexpRules) // 使用密码规则的正则表达式
-
-        // 提取长度规则（例如 ^.{8,}$ 表示最少 8 位）
-        const lengthMatch = this.passwordRules.regexpRules.match(/\{(\d+),?(\d+)?\}/)
-        const minLength = lengthMatch ? parseInt(lengthMatch[1], 10) : this.passwordLength // 默认最小长度为 6
-        const maxLength = lengthMatch && lengthMatch[2] ? parseInt(lengthMatch[2], 10) : minLength // 如果没有最大长度，则使用最小长度
-
-        const passwordLength = Math.min(maxLength, minLength) // 使用最小长度或最大长度
-
-        // 循环生成密码，直到符合规则
-        do {
-          password = ''
-          for (let i = 0; i < passwordLength; i++) {
-            password += characters.charAt(Math.floor(Math.random() * characters.length))
-          }
-        } while (!regex.test(password)) // 验证生成的密码是否符合规则
-      }
-
-      this.saveObject.loginPassword = password
-    },
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          // 请求接口
-          if (that.saveObject.cashoutFeeRuleType === 2) {
-            that.saveObject.cashoutFeeRule = JSON.stringify(that.cashoutFeeRule)
-          } else {
-            that.saveObject.cashoutFeeRule = null
-          }
-          if (that.isAdd) {
-            this.btnLoading = true
-            req
-              .add(API_URL_AGENT_LIST, that.saveObject)
-              .then((res) => {
-                that.$message.success('新增成功')
-                that.visible = false
-                that.callbackFunc() // 刷新列表
-                that.btnLoading = false
-              })
-              .catch((res) => {
-                that.btnLoading = false
-              })
-          } else {
-            if (that.sysPassword.resetPayPass) {
-              that.sysPassword.sipw = null
-            }
-            that.sysPassword.confirmPwd = Base64.encode(that.sysPassword.confirmPwd)
-            console.log(that.sysPassword.confirmPwd)
-            Object.assign(that.saveObject, that.sysPassword) // 拼接对象
-            console.log(that.saveObject)
-            req
-              .updateById(API_URL_AGENT_LIST, that.recordId, that.saveObject)
-              .then((res) => {
-                that.$message.success('修改成功')
-                that.visible = false
-                that.callbackFunc() // 刷新列表
-                that.btnLoading = false
-                that.resetIsShow = true // 展示重置密码板块
-                that.sysPassword.resetPayPass = false
-                that.sysPassword.resetPass = false
-                that.sysPassword.defaultPass = true // 是否使用默认密码默认为true
-                that.resetPassEmpty(that) // 清空密码
-              })
-              .catch((res) => {
-                that.btnLoading = false
-                that.resetIsShow = true // 展示重置密码板块
-                that.sysPassword.resetPayPass = false
-                that.sysPassword.resetPass = false
-                that.sysPassword.defaultPass = true // 是否使用默认密码默认为true
-                that.resetPassEmpty(that) // 清空密码
-              })
           }
         }
-      })
-    },
-    onClose() {
-      this.visible = false
-      this.resetIsShow = false // 取消重置密码板块展示
-      this.sysPassword.resetPayPass = false
-      this.sysPassword.resetPass = false
-      this.resetPassEmpty(this)
-      this.sysPassword.defaultPass = true // 是否使用默认密码默认为true
-    },
-    searchFunc: function () {
-      // 点击【查询】按钮点击事件
-      this.$refs.infoTable.refTable(true)
-    },
-    // 使用默认密码重置是否为true
-    isResetPass() {
-      if (!this.sysPassword.defaultPass) {
-        this.newPwd = ''
-        this.sysPassword.confirmPwd = ''
+        callback()
       }
-    },
-    // 保存后清空密码
-    resetPassEmpty(that) {
-      that.newPwd = ''
-      that.sysPassword.confirmPwd = ''
-    },
-    pidChange(val, selected) {
-      if (selected) {
-        this.saveObject.isvNo = selected?.isvNo
-      }
-    },
-    agentTypeChange() {
-      if (this.saveObject.agentType === 2) {
-        this.imgLabel = '法人'
-        this.settAccountTypeList.push({ settAccountType: 'BANK_PUBLIC', settAccountTypeName: '对公账户' })
-      } else {
-        this.imgLabel = '联系人'
-        this.settAccountTypeList.pop()
-      }
-      if (this.saveObject.agentType === 1 && this.saveObject.settAccountType === 'BANK_PUBLIC') {
-        this.saveObject.settAccountType = 'WX_CASH'
-      }
-    },
-    settAccountTypeChange(value) {
-      switch (value) {
-        case 'WX_CASH':
-          this.settAccountNoLabel = '个人微信号'
-          break
-        case 'ALIPAY_CASH':
-          this.settAccountNoLabel = '支付宝账号'
-          break
-        case 'BANK_PRIVATE':
-          this.settAccountNoLabel = '收款银行卡号'
-          break
-        case 'BANK_PUBLIC':
-          this.settAccountNoLabel = '对公账号'
-          break
-      }
-    },
-    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
-    uploadSuccess(name, fileList) {
-      console.log({ name, fileList })
-      const [firstItem] = fileList
-      this.saveObject[name] = firstItem?.url
-      this.$forceUpdate()
     }
+  ],
+  agentShortName: [{ required: true, message: '请输入代理商简称', trigger: 'blur' }],
+  contactName: [{ required: true, message: '请输入联系人姓名', trigger: 'blur' }],
+  isvNo: [
+    {
+      required: true,
+      validator: (rule, value, callback) => {
+        if (!value) {
+          callback(new Error('请选择服务商'))
+          return
+        }
+        callback()
+      },
+      trigger: 'blur'
+    }
+  ],
+  contactEmail: [
+    {
+      required: false,
+      pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/,
+      message: '请输入正确的邮箱地址',
+      trigger: 'blur'
+    }
+  ],
+  contactTel: [{ required: true, pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }],
+  newPwd: [
+    {
+      required: true,
+      trigger: 'blur',
+      validator: (rule, value, callback) => {
+        if (!newPwd.value) {
+          callback('请输入新密码')
+          return
+        }
+        if (passwordRules.regexpRules && passwordRules.errTips) {
+          const regex = new RegExp(passwordRules.regexpRules)
+          const isMatch = regex.test(newPwd.value)
+          if (!isMatch) {
+            callback(passwordRules.errTips)
+            return
+          }
+        }
+        callback()
+      }
+    }
+  ],
+  confirmPwd: [
+    {
+      required: true,
+      trigger: 'blur',
+      validator: (rule, value, callback) => {
+        if (!sysPassword.confirmPwd) {
+          callback('请输入确认新密码')
+          return
+        }
+        if (passwordRules.regexpRules && passwordRules.errTips) {
+          const regex = new RegExp(passwordRules.regexpRules)
+          const isMatch = regex.test(sysPassword.confirmPwd)
+          if (!isMatch) {
+            callback(passwordRules.errTips)
+            return
+          }
+        }
+        if (newPwd.value !== sysPassword.confirmPwd) {
+          callback('新密码与确认密码不一致')
+          return
+        }
+        callback()
+      }
+    }
+  ]
+}))
+
+function getDefaultSaveObject() {
+  return {
+    state: 1,
+    addAgentFlag: 1,
+    agentType: 1,
+    settAccountType: 'WX_CASH',
+    cashoutFeeRuleType: 1,
+    isNotify: 0,
+    passwordType: 'default',
+    loginPassword: ''
   }
 }
+
+function resetSysPasswordState() {
+  sysPassword.resetPayPass = false
+  sysPassword.resetPass = false
+  sysPassword.defaultPass = true
+  sysPassword.confirmPwd = ''
+}
+
+function resetPassEmpty() {
+  newPwd.value = ''
+  sysPassword.confirmPwd = ''
+}
+
+function normalizeSettAccountTypeList(agentType) {
+  const hasPublic = settAccountTypeList.value.some((item) => item.settAccountType === 'BANK_PUBLIC')
+  if (agentType === 2 && !hasPublic) {
+    settAccountTypeList.value = [...settAccountTypeList.value, { settAccountType: 'BANK_PUBLIC', settAccountTypeName: '对公账户' }]
+  }
+  if (agentType !== 2 && hasPublic) {
+    settAccountTypeList.value = settAccountTypeList.value.filter((item) => item.settAccountType !== 'BANK_PUBLIC')
+  }
+}
+
+function setSettAccountNoLabel(value) {
+  switch (value) {
+    case 'WX_CASH':
+      settAccountNoLabel.value = '个人微信号'
+      break
+    case 'ALIPAY_CASH':
+      settAccountNoLabel.value = '支付宝账号'
+      break
+    case 'BANK_PRIVATE':
+      settAccountNoLabel.value = '收款银行卡号'
+      break
+    case 'BANK_PUBLIC':
+      settAccountNoLabel.value = '对公账号'
+      break
+    default:
+      settAccountNoLabel.value = '个人微信号'
+      break
+  }
+}
+
+function show(currentRecordId) {
+  isAdd.value = !currentRecordId
+  recordId.value = currentRecordId || null
+  resetIsShow.value = false
+  saveObject.value = getDefaultSaveObject()
+  resetSysPasswordState()
+  resetPassEmpty()
+  imgLabel.value = '联系人'
+  settAccountTypeList.value = [...baseSettAccountTypeList]
+  setSettAccountNoLabel(saveObject.value.settAccountType)
+
+  if (infoFormModel.value) {
+    infoFormModel.value.resetFields()
+  }
+
+  if (!isAdd.value) {
+    resetIsShow.value = true
+    agentApi.getById(currentRecordId).then((res) => {
+      saveObject.value = { ...res }
+      normalizeSettAccountTypeList(saveObject.value.agentType)
+      imgLabel.value = saveObject.value.agentType === 2 ? '法人' : '联系人'
+      setSettAccountNoLabel(saveObject.value.settAccountType)
+    })
+  }
+
+  visible.value = true
+}
+
+function searchAgent(params) {
+  return agentApi.queryPage(params)
+}
+
+function searchIsv(params) {
+  return isvApi.queryPage(params)
+}
+
+function genRandomPassword() {
+  if (!passwordLength.value) return
+
+  let password = ''
+  let characters = 'abcdefghijklmnopqrstuvwxyz'
+
+  if (includeUpperCase.value) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  if (includeNumber.value) characters += '0123456789'
+  if (includeSymbol.value) characters += '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~'
+
+  if (!passwordRules.regexpRules) {
+    for (let i = 0; i < passwordLength.value; i++) {
+      password += characters.charAt(Math.floor(Math.random() * characters.length))
+    }
+  } else {
+    const regex = new RegExp(passwordRules.regexpRules)
+    const lengthMatch = passwordRules.regexpRules.match(/\{(\d+),?(\d+)?\}/)
+    const minLength = lengthMatch ? parseInt(lengthMatch[1], 10) : passwordLength.value
+    const maxLength = lengthMatch && lengthMatch[2] ? parseInt(lengthMatch[2], 10) : minLength
+    const generatedLength = Math.min(maxLength, minLength)
+
+    do {
+      password = ''
+      for (let i = 0; i < generatedLength; i++) {
+        password += characters.charAt(Math.floor(Math.random() * characters.length))
+      }
+    } while (!regex.test(password))
+  }
+
+  saveObject.value.loginPassword = password
+}
+
+function handleOkFunc() {
+  infoFormModel.value?.validate((valid) => {
+    if (!valid) return
+
+    if (saveObject.value.cashoutFeeRuleType === 2) {
+      saveObject.value.cashoutFeeRule = JSON.stringify(cashoutFeeRule)
+    } else {
+      saveObject.value.cashoutFeeRule = null
+    }
+
+    if (isAdd.value) {
+      btnLoading.value = true
+      agentApi
+        .add(saveObject.value)
+        .then(() => {
+          window.$message.success('新增成功')
+          visible.value = false
+          props.callbackFunc()
+        })
+        .finally(() => {
+          btnLoading.value = false
+        })
+      return
+    }
+
+    if (sysPassword.resetPayPass) {
+      sysPassword.sipw = null
+    }
+    sysPassword.confirmPwd = Base64.encode(sysPassword.confirmPwd)
+    Object.assign(saveObject.value, sysPassword)
+
+    btnLoading.value = true
+    agentApi
+      .updateById(recordId.value, saveObject.value)
+      .then(() => {
+        window.$message.success('修改成功')
+        visible.value = false
+        props.callbackFunc()
+      })
+      .finally(() => {
+        btnLoading.value = false
+        resetIsShow.value = true
+        resetSysPasswordState()
+        resetPassEmpty()
+      })
+  })
+}
+
+function onClose() {
+  visible.value = false
+  resetIsShow.value = false
+  resetSysPasswordState()
+  resetPassEmpty()
+}
+
+function isResetPass() {
+  if (!sysPassword.defaultPass) {
+    resetPassEmpty()
+  }
+}
+
+function pidChange(val, selected) {
+  if (selected) {
+    saveObject.value.isvNo = selected?.isvNo
+  }
+}
+
+function agentTypeChange() {
+  if (saveObject.value.agentType === 2) {
+    imgLabel.value = '法人'
+  } else {
+    imgLabel.value = '联系人'
+  }
+
+  normalizeSettAccountTypeList(saveObject.value.agentType)
+
+  if (saveObject.value.agentType === 1 && saveObject.value.settAccountType === 'BANK_PUBLIC') {
+    saveObject.value.settAccountType = 'WX_CASH'
+    setSettAccountNoLabel('WX_CASH')
+  }
+}
+
+function settAccountTypeChange(value) {
+  setSettAccountNoLabel(value)
+}
+
+function uploadSuccess(name, fileList) {
+  const [firstItem] = fileList
+  saveObject.value[name] = firstItem?.url
+}
+
+basicApi.getPwdRulesRegexp().then((res) => {
+  passwordRules.regexpRules = res.regexpRules
+  passwordRules.errTips = res.errTips
+})
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 
 <style lang="less">

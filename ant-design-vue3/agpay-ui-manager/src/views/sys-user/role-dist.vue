@@ -29,8 +29,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, defineProps } from 'vue'
-import { uSysUserRoleRela, req, reqLoad, API_URL_ROLE_LIST, API_URL_USER_ROLE_RELA_LIST } from '@/api/manage'
+import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
+import { ref } from 'vue'
 
 const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
@@ -54,7 +54,7 @@ const show = (recordIdParam, sysTypeParam, belongInfoIdParam) => {
   belongInfoId.value = belongInfoIdParam
 
   // 查询所有角色列表
-  reqLoad.list(API_URL_ROLE_LIST, { pageSize: -1, sysType: sysType.value, belongInfoId: belongInfoId.value }).then(res => {
+  sysUserApi.queryRolePageWithLoading({ pageSize: -1, sysType: sysType.value, belongInfoId: belongInfoId.value }).then(res => {
     if (res.total <= 0) {
       import('ant-design-vue').then(({ message }) => {
         message.error(`当前暂无角色，请先行添加`)
@@ -69,7 +69,7 @@ const show = (recordIdParam, sysTypeParam, belongInfoIdParam) => {
     })
 
     // 查询已分配的列表
-    req.list(API_URL_USER_ROLE_RELA_LIST, { pageSize: -1, userId: recordIdParam }).then(relaRes => {
+    sysUserApi.queryUserRoleRelaPage({ pageSize: -1, userId: recordIdParam }).then(relaRes => {
       checkedVal.value = []
       relaRes.records.map(rela => {
           checkedVal.value.push(rela.roleId)
@@ -80,7 +80,7 @@ const show = (recordIdParam, sysTypeParam, belongInfoIdParam) => {
 
 const handleOkFunc = () => {
   confirmLoading.value = true // 显示loading
-  uSysUserRoleRela(recordId.value, checkedVal.value).then(res => {
+  sysUserApi.updateUserRoleRela(recordId.value, checkedVal.value).then(res => {
     import('ant-design-vue').then(({ message }) => {
       message.success('更新成功！')
       isShow.value = false
@@ -102,4 +102,6 @@ const onCheckAllChange = (e) => {
     })
   }
 }
+
+defineExpose({ show })
 </script>

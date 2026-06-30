@@ -73,9 +73,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
 import { message } from 'ant-design-vue'
-import { API_URL_MCH_STORE, req } from '@/api/manage'
+import { reactive, ref, watch } from 'vue'
 
 // Props & Emits
 const props = defineProps({
@@ -136,7 +136,7 @@ watch(localOpen, (val) => {
 const loadDetail = async () => {
   try {
     loading.value = true
-    const res = await req.getById(API_URL_MCH_STORE, props.recordId)
+    const res = await mchStoreApi.getById(props.recordId)
     Object.assign(detailData, res)
   } catch (error) {
     console.error('加载详情失败:', error)

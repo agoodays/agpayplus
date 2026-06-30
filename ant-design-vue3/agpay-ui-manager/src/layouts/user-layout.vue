@@ -25,8 +25,8 @@
 </template>
 
 <script setup>
-import dayjs from 'dayjs'
-import { useI18n } from 'vue-i18n'
+import dayjs from 'dayjs';
+import { useI18n } from 'vue-i18n';
 
 const { t } = useI18n()
 const currentYear = dayjs().year()
@@ -56,7 +56,9 @@ const currentYear = dayjs().year()
   box-sizing: border-box;
   object-fit: cover;
   padding: 80px 10vw 0;
+  height: 100vh;
   min-height: 100vh;
+  overflow-y: auto;
 }
 
 .content-body .content-main {

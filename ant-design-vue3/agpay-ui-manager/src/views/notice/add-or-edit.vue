@@ -5,7 +5,7 @@
     :title="isAdd ? '新增公告' : '修改公告'"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    width="60%"
+    :width="drawerWidth"
     class="drawer-width"
     @close="onClose"
   >
@@ -43,110 +43,122 @@
       </a-row>
     </a-form-model>
     <div class="drawer-btn-center">
-      <a-button icon="close" :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
+      <a-button :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
+        <template #icon><close-outlined /></template>
         取消
       </a-button>
-      <a-button type="primary" icon="check-circle" :loading="btnLoading" @click="onSubmit"> 保存 </a-button>
+      <a-button type="primary" :loading="btnLoading" @click="onSubmit">
+        <template #icon><check-circle-outlined /></template>
+        保存
+      </a-button>
     </div>
   </a-drawer>
 </template>
 
-<script>
+<script setup>
+import { noticeApi } from '@/api/business/notice/notice-api'
 import AgEditor from '@/components/ag-editor'
-import { API_URL_ARTICLE_LIST, req } from '@/api/manage'
-export default {
-  components: { 'ag-editor': AgEditor },
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
-  data() {
-    const checkArticleRange = (rule, value, callback) => {
-      // 是否选择了公告范围
-      if (!value.length) {
-        callback(new Error('请选择公告范围'))
-      }
-      callback()
-    }
-    return {
-      btnLoading: false,
-      isAdd: true, // 新增 or 修改页面标志
-      saveObject: {}, // 数据对象
-      recordId: null, // 更新对象ID
-      visible: false, // 是否显示弹层/抽屉
-      articleRangeOptions: [
-        { label: '商户', value: 'MCH' },
-        { label: '代理商', value: 'AGENT' }
-      ],
-      rules: {
-        title: [{ required: true, message: '请输入公告标题', trigger: 'blur' }],
-        subtitle: [{ required: true, message: '请输入公告副标题', trigger: 'blur' }],
-        publisher: [{ required: true, message: '请填写发布人', trigger: 'blur' }],
-        articleRange: [{ required: true, validator: checkArticleRange, trigger: 'blur' }]
-      }
-    }
-  },
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.saveObject = {}
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
-      const that = this
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        console.log(555)
-        that.recordId = recordId
-        req.getById(API_URL_ARTICLE_LIST, recordId).then((res) => {
-          that.saveObject = res
-        })
-        this.visible = true
-      } else {
-        that.visible = true // 立马展示弹层信息
-      }
-    },
-    onSubmit: function () {
-      // 点击【保存】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          // 请求接口
-          if (that.isAdd) {
-            this.btnLoading = true
-            req
-              .add(API_URL_ARTICLE_LIST, that.saveObject)
-              .then((res) => {
-                that.$message.success('新增成功')
-                that.visible = false
-                that.callbackFunc() // 刷新列表
-                that.btnLoading = false
-              })
-              .catch((res) => {
-                that.btnLoading = false
-              })
-          } else {
-            req
-              .updateById(API_URL_ARTICLE_LIST, that.recordId, that.saveObject)
-              .then((res) => {
-                that.$message.success('修改成功')
-                that.visible = false
-                that.callbackFunc() // 刷新列表
-                that.btnLoading = false
-              })
-              .catch((res) => {
-                that.btnLoading = false
-              })
-          }
-        }
-      })
-    },
-    onClose() {
-      this.visible = false
+import { CheckCircleOutlined, CloseOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const infoFormModel = ref()
+const btnLoading = ref(false)
+const isAdd = ref(true)
+const saveObject = ref({})
+const recordId = ref(null)
+const visible = ref(false)
+const viewportWidth = ref(window.innerWidth)
+const drawerWidth = computed(() => (viewportWidth.value < 1200 ? '94%' : '60%'))
+
+const articleRangeOptions = [
+  { label: '商户', value: 'MCH' },
+  { label: '代理商', value: 'AGENT' }
+]
+
+const onResize = () => {
+  viewportWidth.value = window.innerWidth
+}
+
+onMounted(() => {
+  window.addEventListener('resize', onResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onResize)
+})
+
+const checkArticleRange = (_rule, value, callback) => {
+  if (!value?.length) {
+    callback(new Error('请选择公告范围'))
+    return
+  }
+  callback()
+}
+
+const rules = {
+  title: [{ required: true, message: '请输入公告标题', trigger: 'blur' }],
+  subtitle: [{ required: true, message: '请输入公告副标题', trigger: 'blur' }],
+  publisher: [{ required: true, message: '请填写发布人', trigger: 'blur' }],
+  articleRange: [{ required: true, validator: checkArticleRange, trigger: 'blur' }]
+}
+
+async function show(id) {
+  isAdd.value = !id
+  saveObject.value = {}
+  recordId.value = id || null
+  infoFormModel.value?.resetFields?.()
+  visible.value = true
+
+  if (!isAdd.value && recordId.value) {
+    try {
+      const res = await noticeApi.getById(recordId.value)
+      saveObject.value = res || {}
+    } catch (_e) {
+      message.error('加载公告信息失败，请重试')
     }
   }
 }
+
+function validateForm() {
+  return new Promise((resolve) => {
+    infoFormModel.value?.validate((valid) => {
+      resolve(valid)
+    })
+  })
+}
+
+async function onSubmit() {
+  if (btnLoading.value) return
+
+  const valid = await validateForm()
+  if (!valid) return
+
+  btnLoading.value = true
+  try {
+    if (isAdd.value) {
+      await noticeApi.add(saveObject.value)
+      message.success('新增成功')
+    } else {
+      await noticeApi.updateById(recordId.value, saveObject.value)
+      message.success('修改成功')
+    }
+    visible.value = false
+    props.callbackFunc()
+  } finally {
+    btnLoading.value = false
+  }
+}
+
+function onClose() {
+  visible.value = false
+}
+
+defineExpose({ show })
 </script>
 
 <style lang="less">

@@ -52,9 +52,10 @@
     <SetEntMatchRule ref="setEntMatchRule" :callback-func="refTable" />
   </div>
 </template>
-<script>
-import { getEntTree, API_URL_ENT_LIST, reqLoad } from '@/api/manage'
-import { AgTableActions, AgStateSwitch } from '@/components'
+<script setup>
+import { entApi } from '@/api/business/ent/ent-api'
+import { AgStateSwitch, AgTableActions } from '@/components'
+import { onMounted, ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 import SetEntMatchRule from './set-ent-match-rule.vue'
 
@@ -71,53 +72,40 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
-export default {
-  name: 'EntPage',
-  components: {
-    'ag-state-switch': AgStateSwitch,
-    'ag-table-actions': AgTableActions,
-    InfoAddOrEdit,
-    SetEntMatchRule
-  },
-  data() {
-    return {
-      querySysType: 'MGR', // 默认查询运营平台
-      tableColumns: tableColumns,
-      dataSource: [],
-      loading: false
-    }
-  },
-  mounted() {
-    this.refTable() // 刷新页面
-  },
-  methods: {
-    refTable: function () {
-      const that = this
-      that.loading = true
-      getEntTree(that.querySysType).then((res) => {
-        that.dataSource = res
-        that.loading = false
-      })
-    },
+const infoAddOrEdit = ref(null)
+const setEntMatchRule = ref(null)
+const querySysType = ref('MGR')
+const dataSource = ref([])
+const loading = ref(false)
 
-    updateState: function (recordId, state) {
-      const that = this
-      return reqLoad
-        .updateById(API_URL_ENT_LIST, recordId, { state: state, sysType: that.querySysType })
-        .then((res) => {
-          that.$message.success('更新成功')
-          that.refTable() // 刷新页面
-        })
-    },
-
-    setFunc: function () {
-      this.$refs.setEntMatchRule.show()
-    },
-
-    editFunc: function (recordId) {
-      // 业务通道.编辑. 权限
-      this.$refs.infoAddOrEdit.show(recordId, this.querySysType)
-    }
-  }
+const refTable = () => {
+  loading.value = true
+  entApi
+    .queryEntTree(querySysType.value)
+    .then((res) => {
+      dataSource.value = res
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
+
+const updateState = (recordId, state) => {
+  return entApi.updateStateById(recordId, state, querySysType.value).then(() => {
+    window.$message.success('更新成功')
+    refTable()
+  })
+}
+
+const setFunc = () => {
+  setEntMatchRule.value?.show()
+}
+
+const editFunc = (recordId) => {
+  infoAddOrEdit.value?.show(recordId, querySysType.value)
+}
+
+onMounted(() => {
+  refTable()
+})
 </script>

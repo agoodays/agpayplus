@@ -74,119 +74,80 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref, reactive, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
-import { TransactionOutlined, FileTextOutlined, ShopOutlined, TeamOutlined } from '@ant-design/icons-vue'
+<script setup>
+import { mainApi } from '@/api/business/main/main-api'
 import { useUserStore } from '@/store/modules/system/user'
 import { timeFix } from '@/utils/time-util'
-import { req } from '@/api/manage'
+import { FileTextOutlined, ShopOutlined, TeamOutlined, TransactionOutlined } from '@ant-design/icons-vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const userStore = useUserStore()
+const { t } = useI18n()
 
-export default defineComponent({
-  name: 'MainPage',
-  components: {
-    TransactionOutlined,
-    FileTextOutlined,
-    ShopOutlined,
-    TeamOutlined
-  },
-  setup() {
-    const router = useRouter()
-    const userStore = useUserStore()
-    const { t } = useI18n()
+const loading = ref(true)
+const statistics = reactive({
+  todayAmount: 0,
+  todayCount: 0,
+  totalMch: 0,
+  totalAgent: 0
+})
 
-    const loading = ref(true)
-    const statistics = reactive({
-      todayAmount: 0,
-      todayCount: 0,
-      totalMch: 0,
-      totalAgent: 0
-    })
+const greetingText = computed(() => {
+  const userName = userStore.realname || userStore.loginUsername || t('main.defaultUser')
+  return t('main.greeting', { greet: timeFix(), name: userName })
+})
 
-    // 问候语
-    const greetingText = computed(() => {
-      const userName = userStore.realname || userStore.loginUsername || t('main.defaultUser')
-      return t('main.greeting', { greet: timeFix(), name: userName })
-    })
+const quickMenuList = computed(() => {
+  const allMenus = userStore.allMenuRouteTree || []
+  const quickMenus = []
 
-    // 获取快速菜单列表
-    const quickMenuList = computed(() => {
-      // 从用户的菜单中筛选出常用菜单
-      const allMenus = userStore.allMenuRouteTree || []
-      const quickMenus = []
-
-      // 递归查找菜单
-      const findQuickMenus = (menus) => {
-        menus.forEach((menu) => {
-          // 如果是菜单链接类型且有路径
-          if (menu.entType === 'ML' && menu.menuUri) {
-            quickMenus.push(menu)
-          }
-          // 递归查找子菜单
-          if (menu.children && menu.children.length > 0) {
-            findQuickMenus(menu.children)
-          }
-        })
+  const findQuickMenus = (menus) => {
+    menus.forEach((menu) => {
+      if (menu.entType === 'ML' && menu.menuUri) {
+        quickMenus.push(menu)
       }
-
-      findQuickMenus(allMenus)
-
-      // 只返回前8个菜单
-      return quickMenus.slice(0, 8)
-    })
-
-    /**
-     * 获取统计数据
-     */
-    const fetchStatistics = async () => {
-      try {
-        loading.value = true
-
-        // 获取今日统计数据
-        const dayCountRes = await req.get('/api/mainChart/payDayCount', {
-          queryDateRange: 'today'
-        })
-        if (dayCountRes) {
-          statistics.todayAmount = dayCountRes.payAmount || 0
-          statistics.todayCount = dayCountRes.payCount || 0
-        }
-
-        // 获取商户和代理商数量
-        const countRes = await req.get('/api/mainChart/isvAndMchCount')
-        if (countRes) {
-          statistics.totalMch = countRes.totalMch || 0
-          statistics.totalAgent = countRes.totalAgent || 0
-        }
-      } catch (error) {
-        console.error('获取统计数据失败:', error)
-      } finally {
-        loading.value = false
+      if (menu.children && menu.children.length > 0) {
+        findQuickMenus(menu.children)
       }
-    }
-
-    /**
-     * 菜单点击
-     */
-    const handleMenuClick = (menu) => {
-      if (menu.menuUri) {
-        router.push(menu.menuUri)
-      }
-    }
-
-    onMounted(() => {
-      fetchStatistics()
     })
-
-    return {
-      t,
-      loading,
-      statistics,
-      greetingText,
-      quickMenuList,
-      handleMenuClick
-    }
   }
+
+  findQuickMenus(allMenus)
+  return quickMenus.slice(0, 8)
+})
+
+const fetchStatistics = async () => {
+  try {
+    loading.value = true
+
+    const dayCountRes = await mainApi.queryPayDayCount({ queryDateRange: 'today' })
+    if (dayCountRes) {
+      statistics.todayAmount = dayCountRes.payAmount || 0
+      statistics.todayCount = dayCountRes.payCount || 0
+    }
+
+    const countRes = await mainApi.queryIsvAndMchCount()
+    if (countRes) {
+      statistics.totalMch = countRes.totalMch || 0
+      statistics.totalAgent = countRes.totalAgent || 0
+    }
+  } catch (error) {
+    console.error('获取统计数据失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handleMenuClick = (menu) => {
+  if (menu.menuUri) {
+    router.push(menu.menuUri)
+  }
+}
+
+onMounted(() => {
+  fetchStatistics()
 })
 </script>
 

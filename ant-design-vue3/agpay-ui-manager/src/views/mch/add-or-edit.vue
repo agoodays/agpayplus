@@ -264,13 +264,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, nextTick } from 'vue'
-import { message } from 'ant-design-vue'
-import { useI18n } from 'vue-i18n'
-import { QuestionCircleOutlined, SyncOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
-import { Base64 } from 'js-base64'
-import { API_URL_MCH_LIST, API_URL_AGENT_LIST, API_URL_ISV_LIST, req } from '@/api/manage'
+import { mchApi } from '@/api/business/mch/mch-api'
 import { loginApi } from '@/api/system/login-api'
+import { CheckOutlined, CloseOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { Base64 } from 'js-base64'
+import { nextTick, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
@@ -467,7 +467,7 @@ const fetchPasswordRules = async () => {
 const loadDetail = async () => {
   try {
     loading.value = true
-    const res = await req.getById(API_URL_MCH_LIST, props.recordId)
+    const res = await mchApi.getById(props.recordId)
     Object.assign(formState, res)
 
     // 处理退款方式（字符串转数组）
@@ -520,7 +520,7 @@ const resetForm = () => {
  */
 const handleSearchAgent = async (keyword) => {
   try {
-    const res = await req.list(API_URL_AGENT_LIST, {
+    const res = await mchApi.queryAgentPage({
       agentName: keyword,
       pageSize: 20
     })
@@ -535,7 +535,7 @@ const handleSearchAgent = async (keyword) => {
  */
 const handleSearchIsv = async (keyword) => {
   try {
-    const res = await req.list(API_URL_ISV_LIST, {
+    const res = await mchApi.queryIsvPage({
       isvName: keyword,
       pageSize: 20
     })
@@ -597,10 +597,10 @@ const handleSubmit = async () => {
 
     // 提交数据
     if (isAdd.value) {
-      await req.add(API_URL_MCH_LIST, data)
+      await mchApi.add(data)
       message.success(t('common.addSuccess'))
     } else {
-      await req.updateById(API_URL_MCH_LIST, props.recordId, data)
+      await mchApi.updateById(props.recordId, data)
       message.success(t('common.editSuccess'))
     }
 

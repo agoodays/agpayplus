@@ -1,6 +1,6 @@
 <template>
   <div class="ag-search">
-    <a-form :model="state.model" @submit.prevent>
+    <a-form :model="state.model" @submit.prevent @keyup.enter="onSearch">
       <a-row :gutter="[16, 16]" class="search-row">
         <!-- 
         搜索项响应式配置：
@@ -32,19 +32,19 @@
         >
           <a-form-item>
             <a-space :size="8">
-              <a-button type="primary" @click="onSearch">
+              <a-button type="primary" :loading="searchLoading" @click="onSearch">
                 <search-outlined />
-                查询
+                {{ searchText }}
               </a-button>
               <a-button @click="onReset">
                 <redo-outlined />
-                重置
+                {{ resetText }}
               </a-button>
-              <a v-if="collapsible" class="collapse-link" @click="toggleCollapsed">
-                {{ collapsed ? '展开' : '收起' }}
+              <a-button v-if="collapsible" type="link" class="collapse-link-btn" @click="toggleCollapsed">
+                {{ collapsed ? expandText : collapseText }}
                 <down-outlined v-if="collapsed" />
                 <up-outlined v-else />
-              </a>
+              </a-button>
             </a-space>
           </a-form-item>
         </a-col>
@@ -54,11 +54,28 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
-import { SearchOutlined, RedoOutlined, DownOutlined, UpOutlined } from '@ant-design/icons-vue'
+import { DownOutlined, RedoOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
+import { computed, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
 const props = defineProps({
   searchData: { type: Object, default: null },
   modelValue: { type: Object, default: () => ({}) },
+  // 新属性：查询按钮 loading
+  searchLoading: { type: Boolean, default: false },
+  // 兼容属性：历史页面仍在使用
+  loading: { type: Boolean, default: undefined },
+  btnLoading: { type: Boolean, default: undefined },
+  // 重置策略：undefined | null | empty-string | empty-array | keep
+  resetMode: {
+    type: String,
+    default: 'undefined',
+    validator: (val) => ['undefined', 'null', 'empty-string', 'empty-array', 'keep'].includes(val)
+  },
+  // 重置时跳过的字段
+  resetExclude: { type: Array, default: () => [] },
   // 是否支持展开/收起
   collapsible: { type: Boolean, default: false },
   // 默认是否收起
@@ -76,13 +93,29 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'search', 'reset'])
+const emit = defineEmits(['update:modelValue', 'search', 'reset', 'collapse-change'])
 
 const state = reactive({
-  model: props.modelValue || {}
+  model: props.modelValue || props.searchData || {}
 })
 
 const collapsed = ref(props.defaultCollapsed)
+
+const searchLoading = computed(() => {
+  if (props.loading !== undefined) return props.loading
+  if (props.btnLoading !== undefined) return props.btnLoading
+  return props.searchLoading
+})
+
+function textOrFallback(key, fallback) {
+  const translated = t(key)
+  return translated === key ? fallback : translated
+}
+
+const searchText = computed(() => textOrFallback('common.search', '查询'))
+const resetText = computed(() => textOrFallback('common.reset', '重置'))
+const expandText = computed(() => textOrFallback('common.expand', '展开'))
+const collapseText = computed(() => textOrFallback('common.collapse', '收起'))
 
 // 暴露响应式配置给插槽使用
 defineExpose({
@@ -93,12 +126,38 @@ defineExpose({
 watch(
   () => props.modelValue,
   (val) => {
-    if (val) {
+    if (val !== null && val !== undefined) {
       state.model = val
     }
   },
   { deep: true }
 )
+
+watch(
+  () => props.searchData,
+  (val) => {
+    if (val !== null && val !== undefined && (!props.modelValue || Object.keys(props.modelValue).length === 0)) {
+      state.model = val
+    }
+  },
+  { deep: true }
+)
+
+function getResetValue() {
+  switch (props.resetMode) {
+    case 'null':
+      return null
+    case 'empty-string':
+      return ''
+    case 'empty-array':
+      return []
+    case 'keep':
+      return '__AG_SEARCH_KEEP__'
+    case 'undefined':
+    default:
+      return undefined
+  }
+}
 
 function onSearch() {
   emit('search', state.model)
@@ -106,18 +165,57 @@ function onSearch() {
 }
 
 function onReset() {
-  // 重置为空对象，但保留所有 key
+  const resetValue = getResetValue()
   const keys = Object.keys(state.model)
   keys.forEach((key) => {
-    state.model[key] = undefined
+    if (props.resetExclude.includes(key)) return
+    if (resetValue === '__AG_SEARCH_KEEP__') return
+    state.model[key] = Array.isArray(resetValue) ? [] : resetValue
   })
-  emit('reset')
+  emit('reset', state.model)
   emit('update:modelValue', state.model)
 }
 
 function toggleCollapsed() {
   collapsed.value = !collapsed.value
+  emit('collapse-change', collapsed.value)
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.ag-search {
+  margin-bottom: 12px;
+  padding: 12px 16px 0;
+  background: var(--layout-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+}
+
+.search-buttons {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.search-buttons :deep(.ant-form-item) {
+  margin-bottom: 0;
+}
+
+.collapse-link-btn {
+  padding-inline: 4px !important;
+  color: var(--text-color-weak) !important;
+}
+
+.collapse-link-btn:hover {
+  color: var(--primary-color) !important;
+}
+
+@media (max-width: 992px) {
+  .ag-search {
+    padding: 12px 12px 0;
+  }
+
+  .search-buttons {
+    justify-content: flex-start;
+  }
+}
+</style>

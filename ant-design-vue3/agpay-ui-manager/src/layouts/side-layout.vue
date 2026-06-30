@@ -61,6 +61,15 @@
                   <a-menu-item @click="handleSetting">
                     <setting-outlined /> {{ t('layout.accountSetting') }}
                   </a-menu-item>
+                  <a-menu-item class="ag-theme-menu-item" @click="toggleDarkMode">
+                    <div class="ag-theme-menu-row">
+                      <span class="ag-theme-menu-label">
+                        <bg-colors-outlined />
+                        <span>暗黑模式</span>
+                      </span>
+                      <a-switch :checked="isDarkMode" size="small" @click.stop @change="handleDarkModeChange" />
+                    </div>
+                  </a-menu-item>
                   <a-sub-menu key="language-menu">
                     <template #title>
                       {{ t('layout.language') }}
@@ -99,24 +108,25 @@
 </template>
 
 <script setup>
-import { ref, computed, getCurrentInstance, watch, onMounted, onBeforeUnmount, h } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import {
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  ReloadOutlined,
-  DownOutlined,
-  UserOutlined,
-  SettingOutlined,
-  LogoutOutlined
-} from '@ant-design/icons-vue'
-import * as antIcons from '@ant-design/icons-vue'
-import dayjs from 'dayjs'
-import { useUserStore } from '@/store/modules/system/user'
+import { appDefaultConfig } from '@/config/app-config'
 import { useAppStore } from '@/store/modules/system/app'
 import { useAppConfigStore } from '@/store/modules/system/app-config'
+import { useUserStore } from '@/store/modules/system/user'
+import * as antIcons from '@ant-design/icons-vue'
+import {
+  BgColorsOutlined,
+  DownOutlined,
+  LogoutOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  ReloadOutlined,
+  SettingOutlined,
+  UserOutlined
+} from '@ant-design/icons-vue'
+import dayjs from 'dayjs'
+import { computed, getCurrentInstance, h, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { appDefaultConfig } from '@/config/app-config'
+import { useRoute, useRouter } from 'vue-router'
 
 function getIconComponent(iconName) {
   if (!iconName) return null
@@ -179,21 +189,16 @@ const breadCrumbFlag = computed(() => appConfigStore.breadCrumbFlag)
 const footerFlag = computed(() => appConfigStore.footerFlag)
 
 const menuData = computed(() => {
-  const data = userStore.allMenuRouteTree || []
-  console.log('菜单数据:', data)
-  return data
+  return userStore.allMenuRouteTree || []
 })
 const visibleMenuTree = computed(() => {
-  const data = filterVisibleMenus(menuData.value)
-  console.log('可见菜单树:', data)
-  return data
+  return filterVisibleMenus(menuData.value)
 })
 const menuTheme = computed(() => (appStore.themeConfig?.darkMode ? 'dark' : 'light'))
 const menuItems = computed(() => {
-  const items = transformMenuToItems(visibleMenuTree.value)
-  console.log('菜单Items:', items)
-  return items
+  return transformMenuToItems(visibleMenuTree.value)
 })
+const isDarkMode = computed(() => Boolean(appStore.themeConfig?.darkMode))
 const breadcrumbs = computed(() => route.matched.filter((item) => item.meta && item.meta.title))
 const backTopTarget = () => document.querySelector('.ag-layout-content')
 
@@ -383,6 +388,14 @@ const handleSetting = () => {
 // 语言切换
 const handleLanguageChange = (language) => {
   appConfigStore.setLanguage(language)
+}
+
+const handleDarkModeChange = (checked) => {
+  appStore.setDarkMode(checked)
+}
+
+const toggleDarkMode = () => {
+  appStore.setDarkMode(!isDarkMode.value)
 }
 
 // 退出登录
@@ -636,6 +649,24 @@ const handleLogout = () => {
             .user-name {
               padding: 0 8px;
               color: var(--text-color);
+            }
+          }
+
+          :deep(.ag-theme-menu-item) {
+            padding-right: 12px;
+
+            .ag-theme-menu-row {
+              width: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              gap: 12px;
+            }
+
+            .ag-theme-menu-label {
+              display: inline-flex;
+              align-items: center;
+              gap: 8px;
             }
           }
         }

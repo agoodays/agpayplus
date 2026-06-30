@@ -51,84 +51,87 @@
     </div>
   </a-drawer>
 </template>
-<script>
+<script setup>
+import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import AgSelect from '@/components/ag-select'
-import { API_URL_QRC_LIST, API_URL_MCH_LIST, API_URL_MCH_APP, API_URL_MCH_STORE, req } from '@/api/manage'
+import { message } from 'ant-design-vue'
+import { ref } from 'vue'
 
-export default {
-  components: { AgSelect },
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
-  data() {
-    return {
-      visible: false, // 是否显示弹层/抽屉
-      btnLoading: false,
-      recordId: null, // 更新对象ID
-      saveObject: {}, // 数据对象
-      appList: null, // 应用下拉列表
-      storeList: null, // 门店下拉列表
-      rules: {
-        mchNo: [{ required: true, message: '请选择商户', trigger: 'blur' }],
-        appId: [{ required: true, message: '请选择应用', trigger: 'blur' }],
-        storeId: [{ required: true, message: '请选择门店', trigger: 'blur' }]
-      }
-    }
-  },
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      const that = this
-      that.recordId = recordId
-      req.getById(API_URL_QRC_LIST, recordId).then((res) => {
-        that.saveObject = res
-        if (res.mchNo) {
-          that.mchNoChange()
-        }
-      })
-      this.visible = true
-    },
-    onClose() {
-      this.visible = false
-    },
-    searchMch(params) {
-      return req.list(API_URL_MCH_LIST, params)
-    },
-    mchNoChange() {
-      const that = this
-      if (that.saveObject.mchNo) {
-        req.list(API_URL_MCH_APP, { mchNo: that.saveObject.mchNo, pageSize: -1, state: 1 }).then((res) => {
-          // 下拉选择列表
-          that.appList = res.records
-        })
-        req.list(API_URL_MCH_STORE, { mchNo: that.saveObject.mchNo, pageSize: -1, state: 1 }).then((res) => {
-          // 下拉选择列表
-          that.storeList = res.records
-        })
-      } else {
-        that.appList = null
-        that.storeList = null
-        that.saveObject.appId = null
-        that.saveObject.storeId = null
-      }
-    },
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          // 请求接口
-          req.updateById(API_URL_QRC_LIST + '/bind', that.recordId, that.saveObject).then((res) => {
-            that.$message.success('绑定成功')
-            that.visible = false
-            that.callbackFunc() // 刷新列表
-          })
-        }
-      })
-    }
-  }
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const infoFormModel = ref(null)
+const visible = ref(false)
+const btnLoading = ref(false)
+const recordId = ref(null)
+const saveObject = ref({})
+const appList = ref(null)
+const storeList = ref(null)
+
+const rules = {
+  mchNo: [{ required: true, message: '请选择商户', trigger: 'blur' }],
+  appId: [{ required: true, message: '请选择应用', trigger: 'blur' }],
+  storeId: [{ required: true, message: '请选择门店', trigger: 'blur' }]
 }
+
+async function show(currentRecordId) {
+  recordId.value = currentRecordId
+  const res = await qrcApi.getById(currentRecordId)
+  saveObject.value = res
+  if (res.mchNo) {
+    await mchNoChange()
+  }
+  visible.value = true
+}
+
+function onClose() {
+  visible.value = false
+}
+
+function searchMch(params) {
+  return qrcApi.searchMch(params)
+}
+
+async function mchNoChange() {
+  if (saveObject.value.mchNo) {
+    const [appRes, storeRes] = await Promise.all([
+      qrcApi.listMchApps({ mchNo: saveObject.value.mchNo, pageSize: -1, state: 1 }),
+      qrcApi.listMchStores({ mchNo: saveObject.value.mchNo, pageSize: -1, state: 1 })
+    ])
+    appList.value = appRes.records
+    storeList.value = storeRes.records
+    return
+  }
+  appList.value = null
+  storeList.value = null
+  saveObject.value.appId = null
+  saveObject.value.storeId = null
+}
+
+function validateForm() {
+  return new Promise((resolve) => {
+    if (!infoFormModel.value?.validate) {
+      resolve(true)
+      return
+    }
+    infoFormModel.value.validate((valid) => resolve(valid))
+  })
+}
+
+async function handleOkFunc() {
+  const valid = await validateForm()
+  if (!valid) return
+  await qrcApi.bindById(recordId.value, saveObject.value)
+  message.success('绑定成功')
+  visible.value = false
+  props.callbackFunc()
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 
 <style lang="less"></style>

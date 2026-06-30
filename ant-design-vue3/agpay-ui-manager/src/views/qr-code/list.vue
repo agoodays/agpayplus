@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :btn-loading="btnLoading" @search="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
@@ -111,9 +111,11 @@
     <Bind ref="bind" :callback-func="queryFunc" />
   </div>
 </template>
-<script>
-import { AgSearch, AgTable, AgTableActions, AgSelect, AgStateSwitch, AgInput, AgDateRangePicker } from '@/components'
-import { API_URL_QRC_LIST, API_URL_AGENT_LIST, API_URL_MCH_LIST, req, reqLoad } from '@/api/manage'
+<script setup>
+import { qrcApi } from '@/api/business/qr-code/qrc-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
+import { onMounted, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import InfoAddOrEdit from './add-or-edit.vue'
 import Bind from './bind.vue'
 
@@ -129,128 +131,120 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
-export default {
-  name: 'PayWayPage',
-  components: {
-    'ag-search': AgSearch,
-    'ag-table': AgTable,
-    'ag-table-actions': AgTableActions,
-    'ag-state-switch': AgStateSwitch,
-    'ag-select': AgSelect,
-    'ag-input': AgInput,
-    'ag-date-range-picker': AgDateRangePicker,
-    InfoAddOrEdit,
-    Bind
-  },
-  data() {
-    return {
-      btnLoading: false,
-      tableColumns: tableColumns,
-      searchData: {}
-    }
-  },
-  mounted() {
-    this.searchData.mchNo = this.$route.query.mchNo
-    this.queryFunc()
-  },
-  methods: {
-    searchAgent(params) {
-      return req.list(API_URL_AGENT_LIST, params)
-    },
-    searchMch(params) {
-      return req.list(API_URL_MCH_LIST, params)
-    },
+const route = useRoute()
+const infoTable = ref(null)
+const infoAddOrEdit = ref(null)
+const bind = ref(null)
+const btnLoading = ref(false)
+const searchData = reactive({})
 
-    // 对接table接口函数
-    reqTableDataFunc: (params) => {
-      return req.list(API_URL_QRC_LIST, params)
-    },
-    queryFunc() {
-      // 点击查询按钮事件
-      this.btnLoading = true
-      this.searchFunc(true)
-    },
-    searchFunc(isToFirst = false) {
-      // 点击查询按钮事件
-      this.$refs.infoTable.loadData()
-    },
-    onPreview(recordId) {
-      const that = this
-      req.get(API_URL_QRC_LIST + '/view/' + recordId).then((res) => {
-        that.$viewerApi({
-          images: [res],
-          options: {
-            initialViewIndex: 0
-          }
-        })
-      })
-    },
-    addFunc: function () {
-      // 业务通道.二维码管理 新增
-      this.$refs.infoAddOrEdit.show()
-    },
-    editFunc: function (qrcId) {
-      // 业务通道.二维码管理 编辑
-      this.$refs.infoAddOrEdit.show(qrcId)
-    },
-    bindFunc: function (qrcId) {
-      this.$refs.bind.show(qrcId)
-    },
-    delFunc: function (qrcId) {
-      const that = this
-      this.$infoBox.confirmDanger('确定删除吗', '', () => {
-        req.delById(API_URL_QRC_LIST, qrcId).then((res) => {
-          that.$message.success('删除成功')
-          that.$refs.infoTable.loadData()
-        })
-      })
-    },
-    unbindFunc: function (recordId) {
-      // 二维码解绑
-      const that = this
-      return new Promise((resolve, reject) => {
-        that.$infoBox.confirmDanger(
-          '确认解绑',
-          '解绑后商户将无法使用该二维码',
-          () => {
-            return reqLoad
-              .updateById(API_URL_QRC_LIST + '/unbind', recordId, {})
-              .then((res) => {
-                that.searchFunc()
-                resolve()
-              })
-              .catch((err) => reject(err))
-          },
-          () => {
-            reject(new Error())
-          }
-        )
-      })
-    },
-    updateState: function (recordId, state) {
-      // 二维码状态更新
-      const that = this
-      const title = state === 1 ? '确认[启用]吗' : '确认[停用]吗'
+const searchAgent = (params) => qrcApi.searchAgent(params)
+const searchMch = (params) => qrcApi.searchMch(params)
+const reqTableDataFunc = (params) => qrcApi.queryPage(params)
 
-      return new Promise((resolve, reject) => {
-        that.$infoBox.confirmDanger(
-          title,
-          '',
-          () => {
-            return reqLoad
-              .updateById(API_URL_QRC_LIST, recordId, { state: state })
-              .then((res) => {
-                that.searchFunc()
-                resolve()
-              })
-              .catch((err) => reject(err))
-          },
-          () => {
-            reject(new Error())
-          }
-        )
-      })
-    }
+function reloadTable() {
+  const tableRef = infoTable.value
+  if (!tableRef) return
+
+  if (typeof tableRef.reload === 'function') {
+    tableRef.reload()
+    return
+  }
+  if (typeof tableRef.loadData === 'function') {
+    tableRef.loadData()
+    return
+  }
+  if (typeof tableRef.refTable === 'function') {
+    tableRef.refTable(true)
   }
 }
+
+function queryFunc() {
+  btnLoading.value = true
+  searchFunc(true)
+}
+
+function searchFunc(_isToFirst = false) {
+  reloadTable()
+}
+
+function onPreview(recordId) {
+  qrcApi.viewQrc(recordId).then((res) => {
+    window.$viewerApi({
+      images: [res],
+      options: {
+        initialViewIndex: 0
+      }
+    })
+  })
+}
+
+function addFunc() {
+  infoAddOrEdit.value?.show()
+}
+
+function editFunc(qrcId) {
+  infoAddOrEdit.value?.show(qrcId)
+}
+
+function bindFunc(qrcId) {
+  bind.value?.show(qrcId)
+}
+
+function delFunc(qrcId) {
+  window.$infoBox.confirmDanger('确定删除吗', '', () => {
+    qrcApi.delById(qrcId).then(() => {
+      window.$message.success('删除成功')
+      reloadTable()
+    })
+  })
+}
+
+function unbindFunc(recordId) {
+  return new Promise((resolve, reject) => {
+    window.$infoBox.confirmDanger(
+      '确认解绑',
+      '解绑后商户将无法使用该二维码',
+      () => {
+        return qrcApi
+          .unbindById(recordId)
+          .then(() => {
+            searchFunc()
+            resolve()
+          })
+          .catch((err) => reject(err))
+      },
+      () => {
+        reject(new Error())
+      }
+    )
+  })
+}
+
+function updateState(recordId, state) {
+  const title = state === 1 ? '确认[启用]吗' : '确认[停用]吗'
+  return new Promise((resolve, reject) => {
+    window.$infoBox.confirmDanger(
+      title,
+      '',
+      () => {
+        return qrcApi
+          .updateStateById(recordId, state)
+          .then(() => {
+            searchFunc()
+            resolve()
+          })
+          .catch((err) => reject(err))
+      },
+      () => {
+        reject(new Error())
+      }
+    )
+  })
+}
+
+onMounted(() => {
+  searchData.mchNo = route.query.mchNo
+  queryFunc()
+})
 </script>

@@ -66,102 +66,83 @@
   </a-drawer>
 </template>
 
-<script>
-import { API_URL_ISV_LIST, req } from '@/api/manage'
-export default {
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
+<script setup>
+import { isvApi } from '@/api/business/isv/isv-api'
+import { message } from 'ant-design-vue'
+import { ref } from 'vue'
 
-  data() {
-    return {
-      btnLoading: false,
-      isAdd: true, // 新增 or 修改页面标志
-      saveObject: {}, // 数据对象
-      recordId: null, // 更新对象ID
-      visible: false, // 是否显示弹层/抽屉
-      rules: {
-        isvName: [{ required: true, message: '请输入服务商名称', trigger: 'blur' }],
-        isvShortName: [{ required: true, message: '请输入服务商简称', trigger: 'blur' }],
-        contactEmail: [
-          {
-            required: false,
-            pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/,
-            message: '请输入正确的邮箱地址',
-            trigger: 'blur'
-          }
-        ],
-        contactTel: [{ required: false, pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }]
-      }
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const infoFormModel = ref()
+const btnLoading = ref(false)
+const isAdd = ref(true)
+const saveObject = ref({})
+const recordId = ref(null)
+const visible = ref(false)
+
+const rules = {
+  isvName: [{ required: true, message: '请输入服务商名称', trigger: 'blur' }],
+  isvShortName: [{ required: true, message: '请输入服务商简称', trigger: 'blur' }],
+  contactEmail: [
+    {
+      required: false,
+      pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/,
+      message: '请输入正确的邮箱地址',
+      trigger: 'blur'
     }
-  },
-  created() {},
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.saveObject = { state: 1 } // 数据清空
+  ],
+  contactTel: [{ required: false, pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }]
+}
 
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
+async function show(currentRecordId) {
+  isAdd.value = !currentRecordId
+  saveObject.value = { state: 1 }
+  recordId.value = currentRecordId || null
+  infoFormModel.value?.resetFields?.()
+  visible.value = true
 
-      const that = this
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        that.recordId = recordId
-        req.getById(API_URL_ISV_LIST, recordId).then((res) => {
-          that.saveObject = res
-        })
-        this.visible = true
-      } else {
-        that.visible = true // 立马展示弹层信息
-      }
-    },
-
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          that.btnLoading = true
-          // 请求接口
-          if (that.isAdd) {
-            req
-              .add(API_URL_ISV_LIST, that.saveObject)
-              .then((res) => {
-                that.$message.success('新增成功')
-                that.visible = false
-                that.callbackFunc() // 刷新列表
-                that.btnLoading = false
-              })
-              .catch((res) => {
-                that.btnLoading = false
-              })
-          } else {
-            req
-              .updateById(API_URL_ISV_LIST, that.recordId, that.saveObject)
-              .then((res) => {
-                that.$message.success('修改成功')
-                that.visible = false
-                that.callbackFunc() // 刷新列表
-                that.btnLoading = false
-              })
-              .catch((res) => {
-                that.btnLoading = false
-              })
-          }
-        }
-      })
-    },
-    onClose() {
-      this.visible = false
-    },
-    searchFunc: function () {
-      // 点击【查询】按钮点击事件
-      this.$refs.infoTable.refTable(true)
-    }
+  if (!isAdd.value && recordId.value) {
+    const res = await isvApi.getById(recordId.value)
+    saveObject.value = res || { state: 1 }
   }
 }
+
+function validateForm() {
+  return new Promise((resolve) => {
+    infoFormModel.value?.validate((valid) => {
+      resolve(valid)
+    })
+  })
+}
+
+async function handleOkFunc() {
+  if (btnLoading.value) return
+  const valid = await validateForm()
+  if (!valid) return
+
+  btnLoading.value = true
+  try {
+    if (isAdd.value) {
+      await isvApi.add(saveObject.value)
+      message.success('新增成功')
+    } else {
+      await isvApi.updateById(recordId.value, saveObject.value)
+      message.success('修改成功')
+    }
+    visible.value = false
+    props.callbackFunc()
+  } finally {
+    btnLoading.value = false
+  }
+}
+
+function onClose() {
+  visible.value = false
+}
+
+defineExpose({
+  show
+})
 </script>

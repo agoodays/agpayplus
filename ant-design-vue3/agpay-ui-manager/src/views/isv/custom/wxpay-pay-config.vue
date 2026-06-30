@@ -136,237 +136,248 @@
   </a-drawer>
 </template>
 
-<script>
-import AgCard from '@/components/ag-card'
+<script setup>
+import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
 import AgUpload from '@/components/ag-upload'
-import { API_URL_ISV_PAYCONFIGS_LIST, req, getIsvPayConfigUnique, upload } from '@/api/manage'
-export default {
-  components: {
-    'ag-card': AgCard,
-    'ag-upload': AgUpload
-  },
-  props: {
-    callbackFunc: { type: Function, default: () => ({}) }
-  },
+import { message } from 'ant-design-vue'
+import { computed, ref } from 'vue'
 
-  data() {
-    return {
-      btnLoading: false,
-      visible: false, // 抽屉开关
-      isAdd: true,
-      action: upload.cert, // 上传文件地址
-      saveObject: {}, // 保存的对象
-      ifParams: { apiVersion: 'V2' }, // 参数配置对象
-      rules: {
-        ifRate: [
-          {
-            required: false,
-            pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/,
-            message: '请输入0-100之间的数字，最多四位小数',
-            trigger: 'blur'
-          }
-        ]
-      },
-      ifParamsRules: {
-        mchId: [{ required: true, message: '请输入微信支付商户号', trigger: 'blur' }],
-        appId: [{ required: true, message: '请输入应用AppID', trigger: 'blur' }],
-        appSecret: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.isAdd && !value) {
-                callback(new Error('请输入应用AppSecret'))
-              }
-              callback()
-            }
-          }
-        ],
-        key: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.apiVersion === 'V2' && this.isAdd && !value) {
-                callback(new Error('请输入API密钥'))
-              }
-              callback()
-            }
-          }
-        ],
-        apiV3Key: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.apiVersion === 'V3' && this.isAdd && !value) {
-                callback(new Error('请输入API V3秘钥'))
-              }
-              callback()
-            }
-          }
-        ],
-        serialNo: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.apiVersion === 'V3' && this.isAdd && !value) {
-                callback(new Error('请输入序列号'))
-              }
-              callback()
-            }
-          }
-        ],
-        cert: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.apiVersion === 'V3' && this.isAdd && !value) {
-                callback(new Error('请上传API证书(apiclient_cert.p12)'))
-              }
-              callback()
-            }
-          }
-        ],
-        apiClientCert: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.apiVersion === 'V3' && this.isAdd && !value) {
-                callback(new Error('请上传证书文件(apiclient_cert.pem)'))
-              }
-              callback()
-            }
-          }
-        ],
-        apiClientKey: [
-          {
-            trigger: 'blur',
-            validator: (rule, value, callback) => {
-              if (this.ifParams.apiVersion === 'V3' && !value) {
-                callback(new Error('请上传私钥文件(apiclient_key.pem)'))
-              }
-              callback()
-            }
-          }
-        ]
-      }
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const infoFormModel = ref(null)
+const isvParamFormModel = ref(null)
+const btnLoading = ref(false)
+const visible = ref(false)
+const isAdd = ref(true)
+const action = isvPayConfigApi.certUploadAction
+const saveObject = ref({})
+const ifParams = ref({ apiVersion: 'V2' })
+
+const rules = {
+  ifRate: [
+    {
+      required: false,
+      pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/,
+      message: '请输入0-100之间的数字，最多四位小数',
+      trigger: 'blur'
     }
-  },
-  methods: {
-    // 弹层打开事件
-    show: function (isvNo, record) {
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
-      if (this.$refs.isvParamFormModel !== undefined) {
-        this.$refs.isvParamFormModel.resetFields()
-      }
+  ]
+}
 
-      // 数据初始化
-      this.saveObject = {
-        infoId: isvNo,
-        ifCode: record.ifCode,
-        state: record.ifConfigState === 0 ? 0 : 1
-      }
-
-      // 参数配置对象，数据初始化
-      this.ifParams = {
-        apiVersion: 'V2',
-        appSecret: '',
-        appSecret_ph: '请输入',
-        key: '',
-        key_ph: '请输入',
-        apiV3Key: '',
-        apiV3Key_ph: '请输入',
-        serialNo: '',
-        serialNo_ph: '请输入'
-      }
-      this.visible = true
-      this.getIsvPayConfig()
-    },
-    // 支付参数配置
-    getIsvPayConfig() {
-      const that = this
-      // 获取支付参数
-      getIsvPayConfigUnique(that.saveObject.infoId, that.saveObject.ifCode).then((res) => {
-        if (res && res.ifParams) {
-          that.saveObject = res
-          that.ifParams = JSON.parse(res.ifParams)
-
-          that.ifParams.appSecret_ph = that.ifParams.appSecret
-          that.ifParams.appSecret = ''
-
-          that.ifParams.key_ph = that.ifParams.key
-          that.ifParams.key = ''
-
-          that.ifParams.apiV3Key_ph = that.ifParams.apiV3Key
-          that.ifParams.apiV3Key = ''
-
-          that.ifParams.serialNo_ph = that.ifParams.serialNo
-          that.ifParams.serialNo = ''
-
-          that.isAdd = false
-        } else if (res === undefined) {
-          that.isAdd = true
+const ifParamsRules = computed(() => ({
+  mchId: [{ required: true, message: '请输入微信支付商户号', trigger: 'blur' }],
+  appId: [{ required: true, message: '请输入应用AppID', trigger: 'blur' }],
+  appSecret: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (isAdd.value && !value) {
+          callback(new Error('请输入应用AppSecret'))
+          return
         }
-      })
-    },
-    // 表单提交
-    onSubmit() {
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        this.$refs.isvParamFormModel.validate((valid2) => {
-          if (valid && valid2) {
-            // 验证通过
-            that.btnLoading = true
-            const reqParams = {}
-            reqParams.infoId = that.saveObject.infoId
-            reqParams.ifCode = that.saveObject.ifCode
-            reqParams.ifRate = that.saveObject.ifRate
-            reqParams.state = that.saveObject.state
-            reqParams.remark = that.saveObject.remark
-            // 支付参数配置不能为空
-            if (Object.keys(that.ifParams).length === 0) {
-              this.$message.error('参数不能为空！')
-              return
-            }
-            // 脱敏数据为空时，删除该key
-            that.clearEmptyKey('appSecret')
-            that.clearEmptyKey('key')
-            that.clearEmptyKey('apiV3Key')
-            that.clearEmptyKey('serialNo')
-            reqParams.ifParams = JSON.stringify(that.ifParams)
-            // 请求接口
-            if (Object.keys(reqParams).length === 0) {
-              this.$message.error('参数不能为空！')
-              return
-            }
-            req.add(API_URL_ISV_PAYCONFIGS_LIST, reqParams).then((res) => {
-              that.$message.success('保存成功')
-              that.visible = false
-              that.btnLoading = false
-              that.callbackFunc()
-            })
-          }
-        })
-      })
-    },
-    // 脱敏数据为空时，删除对应key
-    clearEmptyKey(key) {
-      if (!this.ifParams[key]) {
-        this.ifParams[key] = undefined
+        callback()
       }
-      this.ifParams[key + '_ph'] = undefined
-    },
-    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
-    uploadSuccess(name, fileList) {
-      const [firstItem] = fileList
-      this.ifParams[name] = firstItem?.url
-      this.$forceUpdate()
-    },
-    onClose() {
-      this.visible = false
     }
+  ],
+  key: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (ifParams.value.apiVersion === 'V2' && isAdd.value && !value) {
+          callback(new Error('请输入API密钥'))
+          return
+        }
+        callback()
+      }
+    }
+  ],
+  apiV3Key: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (ifParams.value.apiVersion === 'V3' && isAdd.value && !value) {
+          callback(new Error('请输入API V3秘钥'))
+          return
+        }
+        callback()
+      }
+    }
+  ],
+  serialNo: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (ifParams.value.apiVersion === 'V3' && isAdd.value && !value) {
+          callback(new Error('请输入序列号'))
+          return
+        }
+        callback()
+      }
+    }
+  ],
+  cert: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (ifParams.value.apiVersion === 'V3' && isAdd.value && !value) {
+          callback(new Error('请上传API证书(apiclient_cert.p12)'))
+          return
+        }
+        callback()
+      }
+    }
+  ],
+  apiClientCert: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (ifParams.value.apiVersion === 'V3' && isAdd.value && !value) {
+          callback(new Error('请上传证书文件(apiclient_cert.pem)'))
+          return
+        }
+        callback()
+      }
+    }
+  ],
+  apiClientKey: [
+    {
+      trigger: 'blur',
+      validator: (_rule, value, callback) => {
+        if (ifParams.value.apiVersion === 'V3' && !value) {
+          callback(new Error('请上传私钥文件(apiclient_key.pem)'))
+          return
+        }
+        callback()
+      }
+    }
+  ]
+}))
+
+function parseJsonObject(rawValue) {
+  if (!rawValue) return {}
+  try {
+    const parsed = JSON.parse(rawValue)
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch (_error) {
+    return {}
   }
 }
+
+async function show(isvNo, record) {
+  infoFormModel.value?.resetFields?.()
+  isvParamFormModel.value?.resetFields?.()
+
+  saveObject.value = {
+    infoId: isvNo,
+    ifCode: record.ifCode,
+    state: record.ifConfigState === 0 ? 0 : 1
+  }
+
+  ifParams.value = {
+    apiVersion: 'V2',
+    appSecret: '',
+    appSecret_ph: '请输入',
+    key: '',
+    key_ph: '请输入',
+    apiV3Key: '',
+    apiV3Key_ph: '请输入',
+    serialNo: '',
+    serialNo_ph: '请输入'
+  }
+
+  visible.value = true
+  await getIsvPayConfig()
+}
+
+async function getIsvPayConfig() {
+  const res = await isvPayConfigApi.getUnique(saveObject.value.infoId, saveObject.value.ifCode)
+  if (res?.ifParams) {
+    saveObject.value = res
+    const parsed = parseJsonObject(res.ifParams)
+    ifParams.value = {
+      ...parsed,
+      appSecret: '',
+      appSecret_ph: parsed.appSecret,
+      key: '',
+      key_ph: parsed.key,
+      apiV3Key: '',
+      apiV3Key_ph: parsed.apiV3Key,
+      serialNo: '',
+      serialNo_ph: parsed.serialNo
+    }
+    isAdd.value = false
+    return
+  }
+  isAdd.value = true
+}
+
+function validateForm(formRef) {
+  return new Promise((resolve) => {
+    if (!formRef.value?.validate) {
+      resolve(true)
+      return
+    }
+    formRef.value.validate((valid) => resolve(valid))
+  })
+}
+
+function clearEmptyKey(key) {
+  if (!ifParams.value[key]) {
+    ifParams.value[key] = undefined
+  }
+  ifParams.value[key + '_ph'] = undefined
+}
+
+async function onSubmit() {
+  const valid = await validateForm(infoFormModel)
+  const valid2 = await validateForm(isvParamFormModel)
+  if (!valid || !valid2) return
+
+  btnLoading.value = true
+  try {
+    if (Object.keys(ifParams.value).length === 0) {
+      message.error('参数不能为空！')
+      return
+    }
+
+    clearEmptyKey('appSecret')
+    clearEmptyKey('key')
+    clearEmptyKey('apiV3Key')
+    clearEmptyKey('serialNo')
+
+    const reqParams = {
+      infoId: saveObject.value.infoId,
+      ifCode: saveObject.value.ifCode,
+      ifRate: saveObject.value.ifRate,
+      state: saveObject.value.state,
+      remark: saveObject.value.remark,
+      ifParams: JSON.stringify(ifParams.value)
+    }
+
+    await isvPayConfigApi.save(reqParams)
+    message.success('保存成功')
+    visible.value = false
+    props.callbackFunc()
+  } finally {
+    btnLoading.value = false
+  }
+}
+
+function uploadSuccess(name, fileList) {
+  const [firstItem] = fileList
+  ifParams.value[name] = firstItem?.url
+}
+
+function onClose() {
+  visible.value = false
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 <style lang="less" scoped>
 .ag-upload-btn {

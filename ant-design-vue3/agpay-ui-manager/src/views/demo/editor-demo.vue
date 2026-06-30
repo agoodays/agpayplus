@@ -167,9 +167,9 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import AgEditor from '@/components/ag-editor'
 import { message } from 'ant-design-vue'
-import { AgCard, AgEditor } from '@/components'
+import { reactive, ref } from 'vue'
 
 // 基础内容
 const content1 = ref('<p>这是初始内容</p>')
@@ -300,10 +300,6 @@ function getNoticeColor(value) {
 </script>
 
 <style scoped>
-.editor-demo-container {
-  /* padding: 24px */
-}
-
 .mb-3 {
   margin-bottom: 12px;
 }

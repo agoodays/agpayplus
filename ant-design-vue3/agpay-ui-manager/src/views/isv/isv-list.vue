@@ -83,11 +83,11 @@
     <IsvPayIfConfigList ref="isvPayIfConfigList" />
   </div>
 </template>
-<script>
-import { AgSearch, AgTable, AgTableActions, AgInput } from '@/components'
-import AgPayConfig from '@/components/ag-pay-config'
-import AgPayOauth2Config from '@/components/ag-pay-oauth2-config'
-import { API_URL_ISV_LIST, req } from '@/api/manage'
+<script setup>
+import { isvApi } from '@/api/business/isv/isv-api'
+import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 import IsvPayIfConfigList from './isv-pay-if-config-list.vue'
 
@@ -107,60 +107,43 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-export default {
-  name: 'IsvListPage',
-  components: {
-    'ag-search': AgSearch,
-    'ag-table': AgTable,
-    'ag-table-actions': AgTableActions,
-    'ag-input': AgInput,
-    'ag-pay-config': AgPayConfig,
-    'ag-pay-oauth2-config': AgPayOauth2Config,
-    InfoAddOrEdit,
-    IsvPayIfConfigList
-  },
-  data() {
-    return {
-      isShowMore: false,
-      tableColumns: tableColumns,
-      searchData: {}
-    }
-  },
-  mounted() {},
-  methods: {
-    // 对接table接口函数
-    reqTableDataFunc: (params) => {
-      return req.list(API_URL_ISV_LIST, params)
-    },
-    delFunc: function (recordId) {
-      const that = this
-      this.$infoBox.confirmDanger('确定删除吗', '确定删除该服务商及其所有关联商户', () => {
-        req.delById(API_URL_ISV_LIST, recordId).then((res) => {
-          that.$refs.infoTable.reload()
-          this.$message.success('删除成功')
-        })
-      })
-    },
-    addFunc: function () {
-      // 业务通道.服务商管理 新增
-      this.$refs.infoAddOrEdit.show()
-    },
-    editFunc: function (recordId) {
-      // 业务通道.服务商管理 编辑
-      this.$refs.infoAddOrEdit.show(recordId)
-    },
-    payConfigFunc: function (recordId) {
-      // 支付配置
-      this.$refs.payConfig.show(recordId)
-    },
-    payOauth2ConfigFunc: function (recordId) {
-      // 支付配置
-      this.$refs.payOauth2Config.show(recordId)
-    },
-    showPayIfConfigList: function (recordId) {
-      // 支付接口配置
-      this.$refs.isvPayIfConfigList.show(recordId)
-    }
-  }
+const payOauth2Config = ref(null)
+const isvPayIfConfigList = ref(null)
+
+const {
+  infoTable,
+  infoAddOrEdit,
+  payConfig,
+  searchData,
+  reloadTable,
+  openCreate,
+  openEdit,
+  openPayConfig,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: (recordId) => isvApi.delById(recordId),
+  deleteConfirmTitle: '确定删除吗',
+  deleteConfirmContent: '确定删除该服务商及其所有关联商户',
+  deleteSuccessMessage: '删除成功'
+})
+
+const reqTableDataFunc = (params) => isvApi.queryPage(params)
+
+const searchFunc = () => reloadTable()
+
+const delFunc = (recordId) => confirmDelete(recordId)
+
+const addFunc = () => openCreate()
+
+const editFunc = (recordId) => openEdit(recordId)
+
+const payConfigFunc = (recordId) => openPayConfig(recordId)
+
+const payOauth2ConfigFunc = (recordId) => {
+  payOauth2Config.value?.show(recordId)
+}
+
+const showPayIfConfigList = (recordId) => {
+  isvPayIfConfigList.value?.show(recordId)
 }
 </script>

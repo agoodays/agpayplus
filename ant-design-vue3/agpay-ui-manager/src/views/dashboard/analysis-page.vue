@@ -225,13 +225,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
-import { InfoCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
+import { dashboardApi } from '@/api/business/dashboard/dashboard-api'
 import { AgDateRangePicker } from '@/components'
-import { getPayDayCount, getPayTrendCount, getIsvAndMchCount, getPayCount, getPayType } from '@/api/manage'
 import { useUserStore } from '@/store/modules/system/user'
 import { timeFix } from '@/utils/time-util'
+import { InfoCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import empty from './empty.vue'
 
 // 动态导入echarts
@@ -330,7 +330,7 @@ const init = async () => {
 }
 
 const getPayDayCountData = () => {
-  getPayDayCount(todayOrYesterday.value)
+  dashboardApi.queryPayDayCount(todayOrYesterday.value)
     .then((res) => {
       mainChart.dayCount = res.dayCount
       skeletonClose()
@@ -342,7 +342,7 @@ const getPayDayCountData = () => {
 }
 
 const getPayTrendCountData = () => {
-  getPayTrendCount(recentDay.value)
+  dashboardApi.queryPayTrendCount(recentDay.value)
     .then((res) => {
       ispayAmount.value = true
       loadPayAmount(res)
@@ -356,7 +356,7 @@ const getPayTrendCountData = () => {
 }
 
 const getIsvAndMchCountData = () => {
-  getIsvAndMchCount()
+  dashboardApi.queryIsvAndMchCount()
     .then((res) => {
       mainChart.totalMch = res.totalMch
       mainChart.isvSubMchCount = res.isvSubMchCount
@@ -372,7 +372,7 @@ const getIsvAndMchCountData = () => {
 }
 
 const getPayTypeData = () => {
-  getPayType({ queryDateRange: searchData.payTypeQueryDateRange })
+  dashboardApi.queryPayType({ queryDateRange: searchData.payTypeQueryDateRange })
     .then((res) => {
       mainChart.payType = res
       isPayType.value = true
@@ -391,7 +391,7 @@ const getPayTypeData = () => {
 }
 
 const getPayCountData = () => {
-  getPayCount({ queryDateRange: searchData.payCountQueryDateRange })
+  dashboardApi.queryPayCount({ queryDateRange: searchData.payCountQueryDateRange })
     .then((res) => {
       mainChart.payCount = res
       isPayCount.value = true

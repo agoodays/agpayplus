@@ -21,47 +21,46 @@
   </a-drawer>
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue'
 import StoreCountPage from './store-count-page.vue'
 import WayCodeCountPage from './way-code-count-page.vue'
 import WayTypeCountPage from './way-type-count-page.vue'
 
-export default {
-  name: 'Detail',
-  components: { StoreCountPage, WayCodeCountPage, WayTypeCountPage },
-  data() {
-    return {
-      visible: false, // 是否显示弹层/抽屉
-      activeKey: null,
-      topTabData: [],
-      mchNo: null, // 商户号
-      queryDateRange: 'today'
-    }
-  },
-  methods: {
-    show: function (mchNo, queryDateRange) {
-      // 弹层打开事件
-      this.mchNo = mchNo
-      this.queryDateRange = queryDateRange
-      this.topTabData = []
-      if (this.$access('ENT_STATISTIC_MCH_STORE')) {
-        this.topTabData.push('store')
-      }
-      if (this.$access('ENT_STATISTIC_MCH_WAY_CODE')) {
-        this.topTabData.push('wayCode')
-      }
-      if (this.$access('ENT_STATISTIC_MCH_WAY_TYPE')) {
-        this.topTabData.push('wayType')
-      }
-      const [firstTopTab] = this.topTabData
-      this.activeKey = firstTopTab
-      this.visible = true
-    },
-    onClose() {
-      this.visible = false
-    }
+const visible = ref(false)
+const activeKey = ref(null)
+const topTabData = ref([])
+const mchNo = ref(null)
+const queryDateRange = ref('today')
+
+const show = (currentMchNo, currentQueryDateRange) => {
+  mchNo.value = currentMchNo
+  queryDateRange.value = currentQueryDateRange
+  topTabData.value = []
+
+  if (window.$access('ENT_STATISTIC_MCH_STORE')) {
+    topTabData.value.push('store')
   }
+  if (window.$access('ENT_STATISTIC_MCH_WAY_CODE')) {
+    topTabData.value.push('wayCode')
+  }
+  if (window.$access('ENT_STATISTIC_MCH_WAY_TYPE')) {
+    topTabData.value.push('wayType')
+  }
+
+  const [firstTopTab] = topTabData.value
+  activeKey.value = firstTopTab
+  visible.value = true
 }
+
+const onClose = () => {
+  visible.value = false
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 
 <style scoped></style>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :loading="btnLoading" @search="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <a-select
@@ -214,11 +214,11 @@
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { API_URL_ORDER_STATISTIC, API_URL_MCH_LIST, req } from '@/api/manage'
 import moment from 'moment'
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 // 表格列配置
 const tableColumns = [
@@ -265,9 +265,9 @@ const dateRangeMode = ref('date')
 const queryDateType = ref('day')
 
 // 计算开始时间和结束时间
-const startDate = moment().subtract(1, 'month').startOf('day')
-const endDate = moment().startOf('day').subtract(1, 'days')
-const queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
+const initialStartDate = moment().subtract(1, 'month').startOf('day')
+const initialEndDate = moment().startOf('day').subtract(1, 'days')
+const queryDateRange = `customDateTime_${initialStartDate.format('YYYY-MM-DD')} 00:00:00_${initialEndDate.format('YYYY-MM-DD')} 23:59:59`
 
 const defaultSearchData = reactive({
   method: 'transaction',
@@ -288,12 +288,12 @@ const countInitData = reactive({
   round: 0.0
 })
 
-const dateRangeValue = ref([startDate, endDate])
+const dateRangeValue = ref([initialStartDate, initialEndDate])
 const router = useRouter()
 
 // 方法
 const searchMch = (params) => {
-  return req.list(API_URL_MCH_LIST, params)
+  return statisticApi.listMch(params)
 }
 
 const handleSearchFormData = (searchDataParam) => {
@@ -317,16 +317,16 @@ const queryFunc = () => {
 
 // 表格接口数据请求
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_ORDER_STATISTIC, params)
+  return statisticApi.queryOrderStatistic(params)
 }
 
 const reqTableCountFunc = (params) => {
-  return req.total(API_URL_ORDER_STATISTIC, params)
+  return statisticApi.queryOrderStatisticTotal(params)
 }
 
 const reqDownloadDataFunc = (params) => {
-  req
-    .export(API_URL_ORDER_STATISTIC, 'excel', params)
+  statisticApi
+    .exportExcel(params)
     .then((res) => {
       // 将响应中的二进制数据转换为Blob对象
       const blob = new Blob([res])

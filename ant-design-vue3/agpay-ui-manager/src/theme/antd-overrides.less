@@ -29,6 +29,7 @@
   }
 
   .ant-dropdown-menu,
+  .ant-tooltip-inner,
   .ant-menu-light,
   .ant-menu-submenu-popup,
   .ant-select-dropdown,
@@ -46,6 +47,12 @@
     border-color: var(--border-color) !important;
   }
 
+  .ant-tooltip-arrow-content,
+  .ant-popover-arrow-content {
+    --antd-arrow-background-color: var(--layout-surface);
+    background: var(--layout-surface) !important;
+  }
+
   .ant-dropdown-menu-item,
   .ant-menu-item,
   .ant-menu-submenu-title,
@@ -58,7 +65,9 @@
   .ant-message-notice-content,
   .ant-notification-notice-title,
   .ant-notification-notice-description,
-  .ant-popover-inner-title {
+  .ant-popover-inner-title,
+  .ant-popconfirm-message-title,
+  .ant-popconfirm-description {
     color: var(--text-color) !important;
   }
 
@@ -68,7 +77,8 @@
   .ant-picker-cell:hover,
   .ant-table-tbody > tr:hover > td,
   .ant-message-notice-content:hover,
-  .ant-notification-notice-content:hover {
+  .ant-notification-notice-content:hover,
+  .ant-popover-inner:hover {
     background: var(--surface-subtle) !important;
   }
 
@@ -76,10 +86,156 @@
   .ant-input-affix-wrapper,
   .ant-select-selector,
   .ant-picker,
+  .ant-textarea,
+  .ant-input[disabled],
+  .ant-input-disabled,
+  .ant-select-disabled .ant-select-selector,
+  .ant-picker.ant-picker-disabled,
+  .ant-input-number,
   .ant-input-number-input {
     background: var(--layout-surface) !important;
     color: var(--text-color) !important;
     border-color: var(--border-color) !important;
+  }
+
+  .ant-input[disabled],
+  .ant-input-disabled,
+  .ant-select-disabled .ant-select-selector,
+  .ant-picker.ant-picker-disabled,
+  .ant-input-number-disabled,
+  .ant-btn[disabled],
+  .ant-btn[disabled]:hover {
+    opacity: 0.72;
+    color: var(--text-color-muted) !important;
+    background: var(--surface-subtle) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-input-number,
+  .ant-input-number-handler-wrap,
+  .ant-input-number-group-addon,
+  .ant-picker-panel-container,
+  .ant-picker-header,
+  .ant-table-container,
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td,
+  .ant-table-placeholder,
+  .ant-table-expanded-row-fixed,
+  .ant-pagination-item,
+  .ant-pagination-prev .ant-pagination-item-link,
+  .ant-pagination-next .ant-pagination-item-link,
+  .ant-tabs-tab,
+  .ant-tabs-nav::before,
+  .ant-descriptions-bordered .ant-descriptions-item-label,
+  .ant-descriptions-bordered .ant-descriptions-item-content,
+  .ant-list-item,
+  .ant-list-header,
+  .ant-list-footer,
+  .ant-empty-normal,
+  .ant-modal-header,
+  .ant-modal-footer,
+  .ant-drawer-header,
+  .ant-drawer-body,
+  .ant-drawer-footer,
+  .ant-breadcrumb,
+  .ant-breadcrumb-link,
+  .ant-breadcrumb-separator,
+  .ant-divider,
+  .ant-descriptions-view,
+  .ant-card-head,
+  .ant-card-bordered,
+  .ant-statistic,
+  .ant-statistic-content,
+  .ant-statistic-title {
+    background: var(--layout-surface) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td,
+  .ant-table-cell,
+  .ant-pagination-item a,
+  .ant-tabs-tab-btn,
+  .ant-tabs-tab .anticon,
+  .ant-descriptions-item-label,
+  .ant-descriptions-item-content,
+  .ant-empty-description,
+  .ant-breadcrumb-link,
+  .ant-breadcrumb-separator,
+  .ant-statistic-content-value,
+  .ant-statistic-title,
+  .ant-select-arrow,
+  .ant-picker-suffix,
+  .ant-picker-separator {
+    color: var(--text-color) !important;
+  }
+
+  .ant-input::placeholder,
+  .ant-input-number-input::placeholder,
+  .ant-select-selection-placeholder,
+  .ant-picker-input > input::placeholder,
+  .ant-empty-description,
+  .ant-form-item-explain,
+  .ant-form-item-extra {
+    color: var(--text-color-muted) !important;
+  }
+
+  .ant-spin-dot-item {
+    background-color: var(--primary-color) !important;
+  }
+
+  .ant-skeleton-content .ant-skeleton-title,
+  .ant-skeleton-content .ant-skeleton-paragraph > li,
+  .ant-skeleton.ant-skeleton-element .ant-skeleton-button,
+  .ant-skeleton.ant-skeleton-element .ant-skeleton-avatar,
+  .ant-skeleton.ant-skeleton-element .ant-skeleton-input,
+  .ant-skeleton.ant-skeleton-element .ant-skeleton-image {
+    background: linear-gradient(
+      90deg,
+      var(--surface-subtle) 25%,
+      var(--surface-variant) 37%,
+      var(--surface-subtle) 63%
+    ) !important;
+    background-size: 400% 100% !important;
+  }
+
+  .ant-table-thead > tr > th,
+  .ant-table-tbody > tr > td,
+  .ant-table-container,
+  .ant-pagination-item,
+  .ant-pagination-prev .ant-pagination-item-link,
+  .ant-pagination-next .ant-pagination-item-link,
+  .ant-tabs-nav::before,
+  .ant-card-head,
+  .ant-card-bordered,
+  .ant-modal-header,
+  .ant-modal-footer,
+  .ant-drawer-header,
+  .ant-drawer-footer,
+  .ant-descriptions-bordered .ant-descriptions-item-label,
+  .ant-descriptions-bordered .ant-descriptions-item-content,
+  .ant-list-item,
+  .ant-divider {
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-table-thead > tr > th {
+    background: var(--surface-variant) !important;
+  }
+
+  .ant-table-tbody > tr.ant-table-row:hover > td,
+  .ant-table-tbody > tr:hover > td,
+  .ant-list-item:hover,
+  .ant-pagination-item:hover,
+  .ant-tabs-tab:hover {
+    background: var(--surface-subtle) !important;
+  }
+
+  .ant-pagination-item-active,
+  .ant-tabs-tab.ant-tabs-tab-active,
+  .ant-tabs-ink-bar {
+    border-color: var(--primary-color) !important;
   }
 
   // .ant-menu-dark .ant-menu-sub.ant-menu-inline {

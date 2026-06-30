@@ -31,7 +31,7 @@
             <!-- 卡片底部操作栏 -->
             <div class="ag-card-ops">
               <a v-if="$access('ENT_ISV_PAY_CONFIG_ADD')" @click="editPayIfConfigFunc(record)"
-                >填写参数 <a-icon key="right" type="right" style="fontsize: 13px"></a-icon
+                >填写参数 <a-icon key="right" type="right"></a-icon
               ></a>
               <a v-else>暂无操作</a>
             </div>
@@ -125,218 +125,238 @@
   </a-drawer>
 </template>
 
-<script>
-import agCard from '@/components/ag-card'
-import agUpload from '@/components/ag-upload'
-import WxpayPayConfig from './custom/wxpay-pay-config.vue'
+<script setup>
+import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
+import AgCard from '@/components/ag-card'
+import AgUpload from '@/components/ag-upload'
+import { message } from 'ant-design-vue'
+import { ref } from 'vue'
 import AlipayPayConfig from './custom/alipay-pay-config.vue'
-import { API_URL_ISV_PAYCONFIGS_LIST, getIsvPayConfigUnique, req, upload } from '@/api/manage'
+import WxpayPayConfig from './custom/wxpay-pay-config.vue'
 
-export default {
-  components: {
-    agCard,
-    agUpload,
-    WxpayPayConfig,
-    AlipayPayConfig
-  },
-  data() {
-    return {
-      btnLoading: false,
-      isvNo: null, // 服务商号
-      action: upload.cert, // 上传文件地址
-      visible: false, // 一级抽屉开关
-      childrenVisible: false, // 二级抽屉开关
-      isvParams: {}, // 支付接口定义描述
-      saveObject: {}, // 保存的对象
-      ifParams: {}, // 参数配置对象
-      agpayCard: {
-        // 卡片配置
-        height: 300,
-        span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 }
-      },
-      rules: {
-        infoId: [{ required: true, trigger: 'blur' }],
-        ifCode: [{ required: true, trigger: 'blur' }],
-        ifRate: [
-          {
-            required: false,
-            pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/,
-            message: '请输入0-100之间的数字，最多四位小数',
-            trigger: 'blur'
-          }
-        ]
-      },
-      ifParamsRules: {}
+const infoCard = ref(null)
+const infoFormModel = ref(null)
+const isvParamFormModel = ref(null)
+const wxpayPayConfig = ref(null)
+const alipayPayConfig = ref(null)
+
+const btnLoading = ref(false)
+const isvNo = ref(null)
+const action = isvPayConfigApi.certUploadAction
+const visible = ref(false)
+const childrenVisible = ref(false)
+const isvParams = ref([])
+const saveObject = ref({})
+const ifParams = ref({})
+const ifParamsRules = ref({})
+
+const agpayCard = {
+  height: 300,
+  span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 }
+}
+
+const rules = {
+  infoId: [{ required: true, trigger: 'blur' }],
+  ifCode: [{ required: true, trigger: 'blur' }],
+  ifRate: [
+    {
+      required: false,
+      pattern: /^(([1-9]{1}\d{0,1})|(0{1}))(\.\d{1,4})?$/,
+      message: '请输入0-100之间的数字，最多四位小数',
+      trigger: 'blur'
     }
-  },
-  watch: {
-    ifParams: function (o, n) {
-      this.$set(this.ifParams, 'appSecret', this.ifParams.appSecret) // 解决appSecret  双向绑定数据不显示的问题
-    }
-  },
-  methods: {
-    generoterRules() {
-      const rules = {}
-      let newItems = []
-      this.isvParams.forEach((item) => {
-        newItems = []
-        if (item.verify === 'required' && item.star !== '1') {
-          newItems.push({
-            required: true,
-            message: '请输入' + item.desc,
-            trigger: 'blur'
-          })
-          rules[item.name] = newItems
-        }
-      })
-      this.ifParamsRules = rules
-    },
-    // 弹层打开事件
-    show: function (isvNo) {
-      this.isvNo = isvNo
-      this.ifCode = null
-      this.visible = true
-      this.refCardList()
-    },
-    // 请求支付接口定义数据
-    reqCardListFunc() {
-      return req.list(API_URL_ISV_PAYCONFIGS_LIST, { isvNo: this.isvNo })
-    },
-    // 刷新card列表
-    refCardList() {
-      if (this.$refs.infoCard) {
-        this.$refs.infoCard.refCardList()
-      }
-    },
-    // 支付参数配置
-    editPayIfConfigFunc(record) {
-      if (record.configPageType === 1) {
-        // JSON渲染页面
-        if (this.$refs.infoFormModel !== undefined) {
-          this.$refs.infoFormModel.resetFields()
-        }
-        if (this.$refs.isvParamFormModel !== undefined) {
-          this.$refs.isvParamFormModel.resetFields()
-        }
-        this.childrenVisible = true // 打开支付参数配置抽屉
-        this.saveObject = {} // 要保存的对象
-        this.ifParams = {} // 参数配置对象
-        this.isvParams = {} // 支付接口定义描述
-        this.saveObject.infoId = this.isvNo
-        this.saveObject.ifCode = record.ifCode
-        this.saveObject.state = record.ifConfigState === 0 ? 0 : 1
+  ]
+}
 
-        if (!record) {
-          return
-        }
-
-        const that = this
-        // 获取支付参数
-        getIsvPayConfigUnique(this.saveObject.infoId, this.saveObject.ifCode).then((res) => {
-          if (res && res.ifParams) {
-            this.saveObject = res
-            this.ifParams = JSON.parse(res.ifParams)
-          }
-
-          const newItems = [] // 重新加载支付接口配置定义描述json
-          JSON.parse(record.isvParams).forEach((item) => {
-            const radioItems = [] // 存放单选框value title
-            if (item.type === 'radio') {
-              const valueItems = item.values.split(',')
-              const titleItems = item.titles.split(',')
-
-              for (const i in valueItems) {
-                // 检查参数是否为数字类型 然后赋值给radio值
-                let radioVal = valueItems[i]
-                if (!isNaN(radioVal)) {
-                  radioVal = Number(radioVal)
-                }
-
-                radioItems.push({
-                  value: radioVal,
-                  title: titleItems[i]
-                })
-              }
-            }
-
-            if (item.star === '1') {
-              that.ifParams[item.name + '_ph'] = that.ifParams[item.name] ? that.ifParams[item.name] : '请输入'
-              if (that.ifParams[item.name]) {
-                that.ifParams[item.name] = ''
-              }
-            }
-
-            newItems.push({
-              name: item.name,
-              desc: item.desc,
-              type: item.type,
-              verify: item.verify,
-              values: radioItems,
-              star: item.star // 脱敏标识 1-是
-            })
-          })
-          that.isvParams = newItems // 重新赋值接口定义描述
-          that.generoterRules()
-          that.$forceUpdate()
-        })
-      } else if (record.configPageType === 2) {
-        // 自定义配置页面，页面放在custom目录下，配置模块命名规则：if_code + PayConfig
-        this.$refs[record.ifCode + 'PayConfig'].show(this.isvNo, record)
-      }
-    },
-    // 表单提交
-    onSubmit() {
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        this.$refs.isvParamFormModel.validate((valid2) => {
-          if (valid && valid2) {
-            // 验证通过
-            that.btnLoading = true
-            const reqParams = {}
-            reqParams.infoId = that.saveObject.infoId
-            reqParams.ifCode = that.saveObject.ifCode
-            reqParams.ifRate = that.saveObject.ifRate
-            reqParams.state = that.saveObject.state
-            reqParams.remark = that.saveObject.remark
-            // 支付参数配置不能为空
-            if (Object.keys(that.ifParams).length === 0) {
-              this.$message.error('参数不能为空！')
-              return
-            }
-            // 脱敏数据为空时，删除该key
-            this.isvParams.forEach((item) => {
-              if (item.star === '1' && that.ifParams[item.name] === '') {
-                that.ifParams[item.name] = undefined
-              }
-              that.ifParams[item.name + '_ph'] = undefined
-            })
-            reqParams.ifParams = JSON.stringify(that.ifParams)
-            // 请求接口
-            req.add(API_URL_ISV_PAYCONFIGS_LIST, reqParams).then((res) => {
-              that.$message.success('保存成功')
-              that.childrenVisible = false
-              that.refCardList()
-              that.btnLoading = false
-            })
-          }
-        })
-      })
-    },
-    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
-    uploadSuccess(name, fileList) {
-      const [firstItem] = fileList
-      this.ifParams[name] = firstItem?.url
-      this.$forceUpdate()
-    },
-    // 抽屉关闭
-    onClose() {
-      this.visible = false
-    },
-    onChildrenDrawerClose() {
-      this.childrenVisible = false
-    }
+function parseJsonArray(rawValue) {
+  if (Array.isArray(rawValue)) return rawValue
+  if (!rawValue) return []
+  try {
+    const parsed = JSON.parse(rawValue)
+    return Array.isArray(parsed) ? parsed : []
+  } catch (_error) {
+    return []
   }
 }
+
+function parseJsonObject(rawValue) {
+  if (rawValue && typeof rawValue === 'object' && !Array.isArray(rawValue)) return rawValue
+  if (!rawValue) return {}
+  try {
+    const parsed = JSON.parse(rawValue)
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch (_error) {
+    return {}
+  }
+}
+
+function buildRadioItems(item) {
+  if (item.type !== 'radio') return []
+  const valueItems = (item.values || '').split(',')
+  const titleItems = (item.titles || '').split(',')
+  return valueItems.map((rawValue, index) => {
+    let value = rawValue
+    if (value !== '' && !Number.isNaN(Number(rawValue))) {
+      value = Number(rawValue)
+    }
+    return {
+      value,
+      title: titleItems[index]
+    }
+  })
+}
+
+function generateRules() {
+  const rulesMap = {}
+  isvParams.value.forEach((item) => {
+    if (item.verify === 'required' && item.star !== '1') {
+      rulesMap[item.name] = [
+        {
+          required: true,
+          message: '请输入' + item.desc,
+          trigger: 'blur'
+        }
+      ]
+    }
+  })
+  ifParamsRules.value = rulesMap
+}
+
+function show(currentIsvNo) {
+  isvNo.value = currentIsvNo
+  visible.value = true
+  refCardList()
+}
+
+function reqCardListFunc() {
+  return isvPayConfigApi.queryCardList(isvNo.value)
+}
+
+function refCardList() {
+  infoCard.value?.refCardList?.()
+}
+
+async function editPayIfConfigFunc(record) {
+  if (record.configPageType === 1) {
+    infoFormModel.value?.resetFields?.()
+    isvParamFormModel.value?.resetFields?.()
+
+    childrenVisible.value = true
+    saveObject.value = {
+      infoId: isvNo.value,
+      ifCode: record.ifCode,
+      state: record.ifConfigState === 0 ? 0 : 1
+    }
+    ifParams.value = {}
+    isvParams.value = []
+
+    const res = await isvPayConfigApi.getUnique(saveObject.value.infoId, saveObject.value.ifCode)
+    if (res?.ifParams) {
+      saveObject.value = res
+      ifParams.value = parseJsonObject(res.ifParams)
+    }
+
+    const parsedItems = parseJsonArray(record?.isvParams).map((item) => {
+      if (item.star === '1') {
+        const currentValue = ifParams.value[item.name]
+        ifParams.value[item.name + '_ph'] = currentValue || '请输入'
+        if (currentValue) {
+          ifParams.value[item.name] = ''
+        }
+      }
+
+      return {
+        name: item.name,
+        desc: item.desc,
+        type: item.type,
+        verify: item.verify,
+        values: buildRadioItems(item),
+        star: item.star
+      }
+    })
+
+    isvParams.value = parsedItems
+    generateRules()
+    return
+  }
+
+  if (record.configPageType === 2) {
+    const customRefName = `${record.ifCode}PayConfig`
+    const customRefMap = {
+      wxpayPayConfig,
+      alipayPayConfig
+    }
+    customRefMap[customRefName]?.value?.show(isvNo.value, record)
+  }
+}
+
+function validateForm(formRef) {
+  return new Promise((resolve) => {
+    if (!formRef.value?.validate) {
+      resolve(true)
+      return
+    }
+    formRef.value.validate((valid) => {
+      resolve(valid)
+    })
+  })
+}
+
+async function onSubmit() {
+  const valid = await validateForm(infoFormModel)
+  const valid2 = await validateForm(isvParamFormModel)
+  if (!valid || !valid2) return
+
+  btnLoading.value = true
+  try {
+    const reqParams = {
+      infoId: saveObject.value.infoId,
+      ifCode: saveObject.value.ifCode,
+      ifRate: saveObject.value.ifRate,
+      state: saveObject.value.state,
+      remark: saveObject.value.remark
+    }
+
+    if (Object.keys(ifParams.value).length === 0) {
+      message.error('参数不能为空！')
+      return
+    }
+
+    const submitParams = { ...ifParams.value }
+    isvParams.value.forEach((item) => {
+      if (item.star === '1' && submitParams[item.name] === '') {
+        submitParams[item.name] = undefined
+      }
+      submitParams[item.name + '_ph'] = undefined
+    })
+
+    reqParams.ifParams = JSON.stringify(submitParams)
+    await isvPayConfigApi.save(reqParams)
+    message.success('保存成功')
+    childrenVisible.value = false
+    refCardList()
+  } finally {
+    btnLoading.value = false
+  }
+}
+
+function uploadSuccess(name, fileList) {
+  const [firstItem] = fileList
+  ifParams.value[name] = firstItem?.url
+}
+
+function onClose() {
+  visible.value = false
+}
+
+function onChildrenDrawerClose() {
+  childrenVisible.value = false
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 
 <style lang="less" scoped>

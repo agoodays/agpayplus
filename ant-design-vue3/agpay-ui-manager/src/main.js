@@ -1,19 +1,19 @@
-import { createApp } from 'vue'
-import dayjs from 'dayjs'
-import 'dayjs/locale/zh-cn'
+import { i18n, setAppLocale } from '@/i18n'
+import { router } from '@/router'
+import { store } from '@/store'
+import { getInitializedLanguage, useAppConfigStore } from '@/store/modules/system/app-config'
+import { useUserStore } from '@/store/modules/system/user'
+import themeService from '@/utils/theme-service'
 import * as antIcons from '@ant-design/icons-vue'
 import Antd, { message } from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css'
-import './theme/index.less'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+import { createApp } from 'vue'
 import App from './App.vue'
-import { router } from '@/router'
-import { store } from '@/store'
-import { useAppConfigStore, getInitializedLanguage } from '@/store/modules/system/app-config'
-import { useUserStore } from '@/store/modules/system/user'
-import { i18n, setAppLocale } from '@/i18n'
 import Initializer from './bootstrap'
+import './theme/index.less'
 import { infoBox } from './utils/info-box'
-import themeService from '@/utils/theme-service'
 
 // ==================== 全局配置 ====================
 
@@ -63,6 +63,20 @@ function setupGlobalErrorHandling(app) {
 
   // 3. 全局错误捕获
   window.addEventListener('error', (event) => {
+    // 过滤浏览器匿名脚本错误噪音（常见特征：error 为 null，行列号为 0）
+    const isAnonymousScriptNoise =
+      !event.error &&
+      (event.lineno === 0 || event.lineno === undefined) &&
+      (event.colno === 0 || event.colno === undefined)
+
+    if (isAnonymousScriptNoise) {
+      console.warn('⚠️ 忽略匿名脚本错误噪音:', {
+        message: event.message,
+        filename: event.filename
+      })
+      return
+    }
+
     console.error('🚨 全局错误:', event.error)
     console.error('错误文件:', event.filename)
     console.error('错误行号:', event.lineno)

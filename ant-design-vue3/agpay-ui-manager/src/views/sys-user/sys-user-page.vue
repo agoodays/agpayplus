@@ -6,7 +6,7 @@
         :search-data="searchData"
         :open-is-show-more="false"
         :is-show-more="isShowMore"
-        :btn-loading="btnLoading"
+        :search-loading="btnLoading"
         @update-search-data="handleSearchFormData"
         @set-is-show-more="setIsShowMore"
         @query-func="queryFunc">
@@ -97,14 +97,14 @@
     <!-- 新增 / 修改 页面组件  -->
     <info-add-or-edit ref="infoAddOrEdit" :callback-func="queryFunc"/>
     <!-- 邀请码窗口  -->
-    <invite-code ref="inviteCode"/>
+    <invite-code ref="inviteCodeRef"/>
     <!-- 分配角色 页面组件  -->
     <role-dist ref="roleDistRef"/>
   </div>
 </template>
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { API_URL_SYS_USER_LIST, req, reqLoad } from '@/api/manage'
+import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
+import { onMounted, reactive, ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 import InviteCode from './invite-code.vue'
 import RoleDist from './role-dist.vue'
@@ -144,7 +144,7 @@ const defaultSearchData = {
 
 const infoTable = ref(null)
 const infoAddOrEdit = ref(null)
-const inviteCode = ref(null)
+const inviteCodeRef = ref(null)
 const roleDistRef = ref(null)
 const searchData = reactive({ ...defaultSearchData })
 const userTypeOptions = userTypeList
@@ -170,8 +170,8 @@ const copyFunc = (text) => {
   })
 }
 
-const inviteCodeFunc = (inviteCode, sysType) => {
-  inviteCode.value.show(inviteCode, sysType)
+const inviteCodeFunc = (inviteCodeValue, sysType) => {
+  inviteCodeRef.value.show(inviteCodeValue, sysType)
 }
 
 const getUserTypeName = (userType) => {
@@ -193,7 +193,7 @@ const setIsShowMore = (value) => {
 
 // 请求table接口数据
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_SYS_USER_LIST, params)
+  return sysUserApi.queryPage(params)
 }
 
 const queryFunc = () => { // 点击【查询】按钮点击事件
@@ -217,7 +217,7 @@ const relieveFunc = (recordId) => { // 业务通用【解除登录限制】 函�
   import('ant-design-vue').then(({ message }) => {
     import('@/utils/info-box').then(({ infoBox }) => {
       infoBox.confirmDanger('确认解除吗？', '', () => {
-        return req.delById(API_URL_SYS_USER_LIST + '/loginLimit', recordId).then(res => {
+        return sysUserApi.relieveLoginLimit(recordId).then(res => {
           message.success('解除成功！')
           infoTable.value?.refTable(false)
         })
@@ -230,7 +230,7 @@ const delFunc = (recordId) => { // 业务通用【删除】 函数
   import('ant-design-vue').then(({ message }) => {
     import('@/utils/info-box').then(({ infoBox }) => {
       infoBox.confirmDanger('确认删除？', '', () => {
-        return req.delById(API_URL_SYS_USER_LIST, recordId).then(res => {
+        return sysUserApi.delById(recordId).then(res => {
           message.success('删除成功！')
           infoTable.value?.refTable(false)
         })
@@ -251,7 +251,7 @@ const updateState = (recordId, state) => { // 【更新状态】
 
       return new Promise((resolve, reject) => {
         infoBox.confirmDanger(title, content, () => {
-          return reqLoad.updateById(API_URL_SYS_USER_LIST, recordId, { state: state }).then(res => {
+          return sysUserApi.updateStateById(recordId, { state: state }).then(res => {
             searchFunc()
             resolve()
           }).catch(err => reject(err))

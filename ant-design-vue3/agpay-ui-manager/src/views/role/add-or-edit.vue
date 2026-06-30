@@ -24,97 +24,82 @@
   </a-drawer>
 </template>
 
-<script>
-import { API_URL_ROLE_LIST, req } from '@/api/manage'
+<script setup>
+import { roleApi } from '@/api/business/role/role-api'
+import { message } from 'ant-design-vue'
+import { nextTick, ref } from 'vue'
 import RoleDist from './role-dist.vue'
-export default {
-  components: { RoleDist },
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
 
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
+const infoFormModel = ref(null)
+const roleDist = ref(null)
 
-  data() {
-    return {
-      confirmLoading: false, // 显示确定按钮loading图标
-      isAdd: true, // 新增 or 修改页面标识
-      isShow: false, // 是否显示弹层/抽屉
-      saveObject: {}, // 数据对象
-      recordId: null, // 更新对象ID
-      rules: {
-        roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }]
-      }
+const confirmLoading = ref(false)
+const isAdd = ref(true)
+const isShow = ref(false)
+const saveObject = ref({})
+const recordId = ref(null)
+
+const rules = {
+  roleName: [{ required: true, message: '请输入角色名称', trigger: 'blur' }]
+}
+
+const show = async (currentRecordId, sysType) => {
+  isAdd.value = !currentRecordId
+  saveObject.value = {}
+  confirmLoading.value = false
+
+  infoFormModel.value?.resetFields?.()
+
+  await nextTick()
+  roleDist.value?.initTree(currentRecordId, sysType)
+
+  if (!isAdd.value) {
+    recordId.value = currentRecordId
+    saveObject.value = await roleApi.getById(currentRecordId)
+  }
+
+  isShow.value = true
+}
+
+const validateForm = () => {
+  return new Promise((resolve) => {
+    if (!infoFormModel.value?.validate) {
+      resolve(true)
+      return
     }
-  },
-  created() {},
-  methods: {
-    show: function (recordId, sysType) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.saveObject = {} // 数据清空
-      this.confirmLoading = false // 关闭loading
+    infoFormModel.value.validate((valid) => resolve(valid))
+  })
+}
 
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
+const handleOkFunc = async () => {
+  const valid = await validateForm()
+  if (!valid) return
 
-      const that = this
+  confirmLoading.value = true
 
-      // 初始化角色权限分配功能
-      this.$nextTick(() => that.$refs.roleDist.initTree(recordId, sysType))
+  try {
+    const selectedEntIdList = roleDist.value?.getSelectedEntIdList?.() || []
+    saveObject.value.entIds = selectedEntIdList
 
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        that.recordId = recordId
-        req.getById(API_URL_ROLE_LIST, recordId).then((res) => {
-          that.saveObject = res
-        })
-        this.isShow = true
-      } else {
-        that.isShow = true // 立马展示弹层信息
-      }
-    },
-
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          // 请求接口
-
-          that.confirmLoading = true // 显示loading
-
-          // 保存选择的权限信息
-          const selectedEntIdList = that.$refs.roleDist.getSelectedEntIdList()
-          that.saveObject.entIds = selectedEntIdList
-
-          if (that.isAdd) {
-            req
-              .add(API_URL_ROLE_LIST, that.saveObject)
-              .then((res) => {
-                that.$message.success('新增成功')
-                that.isShow = false
-                that.callbackFunc() // 刷新列表
-              })
-              .catch((res) => {
-                that.confirmLoading = false
-              })
-          } else {
-            req
-              .updateById(API_URL_ROLE_LIST, that.recordId, that.saveObject)
-              .then((res) => {
-                that.$message.success('修改成功')
-                that.isShow = false
-                that.callbackFunc() // 刷新列表
-              })
-              .catch((res) => {
-                that.confirmLoading = false
-              })
-          }
-        }
-      })
+    if (isAdd.value) {
+      await roleApi.add(saveObject.value)
+      message.success('新增成功')
+    } else {
+      await roleApi.updateById(recordId.value, saveObject.value)
+      message.success('修改成功')
     }
+
+    isShow.value = false
+    props.callbackFunc()
+  } finally {
+    confirmLoading.value = false
   }
 }
+
+defineExpose({
+  show
+})
 </script>

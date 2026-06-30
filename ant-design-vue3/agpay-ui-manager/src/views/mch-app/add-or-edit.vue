@@ -145,12 +145,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, computed, nextTick } from 'vue'
-import { message } from 'ant-design-vue'
-import { useI18n } from 'vue-i18n'
-import { QuestionCircleOutlined, SyncOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
-import { API_URL_MCH_APP, API_URL_MCH_LIST, req } from '@/api/manage'
+import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { basicApi } from '@/api/system/basic-api'
+import { CheckOutlined, CloseOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // Props & Emits
 const props = defineProps({
@@ -292,7 +292,7 @@ const loadSysRSA2PublicKey = async () => {
 const loadDetail = async () => {
   try {
     loading.value = true
-    const res = await req.getById(API_URL_MCH_APP, props.recordId)
+    const res = await mchAppApi.getById(props.recordId)
 
     Object.assign(formState, res)
 
@@ -341,7 +341,7 @@ const resetForm = () => {
  */
 const handleSearchMch = async (keyword) => {
   try {
-    const res = await req.list(API_URL_MCH_LIST, {
+    const res = await mchAppApi.queryMchPage({
       mchName: keyword,
       pageSize: 20
     })
@@ -389,10 +389,10 @@ const handleSubmit = async () => {
 
     // 提交数据
     if (isAdd.value) {
-      await req.add(API_URL_MCH_APP, data)
+      await mchAppApi.add(data)
       message.success(t('common.addSuccess'))
     } else {
-      await req.updateById(API_URL_MCH_APP, props.recordId, data)
+      await mchAppApi.updateById(props.recordId, data)
       message.success(t('common.editSuccess'))
     }
 

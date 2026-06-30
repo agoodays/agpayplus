@@ -138,323 +138,230 @@
   </div>
 </template>
 
-<script>
-import { defineComponent, ref, reactive, onMounted, getCurrentInstance } from 'vue'
-import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { useI18n } from 'vue-i18n'
-import { CheckCircleOutlined, UploadOutlined, SafetyCertificateOutlined } from '@ant-design/icons-vue'
-import { Base64 } from 'js-base64'
-import { useUserStore } from '@/store/modules/system/user'
+<script setup>
+import { currentApi } from '@/api/business/current/current-api'
 import { loginApi } from '@/api/system/login-api'
-import { req, upload } from '@/api/manage'
+import { useUserStore } from '@/store/modules/system/user'
+import { CheckCircleOutlined, SafetyCertificateOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { Base64 } from 'js-base64'
+import { onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const userStore = useUserStore()
+const { t } = useI18n()
 
-export default defineComponent({
-  name: 'UserInfoPage',
-  components: {
-    CheckCircleOutlined,
-    UploadOutlined,
-    SafetyCertificateOutlined
-  },
-  setup() {
-    const router = useRouter()
-    const userStore = useUserStore()
-    const { proxy } = getCurrentInstance()
-    const { t } = useI18n()
+  const activeTab = ref('basic')
+  const securityTab = ref('password')
 
-    // Tabs
-    const activeTab = ref('basic')
-    const securityTab = ref('password')
+  const basicLoading = ref(false)
+  const avatarLoading = ref(false)
+  const passwordLoading = ref(false)
+  const safeWordLoading = ref(false)
 
-    // Loading 状态
-    const basicLoading = ref(false)
-    const avatarLoading = ref(false)
-    const passwordLoading = ref(false)
-    const safeWordLoading = ref(false)
+  const basicFormRef = ref()
+  const passwordFormRef = ref()
 
-    // 表单引用
-    const basicFormRef = ref()
-    const passwordFormRef = ref()
+const basicForm = reactive({
+  loginUsername: '',
+  realname: '',
+  telphone: '',
+  sex: 1,
+  avatarUrl: ''
+})
 
-    // 基本信息表单
-    const basicForm = reactive({
-      loginUsername: '',
-      realname: '',
-      telphone: '',
-      sex: 1,
-      avatarUrl: ''
-    })
+const passwordForm = reactive({
+  originalPwd: '',
+  newPwd: '',
+  confirmPwd: ''
+})
 
-    // 密码表单
-    const passwordForm = reactive({
-      originalPwd: '',
-      newPwd: '',
-      confirmPwd: ''
-    })
+  const safeWord = ref('')
 
-    // 预留信息
-    const safeWord = ref('')
+  const defaultAvatar = '@/assets/logo.svg'
 
-    // 默认头像
-    const defaultAvatar = '@/assets/logo.svg'
+const passwordRulesConfig = reactive({
+  regexpRules: '',
+  errTips: ''
+})
 
-    // 密码规则
-    const passwordRulesConfig = reactive({
-      regexpRules: '',
-      errTips: ''
-    })
+const basicRules = {
+  realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }]
+}
 
-    // 基本信息验证规则
-    const basicRules = {
-      realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }]
-    }
-
-    // 密码验证规则
-    const passwordRules = {
-      originalPwd: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
-      newPwd: [
-        { required: true, message: '请输入新密码', trigger: 'blur' },
-        {
-          validator: (rule, value) => {
-            if (!value) {
-              return Promise.reject('请输入新密码')
-            }
-            if (passwordRulesConfig.regexpRules && passwordRulesConfig.errTips) {
-              const regex = new RegExp(passwordRulesConfig.regexpRules)
-              if (!regex.test(value)) {
-                return Promise.reject(passwordRulesConfig.errTips)
-              }
-            }
-            return Promise.resolve()
-          },
-          trigger: 'blur'
+const passwordRules = {
+  originalPwd: [{ required: true, message: '请输入原密码', trigger: 'blur' }],
+  newPwd: [
+    { required: true, message: '请输入新密码', trigger: 'blur' },
+    {
+      validator: (_rule, value) => {
+        if (!value) {
+          return Promise.reject('请输入新密码')
         }
-      ],
-      confirmPwd: [
-        { required: true, message: '请输入确认新密码', trigger: 'blur' },
-        {
-          validator: (rule, value) => {
-            if (!value) {
-              return Promise.reject('请输入确认新密码')
-            }
-            if (passwordRulesConfig.regexpRules && passwordRulesConfig.errTips) {
-              const regex = new RegExp(passwordRulesConfig.regexpRules)
-              if (!regex.test(value)) {
-                return Promise.reject(passwordRulesConfig.errTips)
-              }
-            }
-            if (value !== passwordForm.newPwd) {
-              return Promise.reject('新密码与确认密码不一致')
-            }
-            return Promise.resolve()
-          },
-          trigger: 'blur'
-        }
-      ]
-    }
-
-    /**
-     * 获取用户信息
-     */
-    const fetchUserInfo = async () => {
-      try {
-        const res = await loginApi.getCurrentInfo()
-        Object.assign(basicForm, res)
-        safeWord.value = res.safeWord || ''
-      } catch (error) {
-        console.error('获取用户信息失败:', error)
-      }
-    }
-
-    /**
-     * 获取密码规则
-     */
-    const fetchPasswordRules = async () => {
-      try {
-        const res = await loginApi.getPwdRulesRegexp()
-        if (res) {
-          passwordRulesConfig.regexpRules = res.regexpRules
-          passwordRulesConfig.errTips = res.errTips
-        }
-      } catch (error) {
-        console.error('获取密码规则失败:', error)
-      }
-    }
-
-    /**
-     * 更新基本信息
-     */
-    const handleUpdateBasic = async () => {
-      try {
-        await basicFormRef.value.validate()
-
-        proxy.$infoBox.confirmPrimary(t('current.confirmUpdateInfoTitle'), '', async () => {
-          basicLoading.value = true
-          try {
-            await req.post('/api/current/modifyUserInfo', basicForm)
-
-            // 更新Store中的用户信息
-            const userInfo = await loginApi.getCurrentInfo()
-            userStore.setUserLoginInfo(userInfo)
-
-            message.success(t('common.editSuccess'))
-          } catch (error) {
-            message.error(error.msg || t('common.editFailed'))
-          } finally {
-            basicLoading.value = false
+        if (passwordRulesConfig.regexpRules && passwordRulesConfig.errTips) {
+          const regex = new RegExp(passwordRulesConfig.regexpRules)
+          if (!regex.test(value)) {
+            return Promise.reject(passwordRulesConfig.errTips)
           }
-        })
-      } catch (error) {
-        // 表单验证失败
-      }
+        }
+        return Promise.resolve()
+      },
+      trigger: 'blur'
     }
-
-    /**
-     * 更新密码
-     */
-    const handleUpdatePassword = async () => {
-      try {
-        await passwordFormRef.value.validate()
-
-        proxy.$infoBox.confirmPrimary(
-          t('current.confirmUpdatePasswordTitle'),
-          t('current.updatePasswordNeedRelogin'),
-          async () => {
-            passwordLoading.value = true
-            try {
-              await req.post('/api/current/modifyPwd', {
-                originalPwd: Base64.encode(passwordForm.originalPwd),
-                confirmPwd: Base64.encode(passwordForm.confirmPwd)
-              })
-
-              message.success(t('current.editSuccessRelogin'))
-
-              // 退出登录
-              await userStore.logout()
-              router.push({ name: 'login' })
-            } catch (error) {
-              message.error(error.msg || t('common.editFailed'))
-            } finally {
-              passwordLoading.value = false
-            }
+  ],
+  confirmPwd: [
+    { required: true, message: '请输入确认新密码', trigger: 'blur' },
+    {
+      validator: (_rule, value) => {
+        if (!value) {
+          return Promise.reject('请输入确认新密码')
+        }
+        if (passwordRulesConfig.regexpRules && passwordRulesConfig.errTips) {
+          const regex = new RegExp(passwordRulesConfig.regexpRules)
+          if (!regex.test(value)) {
+            return Promise.reject(passwordRulesConfig.errTips)
           }
-        )
-      } catch (error) {
-        // 表单验证失败
-      }
+        }
+        if (value !== passwordForm.newPwd) {
+          return Promise.reject('新密码与确认密码不一致')
+        }
+        return Promise.resolve()
+      },
+      trigger: 'blur'
     }
+  ]
+}
 
-    /**
-     * 更新预留信息
-     */
-    const handleUpdateSafeWord = async () => {
-      if (!safeWord.value) {
-        message.error(t('current.safeWordEmpty'))
-        return
-      }
+const fetchUserInfo = async () => {
+  try {
+    const res = await loginApi.getCurrentInfo()
+    Object.assign(basicForm, res)
+    safeWord.value = res.safeWord || ''
+  } catch (error) {
+    console.error('获取用户信息失败:', error)
+  }
+}
 
-      safeWordLoading.value = true
+const fetchPasswordRules = async () => {
+  try {
+    const res = await loginApi.getPwdRulesRegexp()
+    if (res) {
+      passwordRulesConfig.regexpRules = res.regexpRules
+      passwordRulesConfig.errTips = res.errTips
+    }
+  } catch (error) {
+    console.error('获取密码规则失败:', error)
+  }
+}
+
+const handleUpdateBasic = async () => {
+  try {
+    await basicFormRef.value.validate()
+
+    window.$infoBox.confirmPrimary(t('current.confirmUpdateInfoTitle'), '', async () => {
+      basicLoading.value = true
       try {
-        await req.post('/api/current/modifyUserInfo', {
-          safeWord: safeWord.value
-        })
-
-        // 更新Store中的用户信息
+        await currentApi.modifyUserInfo(basicForm)
         const userInfo = await loginApi.getCurrentInfo()
         userStore.setUserLoginInfo(userInfo)
-
         message.success(t('common.editSuccess'))
       } catch (error) {
         message.error(error.msg || t('common.editFailed'))
       } finally {
-        safeWordLoading.value = false
+        basicLoading.value = false
       }
-    }
+    })
+  } catch (_error) {
+    // 表单验证失败
+  }
+}
 
-    /**
-     * 上传头像前的验证
-     */
-    const beforeAvatarUpload = (file) => {
-      const isImage = ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)
-      if (!isImage) {
-        message.error(t('current.onlyJpgPngAllowed'))
-        return false
-      }
-      const isLt10M = file.size / 1024 / 1024 < 10
-      if (!isLt10M) {
-        message.error(t('current.imageMax10m'))
-        return false
-      }
-      return true
-    }
+const handleUpdatePassword = async () => {
+  try {
+    await passwordFormRef.value.validate()
 
-    /**
-     * 自定义上传头像
-     */
-    const handleUploadAvatar = async ({ file }) => {
-      avatarLoading.value = true
+    window.$infoBox.confirmPrimary(t('current.confirmUpdatePasswordTitle'), t('current.updatePasswordNeedRelogin'), async () => {
+      passwordLoading.value = true
       try {
-        const formData = new FormData()
-        formData.append('file', file)
-
-        const res = await upload.singleFile(upload.avatar, true, formData)
-
-        basicForm.avatarUrl = res.url
-
-        // 更新到服务器
-        await req.post('/api/current/modifyUserInfo', {
-          avatarUrl: res.url
+        await currentApi.modifyPwd({
+          originalPwd: Base64.encode(passwordForm.originalPwd),
+          confirmPwd: Base64.encode(passwordForm.confirmPwd)
         })
 
-        // 更新Store中的用户信息
-        const userInfo = await loginApi.getCurrentInfo()
-        userStore.setUserLoginInfo(userInfo)
-
-        message.success(t('current.avatarUpdated'))
+        message.success(t('current.editSuccessRelogin'))
+        await userStore.logout()
+        router.push({ name: 'login' })
       } catch (error) {
-        message.error(error.msg || t('common.uploadFailed'))
+        message.error(error.msg || t('common.editFailed'))
       } finally {
-        avatarLoading.value = false
+        passwordLoading.value = false
       }
-    }
-
-    /**
-     * 预览头像
-     */
-    const handlePreviewAvatar = () => {
-      // 可以使用 Image Preview 组件
-      window.open(basicForm.avatarUrl, '_blank')
-    }
-
-    // 生命周期
-    onMounted(() => {
-      fetchUserInfo()
-      fetchPasswordRules()
     })
-
-    return {
-      activeTab,
-      securityTab,
-      basicLoading,
-      avatarLoading,
-      passwordLoading,
-      safeWordLoading,
-      basicFormRef,
-      passwordFormRef,
-      basicForm,
-      passwordForm,
-      safeWord,
-      defaultAvatar,
-      basicRules,
-      passwordRules,
-      handleUpdateBasic,
-      handleUpdatePassword,
-      handleUpdateSafeWord,
-      beforeAvatarUpload,
-      handleUploadAvatar,
-      handlePreviewAvatar
-    }
+  } catch (_error) {
+    // 表单验证失败
   }
+}
+
+const handleUpdateSafeWord = async () => {
+  if (!safeWord.value) {
+    message.error(t('current.safeWordEmpty'))
+    return
+  }
+
+  safeWordLoading.value = true
+  try {
+    await currentApi.modifyUserInfo({ safeWord: safeWord.value })
+    const userInfo = await loginApi.getCurrentInfo()
+    userStore.setUserLoginInfo(userInfo)
+    message.success(t('common.editSuccess'))
+  } catch (error) {
+    message.error(error.msg || t('common.editFailed'))
+  } finally {
+    safeWordLoading.value = false
+  }
+}
+
+const beforeAvatarUpload = (file) => {
+  const isImage = ['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)
+  if (!isImage) {
+    message.error(t('current.onlyJpgPngAllowed'))
+    return false
+  }
+  const isLt10M = file.size / 1024 / 1024 < 10
+  if (!isLt10M) {
+    message.error(t('current.imageMax10m'))
+    return false
+  }
+  return true
+}
+
+const handleUploadAvatar = async ({ file }) => {
+  avatarLoading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    const res = await currentApi.uploadAvatar(formData)
+    basicForm.avatarUrl = res.url
+
+    await currentApi.modifyUserInfo({ avatarUrl: res.url })
+    const userInfo = await loginApi.getCurrentInfo()
+    userStore.setUserLoginInfo(userInfo)
+    message.success(t('current.avatarUpdated'))
+  } catch (error) {
+    message.error(error.msg || t('common.uploadFailed'))
+  } finally {
+    avatarLoading.value = false
+  }
+}
+
+const handlePreviewAvatar = () => {
+  window.open(basicForm.avatarUrl, '_blank')
+}
+
+onMounted(() => {
+  fetchUserInfo()
+  fetchPasswordRules()
 })
 </script>
 

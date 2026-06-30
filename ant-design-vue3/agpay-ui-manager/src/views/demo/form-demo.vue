@@ -102,10 +102,11 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { message } from 'ant-design-vue'
+import { AgDateRangePicker, AgSelect, AgUpload } from '@/components'
+import AgEditor from '@/components/ag-editor'
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { AgSelect, AgUpload, AgDateRangePicker, AgEditor, AgInput, AgTextarea } from '@/components'
+import { message } from 'ant-design-vue'
+import { reactive, ref } from 'vue'
 
 const formRef = ref()
 const submitting = ref(false)

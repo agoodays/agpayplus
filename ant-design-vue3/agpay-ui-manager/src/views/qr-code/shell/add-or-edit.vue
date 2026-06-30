@@ -153,9 +153,16 @@
     </div>
   </a-drawer>
 </template>
-<script>
+<script setup>
+import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
 import AgUpload from '@/components/ag-upload'
-import { API_URL_QRC_SHELL_LIST, req, upload } from '@/api/manage'
+import { upload } from '@/lib/ag-axios'
+import { message } from 'ant-design-vue'
+import { ref } from 'vue'
+
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
 
 const payTypeOptions = [
   { value: 'wxpay', label: '微信' },
@@ -164,175 +171,161 @@ const payTypeOptions = [
   { value: 'unionpay', label: '银联' },
   { value: 'custom', label: '自定义' }
 ]
-export default {
-  components: {
-    'ag-upload': AgUpload
-  },
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
-  data() {
-    return {
-      isAdd: true, // 新增 or 修改页面标志
-      visible: false, // 是否显示弹层/抽屉
-      btnLoading: false,
-      payTypeOptions: payTypeOptions,
-      action: upload.form, // 上传图标地址
-      logoImgTipText: '(显示在顶部，透明图片，建议尺寸：924 X 282)',
-      qrInnerImgTipText: '(建议尺寸：100 X 100)',
-      saveObject: {
-        styleCode: 'shellA',
-        configInfo: {
-          showIdFlag: true,
-          payTypeList: [
-            { imgUrl: '', name: 'wxpay', alias: '微信' },
-            { imgUrl: '', name: 'alipay', alias: '支付宝' },
-            { imgUrl: '', name: 'ysfpay', alias: '云闪付' },
-            { imgUrl: '', name: 'unionpay', alias: '银联' }
-          ],
-          bgColor: 'var(--primary-color)',
-          customBgColor: 'var(--text-color)'
-        }
-      }, // 数据对象
-      recordId: null, // 更新对象ID
-      rules: {
-        shellAlias: [{ required: true, message: '请输入模板别名', trigger: 'blur' }],
-        styleCode: [{ required: true, message: '请输入选择渲染模板', trigger: 'blur' }]
-      }
-    }
-  },
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.saveObject = {
-        styleCode: 'shellA',
-        configInfo: {
-          showIdFlag: true,
-          payTypeList: [
-            { imgUrl: '', name: 'wxpay', alias: '微信' },
-            { imgUrl: '', name: 'alipay', alias: '支付宝' },
-            { imgUrl: '', name: 'ysfpay', alias: '云闪付' },
-            { imgUrl: '', name: 'unionpay', alias: '银联' }
-          ],
-          bgColor: 'var(--primary-color)',
-          customBgColor: 'var(--text-color)'
-        }
-      } // 数据初始化
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
 
-      const that = this
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        that.recordId = recordId
-        req.getById(API_URL_QRC_SHELL_LIST, recordId).then((res) => {
-          that.saveObject = res
-          // that.onChange()
-        })
-        this.visible = true
-      } else {
-        that.visible = true // 立马展示弹层信息
-        that.onChange()
-      }
-    },
-    onClose() {
-      this.visible = false
-    },
-    onPayTypeChange(e, index) {
-      const selectedOption = this.payTypeOptions.find((option) => option.value === e.target.value)
-      if (selectedOption) {
-        this.saveObject.configInfo.payTypeList.forEach((item, i) => {
-          if (i === index) {
-            item.imgUrl = ''
-            item.name = selectedOption.value
-            item.alias = selectedOption.value === 'custom' ? '' : selectedOption.label
-          }
-        })
-      }
-      this.onChange()
-    },
-    onChange() {
-      const that = this
-      switch (that.saveObject.styleCode) {
-        case 'shellA':
-          that.logoImgTipText = '(显示在顶部，透明图片，建议尺寸：924 X 282)'
-          break
-        case 'shellB':
-          that.logoImgTipText = '(显示在顶部，建议尺寸：548 X 148)'
-          break
-        default:
-          that.logoImgTipText = '(显示在顶部，透明图片，建议尺寸：924 X 282)'
-      }
-      req.post(API_URL_QRC_SHELL_LIST + '/view', that.saveObject).then((res) => {
-        that.saveObject.shellImgViewUrl = res
-        that.$forceUpdate()
-      })
-    },
-    removePayTypeItem(index) {
-      this.saveObject.configInfo.payTypeList.splice(index, 1)
-      this.onChange()
-    },
-    addPayTypeItem() {
-      this.saveObject.configInfo.payTypeList.push({
-        imgUrl: '',
-        name: 'wxpay',
-        alias: '微信'
-      })
-      this.onChange()
-    },
-    onPreview() {
-      const that = this
-      that.$viewerApi({
-        images: [that.saveObject.shellImgViewUrl],
-        options: {
-          initialViewIndex: 0
-        }
-      })
-    },
-    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
-    uploadSuccess(name, fileList) {
-      const [firstItem] = fileList
-      this.saveObject.configInfo[name] = firstItem?.url
-      this.onChange()
-      this.$forceUpdate()
-    },
-    // 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
-    payTypeImgUploadSuccess(name, fileList) {
-      const [firstItem] = fileList
-      const keyValue = name.split(',')
-      this.saveObject.configInfo.payTypeList[keyValue[0]][keyValue[1]] = firstItem?.url
-      this.onChange()
-      this.$forceUpdate()
-    },
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          const params = { ...that.saveObject }
-          params.shellImgViewUrl = undefined
-          // 请求接口
-          if (that.isAdd) {
-            req.add(API_URL_QRC_SHELL_LIST, params).then((res) => {
-              that.$message.success('新增成功')
-              that.visible = false
-              that.callbackFunc() // 刷新列表
-            })
-          } else {
-            req.updateById(API_URL_QRC_SHELL_LIST, that.recordId, params).then((res) => {
-              that.$message.success('修改成功')
-              that.visible = false
-              that.callbackFunc() // 刷新列表
-            })
-          }
-        }
-      })
+function createDefaultSaveObject() {
+  return {
+    styleCode: 'shellA',
+    configInfo: {
+      showIdFlag: true,
+      payTypeList: [
+        { imgUrl: '', name: 'wxpay', alias: '微信' },
+        { imgUrl: '', name: 'alipay', alias: '支付宝' },
+        { imgUrl: '', name: 'ysfpay', alias: '云闪付' },
+        { imgUrl: '', name: 'unionpay', alias: '银联' }
+      ],
+      bgColor: 'var(--primary-color)',
+      customBgColor: 'var(--text-color)'
     }
   }
 }
+
+const infoFormModel = ref(null)
+const isAdd = ref(true)
+const visible = ref(false)
+const btnLoading = ref(false)
+const action = upload.form
+const logoImgTipText = ref('(显示在顶部，透明图片，建议尺寸：924 X 282)')
+const qrInnerImgTipText = ref('(建议尺寸：100 X 100)')
+const saveObject = ref(createDefaultSaveObject())
+const recordId = ref(null)
+
+const rules = {
+  shellAlias: [{ required: true, message: '请输入模板别名', trigger: 'blur' }],
+  styleCode: [{ required: true, message: '请输入选择渲染模板', trigger: 'blur' }]
+}
+
+async function show(currentRecordId) {
+  isAdd.value = !currentRecordId
+  saveObject.value = createDefaultSaveObject()
+  infoFormModel.value?.resetFields?.()
+
+  if (!isAdd.value) {
+    recordId.value = currentRecordId
+    const res = await qrcShellApi.getById(currentRecordId)
+    saveObject.value = res
+    visible.value = true
+    return
+  }
+
+  visible.value = true
+  onChange()
+}
+
+function onClose() {
+  visible.value = false
+}
+
+function onPayTypeChange(e, index) {
+  const selectedOption = payTypeOptions.find((option) => option.value === e.target.value)
+  if (selectedOption) {
+    saveObject.value.configInfo.payTypeList.forEach((item, i) => {
+      if (i === index) {
+        item.imgUrl = ''
+        item.name = selectedOption.value
+        item.alias = selectedOption.value === 'custom' ? '' : selectedOption.label
+      }
+    })
+  }
+  onChange()
+}
+
+function updateLogoImgTipText() {
+  switch (saveObject.value.styleCode) {
+    case 'shellA':
+      logoImgTipText.value = '(显示在顶部，透明图片，建议尺寸：924 X 282)'
+      break
+    case 'shellB':
+      logoImgTipText.value = '(显示在顶部，建议尺寸：548 X 148)'
+      break
+    default:
+      logoImgTipText.value = '(显示在顶部，透明图片，建议尺寸：924 X 282)'
+  }
+}
+
+function onChange() {
+  updateLogoImgTipText()
+  qrcShellApi.previewImage(saveObject.value).then((res) => {
+    saveObject.value.shellImgViewUrl = res
+  })
+}
+
+function removePayTypeItem(index) {
+  saveObject.value.configInfo.payTypeList.splice(index, 1)
+  onChange()
+}
+
+function addPayTypeItem() {
+  saveObject.value.configInfo.payTypeList.push({
+    imgUrl: '',
+    name: 'wxpay',
+    alias: '微信'
+  })
+  onChange()
+}
+
+function onPreview() {
+  window.$viewerApi({
+    images: [saveObject.value.shellImgViewUrl],
+    options: {
+      initialViewIndex: 0
+    }
+  })
+}
+
+function uploadSuccess(name, fileList) {
+  const [firstItem] = fileList
+  saveObject.value.configInfo[name] = firstItem?.url
+  onChange()
+}
+
+function payTypeImgUploadSuccess(name, fileList) {
+  const [firstItem] = fileList
+  const [targetIndex, targetKey] = name.split(',')
+  saveObject.value.configInfo.payTypeList[targetIndex][targetKey] = firstItem?.url
+  onChange()
+}
+
+function validateForm() {
+  return new Promise((resolve) => {
+    if (!infoFormModel.value?.validate) {
+      resolve(true)
+      return
+    }
+    infoFormModel.value.validate((valid) => resolve(valid))
+  })
+}
+
+async function handleOkFunc() {
+  const valid = await validateForm()
+  if (!valid) return
+
+  const params = { ...saveObject.value, shellImgViewUrl: undefined }
+  if (isAdd.value) {
+    await qrcShellApi.add(params)
+    message.success('新增成功')
+  } else {
+    await qrcShellApi.updateById(recordId.value, params)
+    message.success('修改成功')
+  }
+
+  visible.value = false
+  props.callbackFunc()
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 
 <style lang="less" scoped>
@@ -371,18 +364,18 @@ export default {
   border: 1px solid #d9d9d9;
   border-radius: 4px;
 
-  /deep/ .colorBtn {
+  :deep(.colorBtn) {
     height: 48px;
     width: calc(100% - 16px);
     margin: 8px;
     border-radius: 4px;
   }
 
-  /deep/ .box.open {
+  :deep(.box.open) {
     z-index: 3;
   }
 
-  /deep/ .bd h3:nth-of-type(3) {
+  :deep(.bd h3:nth-of-type(3)) {
     cursor: pointer;
   }
 }

@@ -50,16 +50,16 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { notification } from 'ant-design-vue'
-import { useI18n } from 'vue-i18n'
-import { AgInput } from '@/components'
-import { timeFix } from '@/utils/time-util'
 import { loginApi } from '@/api/system/login-api'
-import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
+import { AgInput } from '@/components'
 import { LOGIN_METHOD_ENUM } from '@/constants/system/login-const.js'
+import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
 import { useUserStore } from '@/store/modules/system/user'
+import { timeFix } from '@/utils/time-util'
+import { notification } from 'ant-design-vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
@@ -182,9 +182,7 @@ const loginSuccess = (res) => {
   loginErrorInfo.value = ''
 }
 
-const onFinishFailed = (errorInfo) => {
-  console.log('Failed:', errorInfo)
-}
+const onFinishFailed = (_errorInfo) => {}
 
 // 生命周期钩子
 onMounted(() => {

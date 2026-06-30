@@ -230,8 +230,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, defineProps } from 'vue'
-import { API_URL_IFDEFINES_LIST, API_URL_PAYWAYS_LIST, req, upload } from '@/api/manage'
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
+import { onMounted, reactive, ref } from 'vue'
 
 const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
@@ -241,7 +241,7 @@ const infoForm = ref(null)
 const visible = ref(false)
 const isAdd = ref(true)
 const ifCode = ref('')
-const action = upload.ifBG
+const action = payConfigApi.getIfBgUploadAction()
 
 const saveObject = reactive({
   isMchMode: 1,
@@ -314,7 +314,7 @@ const show = (ifCodeParam) => {
   if (!isAdd.value) { // 修改信息 延迟展示弹层
     ifCode.value = ifCodeParam
     // 拉取详情
-    req.getById(API_URL_IFDEFINES_LIST, ifCodeParam).then(res => {
+    payConfigApi.getIfDefineById(ifCodeParam).then(res => {
       Object.assign(saveObject, res)
       const newItems = [] // 多选框赋值
       res.wayCodes.forEach(item => {
@@ -339,7 +339,7 @@ const onSubmit = () => {
     saveObject.wayCodeStrs = checkedList.value.join(',')
     // 请求接口
     if (isAdd.value) {
-      req.add(API_URL_IFDEFINES_LIST, saveObject).then(res => {
+      payConfigApi.addIfDefine(saveObject).then(res => {
         import('ant-design-vue').then(({ message }) => {
           message.success('新增成功')
           visible.value = false
@@ -347,7 +347,7 @@ const onSubmit = () => {
         })
       })
     } else {
-      req.updateById(API_URL_IFDEFINES_LIST, ifCode.value, saveObject).then(res => {
+      payConfigApi.updateIfDefineById(ifCode.value, saveObject).then(res => {
         import('ant-design-vue').then(({ message }) => {
           message.success('修改成功')
           visible.value = false
@@ -386,7 +386,7 @@ const getGroupName = (wayType) => {
 
 // 支付方式列表
 const payWayList = () => {
-  req.list(API_URL_PAYWAYS_LIST, { 'pageSize': '-1' }).then(res => {
+  payConfigApi.queryPayWayList({ pageSize: -1 }).then(res => {
     const ways = res.records
 
     const groupedWaysData = groupBy(ways, 'wayType')
@@ -425,6 +425,8 @@ const uploadSuccess = (name, fileList) => {
 onMounted(() => {
   payWayList()
 })
+
+defineExpose({ show })
 </script>
 
 <style lang="less" scoped>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :btn-loading="btnLoading" @search="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
@@ -91,9 +91,11 @@
     <InfoDetail ref="infoDetail" :callback-func="searchFunc" />
   </div>
 </template>
-<script>
-import { AgSearch, AgTable, AgTableActions, AgInput } from '@/components'
-import { API_URL_UR_TEAM_LIST, req, reqLoad } from '@/api/manage'
+<script setup>
+import { teamApi } from '@/api/business/sys-user-team/team-api'
+import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 import InfoDetail from './detail.vue'
 
@@ -114,59 +116,41 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
-export default {
-  name: 'SysUserTeamPage',
-  components: {
-    'ag-search': AgSearch,
-    'ag-table': AgTable,
-    'ag-table-actions': AgTableActions,
-    'ag-input': AgInput,
-    InfoAddOrEdit,
-    InfoDetail
-  },
-  data() {
-    return {
-      btnLoading: false,
-      tableColumns: tableColumns,
-      searchData: defaultSearchData
-    }
-  },
-  mounted() {},
-  methods: {
-    queryFunc() {
-      this.btnLoading = true
-      this.$refs.infoTable.loadData()
-    },
-    // 表格接口数据请求
-    reqTableDataFunc: (params) => {
-      return req.list(API_URL_UR_TEAM_LIST, params)
-    },
-    searchFunc: function () {
-      // 触发查询按钮点击事件
-      this.$refs.infoTable.refTable(true)
-    },
-    addFunc: function () {
-      // 打开新增弹窗
-      this.$refs.infoAddOrEdit.show()
-    },
-    editFunc: function (recordId) {
-      // 打开编辑弹窗
-      this.$refs.infoAddOrEdit.show(recordId)
-    },
-    detailFunc: function (recordId) {
-      // 团队详情页
-      this.$refs.infoDetail.show(recordId)
-    },
-    // 删除团队
-    delFunc: function (recordId) {
-      const that = this
-      this.$infoBox.confirmDanger('确定删除吗', '', () => {
-        reqLoad.delById(API_URL_UR_TEAM_LIST, recordId).then((res) => {
-          that.$refs.infoTable.refTable(true)
-          this.$message.success('删除成功')
-        })
-      })
-    }
-  }
+const btnLoading = ref(false)
+
+const {
+  infoTable,
+  infoAddOrEdit,
+  infoDetail,
+  searchData,
+  reloadTable,
+  openCreate,
+  openEdit,
+  openDetail,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: (recordId) => teamApi.delById(recordId),
+  deleteConfirmTitle: '确定删除吗',
+  deleteConfirmContent: '',
+  deleteSuccessMessage: '删除成功'
+})
+
+Object.assign(searchData, defaultSearchData)
+
+const queryFunc = () => {
+  btnLoading.value = true
+  reloadTable()
 }
+
+const reqTableDataFunc = (params) => teamApi.queryPage(params)
+
+const searchFunc = () => reloadTable()
+
+const addFunc = () => openCreate()
+
+const editFunc = (recordId) => openEdit(recordId)
+
+const detailFunc = (recordId) => openDetail(recordId)
+
+const delFunc = (recordId) => confirmDelete(recordId)
 </script>

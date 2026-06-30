@@ -15,6 +15,13 @@ export const agentApi = {
   },
 
   /**
+   * 查询详情
+   */
+  getById: (id) => {
+    return req.getById(API_URL_AGENT, id)
+  },
+
+  /**
    * 增加
    */
   add: (param) => {

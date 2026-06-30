@@ -1,6 +1,14 @@
 import { store } from '@/store'
 import { useAppStore } from '@/store/modules/system/app'
 
+const isDev = import.meta.env.DEV
+
+function devInfo(...args) {
+  if (isDev) {
+    console.info(...args)
+  }
+}
+
 /**
  * ThemeService - 主题服务
  *
@@ -62,7 +70,7 @@ async function loadAndApplyTheme() {
     const config = await fetchSiteConfig()
 
     if (config) {
-      console.log('主题配置已成功加载并应用')
+      devInfo('主题配置已成功加载并应用')
       return config
     } else {
       console.warn('使用本地缓存的主题配置')
@@ -97,7 +105,7 @@ async function refreshTheme() {
 function resetTheme() {
   const appStore = getAppStore()
   appStore.resetConfig()
-  console.log('主题已重置为默认值')
+  devInfo('主题已重置为默认值')
 }
 
 // 导出服务
@@ -111,4 +119,5 @@ const themeService = {
 export default themeService
 
 // 兼容旧的导出方式
-export { loadAndApplyTheme, refreshTheme, resetTheme, fetchSiteConfig }
+export { fetchSiteConfig, loadAndApplyTheme, refreshTheme, resetTheme }
+

@@ -18,37 +18,34 @@
   </a-drawer>
 </template>
 
-<script>
-import { API_URL_ARTICLE_LIST, req } from '@/api/manage'
-export default {
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
+<script setup>
+import { noticeApi } from '@/api/business/notice/notice-api'
+import { ref } from 'vue'
 
-  data() {
-    return {
-      btnLoading: false,
-      detailData: {}, // 数据对象
-      recordId: null, // 更新对象ID
-      visible: false // 是否显示弹层/抽屉
-    }
-  },
-  created() {},
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      const that = this
-      that.recordId = recordId
-      req.getById(API_URL_ARTICLE_LIST, recordId).then((res) => {
-        that.detailData = res
-      })
-      this.visible = true
-    },
-    onClose() {
-      this.visible = false
-    }
-  }
+defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const detailData = ref({})
+const recordId = ref(null)
+const visible = ref(false)
+
+function show(currentRecordId) {
+  recordId.value = currentRecordId
+  visible.value = true
+  noticeApi.getById(currentRecordId).then((res) => {
+    detailData.value = res || {}
+  })
 }
+
+function onClose() {
+  visible.value = false
+}
+
+defineExpose({
+  show,
+  onClose
+})
 </script>
 
 <style lang="less">

@@ -80,118 +80,99 @@
   </a-modal>
 </template>
 
-<script>
-import { API_URL_ENT_LIST, req, getEntBySysType } from '@/api/manage'
-export default {
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
+<script setup>
+import { entApi } from '@/api/business/ent/ent-api'
+import { ref } from 'vue'
 
-  data() {
-    return {
-      confirmLoading: false, // 显示确定按钮loading图标
-      isAdd: true, // 新增 or 修改页面标识
-      isShow: false, // 是否显示弹层/抽屉
-      saveObject: {
-        matchRule: {
-          epUserEnt: null,
-          userEntRules: null,
-          mchType: null,
-          mchLevelArray: null
-        }
-      }, // 数据对象
-      recordId: null, // 更新对象ID
-      sysType: 'MGR', // 菜单类型
-      rules: {
-        entName: [{ required: true, message: '请输入资源名称', trigger: 'blur' }]
-      }
-    }
-  },
-  created() {},
-  methods: {
-    show: function (recordId, sysType) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.sysType = sysType
-      this.saveObject = {
-        matchRule: {
-          epUserEnt: null,
-          userEntRules: null,
-          mchType: null,
-          mchLevelArray: null
-        }
-      } // 数据清空
-      this.confirmLoading = false // 关闭loading
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
 
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
+const infoFormModel = ref()
+const confirmLoading = ref(false)
+const isAdd = ref(true)
+const isShow = ref(false)
+const recordId = ref(null)
+const sysType = ref('MGR')
+const rules = {
+  entName: [{ required: true, message: '请输入资源名称', trigger: 'blur' }]
+}
 
-      const that = this
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        that.recordId = recordId
-        getEntBySysType(recordId, sysType).then((res) => {
-          res = res || {}
-          if (!res.matchRule) {
-            res.matchRule = {
-              epUserEnt: null,
-              userEntRules: null,
-              mchType: null,
-              mchLevelArray: null
-            }
-          }
-          that.saveObject = res
-        })
-        this.isShow = true
-      } else {
-        that.isShow = true // 立马展示弹层信息
-      }
-    },
-    onEpUserEntChange: function (e) {
-      const that = this
-      if (e.target.checked) {
-        that.saveObject.matchRule.epUserEnt = true
-      } else {
-        that.saveObject.matchRule.epUserEnt = null
-      }
-    },
-    onMchTypeChange(value) {
-      if (this.saveObject.matchRule.mchType === value) {
-        this.saveObject.matchRule.mchType = null
-      } else {
-        this.saveObject.matchRule.mchType = value
-      }
-      this.$forceUpdate()
-    },
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          // 请求接口
+const createDefaultSaveObject = () => ({
+  matchRule: {
+    epUserEnt: null,
+    userEntRules: null,
+    mchType: null,
+    mchLevelArray: null
+  }
+})
 
-          that.confirmLoading = true // 显示loading
+const saveObject = ref(createDefaultSaveObject())
 
-          if (that.isAdd) {
-          } else {
-            req
-              .updateById(API_URL_ENT_LIST, that.recordId, that.saveObject)
-              .then((res) => {
-                that.$message.success('修改成功')
-                that.isShow = false
-                that.callbackFunc() // 刷新列表
-              })
-              .catch((res) => {
-                that.confirmLoading = false
-              })
-          }
-        }
-      })
-    }
+const show = (id, currentSysType) => {
+  isAdd.value = !id
+  sysType.value = currentSysType
+  saveObject.value = createDefaultSaveObject()
+  confirmLoading.value = false
+
+  if (infoFormModel.value !== undefined) {
+    infoFormModel.value.resetFields()
+  }
+
+  if (!isAdd.value) {
+    recordId.value = id
+    entApi.getBySysType(id, currentSysType).then((res) => {
+      const current = res || {}
+      if (!current.matchRule) {
+        current.matchRule = createDefaultSaveObject().matchRule
+      }
+      saveObject.value = current
+    })
+    isShow.value = true
+  } else {
+    isShow.value = true
   }
 }
+
+const onEpUserEntChange = (e) => {
+  if (e.target.checked) {
+    saveObject.value.matchRule.epUserEnt = true
+  } else {
+    saveObject.value.matchRule.epUserEnt = null
+  }
+}
+
+const onMchTypeChange = (value) => {
+  if (saveObject.value.matchRule.mchType === value) {
+    saveObject.value.matchRule.mchType = null
+  } else {
+    saveObject.value.matchRule.mchType = value
+  }
+}
+
+const handleOkFunc = () => {
+  infoFormModel.value.validate((valid) => {
+    if (valid) {
+      confirmLoading.value = true
+      if (isAdd.value) {
+        confirmLoading.value = false
+      } else {
+        entApi
+          .updateById(recordId.value, saveObject.value)
+          .then(() => {
+            window.$message.success('修改成功')
+            isShow.value = false
+            props.callbackFunc()
+          })
+          .catch(() => {
+            confirmLoading.value = false
+          })
+      }
+    }
+  })
+}
+
+defineExpose({ show })
 </script>
 
 <style scoped>

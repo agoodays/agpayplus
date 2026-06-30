@@ -99,10 +99,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { AgSearch, AgTable, AgTableActions, AgInput } from '@/components'
+import { agentApi } from '@/api/business/agent/agent-api'
+import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import AgPayConfig from '@/components/ag-pay-config'
-import { API_URL_AGENT_LIST, req, reqLoad } from '@/api/manage'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import InfoAddOrEdit from './add-or-edit.vue'
 import InfoDetail from './detail.vue'
 
@@ -129,56 +129,40 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-// 响应式数据
-const infoTable = ref(null)
-const infoAddOrEdit = ref(null)
-const infoDetail = ref(null)
-const payConfig = ref(null)
-const isShowMore = ref(false)
-const searchData = reactive({})
+const {
+  infoTable,
+  infoAddOrEdit,
+  infoDetail,
+  payConfig,
+  isShowMore,
+  searchData,
+  reloadTable,
+  openCreate,
+  openEdit,
+  openDetail,
+  openPayConfig,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: (recordId) => agentApi.delById(recordId),
+  deleteConfirmTitle: '确定删除吗',
+  deleteConfirmContent: '此操作将删除该代理商及其所有关联用户信息',
+  deleteSuccessMessage: '删除成功'
+})
 
-// 方法
-const reqTableDataFunc = (params) => {
-  return req.list(API_URL_AGENT_LIST, params)
-}
+// 领域 API 查询入口：后续可直接挂接缓存、埋点、容错。
+const reqTableDataFunc = (params) => agentApi.queryPage(params)
 
-const addFunc = () => {
-  // 业务通道.代理商管理 新增
-  infoAddOrEdit.value.show()
-}
+const addFunc = () => openCreate()
 
-const editFunc = (recordId) => {
-  // 业务通道.代理商管理 编辑
-  infoAddOrEdit.value.show(recordId)
-}
+const editFunc = (recordId) => openEdit(recordId)
 
-const detailFunc = (recordId) => {
-  // 查看详情页面
-  infoDetail.value.show(recordId)
-}
+const detailFunc = (recordId) => openDetail(recordId)
 
-const payConfigFunc = (recordId) => {
-  // 支付配置
-  payConfig.value.show(recordId)
-}
+const payConfigFunc = (recordId) => openPayConfig(recordId)
 
-const searchFunc = () => {
-  // 触发查询
-  infoTable.value.reload()
-}
+const searchFunc = () => reloadTable()
 
-// 删除
-const delFunc = (recordId) => {
-  window.$infoBox.confirmDanger('确定删除吗', '此操作将删除该代理商及其所有关联用户信息', () => {
-    reqLoad.delById(API_URL_AGENT_LIST, recordId).then((res) => {
-      infoTable.value.reload()
-      window.$message.success('删除成功')
-    })
-  })
-}
-
-// 生命周期
-onMounted(() => {})
+const delFunc = (recordId) => confirmDelete(recordId)
 </script>
 
 <style scoped></style>

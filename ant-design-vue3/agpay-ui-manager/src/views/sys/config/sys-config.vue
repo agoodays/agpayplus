@@ -600,227 +600,222 @@
     </a-tabs>
   </div>
 </template>
-<script>
+<script setup>
+import { sysConfigApi } from '@/api/business/sys/sys-config-api'
 import agEditor from '@/components/ag-editor'
-import { API_URL_SYS_CONFIG, req, getConfigs } from '@/api/manage'
+import { message } from 'ant-design-vue'
+import { onMounted, reactive, ref } from 'vue'
 
-export default {
-  components: {
-    'ag-editor': agEditor
+const btnLoading = ref(false)
+const configData = ref([])
+const groupKey = ref('applicationConfig')
+
+const smsConfig = reactive({
+  smsProviderKey: 'agpaydx',
+  agpaydxSmsConfig: {},
+  agpaydxSmsConfigDesen: {},
+  aliyundySmsConfig: {},
+  aliyundySmsConfigDesen: {},
+  mocktestSmsConfig: {}
+})
+
+const ocrConfig = reactive({
+  ocrType: 1,
+  ocrState: 1,
+  tencentOcrConfig: {},
+  tencentOcrConfigDesen: {},
+  aliOcrConfig: {},
+  aliOcrConfigDesen: {},
+  baiduOcrConfig: {},
+  baiduOcrConfigDesen: {}
+})
+
+const ossConfig = reactive({
+  ossUseType: 'localFile',
+  ossPublicSiteUrl: null,
+  aliyunOssConfig: {},
+  aliyunOssConfigDesen: {}
+})
+
+const requireUppercaseLowercaseDigits = ref(false)
+const requireMinimumLength = ref(false)
+const minimumLength = ref(0)
+const securityConfig = reactive({
+  loginErrorMaxLimit: {
+    limitMinute: 0,
+    maxLoginAttempts: 0
   },
-  data() {
-    return {
-      btnLoading: false,
-      configData: [],
-      groupKey: 'applicationConfig',
-      smsConfig: {
-        smsProviderKey: 'agpaydx',
-        agpaydxSmsConfig: {},
-        agpaydxSmsConfigDesen: {},
-        aliyundySmsConfig: {},
-        aliyundySmsConfigDesen: {},
-        mocktestSmsConfig: {}
-      },
-      ocrConfig: {
-        ocrType: 1,
-        ocrState: 1,
-        tencentOcrConfig: {},
-        tencentOcrConfigDesen: {},
-        aliOcrConfig: {},
-        aliOcrConfigDesen: {},
-        baiduOcrConfig: {},
-        baiduOcrConfigDesen: {}
-      },
-      ossConfig: {
-        ossUseType: 'localFile',
-        ossPublicSiteUrl: null,
-        aliyunOssConfig: {},
-        aliyunOssConfigDesen: {}
-      },
-      requireUppercaseLowercaseDigits: false,
-      requireMinimumLength: false,
-      minimumLength: 0,
-      securityConfig: {
-        loginErrorMaxLimit: {
-          limitMinute: 0,
-          maxLoginAttempts: 0
-        },
-        passwordRegexp: {
-          regexpRules: '',
-          errTips: ''
-        }
-      }
-    }
-  },
-  created() {
-    this.detail()
-  },
-  methods: {
-    detail() {
-      // 获取基本信息
-      const that = this
-      that.configData = []
-      getConfigs(that.groupKey).then((res) => {
-        // console.log(res)
-        that.configData = res
-        that.groupKey = res[0]?.groupKey
-        if (that.groupKey === 'ossConfig') {
-          that.setConfigVal(that, 'ossConfig', 'ossUseType', 'localFile')
-          that.setJSONConfigDesen(that, 'ossConfig', 'aliyunOssConfig', true)
-        }
+  passwordRegexp: {
+    regexpRules: '',
+    errTips: ''
+  }
+})
 
-        if (that.groupKey === 'smsConfig') {
-          that.setConfigVal(that, 'smsConfig', 'smsProviderKey', 'agpaydx')
-          that.setJSONConfigDesen(that, 'smsConfig', 'agpaydxSmsConfig', true)
-          that.setJSONConfigDesen(that, 'smsConfig', 'aliyundySmsConfig', true)
-          that.setJSONConfigDesen(that, 'smsConfig', 'mocktestSmsConfig', false)
-        }
+const isNumber = (value) => typeof value === 'number'
 
-        if (that.groupKey === 'ocrConfig') {
-          that.setConfigVal(that, 'ocrConfig', 'ocrType', 1)
-          that.setConfigVal(that, 'ocrConfig', 'ocrState', 1)
-          that.setJSONConfigDesen(that, 'ocrConfig', 'tencentOcrConfig', true)
-          that.setJSONConfigDesen(that, 'ocrConfig', 'aliOcrConfig', true)
-          that.setJSONConfigDesen(that, 'ocrConfig', 'baiduOcrConfig', true)
-        }
+const setConfigVal = (groupObj, key, defaultVal) => {
+  const configVal = configData.value?.find((item) => item.configKey === key)?.configVal
+  groupObj[key] = configVal?.length > 0 ? (isNumber(defaultVal) ? +configVal : configVal) : defaultVal
+}
 
-        if (that.groupKey === 'securityConfig') {
-          that.setJSONConfigDesen(that, 'securityConfig', 'loginErrorMaxLimit', false)
-          that.setJSONConfigDesen(that, 'securityConfig', 'passwordRegexp', false)
-
-          if (that.securityConfig.passwordRegexp.regexpRules.includes('(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])')) {
-            that.requireUppercaseLowercaseDigits = true
-          }
-          that.minimumLength = that.extractMinimumLengths(that.securityConfig.passwordRegexp.regexpRules)[0]
-          if (that.minimumLength > 0) {
-            that.requireMinimumLength = true
-          }
-        }
-      })
-    },
-    isNumber(value) {
-      return typeof value === 'number'
-    },
-    setConfigVal(obj, groupKey, key, defaultVal) {
-      const configVal = obj.configData?.find(({ configKey }) => configKey === key)?.configVal
-      obj[groupKey][key] = configVal?.length > 0 ? (this.isNumber(defaultVal) ? +configVal : configVal) : defaultVal
-    },
-    setJSONConfigDesen(obj, groupKey, key, isDesen) {
-      const config = obj.configData?.find(({ configKey }) => configKey === key)
-      obj[groupKey][key] = config?.configVal?.length > 0 ? JSON.parse(config?.configVal) : {}
-      if (isDesen) {
-        obj[groupKey][`${key}Desen`] = config?.configValDesen?.length > 0 ? JSON.parse(config?.configValDesen) : {}
-      }
-    },
-    selectTabs(key) {
-      // 清空必填提示
-      if (key) {
-        this.groupKey = key
-        this.detail()
-      }
-    },
-    ossUseTypeChange(e) {
-      // console.log(e.target.value)
-      this.configData.find(({ configKey }) => configKey === 'ossUseType').configVal = e.target.value
-    },
-    extractMinimumLengths(regexpRules) {
-      const regex = /{(\d+),}/g
-      const matches = regexpRules.matchAll(regex)
-      const minimumLengths = []
-
-      for (const match of matches) {
-        const minimumLength = parseInt(match[1])
-        minimumLengths.push(minimumLength)
-      }
-
-      return minimumLengths
-    },
-    passwordMinimumLengthChange() {
-      this.requireMinimumLength = false
-      this.passwordRegexpChange()
-    },
-    passwordRegexpChange() {
-      const { requireUppercaseLowercaseDigits, requireMinimumLength, minimumLength } = this
-      console.log(requireMinimumLength)
-      if (requireUppercaseLowercaseDigits && requireMinimumLength) {
-        this.securityConfig.passwordRegexp.regexpRules = `^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{${minimumLength},}$`
-        this.securityConfig.passwordRegexp.errTips = `密码不符合规则，必须包含大小写字母和数字，最少${minimumLength}位`
-      } else if (requireUppercaseLowercaseDigits && !requireMinimumLength) {
-        this.securityConfig.passwordRegexp.regexpRules = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])$'
-        this.securityConfig.passwordRegexp.errTips = '密码不符合规则，必须包含大小写字母和数字'
-      } else if (requireMinimumLength) {
-        this.securityConfig.passwordRegexp.regexpRules = `^.{${minimumLength},}$`
-        this.securityConfig.passwordRegexp.errTips = `密码不符合规则，最少${minimumLength}位`
-      } else {
-        this.securityConfig.passwordRegexp.regexpRules = ''
-        this.securityConfig.passwordRegexp.errTips = ''
-      }
-    },
-    confirm(e, title, content) {
-      // 确认更新
-      // console.log(e)
-      const that = this
-      this.$infoBox.confirmPrimary(`确认修改${title}吗？`, content, () => {
-        that.btnLoading = true // 打开按钮上的 loading
-        const jsonObject = {}
-        for (var i in that.configData) {
-          // jsonObject[that.configData[i].configKey] = that.configData[i].configKey === 'aliyunOssConfig' ? JSON.stringify(that.ossConfig.aliyunOssConfig) : that.configData[i].configVal
-
-          const configKey = that.configData[i].configKey
-          let configVal = that.configData[i].configVal
-          switch (configKey) {
-            case 'ossUseType':
-              configVal = that.ossConfig.ossUseType
-              break
-            case 'aliyunOssConfig':
-              configVal = JSON.stringify(that.ossConfig.aliyunOssConfig)
-              break
-            case 'smsProviderKey':
-              configVal = that.smsConfig.smsProviderKey
-              break
-            case 'agpaydxSmsConfig':
-              configVal = JSON.stringify(that.smsConfig.agpaydxSmsConfig)
-              break
-            case 'aliyundySmsConfig':
-              configVal = JSON.stringify(that.smsConfig.aliyundySmsConfig)
-              break
-            case 'ocrType':
-              configVal = that.ocrConfig.ocrType
-              break
-            case 'ocrState':
-              configVal = that.ocrConfig.ocrState
-              break
-            case 'tencentOcrConfig':
-              configVal = JSON.stringify(that.ocrConfig.tencentOcrConfig)
-              break
-            case 'aliOcrConfig':
-              configVal = JSON.stringify(that.ocrConfig.aliOcrConfig)
-              break
-            case 'baiduOcrConfig':
-              configVal = JSON.stringify(that.ocrConfig.baiduOcrConfig)
-              break
-            case 'loginErrorMaxLimit':
-              configVal = JSON.stringify(that.securityConfig.loginErrorMaxLimit)
-              break
-            case 'passwordRegexp':
-              configVal = JSON.stringify(that.securityConfig.passwordRegexp)
-              break
-          }
-          jsonObject[configKey] = configVal
-        }
-        req
-          .updateById(API_URL_SYS_CONFIG, that.groupKey, jsonObject)
-          .then((res) => {
-            that.$message.success('修改成功')
-            that.btnLoading = false
-          })
-          .catch((res) => {
-            that.btnLoading = false
-          })
-      })
-    }
+const setJSONConfigDesen = (groupObj, key, isDesen) => {
+  const config = configData.value?.find((item) => item.configKey === key)
+  groupObj[key] = config?.configVal?.length > 0 ? JSON.parse(config.configVal) : {}
+  if (isDesen) {
+    groupObj[`${key}Desen`] = config?.configValDesen?.length > 0 ? JSON.parse(config.configValDesen) : {}
   }
 }
+
+const extractMinimumLengths = (regexpRules) => {
+  const regex = /{(\d+),}/g
+  const matches = regexpRules.matchAll(regex)
+  const minimumLengths = []
+
+  for (const match of matches) {
+    minimumLengths.push(parseInt(match[1], 10))
+  }
+
+  return minimumLengths
+}
+
+const detail = async () => {
+  configData.value = []
+  const res = await sysConfigApi.queryGroupConfigs(groupKey.value)
+  configData.value = res || []
+  if (configData.value.length > 0) {
+    groupKey.value = configData.value[0]?.groupKey || groupKey.value
+  }
+
+  if (groupKey.value === 'ossConfig') {
+    setConfigVal(ossConfig, 'ossUseType', 'localFile')
+    setJSONConfigDesen(ossConfig, 'aliyunOssConfig', true)
+  }
+
+  if (groupKey.value === 'smsConfig') {
+    setConfigVal(smsConfig, 'smsProviderKey', 'agpaydx')
+    setJSONConfigDesen(smsConfig, 'agpaydxSmsConfig', true)
+    setJSONConfigDesen(smsConfig, 'aliyundySmsConfig', true)
+    setJSONConfigDesen(smsConfig, 'mocktestSmsConfig', false)
+  }
+
+  if (groupKey.value === 'ocrConfig') {
+    setConfigVal(ocrConfig, 'ocrType', 1)
+    setConfigVal(ocrConfig, 'ocrState', 1)
+    setJSONConfigDesen(ocrConfig, 'tencentOcrConfig', true)
+    setJSONConfigDesen(ocrConfig, 'aliOcrConfig', true)
+    setJSONConfigDesen(ocrConfig, 'baiduOcrConfig', true)
+  }
+
+  if (groupKey.value === 'securityConfig') {
+    setJSONConfigDesen(securityConfig, 'loginErrorMaxLimit', false)
+    setJSONConfigDesen(securityConfig, 'passwordRegexp', false)
+
+    requireUppercaseLowercaseDigits.value = securityConfig.passwordRegexp.regexpRules.includes(
+      '(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])'
+    )
+    minimumLength.value = extractMinimumLengths(securityConfig.passwordRegexp.regexpRules)[0] || 0
+    requireMinimumLength.value = minimumLength.value > 0
+  }
+}
+
+const selectTabs = (key) => {
+  if (key) {
+    groupKey.value = key
+    detail()
+  }
+}
+
+const ossUseTypeChange = (e) => {
+  const selected = e?.target?.value ?? e
+  const targetConfig = configData.value.find((item) => item.configKey === 'ossUseType')
+  if (targetConfig) {
+    targetConfig.configVal = selected
+  }
+}
+
+const passwordMinimumLengthChange = () => {
+  requireMinimumLength.value = false
+  passwordRegexpChange()
+}
+
+const passwordRegexpChange = () => {
+  if (requireUppercaseLowercaseDigits.value && requireMinimumLength.value) {
+    securityConfig.passwordRegexp.regexpRules = `^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{${minimumLength.value},}$`
+    securityConfig.passwordRegexp.errTips = `密码不符合规则，必须包含大小写字母和数字，最少${minimumLength.value}位`
+  } else if (requireUppercaseLowercaseDigits.value && !requireMinimumLength.value) {
+    securityConfig.passwordRegexp.regexpRules = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])$'
+    securityConfig.passwordRegexp.errTips = '密码不符合规则，必须包含大小写字母和数字'
+  } else if (requireMinimumLength.value) {
+    securityConfig.passwordRegexp.regexpRules = `^.{${minimumLength.value},}$`
+    securityConfig.passwordRegexp.errTips = `密码不符合规则，最少${minimumLength.value}位`
+  } else {
+    securityConfig.passwordRegexp.regexpRules = ''
+    securityConfig.passwordRegexp.errTips = ''
+  }
+}
+
+const confirm = (_e, title, content) => {
+  window.$infoBox.confirmPrimary(`确认修改${title}吗？`, content, async () => {
+    btnLoading.value = true
+    try {
+      const jsonObject = {}
+      for (const item of configData.value) {
+        const configKey = item.configKey
+        let configVal = item.configVal
+        switch (configKey) {
+          case 'ossUseType':
+            configVal = ossConfig.ossUseType
+            break
+          case 'aliyunOssConfig':
+            configVal = JSON.stringify(ossConfig.aliyunOssConfig)
+            break
+          case 'smsProviderKey':
+            configVal = smsConfig.smsProviderKey
+            break
+          case 'agpaydxSmsConfig':
+            configVal = JSON.stringify(smsConfig.agpaydxSmsConfig)
+            break
+          case 'aliyundySmsConfig':
+            configVal = JSON.stringify(smsConfig.aliyundySmsConfig)
+            break
+          case 'ocrType':
+            configVal = ocrConfig.ocrType
+            break
+          case 'ocrState':
+            configVal = ocrConfig.ocrState
+            break
+          case 'tencentOcrConfig':
+            configVal = JSON.stringify(ocrConfig.tencentOcrConfig)
+            break
+          case 'aliOcrConfig':
+            configVal = JSON.stringify(ocrConfig.aliOcrConfig)
+            break
+          case 'baiduOcrConfig':
+            configVal = JSON.stringify(ocrConfig.baiduOcrConfig)
+            break
+          case 'loginErrorMaxLimit':
+            configVal = JSON.stringify(securityConfig.loginErrorMaxLimit)
+            break
+          case 'passwordRegexp':
+            configVal = JSON.stringify(securityConfig.passwordRegexp)
+            break
+          default:
+            break
+        }
+        jsonObject[configKey] = configVal
+      }
+
+      await sysConfigApi.updateGroupConfigs(groupKey.value, jsonObject)
+      message.success('修改成功')
+    } finally {
+      btnLoading.value = false
+    }
+  })
+}
+
+onMounted(() => {
+  detail()
+})
 </script>
 <style lang="less">
 .agpay-tip-text:before {

@@ -87,5 +87,16 @@ export const asyncRouteDefine = {
   DivisionReceiverPage: { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/division-receiver-page.vue') }, // 分账账号管理
   DivisionRecordPage: { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/division-record-page.vue') }, // 分账记录
   SysConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') }, // 系统配置
-  NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/notice/notice-list.vue') } // 公告管理
+  NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/notice/notice-list.vue') }, // 公告管理
+
+  // 兼容后端遗留 componentName（Vue2 -> Vue3 迁移期间）
+  IfDefinePage: { defaultPath: '/ifdefines', component: () => import('@/views/pay-config/pay-config-page.vue') },
+  SysUserPage: { defaultPath: '/users', component: () => import('@/views/sys-user/sys-user-page.vue') },
+  MchConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') },
+  MchNotifyListPage: { defaultPath: '/notify', component: () => import('@/views/notice/notice-list.vue') },
+  PlatformProfitPage: {
+    defaultPath: '/platformProfits',
+    component: () => import('@/views/statistic/agent/agent-count-page.vue')
+  },
+  SysLogPage: { defaultPath: '/log', component: () => import('@/views/exception/404.vue') }
 }

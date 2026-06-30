@@ -149,13 +149,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
-import { message } from 'ant-design-vue'
+import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
+import { useModal, usePermission, useTable } from '@/hooks/common-hooks'
+import { PlusOutlined, RedoOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import { message, Modal } from 'ant-design-vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { SearchOutlined, RedoOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons-vue'
-import { useTable, useModal, usePermission, useDelete } from '@/hooks/common-hooks'
-import { API_URL_MCH_APP, API_URL_MCH_LIST, req } from '@/api/manage'
+import { useRoute } from 'vue-router'
 import AddOrEditModal from './add-or-edit.vue'
 
 const route = useRoute()
@@ -163,11 +163,10 @@ const { t } = useI18n()
 
 // 使用 Hooks
 const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
-  useTable((params) => req.list(API_URL_MCH_APP, params))
+  useTable((params) => mchAppApi.queryPage(params))
 
 const { open: modalOpen, showModal, hideModal } = useModal()
 const { hasPermission } = usePermission()
-const { handleDelete: deleteItem } = useDelete()
 
 // State
 const mchList = ref([])
@@ -247,7 +246,7 @@ const handleSearchMch = async (keyword) => {
   }
 
   try {
-    const res = await req.list(API_URL_MCH_LIST, {
+    const res = await mchAppApi.queryMchPage({
       mchName: keyword,
       pageSize: 20
     })
@@ -279,12 +278,19 @@ const handleEdit = (record) => {
  * 删除应用
  */
 const handleDelete = async (record) => {
-  try {
-    await deleteItem(API_URL_MCH_APP, record.appId, '应用')
-    refresh()
-  } catch (error) {
-    console.error('删除失败:', error)
-  }
+  Modal.confirm({
+    title: '确认删除',
+    content: '确认删除该应用吗？',
+    onOk: async () => {
+      try {
+        await mchAppApi.delById(record.appId)
+        message.success('删除成功')
+        refresh()
+      } catch (error) {
+        console.error('删除失败:', error)
+      }
+    }
+  })
 }
 
 /**

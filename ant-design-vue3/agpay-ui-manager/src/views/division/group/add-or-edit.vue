@@ -40,91 +40,78 @@
   </a-modal>
 </template>
 
-<script>
+<script setup>
+import { divisionGroupApi } from '@/api/business/division/division-group-api'
 import AgSelect from '@/components/ag-select'
-import { API_URL_DIVISION_RECEIVER_GROUP, API_URL_MCH_LIST, req } from '@/api/manage'
-export default {
-  components: { AgSelect },
-  props: {
-    callbackFunc: { type: Function, default: () => () => ({}) }
-  },
-  data() {
-    return {
-      confirmLoading: false, // 显示确定按钮loading图标
-      isAdd: true, // 新增 or 修改页面标识
-      isShow: false, // 是否显示弹层/抽屉
-      saveObject: { autoDivisionFlag: 0 }, // 数据对象
-      recordId: null, // 更新对象ID
-      rules: {
-        receiverGroupName: [{ required: true, message: '请输入组名称', trigger: 'blur' }]
-      }
+import { message } from 'ant-design-vue'
+import { ref } from 'vue'
+
+defineOptions({ components: { AgSelect } })
+
+const props = defineProps({
+  callbackFunc: { type: Function, default: () => () => ({}) }
+})
+
+const infoFormModel = ref(null)
+const confirmLoading = ref(false)
+const isAdd = ref(true)
+const isShow = ref(false)
+const saveObject = ref({ autoDivisionFlag: 0 })
+const recordId = ref(null)
+
+const rules = {
+  receiverGroupName: [{ required: true, message: '请输入组名称', trigger: 'blur' }]
+}
+
+const show = async (currentRecordId) => {
+  isAdd.value = !currentRecordId
+  saveObject.value = { autoDivisionFlag: 0 }
+  confirmLoading.value = false
+  infoFormModel.value?.resetFields?.()
+
+  if (!isAdd.value) {
+    recordId.value = currentRecordId
+    const res = await divisionGroupApi.getById(currentRecordId)
+    saveObject.value = res
+  }
+  isShow.value = true
+}
+
+const searchMch = (params) => divisionGroupApi.listMch(params)
+
+const validateForm = () => {
+  return new Promise((resolve) => {
+    if (!infoFormModel.value?.validate) {
+      resolve(true)
+      return
     }
-  },
-  created() {},
-  methods: {
-    show: function (recordId) {
-      // 弹层打开事件
-      this.isAdd = !recordId
-      this.saveObject = { autoDivisionFlag: 0 } // 数据清空
-      this.confirmLoading = false // 关闭loading
+    infoFormModel.value.validate((valid) => resolve(valid))
+  })
+}
 
-      if (this.$refs.infoFormModel !== undefined) {
-        this.$refs.infoFormModel.resetFields()
-      }
+const handleOkFunc = async () => {
+  const valid = await validateForm()
+  if (!valid) return
 
-      const that = this
-      if (!this.isAdd) {
-        // 修改信息 延迟展示弹层
-        that.recordId = recordId
-        req.getById(API_URL_DIVISION_RECEIVER_GROUP, recordId).then((res) => {
-          that.saveObject = res
-          that.isShow = true
-        })
-      } else {
-        that.isShow = true // 立马展示弹层信息
-      }
-    },
-    searchMch(params) {
-      return req.list(API_URL_MCH_LIST, params)
-    },
-    handleOkFunc: function () {
-      // 点击【确认】按钮事件
-      const that = this
-      this.$refs.infoFormModel.validate((valid) => {
-        if (valid) {
-          // 验证通过
-          // 请求接口
-
-          that.confirmLoading = true // 显示loading
-
-          if (that.isAdd) {
-            req
-              .add(API_URL_DIVISION_RECEIVER_GROUP, that.saveObject)
-              .then((res) => {
-                that.$message.success('添加成功')
-                that.isShow = false
-                that.callbackFunc() // 刷新列表
-              })
-              .catch((res) => {
-                that.confirmLoading = false
-              })
-          } else {
-            req
-              .updateById(API_URL_DIVISION_RECEIVER_GROUP, that.recordId, that.saveObject)
-              .then((res) => {
-                that.$message.success('修改成功')
-                that.isShow = false
-                that.callbackFunc() // 刷新列表
-              })
-              .catch((res) => {
-                that.confirmLoading = false
-              })
-          }
-        }
-      })
+  confirmLoading.value = true
+  try {
+    if (isAdd.value) {
+      await divisionGroupApi.add(saveObject.value)
+      message.success('添加成功')
+    } else {
+      await divisionGroupApi.updateById(recordId.value, saveObject.value)
+      message.success('修改成功')
     }
+    isShow.value = false
+    props.callbackFunc()
+  } finally {
+    confirmLoading.value = false
   }
 }
+
+defineExpose({
+  show
+})
 </script>
 <style lang="less">
 .agpay-tip-text:before {

@@ -7,7 +7,7 @@
             <ag-input v-model="searchData.shellAlias" placeholder="模板名称" />
             <span class="table-page-search-submitButtons">
               <a-button type="primary" icon="search" :loading="btnLoading" @click="searchFunc(true)">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => (searchData = {})">重置</a-button>
+              <a-button style="margin-left: 8px" icon="reload" @click="resetFunc">重置</a-button>
             </span>
           </div>
         </a-form>
@@ -69,9 +69,10 @@
     <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="searchFunc" />
   </div>
 </template>
-<script>
-import { AgTable, AgTableActions, AgInput } from '@/components'
-import { API_URL_QRC_SHELL_LIST, req } from '@/api/manage'
+<script setup>
+import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
+import { AgInput, AgTable, AgTableActions } from '@/components'
+import { reactive, ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 
 const tableColumns = [
@@ -86,61 +87,66 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
-export default {
-  name: 'QrCodeShellPage',
-  components: {
-    'ag-table': AgTable,
-    'ag-table-actions': AgTableActions,
-    'ag-input': AgInput,
-    InfoAddOrEdit
-  },
-  data() {
-    return {
-      tableColumns: tableColumns,
-      searchData: {},
-      btnLoading: false
-    }
-  },
-  methods: {
-    // 对接table接口函数
-    reqTableDataFunc: (params) => {
-      return req.list(API_URL_QRC_SHELL_LIST, params)
-    },
+const infoTable = ref(null)
+const infoAddOrEdit = ref(null)
+const searchData = reactive({})
+const btnLoading = ref(false)
 
-    searchFunc(isToFirst = false) {
-      // 点击查询按钮事件
-      this.btnLoading = true
-      this.$refs.infoTable.loadData()
-    },
+const reqTableDataFunc = (params) => qrcShellApi.queryCardList(params)
 
-    onPreview(url) {
-      this.$viewerApi({
-        images: [url],
-        options: {
-          initialViewIndex: 0
-        }
-      })
-    },
+function reloadTable() {
+  const tableRef = infoTable.value
+  if (!tableRef) return
 
-    addFunc: function () {
-      // 业务通道.模板管理 新增
-      this.$refs.infoAddOrEdit.show()
-    },
-
-    editFunc: function (recordId) {
-      // 业务通道.模板管理 编辑
-      this.$refs.infoAddOrEdit.show(recordId)
-    },
-
-    delFunc: function (recordId) {
-      const that = this
-      this.$infoBox.confirmDanger('确定删除吗', '', () => {
-        req.delById(API_URL_QRC_SHELL_LIST, recordId).then((res) => {
-          that.$message.success('删除成功')
-          that.$refs.infoTable.loadData()
-        })
-      })
-    }
+  if (typeof tableRef.reload === 'function') {
+    tableRef.reload()
+    return
   }
+
+  if (typeof tableRef.loadData === 'function') {
+    tableRef.loadData()
+    return
+  }
+
+  if (typeof tableRef.refTable === 'function') {
+    tableRef.refTable(true)
+  }
+}
+
+function searchFunc() {
+  btnLoading.value = true
+  reloadTable()
+}
+
+function resetFunc() {
+  Object.keys(searchData).forEach((key) => {
+    delete searchData[key]
+  })
+}
+
+function onPreview(url) {
+  window.$viewerApi({
+    images: [url],
+    options: {
+      initialViewIndex: 0
+    }
+  })
+}
+
+function addFunc() {
+  infoAddOrEdit.value?.show()
+}
+
+function editFunc(recordId) {
+  infoAddOrEdit.value?.show(recordId)
+}
+
+function delFunc(recordId) {
+  window.$infoBox.confirmDanger('确定删除吗', '', () => {
+    qrcShellApi.delById(recordId).then(() => {
+      window.$message.success('删除成功')
+      reloadTable()
+    })
+  })
 }
 </script>

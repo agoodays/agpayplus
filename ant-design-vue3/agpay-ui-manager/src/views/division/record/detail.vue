@@ -171,24 +171,19 @@
     </a-row>
   </a-drawer>
 </template>
-<script>
-import { API_URL_PAY_ORDER_DIVISION_RECORD_LIST, req } from '@/api/manage'
+<script setup>
+import { divisionRecordApi } from '@/api/business/division/division-record-api'
+import { ref } from 'vue'
 
-export default {
-  data() {
-    return {
-      visible: false,
-      detailData: {}
-    }
-  },
-  methods: {
-    show: function (recordId) {
-      const that = this
-      req.getById(API_URL_PAY_ORDER_DIVISION_RECORD_LIST, recordId).then((res) => {
-        that.detailData = res
-      })
-      this.visible = true
-    }
-  }
+const visible = ref(false)
+const detailData = ref({})
+
+const show = (recordId) => {
+  divisionRecordApi.getById(recordId).then((res) => {
+    detailData.value = res || {}
+  })
+  visible.value = true
 }
+
+defineExpose({ show })
 </script>
