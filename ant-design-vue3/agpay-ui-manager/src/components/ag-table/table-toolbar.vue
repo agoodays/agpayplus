@@ -2,9 +2,25 @@
   <div class="ag-table-toolbar">
     <div class="toolbar-left">
       <slot name="left"></slot>
+      
+      <!-- 批量选择 -->
+      <div v-if="rowSelectionEnabled" class="batch-selection-group">
+        <a-checkbox 
+          :checked="isAllSelected" 
+          :indeterminate="isIndeterminate"
+          @change="handleSelectAllChange"
+        >
+          全选
+        </a-checkbox>
+        <a-button type="link" size="small" @click="emit('clear-selection')">
+          清空选择
+        </a-button>
+      </div>
     </div>
 
     <div class="toolbar-right">
+      <slot name="right"></slot>
+
       <a-tooltip v-if="showAutoRefresh" placement="top" :title="t('agTable.autoRefresh')">
         <div class="auto-refresh-group">
           <sync-outlined :spin="autoRefreshEnabled" class="refresh-icon" />
@@ -93,6 +109,7 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import {
     BarChartOutlined,
     CheckOutlined,
@@ -121,6 +138,10 @@ const props = defineProps({
   dragKey: { type: String, default: null },
   isAllColumnsVisible: { type: Boolean, default: false },
   isSomeColumnsVisible: { type: Boolean, default: false },
+  
+  // 批量选择相关
+  selectedRowKeys: { type: Array, default: () => [] },
+  rowSelectionEnabled: { type: Boolean, default: false }
 })
 
 const emit = defineEmits([
@@ -139,9 +160,21 @@ const emit = defineEmits([
   'drag-over',
   'drop',
   'drag-end',
+  'select-all-rows',
+  'clear-selection'
 ])
 
 const { t } = useI18n()
+
+// 是否全选
+const isAllSelected = computed(() => {
+  return props.selectedRowKeys.length > 0
+})
+
+// 是否部分选中
+const isIndeterminate = computed(() => {
+  return props.selectedRowKeys.length > 0
+})
 
 function handleAutoRefreshChange(checked) {
   emit('update:autoRefreshEnabled', checked)
@@ -158,6 +191,10 @@ function handleColumnSettingsOpenChange(open) {
 function handleDensityChange({ key }) {
   emit('density-change', key)
 }
+
+function handleSelectAllChange(e) {
+  emit('select-all-rows', e.target.checked)
+}
 </script>
 
 <style scoped>
@@ -173,11 +210,22 @@ function handleDensityChange({ key }) {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .toolbar-right {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+}
+
+.batch-selection-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+  background: var(--layout-surface);
+  border-radius: 4px;
 }
 
 .auto-refresh-group {

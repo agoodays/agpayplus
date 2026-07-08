@@ -1,36 +1,28 @@
-<template>
+﻿<template>
   <div>
     <a-card>
-      <div v-if="$access('ENT_DIVISION_RECEIVER_GROUP_LIST')" class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
-            <a-form-item label="" class="table-head-layout">
-              <ag-select
-                v-model="searchData.mchNo"
-                :api="searchMch"
-                value-field="mchNo"
-                label-field="mchName"
-                placeholder="商户号(支持按商户名称搜索)"
-              />
-            </a-form-item>
-            <ag-input v-model="searchData.receiverGroupId" placeholder="分组ID" />
-            <ag-input v-model="searchData.receiverGroupName" placeholder="分组名称" />
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.autoDivisionFlag" placeholder="是否自动分账" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">是</a-select-option>
-                <a-select-option value="0">否</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" :loading="btnLoading" @click="searchFunc">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="resetFunc">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
+        <template #formItem>
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              value-field="mchNo"
+              label-field="mchName"
+              placeholder="商户号(支持按商户名称搜索)"
+            />
+          </a-form-item>
+          <ag-input v-model="searchData.receiverGroupId" placeholder="分组ID" />
+          <ag-input v-model="searchData.receiverGroupName" placeholder="分组名称" />
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model:value="searchData.autoDivisionFlag" placeholder="是否自动分账" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="1">是</a-select-option>
+              <a-select-option value="0">否</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </ag-search>
       <!-- 列表渲染 -->
       <ag-table
         ref="infoTable"
@@ -79,7 +71,7 @@
 </template>
 <script setup>
 import { divisionGroupApi } from '@/api/business/division/division-group-api'
-import { AgInput, AgSelect, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
@@ -99,7 +91,7 @@ const tableColumns = [
   },
   { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: 120 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 const btnLoading = ref(false)
@@ -118,8 +110,12 @@ const searchMch = (params) => divisionGroupApi.listMch(params)
 const reqTableDataFunc = (params) => divisionGroupApi.queryPage(params)
 
 // 搜索函数
-const searchFunc = () => {
+const queryFunc = () => {
   btnLoading.value = true
+  reloadTable()
+}
+
+const searchFunc = () => {
   reloadTable()
 }
 

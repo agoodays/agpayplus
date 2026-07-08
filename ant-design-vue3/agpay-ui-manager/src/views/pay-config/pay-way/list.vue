@@ -1,17 +1,10 @@
 <template>
   <div>
     <a-card>
-      <ag-search
-        :search-data="searchData"
-        :open-is-show-more="false"
-        :is-show-more="isShowMore"
-        :search-loading="btnLoading"
-        @update-search-data="handleSearchFormData"
-        @set-is-show-more="setIsShowMore"
-        @query-func="queryFunc">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
-          <ag-input :placeholder="'支付方式代码'" v-model:value="searchData.wayCode" />
-          <ag-input :placeholder="'支付方式名称'" v-model:value="searchData.wayName" />
+          <ag-input v-model="searchData.wayCode" placeholder="支付方式代码" />
+          <ag-input v-model="searchData.wayName" placeholder="支付方式名称" />
           <a-form-item label="" class="table-head-layout">
             <a-select v-model:value="searchData.wayType" placeholder="支付类型" default-value="">
               <a-select-option value="">全部</a-select-option>
@@ -27,13 +20,12 @@
       </ag-search>
       <!-- 列表渲染 -->
       <ag-table
-        @btn-load-close="btnLoading=false"
         ref="infoTable"
-        :init-data="true"
-        :req-table-data-func="reqTableDataFunc"
-        :table-columns="tableColumns"
+        :on-load="reqTableDataFunc"
+        :columns="tableColumns"
         :search-data="searchData"
         row-key="wayCode"
+        @btn-load-close="btnLoading = false"
       >
         <template #topLeftSlot>
           <div>
@@ -71,57 +63,45 @@
 </template>
 <script setup>
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
+import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { reactive, ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
+import { message } from 'ant-design-vue'
 
 const tableColumns = [
-  { key: 'wayCode', fixed: 'left', title: '支付方式代码', scopedSlots: { customRender: 'wayCodeSlot' } },
-  { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称' },
-  { key: 'wayType', title: '支付类型', align: 'center', scopedSlots: { customRender: 'wayTypeSlot' } },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'wayCode', fixed: 'left', title: '支付方式代码', width: 180, customRender: 'wayCodeSlot' },
+  { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称', width: 180 },
+  { key: 'wayType', title: '支付类型', width: 120, align: 'center', customRender: 'wayTypeSlot' },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 const infoTable = ref(null)
 const infoAddOrEdit = ref(null)
-const isShowMore = ref(false)
 const btnLoading = ref(false)
 const searchData = reactive({})
 
-const handleSearchFormData = (data) => {
-  Object.assign(searchData, data)
-}
-
-const setIsShowMore = (value) => {
-  isShowMore.value = value
-}
-
-// 请求table接口数据
 const reqTableDataFunc = (params) => {
   return payConfigApi.queryPayWayList(params)
 }
 
-const queryFunc = () => { // 点击【查询】按钮点击事件
+const queryFunc = () => {
   btnLoading.value = true
-  infoTable.value?.refTable(true)
+  infoTable.value?.reload()
 }
 
-const addFunc = () => { // 业务通用【新增】 函数
+const addFunc = () => {
   infoAddOrEdit.value.show()
 }
 
-const editFunc = (wayCode) => { // 业务通用【修改】 函数
+const editFunc = (wayCode) => {
   infoAddOrEdit.value.show(wayCode)
 }
 
 const delFunc = (wayCode) => {
-  import('ant-design-vue').then(({ message }) => {
-    import('@/utils/info-box').then(({ infoBox }) => {
-      infoBox.confirmDanger('确认删除？', '', () => {
-        return payConfigApi.delPayWayById(wayCode).then(res => {
-          message.success('删除成功！')
-          infoTable.value?.refTable(false)
-        })
-      })
+  window.$infoBox.confirmDanger('确认删除？', '', () => {
+    payConfigApi.delPayWayById(wayCode).then(() => {
+      message.success('删除成功！')
+      infoTable.value?.reload()
     })
   })
 }

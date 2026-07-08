@@ -8,55 +8,55 @@
     width="40%"
     @close="onClose"
   >
-    <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
+    <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="服务商名称" prop="isvName">
-            <a-input v-model="saveObject.isvName" placeholder="请输入服务商名称" />
-          </a-form-model-item>
+          <a-form-item label="服务商名称" name="isvName">
+            <a-input v-model:value="saveObject.isvName" placeholder="请输入服务商名称" />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="服务商简称" prop="isvShortName">
-            <a-input v-model="saveObject.isvShortName" placeholder="请输入服务商简称" />
-          </a-form-model-item>
+          <a-form-item label="服务商简称" name="isvShortName">
+            <a-input v-model:value="saveObject.isvShortName" placeholder="请输入服务商简称" />
+          </a-form-item>
         </a-col>
       </a-row>
 
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="联系人姓名" prop="contactName">
-            <a-input v-model="saveObject.contactName" placeholder="请输入联系人姓名" />
-          </a-form-model-item>
+          <a-form-item label="联系人姓名" name="contactName">
+            <a-input v-model:value="saveObject.contactName" placeholder="请输入联系人姓名" />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="联系人手机号" prop="contactTel">
-            <a-input v-model="saveObject.contactTel" placeholder="请输入联系人手机号"> </a-input>
-          </a-form-model-item>
+          <a-form-item label="联系人手机号" name="contactTel">
+            <a-input v-model:value="saveObject.contactTel" placeholder="请输入联系人手机号"> </a-input>
+          </a-form-item>
         </a-col>
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="联系人邮箱" prop="contactEmail">
-            <a-input v-model="saveObject.contactEmail" placeholder="请输入联系人邮箱"> </a-input>
-          </a-form-model-item>
+          <a-form-item label="联系人邮箱" name="contactEmail">
+            <a-input v-model:value="saveObject.contactEmail" placeholder="请输入联系人邮箱"> </a-input>
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="状态" prop="state">
-            <a-radio-group v-model="saveObject.state" :default-value="1">
+          <a-form-item label="状态" name="state">
+            <a-radio-group v-model:value="saveObject.state" :default-value="1">
               <a-radio :value="1"> 启用 </a-radio>
               <a-radio :value="0"> 禁用 </a-radio>
             </a-radio-group>
-          </a-form-model-item>
+          </a-form-item>
         </a-col>
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
-          <a-form-model-item label="备注" prop="remark">
-            <a-input v-model="saveObject.remark" placeholder="请输入备注" type="textarea" />
-          </a-form-model-item>
+          <a-form-item label="备注" name="remark">
+            <a-input v-model:value="saveObject.remark" placeholder="请输入备注" type="textarea" />
+          </a-form-item>
         </a-col>
       </a-row>
-    </a-form-model>
+    </a-form>
     <div class="drawer-btn-center">
       <a-button icon="close" style="margin-right: 8px" @click="onClose"> 取消 </a-button>
       <a-button type="primary" style="margin-right: 8px" icon="check" :loading="btnLoading" @click="handleOkFunc">
@@ -75,7 +75,7 @@ const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
 })
 
-const infoFormModel = ref()
+const infoForm = ref(null)
 const btnLoading = ref(false)
 const isAdd = ref(true)
 const saveObject = ref({})
@@ -100,7 +100,7 @@ async function show(currentRecordId) {
   isAdd.value = !currentRecordId
   saveObject.value = { state: 1 }
   recordId.value = currentRecordId || null
-  infoFormModel.value?.resetFields?.()
+  infoForm.value?.resetFields?.()
   visible.value = true
 
   if (!isAdd.value && recordId.value) {
@@ -109,12 +109,13 @@ async function show(currentRecordId) {
   }
 }
 
-function validateForm() {
-  return new Promise((resolve) => {
-    infoFormModel.value?.validate((valid) => {
-      resolve(valid)
-    })
-  })
+async function validateForm() {
+  try {
+    await infoForm.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function handleOkFunc() {

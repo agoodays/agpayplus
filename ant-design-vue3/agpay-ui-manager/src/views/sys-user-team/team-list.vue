@@ -1,10 +1,10 @@
-<template>
+﻿<template>
   <div>
     <a-card>
       <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
-            <a-select v-model="searchData.sysType" placeholder="所属系统" default-value="">
+            <a-select v-model:value="searchData.sysType" placeholder="所属系统" default-value="">
               <a-select-option value="">全部</a-select-option>
               <a-select-option value="MGR">运营平台</a-select-option>
               <a-select-option value="AGENT">代理商</a-select-option>
@@ -109,11 +109,11 @@ const tableColumns = [
   { key: 'teamId', dataIndex: 'teamId', title: '团队ID', width: 80, fixed: 'left' },
   { key: 'teamName', dataIndex: 'teamName', title: '团队名称', width: 200 },
   { key: 'teamNo', dataIndex: 'teamNo', title: '团队编号', width: 140 },
-  { key: 'statRangeType', title: '统计周期', width: 120, scopedSlots: { customRender: 'statRangeTypeSlot' } },
-  { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
+  { key: 'statRangeType', title: '统计周期', width: 120, customRender: 'statRangeTypeSlot' },
+  { key: 'sysType', title: '所属系统', width: 120, customRender: 'sysTypeSlot' },
   { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 const btnLoading = ref(false)

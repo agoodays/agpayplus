@@ -8,6 +8,7 @@ export const currentApi = {
     return req.post('/api/current/modifyPwd', data)
   },
   uploadAvatar(formData) {
-    return upload.singleFile(upload.avatar, formData)
+    // 头像上传是本地上传，isLocalFile = true
+    return upload.singleFile(upload.avatar, true, formData)
   }
 }

@@ -32,7 +32,7 @@
               @open-change="dateRangeOpen = !dateRangeOpen"
             >
               <template #suffixIcon>
-                <a-icon type="sync" />
+                <icons.SyncOutlined />
               </template>
             </a-range-picker>
           </a-form-item>
@@ -124,7 +124,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="支付成功的交易总金额，包含已退款和未退款的交易">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -132,7 +132,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="扣除手续费后实际到账金额">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -140,7 +140,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="交易手续费，平台实际收取">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -148,7 +148,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="退款手续费，平台实际收取">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -156,7 +156,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="实际退款笔数，同一笔交易多次退款只计算一次">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -164,7 +164,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="交易成功总笔数占总订单数的百分比">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -214,9 +214,21 @@
   </div>
 </template>
 <script setup>
+import { InfoCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
+const icons = { InfoCircleOutlined, SyncOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import quarterOfYear from 'dayjs/plugin/quarterOfYear'
+
+dayjs.locale('zh-cn')
+dayjs.extend(relativeTime)
+dayjs.extend(weekOfYear)
+dayjs.extend(quarterOfYear)
+
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -265,8 +277,8 @@ const dateRangeMode = ref('date')
 const queryDateType = ref('day')
 
 // 计算开始时间和结束时间
-const initialStartDate = moment().subtract(1, 'month').startOf('day')
-const initialEndDate = moment().startOf('day').subtract(1, 'days')
+const initialStartDate = dayjs().subtract(1, 'month').startOf('day')
+const initialEndDate = dayjs().startOf('day').subtract(1, 'days')
 const queryDateRange = `customDateTime_${initialStartDate.format('YYYY-MM-DD')} 00:00:00_${initialEndDate.format('YYYY-MM-DD')} 23:59:59`
 
 const defaultSearchData = reactive({
@@ -358,8 +370,8 @@ const searchFunc = () => {
 }
 
 const detailFunc = (groupDate) => {
-  const startDate = moment(groupDate, 'YYYY-MM-DD').startOf(searchData.queryDateType)
-  const endDate = moment(groupDate, 'YYYY-MM-DD').endOf(searchData.queryDateType)
+  const startDate = dayjs(groupDate, 'YYYY-MM-DD').startOf(searchData.queryDateType)
+  const endDate = dayjs(groupDate, 'YYYY-MM-DD').endOf(searchData.queryDateType)
   // 获取开始时间和结束时间的时间戳
   const startTimestamp = startDate.valueOf() // 或者使用 startDate.unix() // 获取秒级时间戳
   const endTimestamp = endDate.valueOf() // 或者使用 endDate.unix() // 获取秒级时间戳
@@ -371,13 +383,13 @@ const detailFunc = (groupDate) => {
 
 const queryDateTypeChange = (value) => {
   queryDateType.value = value
-  let startDate = moment().subtract(1, 'year').startOf('month')
-  let endDate = moment().startOf('day').subtract(1, 'days')
+  let startDate = dayjs().subtract(1, 'year').startOf('month')
+  let endDate = dayjs().startOf('day').subtract(1, 'days')
   switch (value) {
     case 'day':
       dateFormat.value = 'YYYY-MM-DD'
       dateRangeMode.value = 'date'
-      startDate = moment().subtract(1, 'month')
+      startDate = dayjs().subtract(1, 'month')
       break
     case 'month':
       dateFormat.value = 'YYYY-MM'
@@ -407,8 +419,8 @@ const onPanelChange = (value, mode) => {
 const onChange = (date, dateString) => {
   const startDate = dateString[0] // 开始时间
   const endDate = dateString[1] // 结束时间
-  const start = moment(startDate)
-  const end = moment(endDate)
+  const start = dayjs(startDate)
+  const end = dayjs(endDate)
   dateRangeValue.value = !startDate || !endDate ? dateString : [start, end]
   searchData.queryDateRange =
     !startDate || !endDate
@@ -418,7 +430,7 @@ const onChange = (date, dateString) => {
 
 const disabledDate = (current) => {
   // 今天之后的日期不可选
-  return current && current > moment().endOf('day')
+  return current && current > dayjs().endOf('day')
 }
 
 // 暴露方法给模板

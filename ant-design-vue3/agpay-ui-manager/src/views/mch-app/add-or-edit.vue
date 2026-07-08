@@ -7,19 +7,19 @@
     :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
   >
-    <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical">
+    <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 基本信息 -->
       <a-row :gutter="16">
         <a-col v-if="!isAdd" :span="12">
           <a-form-item label="应用AppId" name="appId">
-            <a-input v-model:value="formState.appId" placeholder="应用AppId" disabled />
+            <a-input v-model:value="saveObject.appId" placeholder="应用AppId" disabled />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="商户号" name="mchNo">
             <a-select
-              v-model:value="formState.mchNo"
+              v-model:value="saveObject.mchNo"
               placeholder="请选择商户"
               show-search
               :filter-option="false"
@@ -35,7 +35,7 @@
 
         <a-col :span="12">
           <a-form-item label="应用名称" name="appName">
-            <a-input v-model:value="formState.appName" placeholder="请输入应用名称" />
+            <a-input v-model:value="saveObject.appName" placeholder="请输入应用名称" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -43,13 +43,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="备注" name="remark">
-            <a-input v-model:value="formState.remark" placeholder="请输入备注" />
+            <a-input v-model:value="saveObject.remark" placeholder="请输入备注" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="formState.state">
+            <a-radio-group v-model:value="saveObject.state">
               <a-radio :value="1">启用</a-radio>
               <a-radio :value="0">停用</a-radio>
             </a-radio-group>
@@ -60,7 +60,7 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="是否设置为默认应用" name="defaultFlag">
-            <a-radio-group v-model:value="formState.defaultFlag">
+            <a-radio-group v-model:value="saveObject.defaultFlag">
               <a-radio :value="0">否</a-radio>
               <a-radio :value="1">是</a-radio>
             </a-radio-group>
@@ -83,7 +83,7 @@
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
-            <a-checkbox-group v-model:value="formState.appSignType">
+            <a-checkbox-group v-model:value="saveObject.appSignType">
               <a-checkbox value="MD5">MD5</a-checkbox>
               <a-checkbox value="RSA2">RSA2</a-checkbox>
             </a-checkbox-group>
@@ -92,12 +92,12 @@
       </a-row>
 
       <!-- MD5秘钥 -->
-      <template v-if="formState.appSignType?.includes('MD5')">
+      <template v-if="saveObject.appSignType?.includes('MD5')">
         <a-row :gutter="16">
           <a-col :span="24">
             <a-form-item label="设置MD5秘钥" name="appSecret">
-              <a-textarea v-model:value="formState.appSecret" :placeholder="appSecretPlaceholder" :rows="3" />
-              <a-button type="primary" ghost style="margin-top: 8px" @click="handleGenerateSecret">
+              <a-textarea v-model:value="saveObject.appSecret" :placeholder="appSecretPlaceholder" :rows="3" />
+              <a-button type="primary" style="margin-top: 8px" @click="handleGenerateSecret">
                 <sync-outlined />
                 随机生成私钥
               </a-button>
@@ -107,11 +107,11 @@
       </template>
 
       <!-- RSA2配置 -->
-      <template v-if="formState.appSignType?.includes('RSA2')">
+      <template v-if="saveObject.appSignType?.includes('RSA2')">
         <a-row :gutter="16">
           <a-col :span="24">
             <a-form-item label="设置RSA2应用公钥" name="appRsa2PublicKey">
-              <a-textarea v-model:value="formState.appRsa2PublicKey" placeholder="请输入RSA2应用公钥" :rows="4" />
+              <a-textarea v-model:value="saveObject.appRsa2PublicKey" placeholder="请输入RSA2应用公钥" :rows="4" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -171,7 +171,7 @@ const props = defineProps({
 const emit = defineEmits(['update:open', 'success'])
 
 // State
-const formRef = ref()
+const infoForm = ref(null)
 const loading = ref(false)
 const isAdd = ref(true)
 const localOpen = ref(false)
@@ -180,7 +180,7 @@ const sysRSA2PublicKey = ref('')
 const originalAppSecret = ref('')
 
 // 表单数据
-const formState = reactive({
+const saveObject = reactive({
   appId: '',
   mchNo: '',
   appName: '',
@@ -207,7 +207,7 @@ const rules = computed(() => ({
   appSecret: [
     {
       validator: (rule, value) => {
-        if (formState.appSignType?.includes('MD5')) {
+        if (saveObject.appSignType?.includes('MD5')) {
           if (isAdd.value && !value) {
             return Promise.reject('请输入MD5秘钥')
           }
@@ -224,7 +224,7 @@ const rules = computed(() => ({
   appRsa2PublicKey: [
     {
       validator: (rule, value) => {
-        if (formState.appSignType?.includes('RSA2') && !value) {
+        if (saveObject.appSignType?.includes('RSA2') && !value) {
           return Promise.reject('请输入RSA2应用公钥')
         }
         return Promise.resolve()
@@ -264,7 +264,7 @@ const initForm = async () => {
     resetForm()
     // 如果传入了商户号，则自动填充
     if (props.mchNo) {
-      formState.mchNo = props.mchNo
+      saveObject.mchNo = props.mchNo
       // 加载商户信息
       await handleSearchMch('')
     }
@@ -294,17 +294,17 @@ const loadDetail = async () => {
     loading.value = true
     const res = await mchAppApi.getById(props.recordId)
 
-    Object.assign(formState, res)
+    Object.assign(saveObject, res)
 
     // 保存原始密钥，用于占位符显示
     originalAppSecret.value = res.appSecret || ''
 
     // 清空密钥输入框（编辑时不显示原密钥）
-    formState.appSecret = ''
+    saveObject.appSecret = ''
 
     // 处理签名方式（字符串转数组）
     if (typeof res.appSignType === 'string') {
-      formState.appSignType = res.appSignType.split(',')
+      saveObject.appSignType = res.appSignType.split(',')
     }
   } catch (error) {
     message.error(error.msg || '加载数据失败')
@@ -317,7 +317,7 @@ const loadDetail = async () => {
  * 重置表单
  */
 const resetForm = () => {
-  Object.assign(formState, {
+  Object.assign(saveObject, {
     appId: '',
     mchNo: props.mchNo || '',
     appName: '',
@@ -332,7 +332,7 @@ const resetForm = () => {
   originalAppSecret.value = ''
 
   nextTick(() => {
-    formRef.value?.clearValidate()
+    infoForm.value?.clearValidate()
   })
 }
 
@@ -361,7 +361,7 @@ const handleGenerateSecret = () => {
   for (let i = 0; i < length; i++) {
     secret += chars.charAt(Math.floor(Math.random() * chars.length))
   }
-  formState.appSecret = secret
+  saveObject.appSecret = secret
   message.success(t('mchApp.secretGenerated'))
 }
 
@@ -370,12 +370,12 @@ const handleGenerateSecret = () => {
  */
 const handleSubmit = async () => {
   try {
-    await formRef.value.validate()
+    await infoForm.value.validate()
 
     loading.value = true
 
     // 构建提交数据
-    const data = { ...formState }
+    const data = { ...saveObject }
 
     // 处理签名方式（数组转字符串）
     if (Array.isArray(data.appSignType)) {

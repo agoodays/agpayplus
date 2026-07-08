@@ -48,7 +48,7 @@
         </div>
         <div class="open-close" @click="isShowMore = !isShowMore">
           {{ isShowMore ? '收起' : '展开' }}
-          <a-icon :type="isShowMore ? 'UpOutlined' : 'DownOutlined'" />
+          <component :is="isShowMore ? icons.UpOutlined : icons.DownOutlined" />
         </div>
       </div>
       <div class="content-box">
@@ -92,30 +92,12 @@
       :tab="'支付渠道的选择'"
     >
       <div class="content-box">
-        <div class="table-page-search-wrapper">
-          <a-form layout="inline">
-            <a-row :gutter="10">
-              <a-col :md="4">
-                <a-form-item label="">
-                  <a-input v-model:value="searchData.wayCode" placeholder="支付方式代码" />
-                </a-form-item>
-              </a-col>
-              <a-col :md="4">
-                <a-form-item label="">
-                  <a-input v-model:value="searchData.wayName" placeholder="支付方式名称" />
-                </a-form-item>
-              </a-col>
-              <a-col :sm="6">
-                <span class="table-page-search-submitButtons">
-                  <a-button type="primary" icon="SearchOutlined" @click="searchFunc(true)">查询</a-button>
-                  <a-button style="margin-left: 8px" icon="ReloadOutlined" @click="() => (searchData = {})"
-                    >重置</a-button
-                  >
-                </span>
-              </a-col>
-            </a-row>
-          </a-form>
-        </div>
+        <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc(true)" @reset="resetSearchFunc">
+          <template #formItem>
+            <ag-input v-model="searchData.wayCode" placeholder="支付方式代码" />
+            <ag-input v-model="searchData.wayName" placeholder="支付方式名称" />
+          </template>
+        </ag-search>
         <div class="table-box">
           <div class="table-item">
             <!-- 列表渲染 -->
@@ -123,9 +105,9 @@
               ref="infoTableRef"
               :init-data="true"
               :is-show-table-top="false"
-              :req-table-data-func="reqTableDataFunc"
-              :table-columns="tableColumns"
-              :search-data="searchData"
+              :on-load="reqTableDataFunc"
+              :columns="tableColumns"
+              :params="searchData"
               :row-selection="rowSelection"
               row-key="wayCode"
             >
@@ -143,9 +125,9 @@
               ref="passageInfoTableRef"
               :init-data="false"
               :is-show-table-top="false"
-              :req-table-data-func="reqPassageTableDataFunc"
-              :table-columns="passageTableColumns"
-              :search-data="passageSearchData"
+              :on-load="reqPassageTableDataFunc"
+              :columns="passageTableColumns"
+              :params="passageSearchData"
               row-key="ifCode"
             >
               <template #ifNameSlot="{ record }">
@@ -213,15 +195,11 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { SearchOutlined, ReloadOutlined, UpOutlined, DownOutlined } from '@ant-design/icons-vue'
-import { AgTable, AgTableActions } from '@/components'
-import {
-  API_URL_PAYCONFIGS_LIST,
-  API_URL_MCH_PAYPASSAGE_LIST,
-  API_URL_PAYOAUTH2CONFIGS,
-  getAvailablePayInterfaceList,
-  req
-} from '@/api/manage'
+import { DownOutlined, UpOutlined } from '@ant-design/icons-vue'
+const icons = { DownOutlined, UpOutlined }
+import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
+import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
 import AgPayWayRatePanel from './ag-pay-payway-rate-panel.vue'
 import { infoBox } from '@/utils/info-box'
 
@@ -262,12 +240,12 @@ const searchData = ref({})
 const tableColumns = ref([
   { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式代码' },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称' },
-  { key: 'isConfig', title: '状态', slots: { customRender: 'stateSlot' } }
+  { key: 'isConfig', title: '状态', customRender: 'stateSlot' }
 ])
 const passageTableColumns = ref([
-  { key: 'ifName', title: '通道名称', slots: { customRender: 'ifNameSlot' } },
-  { key: 'rate', title: '费率', slots: { customRender: 'rateSlot' } },
-  { key: 'state', title: '状态', slots: { customRender: 'stateSlot' } }
+  { key: 'ifName', title: '通道名称', customRender: 'ifNameSlot' },
+  { key: 'rate', title: '费率', customRender: 'rateSlot' },
+  { key: 'state', title: '状态', customRender: 'stateSlot' }
 ])
 const passageSearchData = ref({})
 const currentWayCode = ref(null)
@@ -344,19 +322,25 @@ const reset = () => {
 }
 
 const reqTableDataFunc = (params) => {
-  return req.list(API_URL_MCH_PAYPASSAGE_LIST, Object.assign(params, { appId: infoId.value }))
+  return payConfigApi.queryMchPayPassagePage(Object.assign(params, { appId: infoId.value }))
 }
 
 const searchFunc = (isToFirst = false) => {
-  infoTableRef.value?.refTable(isToFirst)
+  infoTableRef.value?.reload(isToFirst)
 }
 
 const reqPassageTableDataFunc = (params) => {
-  return getAvailablePayInterfaceList(infoId.value, currentWayCode.value, params)
+  return payConfigApi.getAvailablePayInterfaceList(infoId.value, currentWayCode.value, params)
 }
 
 const searchPassageFunc = (isToFirst = false) => {
-  passageInfoTableRef.value?.refTable(isToFirst)
+  passageInfoTableRef.value?.reload(isToFirst)
+}
+
+const resetSearchFunc = () => {
+  Object.keys(searchData.value).forEach((key) => {
+    delete searchData.value[key]
+  })
 }
 
 const updateState = (record, state) => {
@@ -368,16 +352,7 @@ const updateState = (record, state) => {
       title,
       content,
       () => {
-        const params = {
-          appId: infoId.value,
-          wayCode: currentWayCode.value,
-          ifCode: record.ifCode,
-          state: state
-        }
-        const queryString = Object.keys(params)
-          .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-          .join('&')
-        req.add(API_URL_MCH_PAYPASSAGE_LIST + '/mchPassage?' + queryString).then((res) => {
+        payConfigApi.updateMchPassageState(infoId.value, currentWayCode.value, record.ifCode, state).then((res) => {
           message.success('已配置')
           searchFunc()
           searchPassageFunc()
@@ -396,14 +371,14 @@ const searchIfCodeFunc = () => {
 }
 
 const getDiyList = () => {
-  req.get(API_URL_PAYOAUTH2CONFIGS + '/diyList', { configMode: props.configMode, infoId: infoId.value }).then((res) => {
+  payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: infoId.value }).then((res) => {
     diyList.value = res
   })
 }
 
 const refIfCodeList = () => {
   const params = Object.assign({}, { configMode: props.configMode, infoId: infoId.value }, ifCodeListSearchData.value)
-  req.list(API_URL_PAYCONFIGS_LIST + '/ifCodes', params).then((resData) => {
+  payConfigApi.queryPayConfigIfCodes(params).then((resData) => {
     ifCodeList.value = resData
   })
 }

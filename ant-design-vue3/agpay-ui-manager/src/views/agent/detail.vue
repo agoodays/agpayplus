@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-drawer
     :visible="visible"
     :title="true ? '代理商详情' : ''"
@@ -126,9 +126,9 @@
     </a-row>
     <a-row justify="start" type="flex">
       <a-col :sm="24">
-        <a-form-model-item label="备注">
-          <a-input v-model="detailData.remark" type="textarea" disabled="disabled" style="height: 50px" />
-        </a-form-model-item>
+        <a-form-item label="备注">
+          <a-input v-model:value="detailData.remark" type="textarea" disabled="disabled" style="height: 50px" />
+        </a-form-item>
       </a-col>
     </a-row>
 
@@ -201,84 +201,66 @@
       <a-row justify="space-between" type="flex">
         <!-- 企业 -->
         <a-col v-if="detailData.agentType === 2" :span="10">
-          <a-form-model-item label="营业执照照片" prop="licenseImg">
-            <div v-if="detailData.licenseImg">
-              <a-upload
-                :default-file-list="getDefaultFileList(detailData.licenseImg)"
-                :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
-              />
-            </div>
-          </a-form-model-item>
+          <a-form-item label="营业执照照片" name="licenseImg">
+            <ag-upload
+              :urls="detailData.licenseImg ? [detailData.licenseImg] : []"
+              :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
+              list-type="picture"
+              :read-only="true"
+            />
+          </a-form-item>
         </a-col>
         <!-- 企业对公 -->
         <a-col v-if="detailData.agentType === 2 && detailData.settAccountType === 'BANK_PUBLIC'" :span="10">
-          <a-form-model-item label="开户许可证照片" prop="permitImg">
-            <div v-if="detailData.permitImg">
-              <a-upload
-                :default-file-list="getDefaultFileList(detailData.permitImg)"
-                :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
-              />
-            </div>
-          </a-form-model-item>
+          <a-form-item label="开户许可证照片" name="permitImg">
+            <ag-upload
+              :urls="detailData.permitImg ? [detailData.permitImg] : []"
+              :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
+              list-type="picture"
+              :read-only="true"
+            />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item :label="'[' + imgLabel + ']身份证人像面照片'" prop="idcard1Img">
-            <div v-if="detailData.idcard1Img">
-              <a-upload
-                :default-file-list="getDefaultFileList(detailData.idcard1Img)"
-                :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
-              />
-            </div>
-          </a-form-model-item>
+          <a-form-item :label="'[' + imgLabel + ']身份证人像面照片'" name="idcard1Img">
+            <ag-upload
+              :urls="detailData.idcard1Img ? [detailData.idcard1Img] : []"
+              :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
+              list-type="picture"
+              :read-only="true"
+            />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item :label="'[' + imgLabel + ']身份证国徽面照片'" prop="idcard2Img">
-            <div v-if="detailData.idcard2Img">
-              <a-upload
-                :default-file-list="getDefaultFileList(detailData.idcard2Img)"
-                :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
-              />
-            </div>
-          </a-form-model-item>
+          <a-form-item :label="'[' + imgLabel + ']身份证国徽面照片'" name="idcard2Img">
+            <ag-upload
+              :urls="detailData.idcard2Img ? [detailData.idcard2Img] : []"
+              :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
+              list-type="picture"
+              :read-only="true"
+            />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="[联系人]手持身份证照片" prop="idcardInHandImg">
-            <div v-if="detailData.idcardInHandImg">
-              <a-upload
-                :default-file-list="getDefaultFileList(detailData.idcardInHandImg)"
-                :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
-              />
-            </div>
-          </a-form-model-item>
+          <a-form-item label="[联系人]手持身份证照片" name="idcardInHandImg">
+            <ag-upload
+              :urls="detailData.idcardInHandImg ? [detailData.idcardInHandImg] : []"
+              :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
+              list-type="picture"
+              :read-only="true"
+            />
+          </a-form-item>
         </a-col>
         <!-- 个人对私/企业对私 -->
         <a-col v-if="detailData.settAccountType === 'BANK_PRIVATE'" :span="10">
-          <a-form-model-item :label="'[' + imgLabel + ']银行卡照片'" prop="bankCardImg">
-            <div v-if="detailData.bankCardImg">
-              <a-upload
-                :default-file-list="getDefaultFileList(detailData.bankCardImg)"
-                :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-                list-type="picture"
-                class="detail-upload-list-inline"
-                @preview="imgPreview($event)"
-              />
-            </div>
-          </a-form-model-item>
+          <a-form-item :label="'[' + imgLabel + ']银行卡照片'" name="bankCardImg">
+            <ag-upload
+              :urls="detailData.bankCardImg ? [detailData.bankCardImg] : []"
+              :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
+              list-type="picture"
+              :read-only="true"
+            />
+          </a-form-item>
         </a-col>
       </a-row>
     </div>
@@ -288,7 +270,8 @@
 <script setup>
 import { agentApi } from '@/api/business/agent/agent-api'
 import 'viewerjs/dist/viewer.css'
-import { getCurrentInstance, ref } from 'vue'
+import { ref } from 'vue'
+import AgUpload from '@/components/ag-upload'
 
 defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
@@ -298,8 +281,6 @@ const visible = ref(false)
 const detailData = ref({})
 const recordId = ref(null)
 const imgLabel = ref('联系人')
-
-const { proxy } = getCurrentInstance()
 
 function buildDefaultDetailData() {
   return {
@@ -347,15 +328,6 @@ function show(currentRecordId) {
 
 function onClose() {
   visible.value = false
-}
-
-function imgPreview(info) {
-  proxy?.$viewerApi({
-    images: [info.url],
-    options: {
-      initialViewIndex: 0
-    }
-  })
 }
 
 function getDefaultFileList(url) {

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-drawer
     :mask-closable="false"
     :visible="visible"
@@ -13,7 +13,7 @@
       <a-col span="24">
         <a-form layout="inline">
           <a-form-item label="">
-            <a-select v-model="sysType" placeholder="选择系统菜单" class="table-head-layout" @change="entTree">
+            <a-select v-model:value="sysType" placeholder="选择系统菜单" class="table-head-layout" @change="entTree">
               <a-select-option value="MGR">显示菜单：运营平台</a-select-option>
               <a-select-option value="AGENT">显示菜单：代理商系统</a-select-option>
               <a-select-option value="MCH">显示菜单：商户系统</a-select-option>
@@ -28,11 +28,11 @@
       </a-col>
       <a-col span="14">
         <p v-if="hasEnt">请选择匹配规则：</p>
-        <a-form-model ref="infoFormModel" :model="matchRule" layout="vertical">
-          <a-form-model-item v-if="sysType !== 'MCH'" label="" prop="epUserEnt">
+        <a-form ref="infoForm" :model="matchRule" layout="vertical">
+          <a-form-item v-if="sysType !== 'MCH'" label="" name="epUserEnt">
             <a-checkbox @change="onEpUserEntChange">拓展员权限</a-checkbox>
-          </a-form-model-item>
-          <a-form-model-item v-if="sysType === 'MCH'" label="" prop="userEntRules">
+          </a-form-item>
+          <a-form-item v-if="sysType === 'MCH'" label="" name="userEntRules">
             <a-checkbox-group v-model="matchRule.userEntRules">
               <a-checkbox value="USER_TYPE_11_INIT">店长默认权限</a-checkbox>
               <a-checkbox value="USER_TYPE_12_INIT">店员默认权限</a-checkbox>
@@ -42,20 +42,20 @@
               <a-checkbox value="DEVICE">设备管理权限</a-checkbox>
               <a-checkbox value="STATS">统计报表权限</a-checkbox>
             </a-checkbox-group>
-          </a-form-model-item>
-          <a-form-model-item v-if="sysType === 'MCH'" prop="mchType">
+          </a-form-item>
+          <a-form-item v-if="sysType === 'MCH'" name="mchType">
             <a-checkbox :checked="matchRule.mchType === 1" @change="onMchTypeChange(1)">普通商户特有权限</a-checkbox>
             <a-checkbox :checked="matchRule.mchType === 2" @change="onMchTypeChange(2)"
               >特约商户(服务商模式)特有权限</a-checkbox
             >
-          </a-form-model-item>
-          <a-form-model-item v-if="sysType === 'MCH'" prop="mchLevelArray">
+          </a-form-item>
+          <a-form-item v-if="sysType === 'MCH'" name="mchLevelArray">
             <a-checkbox-group v-model="matchRule.mchLevelArray">
               <a-checkbox value="M0">M0商户特有权限</a-checkbox>
               <a-checkbox value="M1">M1商户特有权限</a-checkbox>
             </a-checkbox-group>
-          </a-form-model-item>
-        </a-form-model>
+          </a-form-item>
+        </a-form>
       </a-col>
     </a-row>
     <div class="drawer-btn-center">
@@ -81,6 +81,7 @@
 <script setup>
 import { entApi } from '@/api/business/ent/ent-api'
 import { ref } from 'vue'
+import { message } from 'ant-design-vue'
 
 const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }

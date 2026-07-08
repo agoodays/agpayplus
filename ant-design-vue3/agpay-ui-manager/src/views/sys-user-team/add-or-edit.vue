@@ -9,30 +9,30 @@
     :width="drawerWidth"
     @close="onClose"
   >
-    <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
+    <a-form v-if="visible" ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="团队名称" prop="teamName">
-            <a-input v-model="saveObject.teamName" placeholder="请输入团队名称" />
-          </a-form-model-item>
+          <a-form-item label="团队名称" name="teamName">
+            <a-input v-model:value="saveObject.teamName" placeholder="请输入团队名称" />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="团队编号" prop="teamNo">
-            <a-input v-model="saveObject.teamNo" placeholder="请输入团队编号" />
-          </a-form-model-item>
+          <a-form-item label="团队编号" name="teamNo">
+            <a-input v-model:value="saveObject.teamNo" placeholder="请输入团队编号" />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="团队编号" prop="statRangeType">
-            <a-select v-model="saveObject.statRangeType" placeholder="统计周期" default-value="year">
+          <a-form-item label="团队编号" name="statRangeType">
+            <a-select v-model:value="saveObject.statRangeType" placeholder="统计周期" default-value="year">
               <a-select-option value="year">年</a-select-option>
               <a-select-option value="quarter">季度</a-select-option>
               <a-select-option value="month">月</a-select-option>
               <a-select-option value="week">周</a-select-option>
             </a-select>
-          </a-form-model-item>
+          </a-form-item>
         </a-col>
       </a-row>
-    </a-form-model>
+    </a-form>
     <div class="drawer-btn-center">
       <a-button :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
         <template #icon><close-outlined /></template>
@@ -56,7 +56,7 @@ const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
 })
 
-const infoFormModel = ref()
+const infoForm = ref(null)
 const btnLoading = ref(false)
 const isAdd = ref(true)
 const saveObject = ref({})
@@ -95,7 +95,7 @@ async function show(id) {
   isAdd.value = !id
   saveObject.value = { statRangeType: 'year' }
   recordId.value = id || null
-  infoFormModel.value?.resetFields?.()
+  infoForm.value?.resetFields?.()
   visible.value = true
 
   if (!isAdd.value && recordId.value) {
@@ -108,12 +108,13 @@ async function show(id) {
   }
 }
 
-function validateForm() {
-  return new Promise((resolve) => {
-    infoFormModel.value?.validate((valid) => {
-      resolve(valid)
-    })
-  })
+async function validateForm() {
+  try {
+    await infoForm.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function onSubmit() {

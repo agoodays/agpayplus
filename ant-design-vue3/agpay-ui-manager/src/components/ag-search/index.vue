@@ -1,20 +1,16 @@
 <template>
   <div class="ag-search">
-    <a-form :model="state.model" @submit.prevent @keyup.enter="onSearch">
+    <a-form :model="state.model" @submit.prevent>
       <a-row :gutter="[16, 16]" class="search-row">
-        <!-- 
-        搜索项响应式配置：
-        推荐使用: <a-col v-bind="$attrs.colSpan || { xs: 24, sm: 12, md: 8, lg: 6 }">
-        或直接: <a-col :xs="24" :sm="12" :md="8" :lg="6">
-      -->
-
         <!-- 基础搜索条件（始终显示） -->
         <slot name="base" :col-span="colSpan" />
 
         <!-- 高级搜索条件（可展开/收起） -->
-        <template v-if="!collapsed || !collapsible">
-          <slot name="advanced" :col-span="colSpan" />
-        </template>
+        <transition name="search-collapse">
+          <template v-if="!collapsed || !collapsible">
+            <slot name="advanced" :col-span="colSpan" />
+          </template>
+        </transition>
 
         <!-- 默认插槽（向后兼容） -->
         <template v-if="!$slots.base && !$slots.advanced">
@@ -49,13 +45,37 @@
           </a-form-item>
         </a-col>
       </a-row>
+
+      <!-- 搜索历史 -->
+      <transition name="history-fade">
+        <div v-if="showHistory && searchHistory.length > 0" class="search-history">
+          <div class="history-label">
+            <history-outlined />
+            {{ t('agSearch.searchHistory') }}
+            <a-button type="link" size="small" @click="clearHistory">
+              {{ t('agSearch.clearHistory') }}
+            </a-button>
+          </div>
+          <div class="history-tags">
+            <a-tag
+              v-for="(item, index) in searchHistory"
+              :key="index"
+              closable
+              @click="applyHistory(item)"
+              @close="removeHistory(index)"
+            >
+              {{ formatHistoryItem(item) }}
+            </a-tag>
+          </div>
+        </div>
+      </transition>
     </a-form>
   </div>
 </template>
 
 <script setup>
-import { DownOutlined, RedoOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
-import { computed, reactive, ref, watch } from 'vue'
+import { DownOutlined, HistoryOutlined, RedoOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
+import { computed, reactive, ref, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -63,43 +83,44 @@ const { t } = useI18n()
 const props = defineProps({
   searchData: { type: Object, default: null },
   modelValue: { type: Object, default: () => ({}) },
-  // 新属性：查询按钮 loading
   searchLoading: { type: Boolean, default: false },
-  // 兼容属性：历史页面仍在使用
   loading: { type: Boolean, default: undefined },
   btnLoading: { type: Boolean, default: undefined },
-  // 重置策略：undefined | null | empty-string | empty-array | keep
   resetMode: {
     type: String,
     default: 'undefined',
     validator: (val) => ['undefined', 'null', 'empty-string', 'empty-array', 'keep'].includes(val)
   },
-  // 重置时跳过的字段
   resetExclude: { type: Array, default: () => [] },
-  // 是否支持展开/收起
   collapsible: { type: Boolean, default: false },
-  // 默认是否收起
   defaultCollapsed: { type: Boolean, default: true },
-  // 响应式列配置
   colSpan: {
     type: Object,
     default: () => ({
-      xs: 24, // 手机：1 列
-      sm: 12, // 平板：2 列
-      md: 8, // 小桌面：3 列
-      lg: 6, // 桌面：4 列
-      xl: 6 // 大屏：4 列
+      xs: 24,
+      sm: 12,
+      md: 8,
+      lg: 6,
+      xl: 6
     })
-  }
+  },
+  enableQuickSearch: { type: Boolean, default: false },
+  quickSearchDelay: { type: Number, default: 500 },
+  enableSearchHistory: { type: Boolean, default: false },
+  maxHistoryCount: { type: Number, default: 10 },
+  historyKey: { type: String, default: 'ag_search_history' }
 })
 
-const emit = defineEmits(['update:modelValue', 'search', 'reset', 'collapse-change'])
+const emit = defineEmits(['update:modelValue', 'search', 'reset', 'collapse-change', 'quick-search'])
 
 const state = reactive({
   model: props.modelValue || props.searchData || {}
 })
 
 const collapsed = ref(props.defaultCollapsed)
+const showHistory = ref(false)
+const searchHistory = ref([])
+let debounceTimer = null
 
 const searchLoading = computed(() => {
   if (props.loading !== undefined) return props.loading
@@ -117,10 +138,79 @@ const resetText = computed(() => textOrFallback('common.reset', '重置'))
 const expandText = computed(() => textOrFallback('common.expand', '展开'))
 const collapseText = computed(() => textOrFallback('common.collapse', '收起'))
 
-// 暴露响应式配置给插槽使用
 defineExpose({
-  colSpan: props.colSpan
+  colSpan: props.colSpan,
+  onSearch,
+  onReset
 })
+
+// 加载搜索历史
+function loadSearchHistory() {
+  if (!props.enableSearchHistory) return
+  try {
+    const history = localStorage.getItem(props.historyKey)
+    if (history) {
+      searchHistory.value = JSON.parse(history)
+    }
+  } catch (e) {
+    console.warn('[ag-search] Failed to load search history:', e)
+    searchHistory.value = []
+  }
+}
+
+// 保存搜索历史
+function saveSearchHistory() {
+  if (!props.enableSearchHistory) return
+  try {
+    localStorage.setItem(props.historyKey, JSON.stringify(searchHistory.value))
+  } catch (e) {
+    console.warn('[ag-search] Failed to save search history:', e)
+  }
+}
+
+// 添加搜索历史
+function addSearchHistory(item) {
+  if (!props.enableSearchHistory) return
+  const index = searchHistory.value.findIndex(h => JSON.stringify(h) === JSON.stringify(item))
+  if (index > -1) {
+    searchHistory.value.splice(index, 1)
+  }
+  searchHistory.value.unshift({ ...item })
+  if (searchHistory.value.length > props.maxHistoryCount) {
+    searchHistory.value = searchHistory.value.slice(0, props.maxHistoryCount)
+  }
+  saveSearchHistory()
+}
+
+// 清除搜索历史
+function clearHistory() {
+  searchHistory.value = []
+  saveSearchHistory()
+}
+
+// 删除单条历史
+function removeHistory(index) {
+  searchHistory.value.splice(index, 1)
+  saveSearchHistory()
+}
+
+// 应用历史搜索
+function applyHistory(item) {
+  Object.assign(state.model, item)
+  showHistory.value = false
+  onSearch()
+}
+
+// 格式化历史显示
+function formatHistoryItem(item) {
+  const parts = []
+  for (const [key, value] of Object.entries(item)) {
+    if (value !== undefined && value !== null && value !== '' && (Array.isArray(value) ? value.length > 0 : true)) {
+      parts.push(`${key}: ${Array.isArray(value) ? value.join(',') : value}`)
+    }
+  }
+  return parts.join(', ') || t('agSearch.emptySearch')
+}
 
 // 监听 modelValue 变化
 watch(
@@ -139,6 +229,23 @@ watch(
     if (val !== null && val !== undefined && (!props.modelValue || Object.keys(props.modelValue).length === 0)) {
       state.model = val
     }
+  },
+  { deep: true }
+)
+
+// 快速搜索监听
+watch(
+  () => state.model,
+  () => {
+    if (!props.enableQuickSearch) return
+    
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+    }
+    
+    debounceTimer = setTimeout(() => {
+      emit('quick-search', { ...state.model })
+    }, props.quickSearchDelay)
   },
   { deep: true }
 )
@@ -162,6 +269,7 @@ function getResetValue() {
 function onSearch() {
   emit('search', state.model)
   emit('update:modelValue', state.model)
+  addSearchHistory(state.model)
 }
 
 function onReset() {
@@ -180,6 +288,29 @@ function toggleCollapsed() {
   collapsed.value = !collapsed.value
   emit('collapse-change', collapsed.value)
 }
+
+onMounted(() => {
+  loadSearchHistory()
+  
+  // 全局回车键搜索
+  const handleKeydown = (e) => {
+    if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
+      const activeElement = document.activeElement
+      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+        onSearch()
+      }
+    }
+  }
+  
+  document.addEventListener('keydown', handleKeydown)
+  
+  onUnmounted(() => {
+    document.removeEventListener('keydown', handleKeydown)
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+    }
+  })
+})
 </script>
 
 <style scoped>
@@ -189,11 +320,17 @@ function toggleCollapsed() {
   background: var(--layout-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.search-row {
+  margin-bottom: 12px;
 }
 
 .search-buttons {
-  display: flex;
+  /* display: flex; */
   justify-content: flex-end;
+  align-items: center;
 }
 
 .search-buttons :deep(.ant-form-item) {
@@ -209,6 +346,57 @@ function toggleCollapsed() {
   color: var(--primary-color) !important;
 }
 
+.search-history {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.history-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--text-color-weak);
+}
+
+.history-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search-collapse-enter-active,
+.search-collapse-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.search-collapse-enter-from,
+.search-collapse-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.search-collapse-enter-to,
+.search-collapse-leave-from {
+  opacity: 1;
+  max-height: 500px;
+}
+
+.history-fade-enter-active,
+.history-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.history-fade-enter-from,
+.history-fade-leave-to {
+  opacity: 0;
+}
+
 @media (max-width: 992px) {
   .ag-search {
     padding: 12px 12px 0;
@@ -216,6 +404,10 @@ function toggleCollapsed() {
 
   .search-buttons {
     justify-content: flex-start;
+  }
+
+  .search-history {
+    padding-top: 8px;
   }
 }
 </style>

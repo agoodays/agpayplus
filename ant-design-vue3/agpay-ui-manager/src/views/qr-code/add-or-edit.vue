@@ -9,23 +9,23 @@
     class="drawer-width"
     @close="onClose"
   >
-    <a-form-model
-      ref="infoFormModel"
+    <a-form
+      ref="infoForm"
       :model="saveObject"
       :label-col="{ span: 6 }"
       :wrapper-col="{ span: 18 }"
       :rules="rules"
     >
-      <a-form-model-item v-if="isAdd" label="批次号：" prop="batchId">
-        <a-input-number v-model="saveObject.batchId" style="width: 70%; margin-right: 20px" />
+      <a-form-item v-if="isAdd" label="批次号：" name="batchId">
+        <a-input-number v-model:value="saveObject.batchId" style="width: 70%; margin-right: 20px" />
         <a-button type="primary" size="small" @click="onToday">今天</a-button>
         <p class="agpay-tip-text">( 数字格式， 二维码编号的前缀， 建议采用： YYYYMMDD+次数表示 )</p>
-      </a-form-model-item>
-      <a-form-model-item v-if="isAdd" label="创建数量：" prop="addNum">
-        <a-input-number v-model="saveObject.addNum" :min="1" :max="500" />
-      </a-form-model-item>
-      <a-form-model-item v-if="isAdd" label="选择模板" prop="qrcShellId">
-        <a-select v-model="saveObject.qrcShellId" placeholder="请选择模板">
+      </a-form-item>
+      <a-form-item v-if="isAdd" label="创建数量：" name="addNum">
+        <a-input-number v-model:value="saveObject.addNum" :min="1" :max="500" />
+      </a-form-item>
+      <a-form-item v-if="isAdd" label="选择模板" name="qrcShellId">
+        <a-select v-model:value="saveObject.qrcShellId" placeholder="请选择模板">
           <a-select-option key="" value="">无</a-select-option>
           <a-select-option v-for="d in shellList" :key="d.id" :value="d.id">
             <a-tooltip placement="left">
@@ -43,24 +43,24 @@
             {{ d.shellAlias }}
           </a-select-option>
         </a-select>
-      </a-form-model-item>
-      <a-form-model-item label="状态" prop="state">
-        <a-radio-group v-model="saveObject.state">
+      </a-form-item>
+      <a-form-item label="状态" name="state">
+        <a-radio-group v-model:value="saveObject.state">
           <a-radio :value="1"> 启用 </a-radio>
           <a-radio :value="0"> 禁用 </a-radio>
         </a-radio-group>
-      </a-form-model-item>
-      <a-form-model-item label="固定金额" prop="fixedFlag">
-        <a-radio-group v-model="saveObject.fixedFlag">
+      </a-form-item>
+      <a-form-item label="固定金额" name="fixedFlag">
+        <a-radio-group v-model:value="saveObject.fixedFlag">
           <a-radio :value="0"> 任意金额 </a-radio>
           <a-radio :value="1"> 固定金额 </a-radio>
         </a-radio-group>
         <!--<a-input v-if="saveObject.fixedFlag===1" v-model="saveObject.fixedPayAmount" type="number" addon-after="元" style="width: 150px"/>-->
         <span v-if="saveObject.fixedFlag === 1"
-          ><a-input-number v-model="saveObject.fixedPayAmount" addon-after="元" />元</span
+          ><a-input-number v-model:value="saveObject.fixedPayAmount" addon-after="元" />元</span
         >
-      </a-form-model-item>
-      <a-form-model-item v-if="isAdd" prop="entryPage">
+      </a-form-item>
+      <a-form-item v-if="isAdd" name="entryPage">
         <template #label>
           <span>
             <label title="选择页面类型" style="margin-right: 4px">扫码后页面类型</label>
@@ -70,26 +70,26 @@
               <template #content>
                 <p>谨慎选择， 一经填写不可变更。</p>
               </template>
-              <a-icon type="question-circle" />
+              <icons.QuestionCircleOutlined />
             </a-popover>
           </span>
         </template>
-        <a-radio-group v-model="saveObject.entryPage">
+        <a-radio-group v-model:value="saveObject.entryPage">
           <a-radio :value="'default'">
             默认
             <a-popover placement="top">
               <template #content>
                 <p>未指定，取决于二维码是否绑定到微信侧</p>
               </template>
-              <a-icon type="question-circle" />
+              <icons.QuestionCircleOutlined />
             </a-popover>
           </a-radio>
           <a-radio :value="'h5'"> 固定H5页面 </a-radio>
           <a-radio :value="'lite'"> 固定小程序页面 </a-radio>
         </a-radio-group>
         <p class="agpay-tip-text">选择[默认/H5/小程序]任意一种后不可修改，请谨慎选择。</p>
-      </a-form-model-item>
-      <a-form-model-item prop="alipayWayCode">
+      </a-form-item>
+      <a-form-item name="alipayWayCode">
         <template #label>
           <span>
             <label title="支付宝支付方式" style="margin-right: 4px">支付宝支付方式</label>
@@ -99,18 +99,18 @@
               <template #content>
                 <p>仅H5呈现时生效</p>
               </template>
-              <a-icon type="question-circle" />
+              <icons.QuestionCircleOutlined />
             </a-popover>
           </span>
         </template>
-        <a-radio-group v-model="saveObject.alipayWayCode">
+        <a-radio-group v-model:value="saveObject.alipayWayCode">
           <a-radio :value="'ALI_JSAPI'"> ALI_JSAPI </a-radio>
           <a-radio :value="'ALI_WAP'"> ALI_WAP </a-radio>
         </a-radio-group>
         <br />
         <p class="agpay-tip-text">仅H5呈现时生效</p>
-      </a-form-model-item>
-    </a-form-model>
+      </a-form-item>
+    </a-form>
     <div class="drawer-btn-center">
       <a-button icon="close" :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
         取消
@@ -120,6 +120,8 @@
   </a-drawer>
 </template>
 <script setup>
+import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+const icons = { QuestionCircleOutlined }
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { message } from 'ant-design-vue'
 import { ref } from 'vue'
@@ -139,7 +141,7 @@ function createDefaultSaveObject() {
   }
 }
 
-const infoFormModel = ref(null)
+const infoForm = ref(null)
 const isAdd = ref(true)
 const visible = ref(false)
 const btnLoading = ref(false)
@@ -167,7 +169,7 @@ const rules = {
 async function show(currentRecordId) {
   isAdd.value = !currentRecordId
   saveObject.value = createDefaultSaveObject()
-  infoFormModel.value?.resetFields?.()
+  infoForm.value?.resetFields?.()
 
   if (isAdd.value) {
     const [shellRes, batchIdRes] = await Promise.all([
@@ -198,14 +200,16 @@ function onToday() {
   saveObject.value.batchId = +`${year}${month}${day}00`
 }
 
-function validateForm() {
-  return new Promise((resolve) => {
-    if (!infoFormModel.value?.validate) {
-      resolve(true)
-      return
-    }
-    infoFormModel.value.validate((valid) => resolve(valid))
-  })
+async function validateForm() {
+  if (!infoForm.value?.validate) {
+    return true
+  }
+  try {
+    await infoForm.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function handleOkFunc() {

@@ -7,13 +7,13 @@
     :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
   >
-    <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical">
+    <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 商户号（仅新增时显示） -->
       <a-row v-if="isAdd" :gutter="16">
         <a-col :span="24">
           <a-form-item label="商户号" name="mchNo">
             <a-select
-              v-model:value="formState.mchNo"
+              v-model:value="saveObject.mchNo"
               placeholder="请选择商户"
               show-search
               :filter-option="false"
@@ -31,13 +31,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="门店名称" name="storeName">
-            <a-input v-model:value="formState.storeName" placeholder="请输入门店名称" />
+            <a-input v-model:value="saveObject.storeName" placeholder="请输入门店名称" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="联系人电话" name="contactPhone">
-            <a-input v-model:value="formState.contactPhone" placeholder="请输入联系人电话" />
+            <a-input v-model:value="saveObject.contactPhone" placeholder="请输入联系人电话" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -46,52 +46,52 @@
       <a-row :gutter="16">
         <a-col :span="8">
           <a-form-item label="门店LOGO" name="storeLogo">
-            <a-upload
-              :file-list="storeLogoFileList"
+            <ag-upload
+              :urls="saveObject.storeLogo ? [saveObject.storeLogo] : []"
               list-type="picture-card"
               :before-upload="beforeUpload"
               @change="(info) => handleUploadChange(info, 'storeLogo')"
               @preview="handlePreview"
             >
-              <div v-if="storeLogoFileList.length < 1">
+              <div v-if="!saveObject.storeLogo">
                 <plus-outlined />
                 <div style="margin-top: 8px">上传</div>
               </div>
-            </a-upload>
+            </ag-upload>
           </a-form-item>
         </a-col>
 
         <a-col :span="8">
           <a-form-item label="门头照" name="storeOuterImg">
-            <a-upload
-              :file-list="storeOuterImgFileList"
+            <ag-upload
+              :urls="saveObject.storeOuterImg ? [saveObject.storeOuterImg] : []"
               list-type="picture-card"
               :before-upload="beforeUpload"
               @change="(info) => handleUploadChange(info, 'storeOuterImg')"
               @preview="handlePreview"
             >
-              <div v-if="storeOuterImgFileList.length < 1">
+              <div v-if="!saveObject.storeOuterImg">
                 <plus-outlined />
                 <div style="margin-top: 8px">上传</div>
               </div>
-            </a-upload>
+            </ag-upload>
           </a-form-item>
         </a-col>
 
         <a-col :span="8">
           <a-form-item label="门店内景照" name="storeInnerImg">
-            <a-upload
-              :file-list="storeInnerImgFileList"
+            <ag-upload
+              :urls="saveObject.storeInnerImg ? [saveObject.storeInnerImg] : []"
               list-type="picture-card"
               :before-upload="beforeUpload"
               @change="(info) => handleUploadChange(info, 'storeInnerImg')"
               @preview="handlePreview"
             >
-              <div v-if="storeInnerImgFileList.length < 1">
+              <div v-if="!saveObject.storeInnerImg">
                 <plus-outlined />
                 <div style="margin-top: 8px">上传</div>
               </div>
-            </a-upload>
+            </ag-upload>
           </a-form-item>
         </a-col>
       </a-row>
@@ -100,7 +100,7 @@
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-item label="备注" name="remark">
-            <a-textarea v-model:value="formState.remark" placeholder="请输入备注" :rows="3" />
+            <a-textarea v-model:value="saveObject.remark" placeholder="请输入备注" :rows="3" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -122,7 +122,7 @@
 
         <a-col :span="12">
           <a-form-item label="具体位置" name="address">
-            <a-input v-model:value="formState.address" placeholder="请输入详细地址" />
+            <a-input v-model:value="saveObject.address" placeholder="请输入详细地址" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -130,13 +130,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="经度" name="lng">
-            <a-input-number v-model:value="formState.lng" placeholder="请输入经度" :precision="6" style="width: 100%" />
+            <a-input-number v-model:value="saveObject.lng" placeholder="请输入经度" :precision="6" style="width: 100%" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="纬度" name="lat">
-            <a-input-number v-model:value="formState.lat" placeholder="请输入纬度" :precision="6" style="width: 100%" />
+            <a-input-number v-model:value="saveObject.lat" placeholder="请输入纬度" :precision="6" style="width: 100%" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -180,6 +180,7 @@ import { CheckOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons-vu
 import { message } from 'ant-design-vue'
 import { nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import AgUpload from '@/components/ag-upload'
 
 const { t } = useI18n()
 
@@ -202,24 +203,21 @@ const props = defineProps({
 const emit = defineEmits(['update:open', 'success'])
 
 // State
-const formRef = ref()
+const infoForm = ref(null)
 const loading = ref(false)
 const isAdd = ref(true)
 const localOpen = ref(false)
 const mchList = ref([])
 const areas = ref([])
 
-// 文件列表
-const storeLogoFileList = ref([])
-const storeOuterImgFileList = ref([])
-const storeInnerImgFileList = ref([])
+
 
 // 图片预览
 const previewOpen = ref(false)
 const previewImage = ref('')
 
 // 表单数据
-const formState = reactive({
+const saveObject = reactive({
   mchNo: '',
   storeName: '',
   contactPhone: '',
@@ -281,46 +279,14 @@ const loadDetail = async () => {
     loading.value = true
     const res = await mchStoreApi.getById(props.recordId)
 
-    Object.assign(formState, res)
+    Object.assign(saveObject, res)
 
     // 设置省市区
     if (res.provinceCode && res.cityCode && res.districtCode) {
       areas.value = [res.provinceCode, res.cityCode, res.districtCode]
     }
 
-    // 设置图片
-    if (res.storeLogo) {
-      storeLogoFileList.value = [
-        {
-          uid: '-1',
-          name: 'logo.jpg',
-          status: 'done',
-          url: res.storeLogo
-        }
-      ]
-    }
-
-    if (res.storeOuterImg) {
-      storeOuterImgFileList.value = [
-        {
-          uid: '-2',
-          name: 'outer.jpg',
-          status: 'done',
-          url: res.storeOuterImg
-        }
-      ]
-    }
-
-    if (res.storeInnerImg) {
-      storeInnerImgFileList.value = [
-        {
-          uid: '-3',
-          name: 'inner.jpg',
-          status: 'done',
-          url: res.storeInnerImg
-        }
-      ]
-    }
+    
   } catch (error) {
     message.error(error.msg || t('common.loadDataFailed'))
   } finally {
@@ -332,7 +298,7 @@ const loadDetail = async () => {
  * 重置表单
  */
 const resetForm = () => {
-  Object.assign(formState, {
+  Object.assign(saveObject, {
     mchNo: '',
     storeName: '',
     contactPhone: '',
@@ -349,12 +315,9 @@ const resetForm = () => {
   })
 
   areas.value = []
-  storeLogoFileList.value = []
-  storeOuterImgFileList.value = []
-  storeInnerImgFileList.value = []
 
   nextTick(() => {
-    formRef.value?.clearValidate()
+    infoForm.value?.clearValidate()
   })
 }
 
@@ -378,9 +341,9 @@ const handleSearchMch = async (keyword) => {
  */
 const handleAreaChange = (value) => {
   if (value && value.length === 3) {
-    formState.provinceCode = value[0]
-    formState.cityCode = value[1]
-    formState.districtCode = value[2]
+    saveObject.provinceCode = value[0]
+    saveObject.cityCode = value[1]
+    saveObject.districtCode = value[2]
   }
 }
 
@@ -403,20 +366,11 @@ const beforeUpload = (file) => {
  * 上传变化
  */
 const handleUploadChange = async (info, field) => {
-  const { file, fileList } = info
-
-  // 更新文件列表
-  if (field === 'storeLogo') {
-    storeLogoFileList.value = fileList
-  } else if (field === 'storeOuterImg') {
-    storeOuterImgFileList.value = fileList
-  } else if (field === 'storeInnerImg') {
-    storeInnerImgFileList.value = fileList
-  }
+  const { file } = info
 
   // 上传成功后更新表单数据
   if (file.status === 'done' && file.response) {
-    formState[field] = file.response.data.url
+    saveObject[field] = file.response.data
     message.success(t('common.uploadSuccess'))
   } else if (file.status === 'error') {
     message.error(t('common.uploadFailed'))
@@ -443,11 +397,11 @@ const handleCancelPreview = () => {
  */
 const handleSubmit = async () => {
   try {
-    await formRef.value.validate()
+    await infoForm.value.validate()
 
     loading.value = true
 
-    const data = { ...formState }
+    const data = { ...saveObject }
 
     // 提交数据
     if (isAdd.value) {

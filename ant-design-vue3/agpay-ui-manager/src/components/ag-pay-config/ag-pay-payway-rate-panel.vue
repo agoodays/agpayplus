@@ -127,7 +127,7 @@
                                 >范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span
                               >
                             </template>
-                            <a-icon type="QuestionCircleOutlined" />
+                            <icons.QuestionCircleOutlined />
                           </a-popover>
                         </div>
                       </div>
@@ -387,7 +387,7 @@
                               >范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span
                             >
                           </template>
-                          <a-icon type="QuestionCircleOutlined" />
+                          <icons.QuestionCircleOutlined />
                         </a-popover>
                       </div>
                     </div>
@@ -557,8 +557,9 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
-import { BulbOutlined, QuestionCircleOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons-vue'
-import { API_URL_RATECONFIGS_LIST, req } from '@/api/manage'
+import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+const icons = { QuestionCircleOutlined }
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { infoBox } from '@/utils/info-box'
 
 const props = defineProps({
@@ -840,11 +841,11 @@ const getRateConfig = async (currentIfCodeVal) => {
   const params = {}
   Object.assign(params, { configMode: props.configMode, infoId: props.infoId, ifCode: currentIfCode.value })
   let mapData = {}
-  await req.list(API_URL_RATECONFIGS_LIST + '/savedMapData', params).then((res) => {
+  await payConfigApi.queryRateConfigList('/savedMapData', params).then((res) => {
     mapData = res
   })
   Object.assign(params, { pageSize: -1 })
-  await req.list(API_URL_RATECONFIGS_LIST + '/payways', params).then((res) => {
+  await payConfigApi.queryRateConfigList('/payways', params).then((res) => {
     res.records.forEach((payWay) => {
       payWay.checked = false
       allPaywayList.value.push(payWay)
@@ -1488,8 +1489,7 @@ const onSubmit = () => {
       delPayWayCodes: delPayWayCodes
     }
     Object.assign(params, feeRateConfig)
-    req
-      .add(API_URL_RATECONFIGS_LIST, params)
+    payConfigApi.addRateConfig(params)
       .then((res) => {
         message.success('保存成功')
         typeof originSavedListVal === 'object' && (originSavedList.value = originSavedListVal)

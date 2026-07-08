@@ -1,18 +1,11 @@
 <template>
   <div>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <ag-input v-model="searchData.shellAlias" placeholder="模板名称" />
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" :loading="btnLoading" @click="searchFunc(true)">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="resetFunc">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
+        <template #formItem>
+          <ag-input v-model="searchData.shellAlias" placeholder="模板名称" />
+        </template>
+      </ag-search>
       <!-- 列表渲染 -->
       <ag-table
         ref="infoTable"
@@ -71,7 +64,7 @@
 </template>
 <script setup>
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
-import { AgInput, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { reactive, ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 
@@ -81,10 +74,10 @@ const tableColumns = [
     title: '模板预览图',
     width: 151,
     fixed: 'left',
-    scopedSlots: { customRender: 'shellImgViewUrlSlot' }
+    customRender: 'shellImgViewUrlSlot'
   },
   { key: 'shellAlias', dataIndex: 'shellAlias', title: '模板名称' },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 const infoTable = ref(null)
@@ -94,28 +87,13 @@ const btnLoading = ref(false)
 
 const reqTableDataFunc = (params) => qrcShellApi.queryCardList(params)
 
-function reloadTable() {
-  const tableRef = infoTable.value
-  if (!tableRef) return
-
-  if (typeof tableRef.reload === 'function') {
-    tableRef.reload()
-    return
-  }
-
-  if (typeof tableRef.loadData === 'function') {
-    tableRef.loadData()
-    return
-  }
-
-  if (typeof tableRef.refTable === 'function') {
-    tableRef.refTable(true)
-  }
+function queryFunc() {
+  btnLoading.value = true
+  infoTable.value.loadData()
 }
 
 function searchFunc() {
-  btnLoading.value = true
-  reloadTable()
+  infoTable.value.loadData()
 }
 
 function resetFunc() {

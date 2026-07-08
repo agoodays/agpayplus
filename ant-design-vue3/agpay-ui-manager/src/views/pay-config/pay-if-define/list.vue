@@ -23,10 +23,10 @@
           <!-- 卡片底部操作栏 -->
           <div class="ag-card-ops">
             <a-tooltip placement="top" title="编辑">
-              <a-icon key="edit" type="edit" @click="addOrEdit(record.ifCode)" />
+              <icons.EditOutlined />
             </a-tooltip>
             <a-tooltip placement="top" title="删除">
-              <a-icon key="delete" type="delete" @click="del(record.ifCode)" />
+              <icons.DeleteOutlined />
             </a-tooltip>
           </div>
         </div>
@@ -38,6 +38,8 @@
 </template>
 
 <script setup>
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
+const icons = { DeleteOutlined, EditOutlined }
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { reactive, ref } from 'vue'
 import PayIfDefineAddOrEdit from './add-or-edit.vue'

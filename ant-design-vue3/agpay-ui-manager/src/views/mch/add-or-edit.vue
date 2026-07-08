@@ -7,18 +7,18 @@
     :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
   >
-    <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical">
+    <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 基本信息 -->
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="商户名称" name="mchName">
-            <a-input v-model:value="formState.mchName" placeholder="请输入商户名称" />
+            <a-input v-model:value="saveObject.mchName" placeholder="请输入商户名称" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="登录名" name="loginUsername">
-            <a-input v-model:value="formState.loginUsername" placeholder="请输入商户登录名" :disabled="!isAdd" />
+            <a-input v-model:value="saveObject.loginUsername" placeholder="请输入商户登录名" :disabled="!isAdd" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -26,13 +26,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="商户简称" name="mchShortName">
-            <a-input v-model:value="formState.mchShortName" placeholder="请输入商户简称" />
+            <a-input v-model:value="saveObject.mchShortName" placeholder="请输入商户简称" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="联系人姓名" name="contactName">
-            <a-input v-model:value="formState.contactName" placeholder="请输入联系人姓名" />
+            <a-input v-model:value="saveObject.contactName" placeholder="请输入联系人姓名" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -40,13 +40,13 @@
       <a-row :gutter="16">
         <a-col :span="12">
           <a-form-item label="联系人邮箱" name="contactEmail">
-            <a-input v-model:value="formState.contactEmail" placeholder="请输入联系人邮箱" />
+            <a-input v-model:value="saveObject.contactEmail" placeholder="请输入联系人邮箱" />
           </a-form-item>
         </a-col>
 
         <a-col :span="12">
           <a-form-item label="联系人手机号" name="contactTel">
-            <a-input v-model:value="formState.contactTel" placeholder="请输入联系人手机号" />
+            <a-input v-model:value="saveObject.contactTel" placeholder="请输入联系人手机号" />
             <div class="tip-text">(同步更改登录手机号)</div>
           </a-form-item>
         </a-col>
@@ -65,7 +65,7 @@
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
-            <a-radio-group v-model:value="formState.mchLevel">
+            <a-radio-group v-model:value="saveObject.mchLevel">
               <a-radio value="M0">M0</a-radio>
               <a-radio value="M1">M1</a-radio>
             </a-radio-group>
@@ -80,7 +80,7 @@
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
-            <a-checkbox-group v-model:value="formState.refundMode">
+            <a-checkbox-group v-model:value="saveObject.refundMode">
               <a-checkbox value="plat">平台退款</a-checkbox>
               <a-checkbox value="api">接口退款</a-checkbox>
             </a-checkbox-group>
@@ -101,7 +101,7 @@
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
-            <a-radio-group v-model:value="formState.type" :disabled="!isAdd">
+            <a-radio-group v-model:value="saveObject.type" :disabled="!isAdd">
               <a-radio :value="1">普通商户</a-radio>
               <a-radio :value="2">特约商户</a-radio>
             </a-radio-group>
@@ -110,7 +110,7 @@
 
         <a-col :span="12">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="formState.state">
+            <a-radio-group v-model:value="saveObject.state">
               <a-radio :value="1">启用</a-radio>
               <a-radio :value="0">禁用</a-radio>
             </a-radio-group>
@@ -119,11 +119,11 @@
       </a-row>
 
       <!-- 特约商户专属字段 -->
-      <a-row v-if="formState.type === 2" :gutter="16">
+      <a-row v-if="saveObject.type === 2" :gutter="16">
         <a-col :span="12">
           <a-form-item label="代理商号" name="agentNo">
             <a-select
-              v-model:value="formState.agentNo"
+              v-model:value="saveObject.agentNo"
               placeholder="请选择代理商"
               show-search
               :filter-option="false"
@@ -140,11 +140,11 @@
         <a-col :span="12">
           <a-form-item label="服务商号" name="isvNo">
             <a-select
-              v-model:value="formState.isvNo"
+              v-model:value="saveObject.isvNo"
               placeholder="请选择服务商"
               show-search
               :filter-option="false"
-              :disabled="!isAdd || formState.agentNo"
+              :disabled="!isAdd || saveObject.agentNo"
               @search="handleSearchIsv"
             >
               <a-select-option v-for="item in isvList" :key="item.isvNo" :value="item.isvNo">
@@ -158,7 +158,7 @@
       <a-row :gutter="16">
         <a-col :span="24">
           <a-form-item label="备注" name="remark">
-            <a-textarea v-model:value="formState.remark" placeholder="请输入备注" :rows="3" />
+            <a-textarea v-model:value="saveObject.remark" placeholder="请输入备注" :rows="3" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -172,7 +172,7 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="是否发送开通提醒" name="isNotify">
-              <a-radio-group v-model:value="formState.isNotify">
+              <a-radio-group v-model:value="saveObject.isNotify">
                 <a-radio :value="0">否</a-radio>
                 <a-radio :value="1">是</a-radio>
               </a-radio-group>
@@ -183,16 +183,16 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="密码设置" name="passwordType">
-              <a-radio-group v-model:value="formState.passwordType">
+              <a-radio-group v-model:value="saveObject.passwordType">
                 <a-radio value="default">默认密码</a-radio>
                 <a-radio value="custom">自定义密码</a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
 
-          <a-col v-if="formState.passwordType === 'custom'" :span="12">
+          <a-col v-if="saveObject.passwordType === 'custom'" :span="12">
             <a-form-item label="登录密码" name="loginPassword">
-              <a-input-password v-model:value="formState.loginPassword" placeholder="请输入登录密码" />
+              <a-input-password v-model:value="saveObject.loginPassword" placeholder="请输入登录密码" />
             </a-form-item>
             <a-button
               style="color: var(--primary-color); border-color: var(--primary-color)"
@@ -232,13 +232,13 @@
         <a-row v-if="resetPass && !defaultPass" :gutter="16">
           <a-col :span="12">
             <a-form-item label="新密码" name="newPwd">
-              <a-input-password v-model:value="formState.newPwd" placeholder="请输入新密码" />
+              <a-input-password v-model:value="saveObject.newPwd" placeholder="请输入新密码" />
             </a-form-item>
           </a-col>
 
           <a-col :span="12">
             <a-form-item label="确认新密码" name="confirmPwd">
-              <a-input-password v-model:value="formState.confirmPwd" placeholder="请再次输入新密码" />
+              <a-input-password v-model:value="saveObject.confirmPwd" placeholder="请再次输入新密码" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -289,7 +289,7 @@ const props = defineProps({
 const emit = defineEmits(['update:open', 'success'])
 
 // State
-const formRef = ref()
+const infoForm = ref(null)
 const loading = ref(false)
 const isAdd = ref(true)
 const localOpen = ref(false)
@@ -310,7 +310,7 @@ const passwordRules = reactive({
 })
 
 // 表单数据
-const formState = reactive({
+const saveObject = reactive({
   mchName: '',
   loginUsername: '',
   mchShortName: '',
@@ -354,7 +354,7 @@ const rules = {
   isvNo: [
     {
       validator: (rule, value) => {
-        if (formState.type === 2 && !value) {
+        if (saveObject.type === 2 && !value) {
           return Promise.reject('请选择服务商')
         }
         return Promise.resolve()
@@ -365,10 +365,10 @@ const rules = {
   loginPassword: [
     {
       validator: (rule, value) => {
-        if (formState.passwordType === 'custom' && !value) {
+        if (saveObject.passwordType === 'custom' && !value) {
           return Promise.reject('请输入登录密码')
         }
-        if (formState.passwordType === 'custom' && passwordRules.regexpRules) {
+        if (saveObject.passwordType === 'custom' && passwordRules.regexpRules) {
           const regex = new RegExp(passwordRules.regexpRules)
           if (!regex.test(value)) {
             return Promise.reject(passwordRules.errTips)
@@ -402,7 +402,7 @@ const rules = {
         if (resetPass.value && !defaultPass.value && !value) {
           return Promise.reject('请输入确认新密码')
         }
-        if (resetPass.value && !defaultPass.value && value !== formState.newPwd) {
+        if (resetPass.value && !defaultPass.value && value !== saveObject.newPwd) {
           return Promise.reject('两次输入密码不一致')
         }
         return Promise.resolve()
@@ -468,11 +468,11 @@ const loadDetail = async () => {
   try {
     loading.value = true
     const res = await mchApi.getById(props.recordId)
-    Object.assign(formState, res)
+    Object.assign(saveObject, res)
 
     // 处理退款方式（字符串转数组）
     if (typeof res.refundMode === 'string') {
-      formState.refundMode = res.refundMode.split(',')
+      saveObject.refundMode = res.refundMode.split(',')
     }
   } catch (error) {
     message.error(error.msg || '加载数据失败')
@@ -485,7 +485,7 @@ const loadDetail = async () => {
  * 重置表单
  */
 const resetForm = () => {
-  Object.assign(formState, {
+  Object.assign(saveObject, {
     mchName: '',
     loginUsername: '',
     mchShortName: '',
@@ -511,7 +511,7 @@ const resetForm = () => {
   defaultPass.value = true
 
   nextTick(() => {
-    formRef.value?.clearValidate()
+    infoForm.value?.clearValidate()
   })
 }
 
@@ -555,7 +555,7 @@ const handleGeneratePassword = () => {
   for (let i = 0; i < length; i++) {
     password += charset.charAt(Math.floor(Math.random() * charset.length))
   }
-  formState.loginPassword = password
+  saveObject.loginPassword = password
   message.success(t('mch.randomPasswordGenerated', { password }))
 }
 
@@ -564,12 +564,12 @@ const handleGeneratePassword = () => {
  */
 const handleSubmit = async () => {
   try {
-    await formRef.value.validate()
+    await infoForm.value.validate()
 
     loading.value = true
 
     // 构建提交数据
-    const data = { ...formState }
+    const data = { ...saveObject }
 
     // 处理退款方式（数组转字符串）
     data.refundMode = Array.isArray(data.refundMode) ? data.refundMode.join(',') : data.refundMode

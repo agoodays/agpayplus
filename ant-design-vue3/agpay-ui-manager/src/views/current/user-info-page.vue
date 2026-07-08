@@ -46,18 +46,26 @@
                 <div class="avatar-preview">
                   <img :src="basicForm.avatarUrl || defaultAvatar" alt="头像" @click="handlePreviewAvatar" />
                 </div>
-                <a-upload
+                <ag-upload
                   name="file"
+                  :action="uploadAction"
+                  :accept="'.jpg,.jpeg,.png'"
+                  :multiple="false"
                   :show-upload-list="false"
-                  :custom-request="handleUploadAvatar"
+                  :urls="basicForm.avatarUrl ? [basicForm.avatarUrl] : []"
+                  :num="1"
+                  :replace-mode="true"
                   :before-upload="beforeAvatarUpload"
-                  accept=".jpg,.jpeg,.png"
+                  @upload-success="handleAvatarUploadSuccess"
+                  @error="handleAvatarUploadError"
                 >
-                  <a-button :loading="avatarLoading">
-                    <upload-outlined />
-                    {{ avatarLoading ? '正在上传' : '更换头像' }}
-                  </a-button>
-                </a-upload>
+                  <template #uploadSlot="{ loading }">
+                    <a-button :loading="loading">
+                      <upload-outlined />
+                      {{ loading ? '正在上传' : '更换头像' }}
+                    </a-button>
+                  </template>
+                </ag-upload>
               </div>
             </a-col>
           </a-row>
@@ -145,9 +153,10 @@ import { useUserStore } from '@/store/modules/system/user'
 import { CheckCircleOutlined, SafetyCertificateOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import AgUpload from '@/components/ag-upload'
 const router = useRouter()
 const userStore = useUserStore()
 const { t } = useI18n()
@@ -156,7 +165,6 @@ const { t } = useI18n()
   const securityTab = ref('password')
 
   const basicLoading = ref(false)
-  const avatarLoading = ref(false)
   const passwordLoading = ref(false)
   const safeWordLoading = ref(false)
 
@@ -180,6 +188,7 @@ const passwordForm = reactive({
   const safeWord = ref('')
 
   const defaultAvatar = '@/assets/logo.svg'
+const uploadAction = '/api/ossFiles/avatar'
 
 const passwordRulesConfig = reactive({
   regexpRules: '',
@@ -336,23 +345,23 @@ const beforeAvatarUpload = (file) => {
   return true
 }
 
-const handleUploadAvatar = async ({ file }) => {
-  avatarLoading.value = true
+const handleAvatarUploadSuccess = async (_bindName, fileList) => {
   try {
-    const formData = new FormData()
-    formData.append('file', file)
-    const res = await currentApi.uploadAvatar(formData)
-    basicForm.avatarUrl = res.url
-
-    await currentApi.modifyUserInfo({ avatarUrl: res.url })
-    const userInfo = await loginApi.getCurrentInfo()
-    userStore.setUserLoginInfo(userInfo)
-    message.success(t('current.avatarUpdated'))
+    const ossFileUrl = fileList[0]?.url || fileList[0]?.response?.data
+    if (ossFileUrl) {
+      basicForm.avatarUrl = ossFileUrl
+      await currentApi.modifyUserInfo({ avatarUrl: ossFileUrl })
+      const userInfo = await loginApi.getCurrentInfo()
+      userStore.setUserLoginInfo(userInfo)
+      message.success(t('current.avatarUpdated'))
+    }
   } catch (error) {
     message.error(error.msg || t('common.uploadFailed'))
-  } finally {
-    avatarLoading.value = false
   }
+}
+
+const handleAvatarUploadError = (error) => {
+  message.error(error.msg || t('common.uploadFailed'))
 }
 
 const handlePreviewAvatar = () => {

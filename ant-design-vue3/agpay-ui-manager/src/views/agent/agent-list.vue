@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <a-card>
       <ag-search v-model="searchData" :collapsible="true" :default-collapsed="!isShowMore">
@@ -35,7 +35,7 @@
           </a-col>
           <a-col v-if="isShowMore" :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="">
-              <a-select v-model="searchData.state" placeholder="代理商状态" default-value="">
+              <a-select v-model:value="searchData.state" placeholder="代理商状态" default-value="">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">禁用</a-select-option>
                 <a-select-option value="1">启用</a-select-option>

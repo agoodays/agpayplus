@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-drawer
     :visible="visible"
     title="支付参数列表"
@@ -31,7 +31,7 @@
             <!-- 卡片底部操作栏 -->
             <div class="ag-card-ops">
               <a v-if="$access('ENT_ISV_PAY_CONFIG_ADD')" @click="editPayIfConfigFunc(record)"
-                >填写参数 <a-icon key="right" type="right"></a-icon
+                >填写参数 <icons.RightOutlined />
               ></a>
               <a v-else>暂无操作</a>
             </div>
@@ -49,55 +49,55 @@
       :mask-closable="false"
       @close="onChildrenDrawerClose"
     >
-      <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
+      <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-model-item label="支付接口费率" prop="ifRate">
-              <a-input v-model="saveObject.ifRate" placeholder="请输入" suffix="%" />
-            </a-form-model-item>
+            <a-form-item label="支付接口费率" name="ifRate">
+              <a-input v-model:value="saveObject.ifRate" placeholder="请输入" suffix="%" />
+            </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-model-item label="状态" prop="state">
-              <a-radio-group v-model="saveObject.state">
+            <a-form-item label="状态" name="state">
+              <a-radio-group v-model:value="saveObject.state">
                 <a-radio :value="1"> 启用 </a-radio>
                 <a-radio :value="0"> 停用 </a-radio>
               </a-radio-group>
-            </a-form-model-item>
+            </a-form-item>
           </a-col>
           <a-col :span="24">
-            <a-form-model-item label="备注" prop="remark">
-              <a-input v-model="saveObject.remark" placeholder="请输入" type="textarea" />
-            </a-form-model-item>
+            <a-form-item label="备注" name="remark">
+              <a-input v-model:value="saveObject.remark" placeholder="请输入" type="textarea" />
+            </a-form-item>
           </a-col>
         </a-row>
-      </a-form-model>
+      </a-form>
       <a-divider orientation="left">
         <a-tag color="var(--error-color)"> {{ saveObject.ifCode }} 服务商参数配置 </a-tag>
       </a-divider>
-      <a-form-model ref="isvParamFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
+      <a-form ref="isvParamForm" :model="ifParams" layout="vertical" :rules="ifParamsRules">
         <a-row :gutter="16">
           <a-col v-for="(item, key) in isvParams" :key="key" :span="item.type === 'text' ? 12 : 24">
-            <a-form-model-item
+            <a-form-item
               v-if="item.type === 'text' || item.type === 'textarea'"
               :label="item.desc"
-              :prop="item.name"
+              :name="item.name"
             >
               <a-input
                 v-if="item.star === '1'"
-                v-model="ifParams[item.name]"
+                v-model:value="ifParams[item.name]"
                 :placeholder="ifParams[item.name + '_ph']"
                 :type="item.type"
               />
-              <a-input v-else v-model="ifParams[item.name]" placeholder="请输入" :type="item.type" />
-            </a-form-model-item>
-            <a-form-model-item v-else-if="item.type === 'radio'" :label="item.desc" :prop="item.name">
-              <a-radio-group v-model="ifParams[item.name]">
+              <a-input v-else v-model:value="ifParams[item.name]" placeholder="请输入" :type="item.type" />
+            </a-form-item>
+            <a-form-item v-else-if="item.type === 'radio'" :label="item.desc" :name="item.name">
+              <a-radio-group v-model:value="ifParams[item.name]">
                 <a-radio v-for="(radioItem, radioKey) in item.values" :key="radioKey" :value="radioItem.value">
                   {{ radioItem.title }}
                 </a-radio>
               </a-radio-group>
-            </a-form-model-item>
-            <a-form-model-item v-else-if="item.type === 'file'" :label="item.desc" :prop="item.name">
+            </a-form-item>
+            <a-form-item v-else-if="item.type === 'file'" :label="item.desc" :name="item.name">
               <ag-upload
                 :action="action"
                 :bind-name="item.name"
@@ -106,13 +106,13 @@
                 @upload-success="uploadSuccess"
               >
                 <template #uploadSlot="{ loading }">
-                  <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+                  <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
                 </template>
               </ag-upload>
-            </a-form-model-item>
+            </a-form-item>
           </a-col>
         </a-row>
-      </a-form-model>
+      </a-form>
       <div class="drawer-btn-center">
         <a-button :style="{ marginRight: '8px' }" icon="close" @click="onChildrenDrawerClose"> 取消 </a-button>
         <a-button type="primary" :loading="btnLoading" icon="check" @click="onSubmit"> 保存 </a-button>
@@ -126,6 +126,8 @@
 </template>
 
 <script setup>
+import { LoadingOutlined, RightOutlined, UploadOutlined } from '@ant-design/icons-vue'
+const icons = { LoadingOutlined, RightOutlined, UploadOutlined }
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
 import AgCard from '@/components/ag-card'
 import AgUpload from '@/components/ag-upload'
@@ -135,8 +137,8 @@ import AlipayPayConfig from './custom/alipay-pay-config.vue'
 import WxpayPayConfig from './custom/wxpay-pay-config.vue'
 
 const infoCard = ref(null)
-const infoFormModel = ref(null)
-const isvParamFormModel = ref(null)
+const infoForm = ref(null)
+const isvParamForm = ref(null)
 const wxpayPayConfig = ref(null)
 const alipayPayConfig = ref(null)
 
@@ -238,8 +240,8 @@ function refCardList() {
 
 async function editPayIfConfigFunc(record) {
   if (record.configPageType === 1) {
-    infoFormModel.value?.resetFields?.()
-    isvParamFormModel.value?.resetFields?.()
+    infoForm.value?.resetFields?.()
+    isvParamForm.value?.resetFields?.()
 
     childrenVisible.value = true
     saveObject.value = {
@@ -290,21 +292,21 @@ async function editPayIfConfigFunc(record) {
   }
 }
 
-function validateForm(formRef) {
-  return new Promise((resolve) => {
-    if (!formRef.value?.validate) {
-      resolve(true)
-      return
-    }
-    formRef.value.validate((valid) => {
-      resolve(valid)
-    })
-  })
+async function validateForm(formRef) {
+  if (!formRef.value?.validate) {
+    return true
+  }
+  try {
+    await formRef.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function onSubmit() {
-  const valid = await validateForm(infoFormModel)
-  const valid2 = await validateForm(isvParamFormModel)
+  const valid = await validateForm(infoForm)
+  const valid2 = await validateForm(isvParamForm)
   if (!valid || !valid2) return
 
   btnLoading.value = true

@@ -2,6 +2,8 @@ import { req } from '@/lib/ag-axios'
 
 const API_URL_MCH_APP = '/api/mchApps'
 const API_URL_MCH_LIST = '/api/mchInfo'
+const API_URL_MCH_PAYCONFIGS_LIST = '/api/mch/payConfigs'
+const API_URL_MCH_PAYPASSAGE_LIST = '/api/mch/payPassages'
 
 export const mchAppApi = {
   queryPage(params) {
@@ -24,5 +26,30 @@ export const mchAppApi = {
   },
   queryByMchNo(mchNo) {
     return req.list(API_URL_MCH_APP, { pageSize: -1, mchNo })
+  },
+  getMchPayConfigUnique(infoId, ifCode) {
+    return req.get(`${API_URL_MCH_PAYCONFIGS_LIST}/${infoId}/${ifCode}`)
+  },
+  addMchPayConfig(data) {
+    return req.add(API_URL_MCH_PAYCONFIGS_LIST, data)
+  },
+  updateMchPayConfig(infoId, data) {
+    return req.updateById(API_URL_MCH_PAYCONFIGS_LIST, infoId, data)
+  },
+  getAvailablePayInterfaceList(mchNo, wayCode, params) {
+    return req.get(`/api/mch/payPassages/availablePayInterface/${mchNo}/${wayCode}`, params)
+  },
+  updateMchPassageState(appId, wayCode, ifCode, state) {
+    const params = { appId, wayCode, ifCode, state }
+    const queryString = Object.keys(params)
+      .map((key) => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+      .join('&')
+    return req.add(`${API_URL_MCH_PAYPASSAGE_LIST}/mchPassage?${queryString}`)
+  },
+  queryMchPayPassagePage(params) {
+    return req.list(API_URL_MCH_PAYPASSAGE_LIST, params)
+  },
+  queryAlipayIsvsubMchAuthUrl(mchAppId) {
+    return req.get(`/api/mch/payConfigs/alipayIsvsubMchAuthUrls/${mchAppId}`)
   }
 }

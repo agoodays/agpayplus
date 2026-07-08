@@ -45,7 +45,7 @@
                   <template #title>
                     {{ mainTips.recentAmountTip }}
                   </template>
-                  <a-icon class="bi" :icon="InfoCircleOutlined" />
+                  <icons.InfoCircleOutlined />
                 </a-tooltip>
               </div>
               <a-select v-model:value="recentDay" placeholder="" class="date" @change="recentDayChange">
@@ -68,7 +68,7 @@
               <template #title>
                 {{ mainTips.totalAgentTip }}
               </template>
-              <a-icon class="bi" :icon="InfoCircleOutlined" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
           <div class="quantity-number">{{ mainChart.totalAgent }}</div>
@@ -82,7 +82,7 @@
               <template #title>
                 {{ mainTips.totalMchTip }}
               </template>
-              <a-icon class="bi" :icon="InfoCircleOutlined" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
           <div class="quantity-number">{{ mainChart.totalMch }}</div>
@@ -156,7 +156,7 @@
                 <template #title>
                   此信息为你在本站预留的个性信息，用以鉴别假冒、钓鱼网站。如未看到此信息，请立即停止访问并修改密码。如需修改内容请前往个人中心
                 </template>
-                <a-icon :icon="QuestionCircleOutlined" />
+                <icons.QuestionCircleOutlined />
               </a-tooltip>
             </span>
           </div>
@@ -230,6 +230,7 @@ import { AgDateRangePicker } from '@/components'
 import { useUserStore } from '@/store/modules/system/user'
 import { timeFix } from '@/utils/time-util'
 import { InfoCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
+const icons = { InfoCircleOutlined, QuestionCircleOutlined }
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import empty from './empty.vue'

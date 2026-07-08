@@ -1,7 +1,7 @@
 <template>
-  <a-drawer v-model:open="localOpen" title="商户详情" :width="720" @close="handleClose">
+  <a-drawer v-model:open="localOpen" title="商户详情" width="40%" @close="handleClose">
     <a-spin :spinning="loading">
-      <a-descriptions :column="2" bordered>
+      <a-descriptions :column="2">
         <a-descriptions-item label="商户号">
           {{ detailData.mchNo }}
         </a-descriptions-item>

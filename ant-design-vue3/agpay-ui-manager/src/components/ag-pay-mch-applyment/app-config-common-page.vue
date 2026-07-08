@@ -1,5 +1,5 @@
-<template>
-  <a-form-model ref="infoFormModel" :model="formData" layout="vertical">
+﻿<template>
+  <a-form ref="infoForm" :model="formData" layout="vertical">
     <a-row justify="space-between" type="flex">
       <a-col :span="24">
         <a-divider orientation="left">
@@ -7,10 +7,10 @@
         </a-divider>
       </a-col>
       <a-col :span="12">
-        <a-form-model-item label="微信支付目录" prop="payBaseUrl">
+        <a-form-item label="微信支付目录" name="payBaseUrl">
           <a-row type="flex" justify="space-around" align="middle">
             <a-col :span="18">
-              <a-input v-model="formData.payBaseUrl" />
+              <a-input v-model:value="formData.payBaseUrl" />
             </a-col>
             <a-col :span="6">
               <a-button
@@ -23,13 +23,13 @@
               >
             </a-col>
           </a-row>
-        </a-form-model-item>
+        </a-form-item>
       </a-col>
       <a-col :span="12">
-        <a-form-model-item label="关联服务商公众号appId" prop="bindAppId">
+        <a-form-item label="关联服务商公众号appId" name="bindAppId">
           <a-row type="flex" justify="space-around" align="middle">
             <a-col :span="18">
-              <a-input v-model="formData.bindAppId" />
+              <a-input v-model:value="formData.bindAppId" />
             </a-col>
             <a-col :span="6">
               <a-button
@@ -42,13 +42,13 @@
               >
             </a-col>
           </a-row>
-        </a-form-model-item>
+        </a-form-item>
       </a-col>
       <a-col :span="12">
-        <a-form-model-item label="关联服务商小程序appId" prop="bindLiteAppId">
+        <a-form-item label="关联服务商小程序appId" name="bindLiteAppId">
           <a-row type="flex" justify="space-around" align="middle">
             <a-col :span="18">
-              <a-input v-model="formData.bindLiteAppId" />
+              <a-input v-model:value="formData.bindLiteAppId" />
             </a-col>
             <a-col :span="6">
               <a-button
@@ -61,13 +61,13 @@
               >
             </a-col>
           </a-row>
-        </a-form-model-item>
+        </a-form-item>
       </a-col>
       <a-col :span="12">
-        <a-form-model-item label="关注appId" prop="subscribeAppId">
+        <a-form-item label="关注appId" name="subscribeAppId">
           <a-row type="flex" justify="space-around" align="middle">
             <a-col :span="18">
-              <a-input v-model="formData.subscribeAppId" />
+              <a-input v-model:value="formData.subscribeAppId" />
             </a-col>
             <a-col :span="6">
               <a-button
@@ -80,7 +80,7 @@
               >
             </a-col>
           </a-row>
-        </a-form-model-item>
+        </a-form-item>
       </a-col>
     </a-row>
     <a-row justify="space-between" type="flex">
@@ -88,33 +88,29 @@
         <a-button type="primary" icon="bars" @click="queryConfig">参数查询</a-button>
       </a-col>
     </a-row>
-  </a-form-model>
+  </a-form>
 </template>
 
-<script>
-export default {
-  name: 'AppConfigCommonPage',
-  props: {
-    ifCode: { type: String, default: '' }
-  },
-  data() {
-    return {
-      formData: {
-        payBaseUrl: null,
-        bindAppId: null,
-        bindLiteAppId: null,
-        subscribeAppId: null
-      }
-    }
-  },
-  methods: {
-    setConfig(configType) {
-      console.log(this.formData[configType])
-    },
-    queryConfig() {
-      console.log(this.formData)
-    }
-  }
+<script setup>
+import { reactive } from 'vue'
+
+const props = defineProps({
+  ifCode: { type: String, default: '' }
+})
+
+const formData = reactive({
+  payBaseUrl: null,
+  bindAppId: null,
+  bindLiteAppId: null,
+  subscribeAppId: null
+})
+
+const setConfig = (configType) => {
+  console.log(formData[configType])
+}
+
+const queryConfig = () => {
+  console.log(formData)
 }
 </script>
 

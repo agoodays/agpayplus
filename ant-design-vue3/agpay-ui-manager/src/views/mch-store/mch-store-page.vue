@@ -2,81 +2,71 @@
   <div class="mch-store-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <a-form :model="searchParams" layout="inline" class="search-form">
-        <a-form-item label="商户号">
-          <a-select
-            v-model:value="searchParams.mchNo"
-            placeholder="请选择商户"
-            show-search
-            :filter-option="false"
-            allow-clear
-            style="width: 200px"
-            @search="handleSearchMch"
-            @change="handleSearch"
-          >
-            <a-select-option v-for="item in mchList" :key="item.mchNo" :value="item.mchNo">
-              {{ item.mchName }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-
-        <a-form-item label="门店编号">
-          <a-input
-            v-model:value="searchParams.storeId"
-            placeholder="请输入门店编号"
-            allow-clear
-            @press-enter="handleSearch"
-          />
-        </a-form-item>
-
-        <a-form-item label="门店名称">
-          <a-input
-            v-model:value="searchParams.storeName"
-            placeholder="请输入门店名称"
-            allow-clear
-            @press-enter="handleSearch"
-          />
-        </a-form-item>
-
-        <a-form-item>
-          <a-space>
-            <a-button type="primary" @click="handleSearch">
-              <search-outlined />
-              查询
-            </a-button>
-            <a-button @click="handleReset">
-              <redo-outlined />
-              重置
-            </a-button>
-          </a-space>
-        </a-form-item>
-      </a-form>
+      <div style="margin-bottom: 16px">
+        <ag-search
+          v-model:model-value="searchForm"
+          :collapsible="true"
+          :default-collapsed="false"
+          @search="onSearch"
+          @reset="onReset"
+        >
+          <template #base="{ colSpan }">
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-select
+                  v-model:value="searchForm.mchNo"
+                  label="商户号"
+                  placeholder="请选择商户"
+                  allow-clear
+                  :options="mchOptions"
+                  :show-search="true"
+                  :filter-option="false"
+                  @search="handleSearchMch"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input
+                  v-model:value="searchForm.storeId"
+                  label="门店编号"
+                  placeholder="请输入门店编号"
+                  :allow-clear="true"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input
+                  v-model:value="searchForm.storeName"
+                  label="门店名称"
+                  placeholder="请输入门店名称"
+                  :allow-clear="true"
+                />
+              </a-form-item>
+            </a-col>
+          </template>
+        </ag-search>
+      </div>
 
       <!-- 操作按钮 -->
-      <div class="table-operations">
+      <div class="table-operations" style="margin-bottom: 16px">
         <a-space>
           <a-button v-if="hasPermission('ENT_MCH_STORE_ADD')" type="primary" @click="handleAdd">
             <plus-outlined />
             新建
           </a-button>
-          <a-button @click="refresh">
-            <reload-outlined />
-            刷新
-          </a-button>
         </a-space>
       </div>
 
       <!-- 数据表格 -->
-      <a-table
-        row-key="storeId"
+      <ag-table
+        ref="tableRef"
         :columns="columns"
-        :data-source="dataSource"
-        :loading="loading"
-        :pagination="pagination"
-        :scroll="{ x: 1200 }"
-        @change="handleTableChange"
+        :on-load="reqTableDataFunc"
+        :search-data="searchForm"
+        state-key="mch_store_table_columns"
       >
-        <!-- 门店名称 -->
         <template #storeName="{ record }">
           <b v-if="!hasPermission('ENT_MCH_STORE_VIEW')" :title="record.storeName">
             {{ record.storeName }}
@@ -85,22 +75,17 @@
             <b>{{ record.storeName }}</b>
           </a>
         </template>
-
-        <!-- 默认门店 -->
         <template #defaultFlag="{ record }">
           <a-badge
             :status="record.defaultFlag === 0 ? 'error' : 'processing'"
             :text="record.defaultFlag === 0 ? '否' : '是'"
           />
         </template>
-
-        <!-- 操作 -->
-        <template #action="{ record }">
-          <a-space>
+        <template #actions="{ record }">
+          <ag-table-actions :max-show-num="3">
             <a-button v-if="hasPermission('ENT_MCH_STORE_EDIT')" type="link" size="small" @click="handleEdit(record)">
               修改
             </a-button>
-
             <a-button
               v-if="hasPermission('ENT_MCH_STORE_APP_DIS')"
               type="link"
@@ -109,17 +94,16 @@
             >
               应用分配
             </a-button>
-
             <a-popconfirm
               v-if="hasPermission('ENT_MCH_STORE_DEL')"
               title="确认删除该门店吗？"
-              @confirm="handleDelete(record)"
+              @confirm="() => handleDelete(record)"
             >
               <a-button type="link" size="small" danger> 删除 </a-button>
             </a-popconfirm>
-          </a-space>
+          </ag-table-actions>
         </template>
-      </a-table>
+      </ag-table>
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
@@ -141,10 +125,11 @@
 
 <script setup>
 import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
-import { useModal, usePermission, useTable } from '@/hooks/common-hooks'
-import { PlusOutlined, RedoOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { useModal, usePermission } from '@/composables/useCommon'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { message, Modal } from 'ant-design-vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import AddOrEditModal from './add-or-edit.vue'
 import BindAppModal from './bind-app.vue'
@@ -152,20 +137,32 @@ import DetailDrawer from './detail.vue'
 
 const route = useRoute()
 
-// 使用 Hooks
-const { loading, dataSource, pagination, searchParams, handleTableChange, handleSearch, handleReset, refresh } =
-  useTable((params) => mchStoreApi.queryPage(params))
-
 const { open: modalOpen, showModal, hideModal } = useModal()
 const { open: detailOpen, showModal: showDetail } = useModal()
 const { open: bindAppOpen, showModal: showBindApp } = useModal()
 const { hasPermission } = usePermission()
 
 // State
+const tableRef = ref(null)
 const mchList = ref([])
 const currentRecordId = ref('')
 const currentBindAppId = ref('')
 const currentMchNo = ref('')
+
+// 搜索表单
+const searchForm = reactive({
+  mchNo: '',
+  storeId: '',
+  storeName: ''
+})
+
+// 商户选项（用于下拉选择）
+const mchOptions = computed(() => {
+  return mchList.value.map(item => ({
+    value: item.mchNo,
+    label: item.mchName
+  }))
+})
 
 // 表格列定义
 const columns = [
@@ -176,7 +173,7 @@ const columns = [
     width: 200,
     fixed: 'left',
     ellipsis: true,
-    slots: { customRender: 'storeName' }
+    customRender: 'storeName'
   },
   {
     title: '门店编号',
@@ -202,7 +199,7 @@ const columns = [
     dataIndex: 'defaultFlag',
     key: 'defaultFlag',
     width: 100,
-    slots: { customRender: 'defaultFlag' }
+    customRender: 'defaultFlag'
   },
   {
     title: '创建日期',
@@ -212,10 +209,11 @@ const columns = [
   },
   {
     title: '操作',
-    key: 'action',
+    key: 'actions',
     width: 200,
     fixed: 'right',
-    slots: { customRender: 'action' }
+    align: 'center',
+    customRender: 'actions'
   }
 ]
 
@@ -223,12 +221,28 @@ const columns = [
  * 初始化
  */
 onMounted(() => {
-  // 如果 URL 中带有 mchNo 参数，则自动填充
   if (route.query.mchNo) {
-    searchParams.mchNo = route.query.mchNo
+    searchForm.mchNo = route.query.mchNo
   }
-  handleSearch()
 })
+
+// 请求表格数据函数
+function reqTableDataFunc(params) {
+  const requestParams = {
+    pageNumber: params.pageNumber,
+    pageSize: params.pageSize
+  }
+  if (searchForm.mchNo) {
+    requestParams.mchNo = searchForm.mchNo
+  }
+  if (searchForm.storeId) {
+    requestParams.storeId = searchForm.storeId
+  }
+  if (searchForm.storeName) {
+    requestParams.storeName = searchForm.storeName
+  }
+  return mchStoreApi.queryPage(requestParams)
+}
 
 /**
  * 搜索商户
@@ -248,6 +262,24 @@ const handleSearchMch = async (keyword) => {
   } catch (error) {
     console.error('搜索商户失败:', error)
   }
+}
+
+/**
+ * 搜索
+ */
+function onSearch() {
+  message.success('开始搜索')
+  tableRef.value.reload()
+}
+
+/**
+ * 重置
+ */
+function onReset() {
+  searchForm.mchNo = ''
+  searchForm.storeId = ''
+  searchForm.storeName = ''
+  tableRef.value.reload()
 }
 
 /**
@@ -295,7 +327,7 @@ const handleDelete = async (record) => {
       try {
         await mchStoreApi.delById(record.storeId)
         message.success('删除成功')
-        refresh()
+        tableRef.value.reload()
       } catch (error) {
         console.error('删除失败:', error)
       }
@@ -308,18 +340,15 @@ const handleDelete = async (record) => {
  */
 const handleModalSuccess = () => {
   hideModal()
-  refresh()
+  tableRef.value.reload()
 }
 </script>
 
 <style lang="less" scoped>
 .mch-store-page {
-  .search-form {
-    margin-bottom: 16px;
-  }
-
-  .table-operations {
-    margin-bottom: 16px;
-  }
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
 }
 </style>

@@ -14,7 +14,7 @@
 import { ref } from 'vue'
 import ReconnectingWebSocket from 'reconnectingwebsocket'
 import vueQr from 'vue-qr'
-import { getWebSocketPrefix, getChannelUserQrImgUrl } from '@/api/manage'
+import { basicApi } from '@/api/system/basic-api'
 
 const emit = defineEmits(['changeChannelUserId'])
 
@@ -43,14 +43,14 @@ function showModal(appId, ifCode, extObj) {
   // 当前客户端CID
   const cid = appId + new Date().getTime()
   // 获取二维码地址
-  getChannelUserQrImgUrl(ifCode, appId, cid).then((res) => {
+  basicApi.getChannelUserQrImgUrl(ifCode, appId, cid).then((res) => {
     qrImgUrl.value = res
 
     visible.value = true // 打开弹窗
 
     // 监听响应结果
     transferOrderWebSocket.value = new ReconnectingWebSocket(
-      getWebSocketPrefix() + '/api/anon/ws/channelUserId/' + appId + '/' + cid
+      basicApi.getWebSocketPrefix() + '/api/anon/ws/channelUserId/' + appId + '/' + cid
     )
     transferOrderWebSocket.value.onopen = () => {}
     transferOrderWebSocket.value.onmessage = (msgObject) => {

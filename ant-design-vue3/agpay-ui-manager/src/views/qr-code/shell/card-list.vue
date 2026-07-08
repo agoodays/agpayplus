@@ -1,19 +1,11 @@
 <template>
   <div>
     <a-card style="margin-bottom: 10px">
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="">
-              <ag-input v-model:value="searchData.shellAlias" placeholder="模板别名" />
-            </a-form-item>
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" :loading="btnLoading" @click="searchFunc(true)">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => (searchData = {})">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
+        <template #formItem>
+          <ag-input v-model="searchData.shellAlias" placeholder="模板别名" />
+        </template>
+      </ag-search>
     </a-card>
     <ag-card
       ref="infoCard"
@@ -53,10 +45,10 @@
             <!-- 卡片底部操作栏 -->
             <div class="ag-card-ops">
               <a-tooltip v-if="$access('ENT_DEVICE_QRC_SHELL_EDIT')" placement="top" title="编辑">
-                <a-icon key="edit" type="edit" @click="editFunc(record.id)" />
+                <icons.EditOutlined />
               </a-tooltip>
               <a-tooltip v-if="$access('ENT_DEVICE_QRC_SHELL_DEL')" placement="top" title="删除">
-                <a-icon key="delete" type="delete" @click="delFunc(record.id)" />
+                <icons.DeleteOutlined />
               </a-tooltip>
             </div>
           </div>
@@ -68,10 +60,13 @@
   </div>
 </template>
 <script setup>
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
+const icons = { DeleteOutlined, EditOutlined }
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
-import { AgCard, AgInput } from '@/components'
+import { AgCard, AgInput, AgSearch } from '@/components'
 import { reactive, ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
+import { message } from 'ant-design-vue'
 
 // 响应式数据
 const infoCard = ref(null)
@@ -98,10 +93,13 @@ const refCardList = (isToFirst) => {
 }
 
 // 搜索函数
-const searchFunc = (isToFirst = false) => {
-  // 点击【查询】按钮点击事件
+const queryFunc = () => {
   btnLoading.value = true
-  refCardList(isToFirst)
+  refCardList(true)
+}
+
+const searchFunc = () => {
+  refCardList()
 }
 
 // 预览图片
@@ -130,7 +128,7 @@ const editFunc = (recordId) => {
 const delFunc = (recordId) => {
   window.$infoBox.confirmDanger('确认删除？', '', () => {
     qrcShellApi.delById(recordId).then(() => {
-      window.$message.success('删除成功！')
+      message.success('删除成功！')
       refCardList()
     })
   })

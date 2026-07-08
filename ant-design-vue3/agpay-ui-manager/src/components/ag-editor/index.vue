@@ -38,7 +38,7 @@ const [Editor, Toolbar, editorLoaded] = (() => {
 
   return [computed(() => EditorComponent), computed(() => ToolbarComponent), loaded]
 })()
-import { upload } from '@/api/manage'
+import { upload } from '@/lib/ag-axios'
 import { appDefaultConfig } from '@/config/app-config'
 import { useUserStore } from '@/store/modules/system/user'
 

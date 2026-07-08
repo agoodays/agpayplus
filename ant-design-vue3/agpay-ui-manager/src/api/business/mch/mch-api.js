@@ -3,6 +3,7 @@ import { req } from '@/lib/ag-axios'
 const API_URL_AGENT_LIST = '/api/agentInfo'
 const API_URL_ISV_LIST = '/api/isvInfo'
 const API_URL_MCH_LIST = '/api/mchInfo'
+const API_URL_MCH_CONFIG = '/api/mchConfig'
 
 export const mchApi = {
   queryPage(params) {
@@ -25,5 +26,11 @@ export const mchApi = {
   },
   queryIsvPage(params) {
     return req.list(API_URL_ISV_LIST, params)
+  },
+  getMchConfigs(groupKey, mchNo) {
+    return req.get(`${API_URL_MCH_CONFIG}/${groupKey}`, { mchNo })
+  },
+  updateMchConfigs(groupKey, data) {
+    return req.updateById(API_URL_MCH_CONFIG, groupKey, data)
   }
 }

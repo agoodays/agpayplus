@@ -79,7 +79,7 @@
         <div style="display: flex">
           <span>{{ record }}</span>
           <a-tooltip title="支付成功的交易总金额，包含退款金额和未退款金额">
-            <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+            <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
@@ -87,7 +87,7 @@
         <div style="display: flex">
           <span>{{ record }}</span>
           <a-tooltip title="扣除手续费后实际到账金额">
-            <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+            <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
@@ -95,7 +95,7 @@
         <div style="display: flex">
           <span>{{ record }}</span>
           <a-tooltip title="交易手续费，平台实际收取">
-            <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+            <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
@@ -103,7 +103,7 @@
         <div style="display: flex">
           <span>{{ record }}</span>
           <a-tooltip title="退款手续费，平台实际收取">
-            <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+            <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
@@ -111,7 +111,7 @@
         <div style="display: flex">
           <span>{{ record }}</span>
           <a-tooltip title="实际退款笔数，同一笔交易多次退款只计算一次">
-            <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+            <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
@@ -119,7 +119,7 @@
         <div style="display: flex">
           <span>{{ record }}</span>
           <a-tooltip title="交易成功总笔数占总订单数的百分比">
-            <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+            <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
@@ -160,6 +160,8 @@
   </a-card>
 </template>
 <script setup>
+import { InfoCircleOutlined } from '@ant-design/icons-vue'
+const icons = { InfoCircleOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
 import { reactive, ref } from 'vue'
@@ -172,27 +174,31 @@ const tableColumns = [
     key: 'payAmount',
     width: 110,
     ellipsis: true,
-    scopedSlots: { title: 'payAmountTitle', titleValue: '交易金额', customRender: 'payAmountSlot' }
+    title: '交易金额',
+    customRender: 'payAmountSlot'
   },
   {
     key: 'amount',
     width: 110,
-    scopedSlots: { title: 'amountTitle', titleValue: '实际收入', customRender: 'amountSlot' }
+    title: '实际收入',
+    customRender: 'amountSlot'
   },
-  { key: 'fee', width: 110, scopedSlots: { title: 'feeTitle', titleValue: '手续费', customRender: 'feeSlot' } },
-  { key: 'refundAmount', title: '退款金额', width: 110, scopedSlots: { customRender: 'refundAmountSlot' } },
+  { key: 'fee', width: 110, title: '手续费', customRender: 'feeSlot' },
+  { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
   {
     key: 'refundFee',
     width: 125,
-    scopedSlots: { title: 'refundFeeTitle', titleValue: '退款手续费', customRender: 'refundFeeSlot' }
+    title: '退款手续费',
+    customRender: 'refundFeeSlot'
   },
   {
     key: 'refundCount',
     width: 110,
-    scopedSlots: { title: 'refundCountTitle', titleValue: '退款笔数', customRender: 'refundCountSlot' }
+    title: '退款笔数',
+    customRender: 'refundCountSlot'
   },
-  { key: 'count', title: '交易/总笔数', width: 120, scopedSlots: { customRender: 'countSlot' } },
-  { key: 'round', width: 110, scopedSlots: { title: 'roundTitle', titleValue: '成功率', customRender: 'roundSlot' } }
+  { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
+  { key: 'round', width: 110, title: '成功率', customRender: 'roundSlot' }
 ]
 
 const props = defineProps({

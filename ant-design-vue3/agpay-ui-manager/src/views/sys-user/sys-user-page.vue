@@ -1,15 +1,7 @@
-<template>
+﻿<template>
   <div>
     <a-card>
-      <ag-search
-        v-if="$access('ENT_UR_USER_SEARCH')"
-        :search-data="searchData"
-        :open-is-show-more="false"
-        :is-show-more="isShowMore"
-        :search-loading="btnLoading"
-        @update-search-data="handleSearchFormData"
-        @set-is-show-more="setIsShowMore"
-        @query-func="queryFunc">
+      <ag-search v-if="$access('ENT_UR_USER_SEARCH')" v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
         <template #formItem>
           <a-form-item label="" class="table-head-layout">
             <a-select v-model:value="searchData.sysType" placeholder="所属系统" default-value="">
@@ -19,9 +11,9 @@
               <a-select-option value="MCH">商户</a-select-option>
             </a-select>
           </a-form-item>
-          <ag-input :placeholder="'所属代理商/商户'" v-model:value="searchData.belongInfoId" />
-          <ag-input :placeholder="'用户ID'" v-model:value="searchData.sysUserId" />
-          <ag-input :placeholder="'用户姓名'" v-model:value="searchData.realname" />
+          <ag-input v-model="searchData.belongInfoId" placeholder="所属代理商/商户" />
+          <ag-input v-model="searchData.sysUserId" placeholder="用户ID" />
+          <ag-input v-model="searchData.realname" placeholder="用户姓名" />
           <a-form-item label="" class="table-head-layout">
             <a-select v-model:value="searchData.userType" placeholder="请选择用户类型">
               <a-select-option v-for="d in userTypeOptions" :value="d.userType" :key="d.userType">
@@ -33,13 +25,12 @@
       </ag-search>
       <!-- 列表渲染 -->
       <ag-table
-        @btn-load-close="btnLoading=false"
         ref="infoTable"
-        :init-data="true"
-        :req-table-data-func="reqTableDataFunc"
-        :table-columns="tableColumns"
+        :on-load="reqTableDataFunc"
+        :columns="tableColumns"
         :search-data="searchData"
         row-key="sysUserId"
+        @btn-load-close="btnLoading = false"
       >
         <template #topLeftSlot>
           <div>
@@ -110,21 +101,21 @@ import InviteCode from './invite-code.vue'
 import RoleDist from './role-dist.vue'
 
 const tableColumns = [
-  { key: 'avatar', title: '头像', width: 65, fixed: 'left', scopedSlots: { customRender: 'avatarSlot' } },
-  { key: 'realname', title: '姓名', width: 135, fixed: 'left', scopedSlots: { customRender: 'realnameSlot' } },
+  { key: 'avatar', title: '头像', width: 65, fixed: 'left', customRender: 'avatarSlot' },
+  { key: 'realname', title: '姓名', width: 135, fixed: 'left', customRender: 'realnameSlot' },
   { key: 'sysUserId', dataIndex: 'sysUserId', title: '用户ID', width: 120, fixed: 'left' },
-  { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: (text, record, index) => { return record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' } },
+  { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: (text, record) => (record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知') },
   { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 125 },
   { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
-  { key: 'sysType', title: '所属系统', width: 120, scopedSlots: { customRender: 'sysTypeSlot' } },
+  { key: 'sysType', title: '所属系统', width: 120, customRender: 'sysTypeSlot' },
   { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
-  { key: 'userType', title: '操作员类型', width: 120, scopedSlots: { customRender: 'userTypeSlot' } },
+  { key: 'userType', title: '操作员类型', width: 120, customRender: 'userTypeSlot' },
   { key: 'teamName', dataIndex: 'teamName', title: '团队', width: 160 },
-  { key: 'inviteCode', title: '邀请码', width: 160, scopedSlots: { customRender: 'inviteCodeSlot' }, align: 'center' },
-  { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' }, align: 'center' },
+  { key: 'inviteCode', title: '邀请码', width: 160, customRender: 'inviteCodeSlot', align: 'center' },
+  { key: 'state', title: '状态', width: 100, customRender: 'stateSlot', align: 'center' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
   { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
-  { key: 'op', title: '操作', width: 180, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 180, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 const userTypeList = [
@@ -202,7 +193,7 @@ const queryFunc = () => { // 点击【查询】按钮点击事件
 }
 
 const searchFunc = (isToFirst = false) => { // 点击【查询】按钮点击事件
-  infoTable.value?.refTable(isToFirst)
+  infoTable.value?.reload(isToFirst)
 }
 
 const addFunc = () => { // 业务通用【新增】 函数
@@ -219,7 +210,7 @@ const relieveFunc = (recordId) => { // 业务通用【解除登录限制】 函�
       infoBox.confirmDanger('确认解除吗？', '', () => {
         return sysUserApi.relieveLoginLimit(recordId).then(res => {
           message.success('解除成功！')
-          infoTable.value?.refTable(false)
+          infoTable.value?.reload(false)
         })
       })
     })
@@ -232,7 +223,7 @@ const delFunc = (recordId) => { // 业务通用【删除】 函数
       infoBox.confirmDanger('确认删除？', '', () => {
         return sysUserApi.delById(recordId).then(res => {
           message.success('删除成功！')
-          infoTable.value?.refTable(false)
+          infoTable.value?.reload(false)
         })
       })
     })

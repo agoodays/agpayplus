@@ -1,49 +1,41 @@
-<template>
+﻿<template>
   <div>
     <a-card>
-      <div v-if="$access('ENT_DIVISION_RECEIVER_LIST')" class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
-            <a-form-item label="" class="table-head-layout">
-              <ag-select
-                v-model="searchData.mchNo"
-                :api="searchMch"
-                value-field="mchNo"
-                label-field="mchName"
-                placeholder="商户号(支持按商户名称搜索)"
-              />
-            </a-form-item>
-            <ag-input v-model="searchData.appId" placeholder="应用ID[精确]" />
-            <ag-input v-model="searchData.receiverId" placeholder="收款账户ID[精确]" />
-            <ag-input v-model="searchData.receiverAlias" placeholder="收款账户别名[模糊]" />
-            <ag-input v-model="searchData.receiverGroupId" placeholder="分组ID[精确]" />
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="账户状态(系统默认)" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">正常可用</a-select-option>
-                <a-select-option value="0">暂停使用</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.ifCode" placeholder="支付接口">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
-                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
-                    ><img class="icon" :src="item.icon" alt=""
-                  /></span>
-                  {{ item.ifName }}[{{ item.ifCode }}]
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" :loading="btnLoading" @click="searchFunc">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="resetFunc">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
+        <template #formItem>
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              value-field="mchNo"
+              label-field="mchName"
+              placeholder="商户号(支持按商户名称搜索)"
+            />
+          </a-form-item>
+          <ag-input v-model="searchData.appId" placeholder="应用ID[精确]" />
+          <ag-input v-model="searchData.receiverId" placeholder="收款账户ID[精确]" />
+          <ag-input v-model="searchData.receiverAlias" placeholder="收款账户别名[模糊]" />
+          <ag-input v-model="searchData.receiverGroupId" placeholder="分组ID[精确]" />
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model:value="searchData.state" placeholder="账户状态(系统默认)" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="1">正常可用</a-select-option>
+              <a-select-option value="0">暂停使用</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model:value="searchData.ifCode" placeholder="支付接口">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
+                <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
+                  ><img class="icon" :src="item.icon" alt=""
+                /></span>
+                {{ item.ifName }}[{{ item.ifCode }}]
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </ag-search>
       <!-- 列表渲染 -->
       <ag-table
         ref="infoTable"
@@ -135,7 +127,7 @@
 </template>
 <script setup>
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
-import { AgInput, AgSelect, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { defineAsyncComponent, nextTick, onMounted, reactive, ref } from 'vue'
 
 // 动态导入组件
@@ -145,14 +137,14 @@ const Detail = defineAsyncComponent(() => import('./detail.vue'))
 
 // 表格列配置
 const tableColumns = [
-  { key: 'receiverId', title: '收款账户ID', width: 125, scopedSlots: { customRender: 'receiverIdSlot' } },
+  { key: 'receiverId', title: '收款账户ID', width: 125, customRender: 'receiverIdSlot' },
   { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账户别名', width: 140 },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
   { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140, ellipsis: true },
   { key: 'appId', dataIndex: 'appId', title: '应用ID', width: 225 },
   { key: 'receiverGroupId', dataIndex: 'receiverGroupId', title: '分组ID', width: 100 },
   { key: 'receiverGroupName', dataIndex: 'receiverGroupName', title: '分组名称', width: 140 },
-  { key: 'ifCode', title: '支付接口', width: 200, scopedSlots: { customRender: 'ifCodeSlot' } },
+  { key: 'ifCode', title: '支付接口', width: 200, customRender: 'ifCodeSlot' },
   { key: 'accNo', dataIndex: 'accNo', title: '收款账户账号', width: 200 },
   { key: 'accName', dataIndex: 'accName', title: '收款账户账号名称', width: 260 },
   { key: 'channelAccNo', dataIndex: 'channelAccNo', title: '渠道账号', width: 230 },
@@ -162,7 +154,7 @@ const tableColumns = [
     dataIndex: 'state',
     title: '状态',
     width: 120,
-    scopedSlots: { customRender: 'stateSlot' },
+    customRender: 'stateSlot',
     align: 'center'
   },
   {
@@ -174,7 +166,7 @@ const tableColumns = [
   },
   { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间', width: 200 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 // 响应式数据
@@ -207,8 +199,12 @@ const reqIfDefineListFunc = () => {
 }
 
 // 搜索函数
-const searchFunc = () => {
+const queryFunc = () => {
   btnLoading.value = true
+  infoTable.value.loadData()
+}
+
+const searchFunc = () => {
   infoTable.value.loadData()
 }
 
@@ -217,7 +213,6 @@ const resetFunc = () => {
     searchData[key] = ''
   })
   searchData.appId = ''
-  searchFunc()
 }
 
 // 新增函数

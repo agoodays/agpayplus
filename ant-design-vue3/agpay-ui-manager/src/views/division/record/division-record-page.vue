@@ -1,55 +1,47 @@
-<template>
+﻿<template>
   <div>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <a-form-item label="" class="table-head-layout">
-              <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
-            </a-form-item>
-            <!-- <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo" /> -->
-            <a-form-item label="" class="table-head-layout">
-              <ag-select
-                v-model="searchData.mchNo"
-                :api="searchMch"
-                value-field="mchNo"
-                label-field="mchName"
-                placeholder="商户号(支持按商户名称搜索)"
-              />
-            </a-form-item>
-            <ag-input v-model="searchData.appId" placeholder="应用AppId" />
-            <ag-input v-model="searchData.payOrderId" placeholder="支付订单号" />
-            <ag-input v-model="searchData.receiverId" placeholder="收款账户ID" />
-            <ag-input v-model="searchData.receiverGroupId" placeholder="收款账户分组ID" />
-            <ag-input v-model="searchData.accNo" placeholder="收款账户账号" />
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="分账状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">待分账</a-select-option>
-                <a-select-option value="1">分账成功</a-select-option>
-                <a-select-option value="2">分账失败</a-select-option>
-                <a-select-option value="3">已退款</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.ifCode" placeholder="支付接口">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
-                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
-                    ><img class="icon" :src="item.icon" alt=""
-                  /></span>
-                  {{ item.ifName }}[{{ item.ifCode }}]
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons">
-              <a-button type="primary" icon="search" :loading="btnLoading" @click="queryFunc">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="resetFunc">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
+        <template #formItem>
+          <a-form-item label="" class="table-head-layout">
+            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
+          </a-form-item>
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.mchNo"
+              :api="searchMch"
+              value-field="mchNo"
+              label-field="mchName"
+              placeholder="商户号(支持按商户名称搜索)"
+            />
+          </a-form-item>
+          <ag-input v-model="searchData.appId" placeholder="应用AppId" />
+          <ag-input v-model="searchData.payOrderId" placeholder="支付订单号" />
+          <ag-input v-model="searchData.receiverId" placeholder="收款账户ID" />
+          <ag-input v-model="searchData.receiverGroupId" placeholder="收款账户分组ID" />
+          <ag-input v-model="searchData.accNo" placeholder="收款账户账号" />
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model:value="searchData.state" placeholder="分账状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">待分账</a-select-option>
+              <a-select-option value="1">分账成功</a-select-option>
+              <a-select-option value="2">分账失败</a-select-option>
+              <a-select-option value="3">已退款</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model:value="searchData.ifCode" placeholder="支付接口">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
+                <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
+                  ><img class="icon" :src="item.icon" alt=""
+                /></span>
+                {{ item.ifName }}[{{ item.ifCode }}]
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </ag-search>
       <!-- 列表渲染 -->
       <ag-table
         ref="infoTable"
@@ -124,16 +116,16 @@
 </template>
 <script setup>
 import { divisionRecordApi } from '@/api/business/division/division-record-api'
-import { AgDateRangePicker, AgInput, AgSelect, AgTable, AgTableActions } from '@/components'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { onMounted, reactive, ref } from 'vue'
 import Detail from './detail.vue'
 
 // 表格列配置
 const tableColumns = [
-  { key: 'calDivisionAmount', title: '分账金额', width: 108, scopedSlots: { customRender: 'amountSlot' } },
+  { key: 'calDivisionAmount', title: '分账金额', width: 108, customRender: 'amountSlot' },
   { key: 'batchOrderId', dataIndex: 'batchOrderId', title: '分账批次号', width: 120 },
   { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号', width: 220 },
-  { key: 'ifCode', title: '支付接口', width: 200, scopedSlots: { customRender: 'ifCodeSlot' } },
+  { key: 'ifCode', title: '支付接口', width: 200, customRender: 'ifCodeSlot' },
   {
     key: 'payOrderAmount',
     dataIndex: 'payOrderAmount',
@@ -157,11 +149,11 @@ const tableColumns = [
     dataIndex: 'divisionProfit',
     title: '分账比例',
     width: 108,
-    customRender: (text, record, index) => (text * 100).toFixed(2) + '%'
+    customRender: (text) => (text * 100).toFixed(2) + '%'
   },
-  { key: 'state', title: '分账状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
+  { key: 'state', title: '分账状态', width: 100, customRender: 'stateSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 // 响应式数据

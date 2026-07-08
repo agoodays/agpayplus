@@ -27,23 +27,7 @@ export function useCrudTablePage(options = {}) {
   const searchData = reactive({})
 
   function reloadTable() {
-    const tableRef = infoTable.value
-    if (!tableRef) return
-
-    // 兼容 AgTable 新旧 API：reload/loadData/refTable。
-    if (typeof tableRef.reload === 'function') {
-      tableRef.reload()
-      return
-    }
-
-    if (typeof tableRef.loadData === 'function') {
-      tableRef.loadData()
-      return
-    }
-
-    if (typeof tableRef.refTable === 'function') {
-      tableRef.refTable(true)
-    }
+    infoTable.value?.reload()
   }
 
   function openCreate() {

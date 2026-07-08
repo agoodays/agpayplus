@@ -9,40 +9,40 @@
     class="drawer-width"
     @close="onClose"
   >
-    <a-form-model
-      ref="infoFormModel"
+    <a-form
+      ref="infoForm"
       :model="saveObject"
       :label-col="{ span: 6 }"
       :wrapper-col="{ span: 18 }"
       :rules="rules"
     >
-      <a-form-model-item label="商户号" prop="mchNo">
+      <a-form-item label="商户号" name="mchNo">
         <ag-select
-          v-model="saveObject.mchNo"
+          v-model:value="saveObject.mchNo"
           :api="searchMch"
           value-field="mchNo"
           label-field="mchName"
           placeholder="商户号（搜索商户名称）"
           @change="mchNoChange"
         />
-      </a-form-model-item>
-      <a-form-model-item label="应用" prop="appId">
-        <a-select v-model="saveObject.appId" placeholder="请选择应用">
+      </a-form-item>
+      <a-form-item label="应用" name="appId">
+        <a-select v-model:value="saveObject.appId" placeholder="请选择应用">
           <a-select-option key="" value="">请选择应用</a-select-option>
           <a-select-option v-for="d in appList" :key="d.appId" :value="d.appId">
             {{ d.appName + ' [ AppId: ' + d.appId + ' ]' }}
           </a-select-option>
         </a-select>
-      </a-form-model-item>
-      <a-form-model-item label="门店" prop="storeId">
-        <a-select v-model="saveObject.storeId" placeholder="请选择门店">
+      </a-form-item>
+      <a-form-item label="门店" name="storeId">
+        <a-select v-model:value="saveObject.storeId" placeholder="请选择门店">
           <a-select-option key="" value="">请选择门店</a-select-option>
           <a-select-option v-for="d in storeList" :key="d.storeId" :value="d.storeId">
             {{ d.storeName + ' [ ID: ' + d.storeId + ' ]' }}
           </a-select-option>
         </a-select>
-      </a-form-model-item>
-    </a-form-model>
+      </a-form-item>
+    </a-form>
     <div class="drawer-btn-center">
       <a-button icon="close" :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
         取消
@@ -61,7 +61,7 @@ const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
 })
 
-const infoFormModel = ref(null)
+const infoForm = ref(null)
 const visible = ref(false)
 const btnLoading = ref(false)
 const recordId = ref(null)
@@ -109,14 +109,16 @@ async function mchNoChange() {
   saveObject.value.storeId = null
 }
 
-function validateForm() {
-  return new Promise((resolve) => {
-    if (!infoFormModel.value?.validate) {
-      resolve(true)
-      return
-    }
-    infoFormModel.value.validate((valid) => resolve(valid))
-  })
+async function validateForm() {
+  if (!infoForm.value?.validate) {
+    return true
+  }
+  try {
+    await infoForm.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function handleOkFunc() {

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <a-card>
       <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
@@ -7,14 +7,14 @@
             <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
           </a-form-item>
           <a-form-item label="" class="table-head-layout">
-            <a-select v-model="searchData.infoType" placeholder="" default-value="">
+            <a-select v-model:value="searchData.infoType" placeholder="" default-value="">
               <a-select-option value="">全部</a-select-option>
               <a-select-option value="PLATFORM">运营平台</a-select-option>
               <a-select-option value="AGENT">代理商</a-select-option>
             </a-select>
           </a-form-item>
           <a-form-item label="" class="table-head-layout">
-            <a-select v-model="searchData.bizType" placeholder="业务类型" default-value="">
+            <a-select v-model:value="searchData.bizType" placeholder="业务类型" default-value="">
               <a-select-option value="">全部</a-select-option>
               <a-select-option :value="1">平台佣金收入</a-select-option>
               <a-select-option :value="2">提现支出</a-select-option>
@@ -23,7 +23,7 @@
             </a-select>
           </a-form-item>
           <a-form-item label="" class="table-head-layout">
-            <a-select v-model="searchData.accountType" placeholder="账户类型" default-value="">
+            <a-select v-model:value="searchData.accountType" placeholder="账户类型" default-value="">
               <a-select-option value="">全部</a-select-option>
               <a-select-option :value="1">钱包账户</a-select-option>
               <a-select-option :value="2">用途账户</a-select-option>
@@ -238,8 +238,8 @@ import { onMounted, reactive, ref } from 'vue'
 // 表格列配置
 const tableColumns = [
   { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
-  { key: 'bizType', title: '业务类型', width: 160, scopedSlots: { customRender: 'bizTypeSlot' } },
-  { key: 'infoName', title: '角色名称', width: 260, scopedSlots: { customRender: 'infoNameSlot' } },
+  { key: 'bizType', title: '业务类型', width: 160, customRender: 'bizTypeSlot' },
+  { key: 'infoName', title: '角色名称', width: 260, customRender: 'infoNameSlot' },
   {
     key: 'beforeBalance',
     dataIndex: 'beforeBalance',
@@ -263,7 +263,7 @@ const tableColumns = [
   },
   { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联业务订单号', width: 200 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 // 默认查询参数对象模板

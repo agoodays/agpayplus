@@ -9,78 +9,78 @@
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     @close="onClose"
   >
-    <a-form-model ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
+    <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-model-item label="支付接口费率" prop="ifRate">
-            <a-input v-model="saveObject.ifRate" placeholder="请输入" suffix="%" />
-          </a-form-model-item>
+          <a-form-item label="支付接口费率" name="ifRate">
+            <a-input v-model:value="saveObject.ifRate" placeholder="请输入" suffix="%" />
+          </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-model-item label="状态" prop="state">
-            <a-radio-group v-model="saveObject.state">
+          <a-form-item label="状态" name="state">
+            <a-radio-group v-model:value="saveObject.state">
               <a-radio :value="1"> 启用 </a-radio>
               <a-radio :value="0"> 停用 </a-radio>
             </a-radio-group>
-          </a-form-model-item>
+          </a-form-item>
         </a-col>
         <a-col :span="24">
-          <a-form-model-item label="备注" prop="remark">
-            <a-input v-model="saveObject.remark" placeholder="请输入" type="textarea" />
-          </a-form-model-item>
+          <a-form-item label="备注" name="remark">
+            <a-input v-model:value="saveObject.remark" placeholder="请输入" type="textarea" />
+          </a-form-item>
         </a-col>
       </a-row>
-    </a-form-model>
+    </a-form>
     <a-divider orientation="left">
       <a-tag color="#FF4B33"> {{ saveObject.ifCode }} 服务商参数配置 </a-tag>
     </a-divider>
-    <a-form-model ref="isvParamFormModel" :model="ifParams" layout="vertical" :rules="ifParamsRules">
+    <a-form ref="isvParamForm" :model="ifParams" layout="vertical" :rules="ifParamsRules">
       <a-row :gutter="16">
         <a-col span="12">
-          <a-form-model-item label="微信支付商户号" prop="mchId">
-            <a-input v-model="ifParams.mchId" placeholder="请输入" />
-          </a-form-model-item>
+          <a-form-item label="微信支付商户号" name="mchId">
+            <a-input v-model:value="ifParams.mchId" placeholder="请输入" />
+          </a-form-item>
         </a-col>
         <a-col span="12">
-          <a-form-model-item label="应用AppID" prop="appId">
-            <a-input v-model="ifParams.appId" placeholder="请输入" />
-          </a-form-model-item>
+          <a-form-item label="应用AppID" name="appId">
+            <a-input v-model:value="ifParams.appId" placeholder="请输入" />
+          </a-form-item>
         </a-col>
         <a-col span="12">
-          <a-form-model-item label="应用AppSecret" prop="appSecret">
-            <a-input v-model="ifParams.appSecret" :placeholder="ifParams.appSecret_ph" />
-          </a-form-model-item>
+          <a-form-item label="应用AppSecret" name="appSecret">
+            <a-input v-model:value="ifParams.appSecret" :placeholder="ifParams.appSecret_ph" />
+          </a-form-item>
         </a-col>
         <a-col span="12">
-          <a-form-model-item label="oauth2地址（置空将使用官方）" prop="oauth2Url">
-            <a-input v-model="ifParams.oauth2Url" placeholder="请输入" />
-          </a-form-model-item>
+          <a-form-item label="oauth2地址（置空将使用官方）" name="oauth2Url">
+            <a-input v-model:value="ifParams.oauth2Url" placeholder="请输入" />
+          </a-form-item>
         </a-col>
         <a-col span="12">
-          <a-form-model-item label="微信支付API版本" prop="apiVersion">
-            <a-radio-group v-model="ifParams.apiVersion" default-value="V2">
+          <a-form-item label="微信支付API版本" name="apiVersion">
+            <a-radio-group v-model:value="ifParams.apiVersion" default-value="V2">
               <a-radio value="V2">V2</a-radio>
               <a-radio value="V3">V3</a-radio>
             </a-radio-group>
-          </a-form-model-item>
+          </a-form-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="APIv2密钥" prop="key">
-            <a-input v-model="ifParams.key" :placeholder="ifParams.key_ph" type="textarea" />
-          </a-form-model-item>
+          <a-form-item label="APIv2密钥" name="key">
+            <a-input v-model:value="ifParams.key" :placeholder="ifParams.key_ph" type="textarea" />
+          </a-form-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="APIv3密钥" prop="apiV3Key">
-            <a-input v-model="ifParams.apiV3Key" :placeholder="ifParams.apiV3Key_ph" type="textarea" />
-          </a-form-model-item>
+          <a-form-item label="APIv3密钥" name="apiV3Key">
+            <a-input v-model:value="ifParams.apiV3Key" :placeholder="ifParams.apiV3Key_ph" type="textarea" />
+          </a-form-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="序列号" prop="serialNo">
-            <a-input v-model="ifParams.serialNo" :placeholder="ifParams.serialNo_ph" type="textarea" />
-          </a-form-model-item>
+          <a-form-item label="序列号" name="serialNo">
+            <a-input v-model:value="ifParams.serialNo" :placeholder="ifParams.serialNo_ph" type="textarea" />
+          </a-form-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="API证书(apiclient_cert.p12)" prop="cert">
+          <a-form-item label="API证书(apiclient_cert.p12)" name="cert">
             <ag-upload
               :action="action"
               accept=".p12"
@@ -90,13 +90,13 @@
               @upload-success="uploadSuccess"
             >
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
               </template>
             </ag-upload>
-          </a-form-model-item>
+          </a-form-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="证书文件(apiclient_cert.pem)" prop="apiClientCert">
+          <a-form-item label="证书文件(apiclient_cert.pem)" name="apiClientCert">
             <ag-upload
               :action="action"
               accept=".pem"
@@ -106,13 +106,13 @@
               @upload-success="uploadSuccess"
             >
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
               </template>
             </ag-upload>
-          </a-form-model-item>
+          </a-form-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="私钥文件(apiclient_key.pem)" prop="apiClientKey">
+          <a-form-item label="私钥文件(apiclient_key.pem)" name="apiClientKey">
             <ag-upload
               :action="action"
               accept=".pem"
@@ -122,13 +122,13 @@
               @upload-success="uploadSuccess"
             >
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
               </template>
             </ag-upload>
-          </a-form-model-item>
+          </a-form-item>
         </a-col>
       </a-row>
-    </a-form-model>
+    </a-form>
     <div v-if="$access('ENT_MCH_PAY_CONFIG_ADD')" class="drawer-btn-center">
       <a-button :style="{ marginRight: '8px' }" icon="close" @click="onClose">取消</a-button>
       <a-button type="primary" icon="check" :loading="btnLoading" @click="onSubmit">保存</a-button>
@@ -137,6 +137,8 @@
 </template>
 
 <script setup>
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+const icons = { LoadingOutlined, UploadOutlined }
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
 import AgUpload from '@/components/ag-upload'
 import { message } from 'ant-design-vue'
@@ -146,8 +148,8 @@ const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
 })
 
-const infoFormModel = ref(null)
-const isvParamFormModel = ref(null)
+const infoForm = ref(null)
+const isvParamForm = ref(null)
 const btnLoading = ref(false)
 const visible = ref(false)
 const isAdd = ref(true)
@@ -266,8 +268,8 @@ function parseJsonObject(rawValue) {
 }
 
 async function show(isvNo, record) {
-  infoFormModel.value?.resetFields?.()
-  isvParamFormModel.value?.resetFields?.()
+  infoForm.value?.resetFields?.()
+  isvParamForm.value?.resetFields?.()
 
   saveObject.value = {
     infoId: isvNo,
@@ -313,14 +315,16 @@ async function getIsvPayConfig() {
   isAdd.value = true
 }
 
-function validateForm(formRef) {
-  return new Promise((resolve) => {
-    if (!formRef.value?.validate) {
-      resolve(true)
-      return
-    }
-    formRef.value.validate((valid) => resolve(valid))
-  })
+async function validateForm(formRef) {
+  if (!formRef.value?.validate) {
+    return true
+  }
+  try {
+    await formRef.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 function clearEmptyKey(key) {
@@ -331,8 +335,8 @@ function clearEmptyKey(key) {
 }
 
 async function onSubmit() {
-  const valid = await validateForm(infoFormModel)
-  const valid2 = await validateForm(isvParamFormModel)
+  const valid = await validateForm(infoForm)
+  const valid2 = await validateForm(isvParamForm)
   if (!valid || !valid2) return
 
   btnLoading.value = true

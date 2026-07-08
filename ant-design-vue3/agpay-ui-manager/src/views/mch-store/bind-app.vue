@@ -6,9 +6,9 @@
     @ok="handleSubmit"
     @cancel="handleClose"
   >
-    <a-form ref="formRef" :model="formState" layout="vertical">
+    <a-form ref="infoForm" :model="saveObject" layout="vertical">
       <a-form-item :label="t('mchStore.pleaseSelectBindApp')" name="bindAppId">
-        <a-select v-model:value="formState.bindAppId" :placeholder="t('mchStore.pleaseSelectApp')" :loading="loading">
+        <a-select v-model:value="saveObject.bindAppId" :placeholder="t('mchStore.pleaseSelectApp')" :loading="loading">
           <a-select-option value="">{{ t('mchStore.emptyOption') }}</a-select-option>
           <a-select-option v-for="item in appList" :key="item.appId" :value="item.appId">
             {{ item.appName }} [{{ item.appId }}]
@@ -58,13 +58,13 @@ const props = defineProps({
 const emit = defineEmits(['update:open', 'success'])
 
 // State
-const formRef = ref()
+const infoForm = ref(null)
 const loading = ref(false)
 const localOpen = ref(false)
 const appList = ref([])
 
 // 表单数据
-const formState = reactive({
+const saveObject = reactive({
   bindAppId: ''
 })
 
@@ -89,7 +89,7 @@ watch(localOpen, (val) => {
  */
 const initForm = async () => {
   // 设置当前绑定的应用
-  formState.bindAppId = props.bindAppId || ''
+  saveObject.bindAppId = props.bindAppId || ''
 
   // 加载应用列表
   await loadAppList()
@@ -125,7 +125,7 @@ const handleSubmit = () => {
         loading.value = true
 
         const data = {
-          bindAppId: formState.bindAppId || null
+          bindAppId: saveObject.bindAppId || null
         }
 
         await mchStoreApi.updateById(props.storeId, data)

@@ -208,7 +208,7 @@
               @upload-success="uploadSuccess"
             >
               <template #uploadSlot="{loading}">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
               </template>
             </ag-upload>
           </a-form-item>
@@ -230,6 +230,8 @@
 </template>
 
 <script setup>
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+const icons = { LoadingOutlined, UploadOutlined }
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { onMounted, reactive, ref } from 'vue'
 

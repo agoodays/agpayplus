@@ -1,4 +1,4 @@
-<!-- 详情抽屉 -->
+﻿<!-- 详情抽屉 -->
 <template>
   <a-drawer
     width="50%"
@@ -159,14 +159,14 @@
     <a-divider />
     <a-row justify="start" type="flex">
       <a-col :sm="24">
-        <a-form-model-item label="上游返回数据包">
+        <a-form-item label="上游返回数据包">
           <a-input
             v-model="detailData.channelRespResult"
             type="textarea"
             disabled="disabled"
             style="height: 100px; color: black"
           />
-        </a-form-model-item>
+        </a-form-item>
       </a-col>
     </a-row>
   </a-drawer>

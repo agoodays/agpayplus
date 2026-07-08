@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-drawer
     :mask-closable="false"
     :visible="visible"
@@ -9,39 +9,39 @@
     class="drawer-width"
     @close="onClose"
   >
-    <a-form-model v-if="visible" ref="infoFormModel" :model="saveObject" layout="vertical" :rules="rules">
+    <a-form v-if="visible" ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
-          <a-form-model-item label="公告标题" prop="title">
-            <a-input v-model="saveObject.title" placeholder="请输入公告标题" />
-          </a-form-model-item>
+          <a-form-item label="公告标题" name="title">
+            <a-input v-model:value="saveObject.title" placeholder="请输入公告标题" />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="公告副标题" prop="subtitle">
-            <a-input v-model="saveObject.subtitle" placeholder="请输入公告副标题" />
-          </a-form-model-item>
+          <a-form-item label="公告副标题" name="subtitle">
+            <a-input v-model:value="saveObject.subtitle" placeholder="请输入公告副标题" />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="公告范围" prop="articleRange">
-            <a-checkbox-group v-model="saveObject.articleRange" :options="articleRangeOptions" />
-          </a-form-model-item>
+          <a-form-item label="公告范围" name="articleRange">
+            <a-checkbox-group v-model:value="saveObject.articleRange" :options="articleRangeOptions" />
+          </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-model-item label="发布人" prop="publisher">
-            <a-input v-model="saveObject.publisher" placeholder="请输入发布人" />
-          </a-form-model-item>
+          <a-form-item label="发布人" name="publisher">
+            <a-input v-model:value="saveObject.publisher" placeholder="请输入发布人" />
+          </a-form-item>
         </a-col>
         <a-col :span="24">
-          <a-form-model-item label="公告内容" prop="content">
-            <ag-editor v-model="saveObject.content" :height="438"></ag-editor>
+          <a-form-item label="公告内容" name="content">
+            <ag-editor v-model:modelValue="saveObject.content" :height="438"></ag-editor>
             <!--vue2父组件的v-model，相当于-->
             <!--<ag-editor :value="saveObject.content" @input="saveObject.content = $event"></ag-editor>-->
             <!--vue3父组件的v-model，相当于-->
             <!--<ag-editor :height="438" :modelValue="saveObject.content" @update:modelValue="saveObject.content = $event"></ag-editor>-->
-          </a-form-model-item>
+          </a-form-item>
         </a-col>
       </a-row>
-    </a-form-model>
+    </a-form>
     <div class="drawer-btn-center">
       <a-button :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
         <template #icon><close-outlined /></template>
@@ -66,7 +66,7 @@ const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
 })
 
-const infoFormModel = ref()
+const infoForm = ref(null)
 const btnLoading = ref(false)
 const isAdd = ref(true)
 const saveObject = ref({})
@@ -111,7 +111,7 @@ async function show(id) {
   isAdd.value = !id
   saveObject.value = {}
   recordId.value = id || null
-  infoFormModel.value?.resetFields?.()
+  infoForm.value?.resetFields?.()
   visible.value = true
 
   if (!isAdd.value && recordId.value) {
@@ -124,12 +124,13 @@ async function show(id) {
   }
 }
 
-function validateForm() {
-  return new Promise((resolve) => {
-    infoFormModel.value?.validate((valid) => {
-      resolve(valid)
-    })
-  })
+async function validateForm() {
+  try {
+    await infoForm.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function onSubmit() {

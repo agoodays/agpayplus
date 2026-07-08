@@ -1,10 +1,13 @@
 <template>
   <a-config-provider :locale="locale" :theme="antdThemeConfig">
-    <!-- 全局 Loading -->
-    <a-spin :spinning="spinning" size="large">
-      <!-- 路由视图 -->
-      <RouterView />
-    </a-spin>
+    <!-- 全局错误边界 -->
+    <AgErrorBoundary @error="handleError">
+      <!-- 全局 Loading -->
+      <a-spin :spinning="spinning" size="large">
+        <!-- 路由视图 -->
+        <RouterView />
+      </a-spin>
+    </AgErrorBoundary>
   </a-config-provider>
 </template>
 
@@ -14,6 +17,7 @@ import { useRoute } from 'vue-router'
 import { theme as antdTheme, ConfigProvider, Spin } from 'ant-design-vue'
 import zhCN from 'ant-design-vue/es/locale/zh_CN'
 import enUS from 'ant-design-vue/es/locale/en_US'
+import { AgErrorBoundary } from '@/components'
 import { useSpinStore } from '@/store/modules/system/spin'
 import { useAppStore } from '@/store/modules/system/app'
 import { useAppConfigStore } from '@/store/modules/system/app-config'
@@ -57,6 +61,13 @@ watch(
 )
 
 // ==================== 开发调试 ====================
+
+// 错误边界处理
+const handleError = ({ error, instance, info }) => {
+  console.error('🚨 错误边界捕获:', error)
+  console.error('组件实例:', instance)
+  console.error('错误信息:', info)
+}
 
 // 开发环境输出主题色（生产环境自动移除）
 if (import.meta.env.DEV) {

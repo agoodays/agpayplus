@@ -6,7 +6,7 @@
     @ok="handleSubmit"
     @cancel="handleClose"
   >
-    <a-form ref="formRef" :model="formState" :rules="rules" layout="vertical">
+    <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <a-alert
         :message="t('refund.noticeTitle')"
         :description="t('refund.noticeDesc')"
@@ -33,7 +33,7 @@
 
       <a-form-item :label="t('refund.refundAmount')" name="refundAmount">
         <a-input-number
-          v-model:value="formState.refundAmount"
+          v-model:value="saveObject.refundAmount"
           :min="0.01"
           :max="payOrder?.amount / 100"
           :precision="2"
@@ -49,7 +49,7 @@
       </a-form-item>
 
       <a-form-item :label="t('refund.refundReason')" name="refundReason">
-        <a-select v-model:value="formState.refundReason" :placeholder="t('refund.pleaseSelectRefundReason')">
+        <a-select v-model:value="saveObject.refundReason" :placeholder="t('refund.pleaseSelectRefundReason')">
           <a-select-option :value="t('refund.reasonUserRequest')">{{ t('refund.reasonUserRequest') }}</a-select-option>
           <a-select-option :value="t('refund.reasonOrderException')">{{
             t('refund.reasonOrderException')
@@ -60,7 +60,7 @@
       </a-form-item>
 
       <a-form-item :label="t('refund.remark')" name="remark">
-        <a-textarea v-model:value="formState.remark" :placeholder="t('refund.pleaseInputRemarkOptional')" :rows="4" />
+        <a-textarea v-model:value="saveObject.remark" :placeholder="t('refund.pleaseInputRemarkOptional')" :rows="4" />
       </a-form-item>
     </a-form>
   </a-modal>
@@ -89,12 +89,12 @@ const props = defineProps({
 const emit = defineEmits(['update:open', 'success'])
 
 // State
-const formRef = ref()
+const infoForm = ref(null)
 const loading = ref(false)
 const localOpen = ref(props.open)
 
 // 表单数据
-const formState = reactive({
+const saveObject = reactive({
   refundAmount: 0,
   refundReason: '',
   remark: ''
@@ -141,12 +141,12 @@ watch(localOpen, (val) => {
  */
 const initForm = () => {
   // 默认退款全额
-  formState.refundAmount = props.payOrder ? props.payOrder.amount / 100 : 0
-  formState.refundReason = ''
-  formState.remark = ''
+  saveObject.refundAmount = props.payOrder ? props.payOrder.amount / 100 : 0
+  saveObject.refundReason = ''
+  saveObject.remark = ''
 
   nextTick(() => {
-    formRef.value?.clearValidate()
+    infoForm.value?.clearValidate()
   })
 }
 
@@ -154,10 +154,10 @@ const initForm = () => {
  * 提交表单
  */
 const handleSubmit = () => {
-  formRef.value.validate().then(async () => {
+  infoForm.value.validate().then(async () => {
     Modal.confirm({
       title: t('refund.confirmTitle'),
-      content: t('refund.confirmContent', { amount: formState.refundAmount.toFixed(2) }),
+      content: t('refund.confirmContent', { amount: saveObject.refundAmount.toFixed(2) }),
       okText: t('common.confirm'),
       cancelText: t('common.cancel'),
       onOk: async () => {
@@ -166,9 +166,9 @@ const handleSubmit = () => {
 
           const data = {
             payOrderId: props.payOrder.payOrderId,
-            refundAmount: Math.round(formState.refundAmount * 100), // 转换为分
-            refundReason: formState.refundReason,
-            remark: formState.remark
+            refundAmount: Math.round(saveObject.refundAmount * 100), // 转换为分
+            refundReason: saveObject.refundReason,
+            remark: saveObject.remark
           }
 
           await orderApi.createRefund(data)

@@ -62,7 +62,7 @@ const tableColumns = [
   { key: 'subtitle', dataIndex: 'subtitle', title: '副标题', width: 200 },
   { key: 'publisher', dataIndex: 'publisher', title: '发布人', width: 120 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 const defaultSearchData = {

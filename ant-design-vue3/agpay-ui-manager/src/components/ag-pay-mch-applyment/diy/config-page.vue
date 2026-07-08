@@ -2,25 +2,25 @@
   <div>
     <div v-if="showCard" class="card">
       <div class="content-box">
-        <a-form v-bind="formItemLayout" ref="formRef" :model="formState">
+        <a-form v-bind="formItemLayout" ref="infoForm" :model="saveObject">
           <a-row :gutter="24">
             <a-col v-for="(item, key) in formItems" :key="key" :span="item.span || 6" class="form-item">
               <a-form-item :label="item.label" :required="item.required" :rules="item.rules" :name="item.key">
                 <a-input
                   v-if="item.type === 'text'"
-                  v-model:value="formState[item.key]"
+                  v-model:value="saveObject[item.key]"
                   :disabled="item.readonly"
                   :placeholder="item.placeholder"
                 />
                 <a-textarea
                   v-else-if="item.type === 'textarea'"
-                  v-model:value="formState[item.key]"
+                  v-model:value="saveObject[item.key]"
                   :disabled="item.readonly"
                   :placeholder="item.placeholder"
                 />
                 <a-select
                   v-else-if="item.type === 'select'"
-                  v-model:value="formState[item.key]"
+                  v-model:value="saveObject[item.key]"
                   :disabled="item.readonly"
                   :placeholder="item.placeholder"
                 >
@@ -30,12 +30,12 @@
                 </a-select>
                 <a-switch
                   v-else-if="item.type === 'switch'"
-                  v-model:checked="formState[item.key]"
+                  v-model:checked="saveObject[item.key]"
                   :disabled="item.readonly"
                 />
                 <ag-upload
                   v-else-if="item.type === 'upload'"
-                  v-model:value="formState[item.key]"
+                  v-model:value="saveObject[item.key]"
                   :disabled="item.readonly"
                   :max-size="item.maxSize || 2"
                   :max-count="item.maxCount || 1"
@@ -72,7 +72,7 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { API_URL_PAYCONFIGS_LIST, req } from '@/api/manage'
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgUpload } from '@/components'
 
 const props = defineProps({
@@ -105,8 +105,8 @@ const props = defineProps({
 // State
 const showCard = ref(false)
 const btnLoading = ref(false)
-const formRef = ref(null)
-const formState = reactive({})
+const infoForm = ref(null)
+const saveObject = reactive({})
 const formItems = ref([])
 
 // Layout
@@ -125,17 +125,12 @@ const formItemLayout = {
 const getConfig = () => {
   if (props.ifDefine) {
     btnLoading.value = true
-    req
-      .get(API_URL_PAYCONFIGS_LIST, {
-        infoId: props.infoId,
-        infoType: props.infoType,
-        ifCode: props.ifDefine.ifCode
-      })
+    payConfigApi.getPayConfigById(props.infoId, props.ifDefine.ifCode)
       .then((res) => {
         showCard.value = true
         formItems.value = res.configItems
         formItems.value.forEach((item) => {
-          formState[item.key] = item.value
+          saveObject[item.key] = item.value
         })
         btnLoading.value = false
       })
@@ -145,13 +140,13 @@ const getConfig = () => {
 const reset = () => {
   showCard.value = false
   formItems.value = []
-  Object.keys(formState).forEach((key) => {
-    delete formState[key]
+  Object.keys(saveObject).forEach((key) => {
+    delete saveObject[key]
   })
 }
 
 const onSubmit = () => {
-  formRef.value.validate((errors) => {
+  infoForm.value.validate((errors) => {
     if (!errors) {
       btnLoading.value = true
       const params = {
@@ -160,10 +155,10 @@ const onSubmit = () => {
         ifCode: props.ifDefine.ifCode,
         configItems: formItems.value.map((item) => ({
           key: item.key,
-          value: formState[item.key]
+          value: saveObject[item.key]
         }))
       }
-      req.add(API_URL_PAYCONFIGS_LIST, params).then((res) => {
+      payConfigApi.addPayConfig(params).then((res) => {
         message.success('保存成功')
         props.callbackFunc()
         btnLoading.value = false

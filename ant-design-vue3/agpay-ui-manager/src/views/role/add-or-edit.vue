@@ -8,11 +8,11 @@
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     @close="isShow = false"
   >
-    <a-form-model ref="infoFormModel" :model="saveObject" :label-col="{ span: 4 }" :rules="rules">
-      <a-form-model-item label="角色名称：" prop="roleName">
-        <a-input v-model="saveObject.roleName" />
-      </a-form-model-item>
-    </a-form-model>
+    <a-form ref="infoForm" :model="saveObject" :label-col="{ span: 4 }" :rules="rules">
+      <a-form-item label="角色名称：" name="roleName">
+        <a-input v-model:value="saveObject.roleName" />
+      </a-form-item>
+    </a-form>
 
     <!-- 角色权限分配 -->
     <RoleDist ref="roleDist" />
@@ -33,7 +33,7 @@ const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
 })
 
-const infoFormModel = ref(null)
+const infoForm = ref(null)
 const roleDist = ref(null)
 
 const confirmLoading = ref(false)
@@ -51,7 +51,7 @@ const show = async (currentRecordId, sysType) => {
   saveObject.value = {}
   confirmLoading.value = false
 
-  infoFormModel.value?.resetFields?.()
+  infoForm.value?.resetFields?.()
 
   await nextTick()
   roleDist.value?.initTree(currentRecordId, sysType)
@@ -64,14 +64,16 @@ const show = async (currentRecordId, sysType) => {
   isShow.value = true
 }
 
-const validateForm = () => {
-  return new Promise((resolve) => {
-    if (!infoFormModel.value?.validate) {
-      resolve(true)
-      return
-    }
-    infoFormModel.value.validate((valid) => resolve(valid))
-  })
+const validateForm = async () => {
+  if (!infoForm.value?.validate) {
+    return true
+  }
+  try {
+    await infoForm.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 const handleOkFunc = async () => {

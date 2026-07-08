@@ -1,32 +1,32 @@
 <template>
   <a-modal
-    v-model="isShow"
+    v-model:visible="isShow"
     :title="isAdd ? '新增账号组' : '修改账号组'"
     :confirm-loading="confirmLoading"
     @ok="handleOkFunc"
   >
-    <a-form-model
-      ref="infoFormModel"
+    <a-form
+      ref="infoForm"
       :model="saveObject"
       :label-col="{ span: 6 }"
       :wrapper-col="{ span: 15 }"
       :rules="rules"
     >
-      <a-form-model-item label="商户号" prop="mchNo">
+      <a-form-item label="商户号" name="mchNo">
         <ag-select
-          v-model="saveObject.mchNo"
+          v-model:value="saveObject.mchNo"
           :api="searchMch"
           value-field="mchNo"
           label-field="mchName"
           placeholder="商户号（搜索商户名称）"
           :disabled="!isAdd"
         />
-      </a-form-model-item>
-      <a-form-model-item label="组名称：" prop="receiverGroupName">
-        <a-input v-model="saveObject.receiverGroupName" />
-      </a-form-model-item>
-      <a-form-model-item label="自动分账组" prop="autoDivisionFlag">
-        <a-radio-group v-model="saveObject.autoDivisionFlag">
+      </a-form-item>
+      <a-form-item label="组名称：" name="receiverGroupName">
+        <a-input v-model:value="saveObject.receiverGroupName" />
+      </a-form-item>
+      <a-form-item label="自动分账组" name="autoDivisionFlag">
+        <a-radio-group v-model:value="saveObject.autoDivisionFlag">
           <a-radio :value="1">是</a-radio> <a-radio :value="0">否</a-radio>
         </a-radio-group>
         <div class="agpay-tip-text">
@@ -35,8 +35,8 @@
           </p>
           <p style="line-height: 20px">2. 每个商户仅有一个默认分账组， 当该组更新为自动分账时，其他组将改为否</p>
         </div>
-      </a-form-model-item>
-    </a-form-model>
+      </a-form-item>
+    </a-form>
   </a-modal>
 </template>
 
@@ -52,7 +52,7 @@ const props = defineProps({
   callbackFunc: { type: Function, default: () => () => ({}) }
 })
 
-const infoFormModel = ref(null)
+const infoForm = ref(null)
 const confirmLoading = ref(false)
 const isAdd = ref(true)
 const isShow = ref(false)
@@ -67,7 +67,7 @@ const show = async (currentRecordId) => {
   isAdd.value = !currentRecordId
   saveObject.value = { autoDivisionFlag: 0 }
   confirmLoading.value = false
-  infoFormModel.value?.resetFields?.()
+  infoForm.value?.resetFields?.()
 
   if (!isAdd.value) {
     recordId.value = currentRecordId
@@ -79,14 +79,16 @@ const show = async (currentRecordId) => {
 
 const searchMch = (params) => divisionGroupApi.listMch(params)
 
-const validateForm = () => {
-  return new Promise((resolve) => {
-    if (!infoFormModel.value?.validate) {
-      resolve(true)
-      return
-    }
-    infoFormModel.value.validate((valid) => resolve(valid))
-  })
+const validateForm = async () => {
+  if (!infoForm.value?.validate) {
+    return true
+  }
+  try {
+    await infoForm.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 const handleOkFunc = async () => {

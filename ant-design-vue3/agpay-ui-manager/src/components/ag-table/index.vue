@@ -18,6 +18,8 @@
       :drag-key="dragKey"
       :is-all-columns-visible="isAllColumnsVisible"
       :is-some-columns-visible="isSomeColumnsVisible"
+      :selected-row-keys="state.selectedRowKeys"
+      :row-selection-enabled="!!rowSelection"
       @update:auto-refresh-enabled="handleAutoRefreshEnabledChange"
       @update:show-statistics="handleShowStatisticsChange"
       @update:column-settings-open="handleColumnSettingsOpenChange"
@@ -33,9 +35,14 @@
       @drag-over="({ event, key }) => onDragOver(event, key)"
       @drop="({ event, key }) => onDrop(event, key)"
       @drag-end="onDragEnd"
+      @select-all-rows="handleSelectAllRows"
+      @clear-selection="handleClearSelection"
     >
       <template #left>
         <slot name="toolbar-left"></slot>
+      </template>
+      <template #right>
+        <slot name="toolbar-right"></slot>
       </template>
     </ag-table-toolbar>
 
@@ -53,16 +60,24 @@
       :data-source="tableData.records"
       :loading="computedLoading"
       :pagination="paginationConfig"
-      :row-selection="rowSelection"
+      :row-selection="computedRowSelection"
       :row-key="rowKey"
       :size="state.density"
       :scroll="{ x: scrollX }"
-      :virtual="{ scroll: true, itemHeight: 54 }"
+      :virtual="{ scroll: true, itemHeight: getRowHeight() }"
+      :summary="summaryFunc"
       @change="handleTableChange"
       @row-click="handleRowClick"
+      @row-dblclick="handleRowDoubleClick"
     >
       <slot></slot>
     </a-table>
+
+    <!-- 批量操作提示 -->
+    <div v-if="state.selectedRowKeys.length > 0" class="batch-operation-bar">
+      <span class="batch-count">已选择 {{ state.selectedRowKeys.length }} 条记录</span>
+      <slot name="batch-actions" :keys="state.selectedRowKeys"></slot>
+    </div>
   </div>
 </template>
 
@@ -87,8 +102,10 @@ const props = defineProps({
   rowKey: { type: [String, Function], default: 'id' },
   rowSelection: { type: Object, default: null },
   scrollX: { type: Number, default: 500 },
+  
   // 行点击事件
   rowClick: { type: Function, default: null },
+  rowDoubleClick: { type: Function, default: null },
 
   // 工具栏配置
   showToolbar: { type: Boolean, default: true },
@@ -118,10 +135,21 @@ const props = defineProps({
   autoRefreshInterval: { type: Number, default: 180 },
 
   // 列持久化键
-  stateKey: { type: String, default: '' }
+  stateKey: { type: String, default: '' },
+
+  // 汇总配置
+  summary: { type: Function, default: null }
 })
 
-const emit = defineEmits(['load-complete', 'change', 'reload', 'statistics-loaded'])
+const emit = defineEmits([
+  'load-complete', 
+  'change', 
+  'reload', 
+  'statistics-loaded',
+  'row-click',
+  'row-dblclick',
+  'selection-change'
+])
 const { t } = useI18n()
 
 // ==================== 内部状态 ====================
@@ -134,7 +162,9 @@ const state = reactive({
   autoRefreshCountdown: props.autoRefreshInterval,
   density: 'middle',
   showStatistics: false,
-  autoRefreshTimerId: null
+  autoRefreshTimerId: null,
+  selectedRowKeys: [],
+  selectedRows: []
 })
 
 // 内部分页状态（由 state 管理，便于统一持久化/观察）
@@ -175,7 +205,6 @@ const { loadDensitySetting, handleDensityChange } = useTablePreferences({
 
 // 显示的列（使用缓存优化）
 const displayColumns = computed(() => {
-  // 缓存计算结果，避免重复计算
   if (!state.allColumns.length) return []
 
   return state.allColumns
@@ -190,7 +219,6 @@ const displayColumns = computed(() => {
       // 处理自定义渲染
       if (c.customRender) {
         if (typeof c.customRender === 'string') {
-          // 字符串形式：使用插槽
           const slotName = c.customRender
           if (!c._customRenderCache) {
             c._customRenderCache = ({ text, record, index }) => {
@@ -200,7 +228,6 @@ const displayColumns = computed(() => {
           }
           c.customRender = c._customRenderCache
         } else if (typeof c.customRender === 'function') {
-          // 函数形式：直接使用
           if (!c._customRenderCache) {
             c._customRenderCache = c.customRender
           }
@@ -211,6 +238,35 @@ const displayColumns = computed(() => {
       return c
     })
 })
+
+// 行选择配置
+const computedRowSelection = computed(() => {
+  if (!props.rowSelection) return null
+
+  return {
+    ...props.rowSelection,
+    selectedRowKeys: state.selectedRowKeys,
+    onChange: handleSelectionChange,
+    onSelect: handleSelect,
+    onSelectAll: handleSelectAll
+  }
+})
+
+// 根据密度计算行高
+function getRowHeight() {
+  const heightMap = {
+    small: 40,
+    middle: 54,
+    large: 68
+  }
+  return heightMap[state.density] || 54
+}
+
+// 汇总函数
+function summaryFunc({ columns, data }) {
+  if (!props.summary) return null
+  return props.summary({ columns, data })
+}
 
 // 列相关状态与行为
 const {
@@ -253,6 +309,55 @@ function handleRowClick(record, event) {
   if (props.rowClick) {
     props.rowClick(record, event)
   }
+  emit('row-click', record, event)
+}
+
+function handleRowDoubleClick(record, event) {
+  if (props.rowDoubleClick) {
+    props.rowDoubleClick(record, event)
+  }
+  emit('row-dblclick', record, event)
+}
+
+function handleSelectionChange(selectedRowKeys, selectedRows) {
+  state.selectedRowKeys = selectedRowKeys
+  state.selectedRows = selectedRows
+  emit('selection-change', { selectedRowKeys, selectedRows })
+}
+
+function handleSelect(record, selected, selectedRows) {
+  if (props.rowSelection?.onSelect) {
+    props.rowSelection.onSelect(record, selected, selectedRows)
+  }
+}
+
+function handleSelectAll(selected, selectedRows, changeRows) {
+  if (props.rowSelection?.onSelectAll) {
+    props.rowSelection.onSelectAll(selected, selectedRows, changeRows)
+  }
+}
+
+function handleSelectAllRows(checked) {
+  if (checked) {
+    const keys = tableData.value.records.map(record => 
+      typeof props.rowKey === 'function' ? props.rowKey(record) : record[props.rowKey]
+    )
+    state.selectedRowKeys = keys
+    state.selectedRows = tableData.value.records
+  } else {
+    state.selectedRowKeys = []
+    state.selectedRows = []
+  }
+  emit('selection-change', { 
+    selectedRowKeys: state.selectedRowKeys, 
+    selectedRows: state.selectedRows 
+  })
+}
+
+function handleClearSelection() {
+  state.selectedRowKeys = []
+  state.selectedRows = []
+  emit('selection-change', { selectedRowKeys: [], selectedRows: [] })
 }
 
 function handleShowStatisticsChange(val) {
@@ -265,22 +370,6 @@ function handleColumnSettingsOpenChange(val) {
 
 // ==================== 监听器 ====================
 
-// // 搜索条件变化时重新加载数据（使用防抖优化）
-// const debouncedReload = debounce(() => {
-//   if (props.onLoad) {
-//     reload(true)
-//   }
-// }, DEBOUNCE_DELAY)
-
-// watch(
-//   () => props.searchData,
-//   () => {
-//     debouncedReload()
-//   },
-//   { deep: true, flush: 'post' }
-// )
-
-// 统计面板展开/收起
 watch(
   () => state.showStatistics,
   (val) => {
@@ -296,17 +385,14 @@ watch(
 onMounted(() => {
   loadColumnSettings()
 
-  // 如果提供了数据加载函数，初始化时加载
   if (props.onLoad) {
     reload(true)
   }
 
-  // 如果提供了数据统计加载函数，初始化时也加载
   if (props.onLoadStatistics) {
     reloadStatistics()
   }
 
-  // 初始化自动刷新状态
   initAutoRefresh()
 })
 
@@ -317,12 +403,42 @@ defineExpose({
   reloadStatistics,
   resetColumnSettings,
   startAutoRefresh,
-  stopAutoRefresh
+  stopAutoRefresh,
+  getSelectedRowKeys: () => state.selectedRowKeys,
+  getSelectedRows: () => state.selectedRows,
+  clearSelection: handleClearSelection,
+  toggleRowSelection: (key, selected) => {
+    const index = state.selectedRowKeys.indexOf(key)
+    if (selected && index === -1) {
+      state.selectedRowKeys.push(key)
+    } else if (!selected && index > -1) {
+      state.selectedRowKeys.splice(index, 1)
+    }
+  }
 })
 </script>
 
 <style scoped>
 .ag-table {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.batch-operation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--primary-color-weak);
+  border-radius: 4px;
+  margin-top: 8px;
+  gap: 16px;
+}
+
+.batch-count {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary-color);
 }
 </style>

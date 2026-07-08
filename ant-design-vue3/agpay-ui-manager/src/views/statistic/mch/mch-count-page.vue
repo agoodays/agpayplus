@@ -91,7 +91,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="支付成功的交易总金额，包含退款金额和未退款金额">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -99,7 +99,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="扣除手续费后实际到账金额">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -107,7 +107,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="交易手续费，平台实际收取">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -115,7 +115,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="退款手续费，平台实际收取">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -123,7 +123,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="实际退款笔数，同一笔交易多次退款只计算一次">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -131,7 +131,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="交易成功总笔数占总订单数的百分比">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -191,9 +191,15 @@
   </div>
 </template>
 <script setup>
+import { InfoCircleOutlined } from '@ant-design/icons-vue'
+const icons = { InfoCircleOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import moment from 'moment'
+import dayjs from 'dayjs'
+import 'dayjs/locale/zh-cn'
+
+dayjs.locale('zh-cn')
+
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import InfoDetail from './detail.vue'
@@ -206,28 +212,28 @@ const tableColumns = [
     key: 'payAmount',
     width: 110,
     ellipsis: true,
-    scopedSlots: { title: 'payAmountTitle', titleValue: '交易金额', customRender: 'payAmountSlot' }
+    customRender: 'payAmountSlot', titleSlot: 'payAmountTitle'
   },
   {
     key: 'amount',
     width: 110,
-    scopedSlots: { title: 'amountTitle', titleValue: '实际收入', customRender: 'amountSlot' }
+    customRender: 'amountSlot', titleSlot: 'amountTitle'
   },
-  { key: 'fee', width: 110, scopedSlots: { title: 'feeTitle', titleValue: '手续费', customRender: 'feeSlot' } },
-  { key: 'refundAmount', title: '退款金额', width: 110, scopedSlots: { customRender: 'refundAmountSlot' } },
+  { key: 'fee', width: 110, customRender: 'feeSlot', titleSlot: 'feeTitle' },
+  { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
   {
     key: 'refundFee',
     width: 125,
-    scopedSlots: { title: 'refundFeeTitle', titleValue: '退款手续费', customRender: 'refundFeeSlot' }
+    customRender: 'refundFeeSlot', titleSlot: 'refundFeeTitle'
   },
   {
     key: 'refundCount',
     width: 110,
-    scopedSlots: { title: 'refundCountTitle', titleValue: '退款笔数', customRender: 'refundCountSlot' }
+    customRender: 'refundCountSlot', titleSlot: 'refundCountTitle'
   },
-  { key: 'count', title: '交易/总笔数', width: 120, scopedSlots: { customRender: 'countSlot' } },
-  { key: 'round', width: 110, scopedSlots: { title: 'roundTitle', titleValue: '成功率', customRender: 'roundSlot' } },
-  { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
+  { key: 'round', width: 110, customRender: 'roundSlot', titleSlot: 'roundTitle' },
+  { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 // 响应式数据
@@ -242,8 +248,8 @@ if (route.query.queryDate) {
   // 解析时间范围
   const [startTimestamp, endTimestamp] = route.query.queryDate.split('_').map(Number)
   // 转换为日期格式
-  const startDate = moment(startTimestamp)
-  const endDate = moment(endTimestamp)
+  const startDate = dayjs(startTimestamp)
+  const endDate = dayjs(endTimestamp)
   queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
 }
 if (route.query.hasOwnProperty('queryDateRange')) {

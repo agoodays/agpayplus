@@ -49,7 +49,7 @@
         </template>
         <template #qrcIdSlot="{ record }">
           <span>
-            <a-icon v-if="$access('ENT_DEVICE_QRC_VIEW')" type="qrcode" @click="onPreview(record.qrcId)" />
+            <icons.QrcodeOutlined />
             {{ record.qrcId }}
           </span>
         </template>
@@ -60,7 +60,7 @@
             <p>应用：{{ record.appName }}[{{ record.appId }}]</p>
             <p>门店：{{ record.storeName }}[{{ record.storeId }}]</p>
           </span>
-          <span v-else><a-icon type="exclamation-circle" />未绑定</span>
+          <span v-else><icons.ExclamationCircleOutlined />未绑定</span>
         </template>
         <template #entryPageSlot="{ record }">
           <span>{{
@@ -112,23 +112,26 @@
   </div>
 </template>
 <script setup>
+import { ExclamationCircleOutlined, QrcodeOutlined } from '@ant-design/icons-vue'
+const icons = { ExclamationCircleOutlined, QrcodeOutlined }
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import InfoAddOrEdit from './add-or-edit.vue'
 import Bind from './bind.vue'
+import { message } from 'ant-design-vue'
 
 const tableColumns = [
-  { key: 'qrcId', fixed: 'left', title: '二维码ID', width: 180, scopedSlots: { customRender: 'qrcIdSlot' } },
+  { key: 'qrcId', fixed: 'left', title: '二维码ID', width: 180, customRender: 'qrcIdSlot' },
   { key: 'batchId', dataIndex: 'batchId', title: '批次号', width: 135 },
-  { key: 'bindInfo', title: '绑定商户信息', width: 360, scopedSlots: { customRender: 'bindInfoSlot' } },
+  { key: 'bindInfo', title: '绑定商户信息', width: 360, customRender: 'bindInfoSlot' },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
-  { key: 'entryPage', title: '扫码页面', width: 140, scopedSlots: { customRender: 'entryPageSlot' } },
-  { key: 'state', title: '状态', width: 80, scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'fixedPayAmount', title: '固定金额', width: 120, scopedSlots: { customRender: 'fixedPayAmountSlot' } },
+  { key: 'entryPage', title: '扫码页面', width: 140, customRender: 'entryPageSlot' },
+  { key: 'state', title: '状态', width: 80, customRender: 'stateSlot' },
+  { key: 'fixedPayAmount', title: '固定金额', width: 120, customRender: 'fixedPayAmountSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 const route = useRoute()
@@ -143,20 +146,7 @@ const searchMch = (params) => qrcApi.searchMch(params)
 const reqTableDataFunc = (params) => qrcApi.queryPage(params)
 
 function reloadTable() {
-  const tableRef = infoTable.value
-  if (!tableRef) return
-
-  if (typeof tableRef.reload === 'function') {
-    tableRef.reload()
-    return
-  }
-  if (typeof tableRef.loadData === 'function') {
-    tableRef.loadData()
-    return
-  }
-  if (typeof tableRef.refTable === 'function') {
-    tableRef.refTable(true)
-  }
+  infoTable.value?.reload()
 }
 
 function queryFunc() {
@@ -164,8 +154,8 @@ function queryFunc() {
   searchFunc(true)
 }
 
-function searchFunc(_isToFirst = false) {
-  reloadTable()
+function searchFunc(isToFirst = false) {
+  infoTable.value?.reload(isToFirst)
 }
 
 function onPreview(recordId) {
@@ -194,7 +184,7 @@ function bindFunc(qrcId) {
 function delFunc(qrcId) {
   window.$infoBox.confirmDanger('确定删除吗', '', () => {
     qrcApi.delById(qrcId).then(() => {
-      window.$message.success('删除成功')
+      message.success('删除成功')
       reloadTable()
     })
   })

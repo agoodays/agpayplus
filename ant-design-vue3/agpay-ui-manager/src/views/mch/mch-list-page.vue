@@ -118,7 +118,7 @@
 <script setup>
 import { mchApi } from '@/api/business/mch/mch-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { useDelete, useModal, usePermission } from '@/hooks/common-hooks'
+import { useDelete, useModal, usePermission } from '@/composables/useCommon'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { reactive, ref } from 'vue'

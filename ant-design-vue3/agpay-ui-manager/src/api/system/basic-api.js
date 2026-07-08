@@ -2,17 +2,15 @@
  *  基础API
  *
  */
-import { request, getRequest } from '../../lib/ag-axios'
+import { request, getRequest } from '@/lib/ag-axios'
 
 export const basicApi = {
   /**
    * 获取到webSocket的前缀 （ws://localhost）
    */
   getWebSocketPrefix: () => {
-    // 获取网站域名 +  端口号
     let domain = document.location.protocol + '//' + document.location.host
 
-    // 判断api_base_url 是否设置
     if (import.meta.env.VITE_APP_API_BASE_URL && import.meta.env.VITE_APP_API_BASE_URL !== '/') {
       domain = import.meta.env.VITE_APP_API_BASE_URL
     }
@@ -22,6 +20,16 @@ export const basicApi = {
     } else {
       return 'ws://' + domain.replace('http://', '')
     }
+  },
+  /**
+   * 获取渠道用户ID二维码地址
+   */
+  getChannelUserQrImgUrl: (ifCode, appId, extParam) => {
+    return request({
+      url: '/api/mchChannel/channelUserId',
+      method: 'GET',
+      params: { ifCode, appId, extParam }
+    })
   },
   /**
    * 获取权限树状结构图

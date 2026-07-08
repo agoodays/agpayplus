@@ -11,25 +11,25 @@
   >
     <a-row>
       <a-col span="14">
-        <a-form-model
-          ref="infoFormModel"
+        <a-form
+          ref="infoForm"
           :model="saveObject"
           :label-col="{ span: 4 }"
           :wrapper-col="{ span: 20 }"
           :rules="rules"
         >
-          <a-form-model-item label="模板别名：" prop="shellAlias">
-            <a-input v-model="saveObject.shellAlias" />
-          </a-form-model-item>
-          <a-form-model-item label="选择渲染模板：" prop="styleCode">
-            <a-radio-group v-model="saveObject.styleCode" size="small" button-style="solid" @change="onChange">
+          <a-form-item label="模板别名：" name="shellAlias">
+            <a-input v-model:value="saveObject.shellAlias" />
+          </a-form-item>
+          <a-form-item label="选择渲染模板：" name="styleCode">
+            <a-radio-group v-model:value="saveObject.styleCode" size="small" button-style="solid" @change="onChange">
               <a-radio-button value="shellA">模板A</a-radio-button>
               <a-radio-button value="shellB">模板B</a-radio-button>
             </a-radio-group>
-          </a-form-model-item>
-          <a-form-model-item label="显示ID：" prop="showIdFlag">
+          </a-form-item>
+          <a-form-item label="显示ID：" name="showIdFlag">
             <a-radio-group
-              v-model="saveObject.configInfo.showIdFlag"
+              v-model:value="saveObject.configInfo.showIdFlag"
               size="small"
               button-style="solid"
               @change="onChange"
@@ -37,13 +37,13 @@
               <a-radio-button :value="true">显示</a-radio-button>
               <a-radio-button :value="false">隐藏</a-radio-button>
             </a-radio-group>
-          </a-form-model-item>
-          <a-form-model-item label="支付方式：" prop="payType">
+          </a-form-item>
+          <a-form-item label="支付方式：" name="payType">
             <a-row v-for="(item, index) in saveObject.configInfo.payTypeList" :key="index">
               <a-col>
-                <a-radio-group v-model="item.name" :options="payTypeOptions" @change="onPayTypeChange($event, index)" />
+                <a-radio-group v-model:value="item.name" :options="payTypeOptions" @change="onPayTypeChange($event, index)" />
                 <span
-                  ><span>名称：</span><a-input v-model="item.alias" size="small" style="width: 60px" @change="onChange"
+                  ><span>名称：</span><a-input v-model:value="item.alias" size="small" style="width: 60px" @change="onChange"
                 /></span>
                 <a-button size="small" @click="removePayTypeItem(index)">删除</a-button>
                 <a-button
@@ -65,7 +65,7 @@
                   >
                     <template #uploadSlot="{ loading }">
                       <a-button class="ag-upload-btn">
-                        <a-icon :type="loading ? 'loading' : 'upload'" /> 上传
+                        <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
                       </a-button>
                     </template>
                   </ag-upload>
@@ -78,11 +78,11 @@
             <a-row v-if="saveObject.configInfo.payTypeList.length <= 0">
               <a-button size="small" @click="addPayTypeItem">新增</a-button>
             </a-row>
-          </a-form-model-item>
-          <a-form-model-item label="背景颜色：" prop="bgColor">
+          </a-form-item>
+          <a-form-item label="背景颜色：" name="bgColor">
             <a-row>
               <a-col>
-                <a-radio-group v-model="saveObject.configInfo.bgColor" @change="onChange">
+                <a-radio-group v-model:value="saveObject.configInfo.bgColor" @change="onChange">
                   <a-radio :value="'var(--primary-color)'" style="color: var(--primary-color)">蓝色</a-radio>
                   <a-radio :value="'var(--error-color)'" style="color: var(--error-color)">红色</a-radio>
                   <a-radio :value="'var(--success-color)'" style="color: var(--success-color)">绿色</a-radio>
@@ -94,14 +94,14 @@
               <a-col>
                 <colorPicker
                   v-if="saveObject.configInfo.bgColor === 'custom'"
-                  v-model="saveObject.configInfo.customBgColor"
+                  v-model:modelValue="saveObject.configInfo.customBgColor"
                   style="height: 66px; margin-top: 8px"
                   @change="onChange"
                 />
               </a-col>
             </a-row>
-          </a-form-model-item>
-          <a-form-model-item label="主logo：" prop="logoImgUrl">
+          </a-form-item>
+          <a-form-item label="主logo：" name="logoImgUrl">
             <ag-upload
               :action="action"
               accept=".jpg, .jpeg, .png"
@@ -110,12 +110,12 @@
               @upload-success="uploadSuccess"
             >
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
               </template>
             </ag-upload>
             <span class="agpay-tip-text">{{ logoImgTipText }}</span>
-          </a-form-model-item>
-          <a-form-model-item label="二维码上的logo：" prop="qrInnerImgUrl">
+          </a-form-item>
+          <a-form-item label="二维码上的logo：" name="qrInnerImgUrl">
             <ag-upload
               :action="action"
               accept=".jpg, .jpeg, .png"
@@ -124,14 +124,14 @@
               @upload-success="uploadSuccess"
             >
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <a-icon :type="loading ? 'loading' : 'upload'" /> 上传 </a-button>
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
               </template>
             </ag-upload>
             <div class="agpay-tip-text">
               <span>{{ qrInnerImgTipText }}</span>
             </div>
-          </a-form-model-item>
-        </a-form-model>
+          </a-form-item>
+        </a-form>
       </a-col>
       <a-col span="10">
         <div style="display: flex; justify-content: center">
@@ -154,6 +154,8 @@
   </a-drawer>
 </template>
 <script setup>
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+const icons = { LoadingOutlined, UploadOutlined }
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
 import AgUpload from '@/components/ag-upload'
 import { upload } from '@/lib/ag-axios'
@@ -189,7 +191,7 @@ function createDefaultSaveObject() {
   }
 }
 
-const infoFormModel = ref(null)
+const infoForm = ref(null)
 const isAdd = ref(true)
 const visible = ref(false)
 const btnLoading = ref(false)
@@ -207,7 +209,7 @@ const rules = {
 async function show(currentRecordId) {
   isAdd.value = !currentRecordId
   saveObject.value = createDefaultSaveObject()
-  infoFormModel.value?.resetFields?.()
+  infoForm.value?.resetFields?.()
 
   if (!isAdd.value) {
     recordId.value = currentRecordId
@@ -252,11 +254,10 @@ function updateLogoImgTipText() {
   }
 }
 
-function onChange() {
+async function onChange() {
   updateLogoImgTipText()
-  qrcShellApi.previewImage(saveObject.value).then((res) => {
-    saveObject.value.shellImgViewUrl = res
-  })
+  const res = await qrcShellApi.previewImage(saveObject.value)
+  saveObject.value.shellImgViewUrl = res
 }
 
 function removePayTypeItem(index) {
@@ -295,14 +296,16 @@ function payTypeImgUploadSuccess(name, fileList) {
   onChange()
 }
 
-function validateForm() {
-  return new Promise((resolve) => {
-    if (!infoFormModel.value?.validate) {
-      resolve(true)
-      return
-    }
-    infoFormModel.value.validate((valid) => resolve(valid))
-  })
+async function validateForm() {
+  if (!infoForm.value?.validate) {
+    return true
+  }
+  try {
+    await infoForm.value.validate()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function handleOkFunc() {

@@ -231,7 +231,7 @@
 <script setup>
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable } from '@/components'
-import { useModal, usePermission } from '@/hooks/common-hooks'
+import { useModal, usePermission } from '@/composables/useCommon'
 import {
     DollarOutlined,
     TransactionOutlined,

@@ -7,14 +7,14 @@
     <template #overlay>
       <a-menu class="ant-pro-drop-down menu" :selected-keys="[]">
         <a-menu-item v-if="hasPermission('ENT_C_USERINFO')" key="settings" @click="handleToSettings">
-          <a-icon type="setting" />
+          <icons.SettingOutlined />
           账户设置
         </a-menu-item>
 
         <a-menu-divider />
 
         <a-menu-item key="logout" @click="handleLogout">
-          <a-icon type="logout" />
+          <icons.LogoutOutlined />
           退出登录
         </a-menu-item>
       </a-menu>
@@ -23,11 +23,13 @@
 </template>
 
 <script setup>
+import { LogoutOutlined, SettingOutlined } from '@ant-design/icons-vue'
+const icons = { LogoutOutlined, SettingOutlined }
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'pinia'
 import { infoBox } from '@/utils/info-box'
-import { usePermission } from '@/hooks/common-hooks'
+import { usePermission } from '@/composables/useCommon'
 
 const store = useStore()
 const router = useRouter()

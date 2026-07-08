@@ -80,7 +80,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="支付成功的订单金额，不包含退款和全额退款的订单">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -88,7 +88,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="实际收入=支付金额-手续费">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -96,7 +96,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="支付手续费=支付金额*费率">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -104,7 +104,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="退款手续费=退款金额*费率">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -112,7 +112,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="实际退款笔数=退款订单数-全额退款订单数">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -120,7 +120,7 @@
           <div style="display: flex">
             <span>{{ record }}</span>
             <a-tooltip title="支付成功数/总订单数得出的百分比">
-              <a-icon class="bi" type="info-circle" style="margin-left: 5px" />
+              <icons.InfoCircleOutlined />
             </a-tooltip>
           </div>
         </template>
@@ -170,6 +170,8 @@
   </div>
 </template>
 <script setup>
+import { InfoCircleOutlined } from '@ant-design/icons-vue'
+const icons = { InfoCircleOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { reactive, ref } from 'vue'

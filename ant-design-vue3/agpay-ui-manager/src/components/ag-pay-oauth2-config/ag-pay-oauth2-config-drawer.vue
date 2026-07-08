@@ -1,5 +1,5 @@
 <template>
-  <a-drawer
+  <ag-drawer
     :visible="visible"
     :title="true ? 'Oauth2配置' : ''"
     :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
@@ -11,7 +11,7 @@
       <div style="margin-bottom: 20px">
         <label>选择配置的条目：</label>
         <a-select
-          v-model="diyListSelectedInfoId"
+          v-model:value="diyListSelectedInfoId"
           placeholder=""
           style="width: 380px; margin-right: 20px"
           @change="getSavedConfigs"
@@ -27,7 +27,7 @@
       </div>
       <div v-show="diyAddMode === 'adding'">
         <label>输入名称：</label>
-        <a-input v-model="addDiyListName" placeholder="" style="width: 160px" />
+        <a-input v-model:value="addDiyListName" placeholder="" style="width: 160px" />
         <a-checkbox
           style="margin-left: 20px"
           :checked="addDiyListIsCopyCurrentFlag"
@@ -43,7 +43,7 @@
           <template #title>
             <span>复制当前参数</span>
           </template>
-          <a-icon type="question-circle" />
+          <icons.QuestionCircleOutlined />
         </a-popover>
         <a-button type="danger" icon="check" :style="{ marginLeft: '20px' }" @click="onSave">保存</a-button>
         <a-button type="primary" icon="close" :style="{ marginLeft: '8px' }" @click="diyAddMode = 'init'"
@@ -52,7 +52,7 @@
       </div>
       <a-divider />
     </div>
-    <a-tabs v-model="currentIfCode" type="card" @change="getSavedConfigs">
+    <a-tabs v-model:activeKey="currentIfCode" type="card" @change="getSavedConfigs">
       <a-tab-pane v-for="item in tabData" :key="item.code" :tab="item.name" />
     </a-tabs>
     <a-card style="padding: 30px">
@@ -67,177 +67,158 @@
         <a-button type="primary" icon="check" :loading="btnLoading" @click="onSubmit">保存</a-button>
       </div>
     </a-card>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
-<script>
-import { API_URL_PAYOAUTH2CONFIGS, req } from '@/api/manage'
+<script setup>
+import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+const icons = { QuestionCircleOutlined }
+import { ref, nextTick, markRaw } from 'vue'
+import { message } from 'ant-design-vue'
+import { AgDrawer } from '@/components'
+import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
 
-export default {
-  name: 'AgPayOauth2ConfigDrawer',
-  props: {
-    configMode: { type: String, default: null }
-  },
-  data() {
-    return {
-      visible: false, // 是否显示弹层/抽屉
-      infoId: null, // 更新对象ID
-      btnLoading: false,
-      isIsvSubMch: false,
-      diyListSelectedInfoId: '',
-      diyList: [],
-      diyAddMode: 'init',
-      addDiyListName: '',
-      addDiyListIsCopyCurrentFlag: true,
-      currentIfCode: 'wxpay',
-      tabData: [
-        { code: 'wxpay', name: '微信' },
-        { code: 'alipay', name: '支付宝' }
-      ],
-      currentComponent: null,
-      saveObject: {},
-      ifParams: {} // 参数配置对象
-    }
-  },
-  methods: {
-    show: function (infoId, isIsvSubMch) {
-      // 弹层打开事件
-      this.infoId = infoId
-      this.diyListSelectedInfoId = infoId
-      this.isIsvSubMch = isIsvSubMch
-      this.visible = true
-      if (this.configMode === 'mgrIsv') {
-        this.getDiyList()
-      }
-      this.$nextTick(() => {
-        // DOM 更新周期结束后执行该回调函数
-        this.getSavedConfigs()
-      })
-    },
-    onClose() {
-      this.visible = false
-      this.infoId = null
-      this.isIsvSubMch = false
-      this.diyListSelectedInfoId = ''
-      this.diyList = []
-      this.diyAddMode = 'init'
-      this.addDiyListName = ''
-      this.addDiyListIsCopyCurrentFlag = true
-      this.currentIfCode = 'wxpay'
-      this.saveObject = {}
-      this.currentComponent = null
-    },
-    getCurrentComponent() {
-      switch (this.currentIfCode) {
-        case 'wxpay':
-          return import(`./diy/wxpay/${this.isIsvSubMch ? 'IsvSubMch' : ''}Oauth2ConfigPage.vue`)
-        case 'alipay':
-          return import(`./diy/alipay/${this.isIsvSubMch ? 'IsvSubMch' : ''}Oauth2ConfigPage.vue`)
-        default:
-          return Promise.reject(new Error('Unknown variable dynamic import: ' + this.currentIfCode))
-      }
-    },
-    // onIfCodeChange () {
-    //   const that = this
-    //   that.getSavedConfigs()
-    //   that.getCurrentComponent().then(module => {
-    //     that.currentComponent = module.default || module
-    //   }).catch(() => {
-    //     that.currentComponent = null
-    //     that.$message.error('当前渠道不支持Oauth2配置！')
-    //   })
-    // },
-    getDiyList() {
-      req
-        .get(API_URL_PAYOAUTH2CONFIGS + '/diyList', { configMode: this.configMode, infoId: this.infoId })
-        .then((res) => {
-          this.diyList = res
-        })
-    },
-    getSavedConfigs() {
-      const that = this
-      that.currentComponent = null
-      const params = Object.assign(
-        {},
-        { configMode: that.configMode, infoId: that.diyListSelectedInfoId, ifCode: that.currentIfCode }
-      )
-      req.get(API_URL_PAYOAUTH2CONFIGS + '/savedConfigs', params).then((res) => {
-        if (res) {
-          that.saveObject = res
-          that.ifParams = JSON.parse(res.ifParams || '{}')
-          if (that.currentIfCode === 'alipay') {
-            that.ifParams.liteParams = that.ifParams.liteParams || {}
-          }
-          if (that.isIsvSubMch) {
-            that.ifParams.isUseSubmchAccount = that.ifParams.isUseSubmchAccount || 0
-          }
-        }
-        that.$forceUpdate()
-        that.$nextTick(() => {
-          // DOM 更新周期结束后执行该回调函数
-          that
-            .getCurrentComponent()
-            .then((module) => {
-              that.currentComponent = module.default || module
-            })
-            .catch(() => {
-              that.currentComponent = null
-              that.$message.error('当前渠道不支持Oauth2配置！')
-            })
-        })
-      })
-    },
-    handleUpdateIfParams(ifParams) {
-      this.ifParams = ifParams
-    },
-    onSave() {
-      const that = this
-      if (!that.addDiyListName) {
-        that.$message.error('请输入名称')
-        return
-      }
-      this.$infoBox.confirmPrimary('确认新增该服务商的配置条目？', '新建后不支持修改/删除，请谨慎操作', () => {
-        const params = Object.assign(
-          {},
-          {
-            infoId: that.infoId,
-            configMode: that.configMode,
-            remark: that.addDiyListName,
-            copySourceInfoId: that.diyListSelectedInfoId
-          }
-        )
-        req.post(API_URL_PAYOAUTH2CONFIGS + '/diyList', params).then((res) => {
-          that.$message.success('保存成功')
-          that.getDiyList()
-        })
-      })
-    },
-    onSubmit() {
-      const that = this
-      this.$refs.currentComponentRef.validate((valid) => {
-        if (!valid) return
-        // 验证通过
-        // 支付参数配置不能为空
-        if (Object.keys(that.ifParams).length === 0) {
-          this.$message.error('参数不能为空！')
-          return
-        }
-        const ifParams = this.$refs.currentComponentRef.handleStarParams()
-        that.saveObject.ifParams = JSON.stringify(ifParams)
-        that.btnLoading = true
-        req
-          .add(API_URL_PAYOAUTH2CONFIGS + '/configParams', that.saveObject)
-          .then((res) => {
-            that.$message.success('保存成功')
-            that.btnLoading = false
-          })
-          .catch((res) => {
-            that.btnLoading = false
-          })
-      })
-    }
+const props = defineProps({
+  configMode: { type: String, default: null }
+})
+
+const visible = ref(false)
+const infoId = ref(null)
+const btnLoading = ref(false)
+const isIsvSubMch = ref(false)
+const diyListSelectedInfoId = ref('')
+const diyList = ref([])
+const diyAddMode = ref('init')
+const addDiyListName = ref('')
+const addDiyListIsCopyCurrentFlag = ref(true)
+const currentIfCode = ref('wxpay')
+const tabData = ref([
+  { code: 'wxpay', name: '微信' },
+  { code: 'alipay', name: '支付宝' }
+])
+const currentComponent = ref(null)
+const saveObject = ref({})
+const ifParams = ref({})
+const currentComponentRef = ref(null)
+
+const show = (infoIdValue, isIsvSubMchValue) => {
+  infoId.value = infoIdValue
+  diyListSelectedInfoId.value = infoIdValue
+  isIsvSubMch.value = isIsvSubMchValue
+  visible.value = true
+  if (props.configMode === 'mgrIsv') {
+    getDiyList()
+  }
+  nextTick(() => {
+    getSavedConfigs()
+  })
+}
+
+const onClose = () => {
+  visible.value = false
+  infoId.value = null
+  isIsvSubMch.value = false
+  diyListSelectedInfoId.value = ''
+  diyList.value = []
+  diyAddMode.value = 'init'
+  addDiyListName.value = ''
+  addDiyListIsCopyCurrentFlag.value = true
+  currentIfCode.value = 'wxpay'
+  saveObject.value = {}
+  currentComponent.value = null
+}
+
+const getCurrentComponent = () => {
+  const suffix = isIsvSubMch.value ? 'IsvSubMch' : ''
+  switch (currentIfCode.value) {
+    case 'wxpay':
+      return import(`./diy/wxpay/${suffix}Oauth2ConfigPage.vue`)
+    case 'alipay':
+      return import(`./diy/alipay/${suffix}Oauth2ConfigPage.vue`)
+    default:
+      return Promise.reject(new Error('Unknown variable dynamic import: ' + currentIfCode.value))
   }
 }
+
+const getDiyList = async () => {
+  const res = await payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: infoId.value })
+  diyList.value = res
+}
+
+const getSavedConfigs = async () => {
+  currentComponent.value = null
+  const params = Object.assign(
+    {},
+    { configMode: props.configMode, infoId: diyListSelectedInfoId.value, ifCode: currentIfCode.value }
+  )
+  const res = await payOauth2Api.querySavedConfigs(params)
+  if (res) {
+    saveObject.value = res
+    ifParams.value = JSON.parse(res.ifParams || '{}')
+    if (currentIfCode.value === 'alipay') {
+      ifParams.value.liteParams = ifParams.value.liteParams || {}
+    }
+    if (isIsvSubMch.value) {
+      ifParams.value.isUseSubmchAccount = ifParams.value.isUseSubmchAccount || 0
+    }
+  }
+  await nextTick()
+  try {
+    const module = await getCurrentComponent()
+    currentComponent.value = markRaw(module.default || module)
+  } catch {
+    currentComponent.value = null
+    message.error('当前渠道不支持Oauth2配置！')
+  }
+}
+
+const handleUpdateIfParams = (params) => {
+  ifParams.value = params
+}
+
+const onSave = async () => {
+  if (!addDiyListName.value) {
+    message.error('请输入名称')
+    return
+  }
+  window.$infoBox.confirmPrimary('确认新增该服务商的配置条目？', '新建后不支持修改/删除，请谨慎操作', async () => {
+    const params = Object.assign(
+      {},
+      {
+        infoId: infoId.value,
+        configMode: props.configMode,
+        remark: addDiyListName.value,
+        copySourceInfoId: diyListSelectedInfoId.value
+      }
+    )
+    await payOauth2Api.createDiyList(params)
+    message.success('保存成功')
+    await getDiyList()
+  })
+}
+
+const onSubmit = async () => {
+  try {
+    await currentComponentRef.value.validate()
+  } catch {
+    return
+  }
+  if (Object.keys(ifParams.value).length === 0) {
+    message.error('参数不能为空！')
+    return
+  }
+  const params = currentComponentRef.value.handleStarParams()
+  saveObject.value.ifParams = JSON.stringify(params)
+  btnLoading.value = true
+  try {
+    await payOauth2Api.saveConfigParams(saveObject.value)
+    message.success('保存成功')
+  } finally {
+    btnLoading.value = false
+  }
+}
+
+defineExpose({ show })
 </script>
 
 <style scoped>
