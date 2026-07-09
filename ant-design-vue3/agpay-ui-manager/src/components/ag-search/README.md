@@ -219,7 +219,7 @@ function onSearch(values) {
 | resetExclude | 重置时跳过的字段 | `Array` | `[]` |
 | collapsible | 是否支持展开/收起功能 | `Boolean` | `false` |
 | defaultCollapsed | 默认是否收起高级搜索 | `Boolean` | `true` |
-| colSpan | 响应式列配置 | `Object` | `{ xs: 24, sm: 12, md: 8, lg: 6, xl: 6 }` |
+| colSpan | 响应式列配置 | `Object` | `{ xs: 24, sm: 12, md: 8, lg: 6, xl: 4 }` |
 | enableQuickSearch | 启用快速搜索 | `Boolean` | `false` |
 | quickSearchDelay | 快速搜索防抖延迟（ms） | `Number` | `500` |
 | enableSearchHistory | 启用搜索历史 | `Boolean` | `false` |

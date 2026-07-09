@@ -1,20 +1,22 @@
 <template>
-  <a-drawer
+  <ag-drawer
     v-model:open="localOpen"
     :mask-closable="false"
     :title="isAdd ? '新增代理商' : '修改代理商'"
-    :body-style="{ paddingBottom: '80px' }"
     width="40%"
-    @close="onClose"
+    @close="handleClose"
+    :show-confirm="true"
+    :confirm-loading="btnLoading"
+    @confirm="handleConfirm"
   >
     <a-form
-      v-if="localOpen"
       ref="infoForm"
       :model="saveObject"
       layout="vertical"
       :rules="rules"
     >
-      <a-row justify="space-between" type="flex">
+      <!-- 基本信息 -->
+      <a-row :gutter="16">
         <a-col :span="10">
           <a-form-item label="代理商名称" name="agentName">
             <a-input v-model:value="saveObject.agentName" placeholder="请输入代理商名称" />
@@ -94,12 +96,14 @@
         </a-col>
       </a-row>
 
-      <!-- 账户安全板块 -->
+      <!-- 账户安全 -->
       <a-divider orientation="left">
         <a-tag color="var(--error-color)">账户安全</a-tag>
       </a-divider>
+
+      <!-- 新增时的密码设置 -->
       <div v-if="isAdd">
-        <a-row justify="space-between" type="flex">
+        <a-row :gutter="16">
           <a-col :span="10">
             <a-form-item label="是否发送开通提醒" name="isNotify">
               <a-radio-group v-model:value="saveObject.isNotify">
@@ -109,7 +113,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row justify="space-between" type="flex">
+        <a-row :gutter="16">
           <a-col :span="10">
             <a-form-item label="密码设置" name="passwordType">
               <a-radio-group v-model:value="saveObject.passwordType">
@@ -131,17 +135,17 @@
           </a-col>
         </a-row>
       </div>
-      <!-- 重置密码板块 -->
+
+      <!-- 编辑时的密码重置 -->
       <div v-else>
-        <a-row justify="space-between" type="flex">
+        <a-row :gutter="16">
           <a-col :span="10">
             <a-form-item label="">
               重置支付密码：<a-checkbox v-model:checked="sysPassword.resetPayPass" />
             </a-form-item>
           </a-col>
         </a-row>
-
-        <a-row justify="space-between" type="flex">
+        <a-row :gutter="16">
           <a-col :span="10">
             <a-form-item label="">
               重置密码：<a-checkbox v-model:checked="sysPassword.resetPass" />
@@ -153,8 +157,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-
-        <a-row v-if="sysPassword.resetPass && !sysPassword.defaultPass" justify="space-between" type="flex">
+        <a-row v-if="sysPassword.resetPass && !sysPassword.defaultPass" :gutter="16">
           <a-col :span="10">
             <a-form-item label="新密码：" name="newPwd">
               <a-input-password
@@ -176,11 +179,11 @@
         </a-row>
       </div>
 
-      <!-- 账户信息板块 -->      
+      <!-- 账户信息 -->
       <a-divider orientation="left">
         <a-tag color="var(--error-color)">账户信息</a-tag>
       </a-divider>
-      <a-row justify="space-between" type="flex">
+      <a-row :gutter="16">
         <a-col :span="10">
           <a-form-item label="代理商类型" name="agentType">
             <a-select v-model:value="saveObject.agentType" placeholder="请选择代理商类型" @change="agentTypeChange">
@@ -225,11 +228,11 @@
         </a-col>
       </a-row>
 
-      <!-- 手续费信息板块 -->
+      <!-- 手续费信息 -->
       <a-divider orientation="left">
         <a-tag color="var(--error-color)">手续费信息</a-tag>
       </a-divider>
-      <a-row justify="space-between" type="flex">
+      <a-row :gutter="16">
         <a-col :span="24">
           <div class="ant-col ant-form-item-label"><label title="设置提现手续费规则">设置提现手续费规则</label></div>
         </a-col>
@@ -242,7 +245,7 @@
           </a-form-item>
         </a-col>
       </a-row>
-      <a-row v-if="saveObject.cashoutFeeRuleType === 2" justify="space-between" type="flex">
+      <a-row v-if="saveObject.cashoutFeeRuleType === 2" :gutter="16">
         <a-col :span="24">
           <a-form-item
             class="cashout-fee"
@@ -296,12 +299,11 @@
         </a-col>
       </a-row>
 
-      <!-- 资料信息板块 -->
+      <!-- 资料信息 -->
       <a-divider orientation="left">
         <a-tag color="var(--error-color)">资料信息</a-tag>
       </a-divider>
-      <a-row justify="space-between" type="flex">
-        <!-- 企业 -->
+      <a-row :gutter="16">
         <a-col v-if="saveObject.agentType === 2" :span="10">
           <a-form-item label="营业执照照片" name="licenseImg">
             <ag-upload
@@ -316,7 +318,6 @@
             </ag-upload>
           </a-form-item>
         </a-col>
-        <!-- 企业对公 -->
         <a-col v-if="saveObject.agentType === 2 && saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
           <a-form-item label="开户许可证照片" name="permitImg">
             <ag-upload
@@ -373,7 +374,6 @@
             </ag-upload>
           </a-form-item>
         </a-col>
-        <!-- 个人对私/企业对私 -->
         <a-col v-if="saveObject.settAccountType === 'BANK_PRIVATE'" :span="10">
           <a-form-item :label="'[' + imgLabel + ']银行卡照片'" name="bankCardImg">
             <ag-upload
@@ -390,32 +390,28 @@
         </a-col>
       </a-row>
     </a-form>
-    <div class="drawer-btn-center">
-      <a-button @click="onClose">
-        <close-outlined />
-        取消
-      </a-button>
-      <a-button type="primary" :loading="btnLoading" @click="handleOkFunc">
-        <check-outlined />
-        保存
-      </a-button>
-    </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+/**
+ * 代理商新增/编辑抽屉组件
+ * 功能：代理商信息的新增和编辑，包含基本信息、账户安全、账户信息、手续费信息、资料信息
+ */
 import { agentApi } from '@/api/business/agent/agent-api'
 import { isvApi } from '@/api/business/isv/isv-api'
 import { basicApi } from '@/api/system/basic-api'
-import AgSelect from '@/components/ag-select'
-import AgUpload from '@/components/ag-upload'
+import { AgDrawer, AgSelect, AgUpload } from '@/components'
 import { upload } from '@/lib/ag-axios'
-import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
 import { computed, reactive, ref, watch } from 'vue'
+
+/** 图标集合 */
 const icons = { LoadingOutlined, UploadOutlined }
 
+/** Props 定义 */
 const props = defineProps({
   open: {
     type: Boolean,
@@ -427,46 +423,58 @@ const props = defineProps({
   }
 })
 
+/** 事件定义 */
 const emit = defineEmits(['update:open', 'success'])
 
+/** 表单引用 */
 const infoForm = ref(null)
+
+/** 本地状态 */
 const localOpen = ref(false)
 const isAdd = ref(true)
 const btnLoading = ref(false)
 const imgLabel = ref('联系人')
 const settAccountNoLabel = ref('个人微信号')
 
+/** 密码生成规则 */
 const passwordLength = ref(6)
 const includeUpperCase = ref(true)
 const includeNumber = ref(false)
 const includeSymbol = ref(false)
 
+/** 密码验证规则 */
 const passwordRules = reactive({
   regexpRules: '',
   errTips: ''
 })
 
+/** 上传地址 */
 const action = upload.form
 
+/** 代理商类型列表 */
 const agentTypeList = [
   { agentType: 1, agentTypeName: '个人' },
   { agentType: 2, agentTypeName: '企业' }
 ]
 
+/** 基础收款账户类型列表 */
 const baseSettAccountTypeList = [
   { settAccountType: 'WX_CASH', settAccountTypeName: '个人微信' },
   { settAccountType: 'ALIPAY_CASH', settAccountTypeName: '个人支付宝' },
   { settAccountType: 'BANK_PRIVATE', settAccountTypeName: '对私账户' }
 ]
 
+/** 收款账户类型列表（响应式，根据代理商类型动态调整） */
 const settAccountTypeList = ref([...baseSettAccountTypeList])
 
+/** 系统密码重置状态 */
 const sysPassword = reactive({
   resetPayPass: false,
   resetPass: false,
   defaultPass: true
 })
 
+/** 提现手续费规则 */
 const cashoutFeeRule = reactive({
   freeLimit: 0,
   applyLimit: 0,
@@ -475,8 +483,10 @@ const cashoutFeeRule = reactive({
   feeRate: 0
 })
 
+/** 保存对象 */
 const saveObject = ref({})
 
+/** 表单验证规则 */
 const rules = computed(() => ({
   agentName: [{ required: true, message: '请输入代理商名称', trigger: 'blur' }],
   loginUsername: [
@@ -494,19 +504,16 @@ const rules = computed(() => ({
         if (saveObject.value.passwordType !== 'custom') {
           return Promise.resolve()
         }
-
         const loginPassword = saveObject.value.loginPassword || ''
         if (!loginPassword) {
           return Promise.reject(new Error('请输入登录密码'))
         }
-
         if (passwordRules.regexpRules && passwordRules.errTips) {
           const regex = new RegExp(passwordRules.regexpRules)
           if (!regex.test(loginPassword)) {
             return Promise.reject(new Error(passwordRules.errTips))
           }
         }
-
         return Promise.resolve()
       }
     }
@@ -543,14 +550,12 @@ const rules = computed(() => ({
         if (!newPassword) {
           return Promise.reject(new Error('请输入新密码'))
         }
-
         if (passwordRules.regexpRules && passwordRules.errTips) {
           const regex = new RegExp(passwordRules.regexpRules)
           if (!regex.test(newPassword)) {
             return Promise.reject(new Error(passwordRules.errTips))
           }
         }
-
         return Promise.resolve()
       }
     }
@@ -564,24 +569,22 @@ const rules = computed(() => ({
         if (!confirmPassword) {
           return Promise.reject(new Error('请输入确认新密码'))
         }
-
         if (passwordRules.regexpRules && passwordRules.errTips) {
           const regex = new RegExp(passwordRules.regexpRules)
           if (!regex.test(confirmPassword)) {
             return Promise.reject(new Error(passwordRules.errTips))
           }
         }
-
         if (saveObject.value.newPwd !== confirmPassword) {
           return Promise.reject(new Error('新密码与确认密码不一致'))
         }
-
         return Promise.resolve()
       }
     }
   ]
 }))
 
+/** 获取默认保存对象 */
 function getDefaultSaveObject() {
   return {
     state: 1,
@@ -597,17 +600,20 @@ function getDefaultSaveObject() {
   }
 }
 
+/** 重置系统密码状态 */
 function resetSysPasswordState() {
   sysPassword.resetPayPass = false
   sysPassword.resetPass = false
   sysPassword.defaultPass = true
 }
 
+/** 重置密码输入 */
 function resetPassEmpty() {
   saveObject.value.newPwd = ''
   saveObject.value.confirmPwd = ''
 }
 
+/** 根据代理商类型规范化收款账户类型列表 */
 function normalizeSettAccountTypeList(agentType) {
   const hasPublic = settAccountTypeList.value.some((item) => item.settAccountType === 'BANK_PUBLIC')
   if (agentType === 2 && !hasPublic) {
@@ -618,6 +624,7 @@ function normalizeSettAccountTypeList(agentType) {
   }
 }
 
+/** 设置收款账号标签 */
 function setSettAccountNoLabel(value) {
   switch (value) {
     case 'WX_CASH':
@@ -638,6 +645,7 @@ function setSettAccountNoLabel(value) {
   }
 }
 
+/** 初始化表单 */
 async function initForm(currentRecordId) {
   isAdd.value = !currentRecordId
   saveObject.value = getDefaultSaveObject()
@@ -665,28 +673,36 @@ async function initForm(currentRecordId) {
   }
 }
 
+/** 监听 open 属性变化 */
 watch(
   () => props.open,
-  (val) => {
+  async (val) => {
     localOpen.value = val
     if (val) {
-      initForm(props.recordId)
+      await initForm(props.recordId)
+    } else {
+      resetSysPasswordState()
+      resetPassEmpty()
     }
   }
 )
 
+/** 监听本地 open 变化，同步 emit */
 watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
+/** 搜索代理商 */
 function searchAgent(params) {
   return agentApi.queryPage(params)
 }
 
+/** 搜索服务商 */
 function searchIsv(params) {
   return isvApi.queryPage(params)
 }
 
+/** 生成随机密码 */
 function genRandomPassword() {
   if (!passwordLength.value) return
 
@@ -719,7 +735,8 @@ function genRandomPassword() {
   saveObject.value.loginPassword = password
 }
 
-async function handleOkFunc() {
+/** 处理确认提交 */
+async function handleConfirm() {
   try {
     await infoForm.value.validate()
 
@@ -765,12 +782,14 @@ async function handleOkFunc() {
   }
 }
 
-function onClose() {
+/** 处理关闭 */
+function handleClose() {
   localOpen.value = false
   resetSysPasswordState()
   resetPassEmpty()
 }
 
+/** 监听默认密码变化 */
 watch(
   () => sysPassword.defaultPass,
   (val) => {
@@ -780,12 +799,14 @@ watch(
   }
 )
 
+/** 上级代理商变更处理 */
 function pidChange(val, selected) {
   if (selected) {
     saveObject.value.isvNo = selected?.isvNo
   }
 }
 
+/** 代理商类型变更处理 */
 function agentTypeChange() {
   if (saveObject.value.agentType === 2) {
     imgLabel.value = '法人'
@@ -801,15 +822,18 @@ function agentTypeChange() {
   }
 }
 
+/** 收款账户类型变更处理 */
 function settAccountTypeChange(value) {
   setSettAccountNoLabel(value)
 }
 
+/** 上传成功处理 */
 function uploadSuccess(name, fileList) {
   const [firstItem] = fileList
   saveObject.value[name] = firstItem?.url
 }
 
+/** 加载密码规则 */
 async function loadPwdRules() {
   try {
     const res = await basicApi.getPwdRulesRegexp()
@@ -820,6 +844,7 @@ async function loadPwdRules() {
   }
 }
 
+/** 初始化加载密码规则 */
 loadPwdRules()
 </script>
 
@@ -848,11 +873,9 @@ loadPwdRules()
 }
 .cashout-fee {
   display: flex;
-  /*margin: auto;*/
   margin-bottom: 8px;
 }
 .cashout-fee .ant-input-number {
-  /*width: 100px;*/
   margin: 0 5px 0 5px;
 }
 .cashout-fee-type .ant-radio-group {

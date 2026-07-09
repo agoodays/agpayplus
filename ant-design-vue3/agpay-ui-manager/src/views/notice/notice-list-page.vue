@@ -1,13 +1,23 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
-          </a-form-item>
-          <ag-input v-model="searchData.articleId" placeholder="公告ID" />
-          <ag-input v-model="searchData.title" placeholder="公告标题" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-date-range-picker v-model:value="searchData.queryDateRange" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.articleId" label="公告ID" placeholder="请输入公告ID" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.title" label="公告标题" placeholder="请输入公告标题" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -90,17 +100,14 @@ const {
 
 Object.assign(searchData, defaultSearchData)
 
-// 查询函数
-const queryFunc = () => {
-  btnLoading.value = true
-  reloadTable()
-}
-
 // 对接table接口函数
 const reqTableDataFunc = (params) => noticeApi.queryPage(params)
 
 // 搜索函数
-const searchFunc = () => reloadTable()
+const searchFunc = () => {
+  btnLoading.value = true
+  reloadTable()
+}
 
 const addFunc = () => openCreate()
 

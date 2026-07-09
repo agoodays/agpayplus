@@ -63,6 +63,17 @@ const handleClose = () => {
   localOpen.value = false
   payConfigRef.value?.reset()
 }
+
+const show = (infoIdVal) => {
+  localOpen.value = true
+  if (infoIdVal && payConfigRef.value) {
+    payConfigRef.value.getPayConfig(infoIdVal, props.configMchAppIsIsvSubMch)
+  }
+}
+
+defineExpose({
+  show
+})
 </script>
 
 <style scoped></style>

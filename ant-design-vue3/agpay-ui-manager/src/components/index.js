@@ -27,6 +27,8 @@ export { default as AgSelectInfinite } from './ag-select-infinite/index.vue'
 // 容器组件
 export { default as AgDrawer } from './ag-drawer/index.vue'
 export { default as AgModal } from './ag-modal/index.vue'
+export { default as AgPayConfigDrawer } from './ag-pay-config/ag-pay-config-drawer.vue'
+export { default as AgPayOauth2ConfigDrawer } from './ag-pay-oauth2-config/ag-pay-oauth2-config-drawer.vue'
 
 // 工具组件
 export { default as AgLoading } from './ag-loading/index.js'

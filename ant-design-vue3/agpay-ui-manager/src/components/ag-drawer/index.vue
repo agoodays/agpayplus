@@ -4,6 +4,7 @@
     :title="title"
     :width="computedWidth"
     :closable="closable"
+    :mask-closable="maskClosable"
     :destroy-on-close="destroyOnClose"
     @close="handleClose"
   >
@@ -14,9 +15,11 @@
         <slot name="footer">
           <a-space>
             <a-button @click="handleClose">
+              <close-outlined />
               {{ cancelText }}
             </a-button>
             <a-button v-if="showConfirm" type="primary" :loading="confirmLoading" @click="handleConfirm">
+              <check-outlined />
               {{ confirmText }}
             </a-button>
           </a-space>
@@ -28,6 +31,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 
 const props = defineProps({
   open: {
@@ -58,6 +62,10 @@ const props = defineProps({
     type: Boolean,
     default: true
   },
+  maskClosable: {
+    type: Boolean,
+    default: true
+  },
   destroyOnClose: {
     type: Boolean,
     default: true
@@ -72,7 +80,7 @@ const props = defineProps({
   },
   confirmText: {
     type: String,
-    default: '确定'
+    default: '保存'
   },
   cancelText: {
     type: String,

@@ -4,17 +4,17 @@
       <!-- 搜索表单 -->
       <div style="margin-bottom: 16px">
         <ag-search
-          v-model:model-value="searchForm"
+          v-model="searchData"
           :collapsible="true"
           :default-collapsed="false"
-          @search="onSearch"
+          @search="searchFunc"
           @reset="onReset"
         >
           <template #base="{ colSpan }">
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-date-range-picker
-                  v-model:value="searchForm.dateRange"
+                  v-model:value="searchData.dateRange"
                   label="创建时间"
                   :show-time="{ format: 'HH:mm:ss' }"
                   format="YYYY-MM-DD HH:mm:ss"
@@ -24,7 +24,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-input
-                  v-model:value="searchForm.refundOrderId"
+                  v-model="searchData.refundOrderId"
                   label="退款订单号"
                   placeholder="请输入退款订单号"
                   :allow-clear="true"
@@ -34,7 +34,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-input
-                  v-model:value="searchForm.payOrderId"
+                  v-model="searchData.payOrderId"
                   label="支付订单号"
                   placeholder="请输入支付订单号"
                   :allow-clear="true"
@@ -44,7 +44,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-select
-                  v-model:value="searchForm.mchNo"
+                  v-model:value="searchData.mchNo"
                   label="商户号"
                   placeholder="请选择商户"
                   allow-clear
@@ -60,12 +60,11 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-select
-                  v-model:value="searchForm.state"
+                  v-model="searchData.state"
                   label="退款状态"
                   placeholder="全部"
                   allow-clear
                   :options="[
-                    { value: '', label: '全部' },
                     { value: '0', label: '订单生成' },
                     { value: '1', label: '退款中' },
                     { value: '2', label: '退款成功' },
@@ -78,7 +77,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-input
-                  v-model:value="searchForm.appId"
+                  v-model="searchData.appId"
                   label="应用ID"
                   placeholder="请输入应用ID"
                   :allow-clear="true"
@@ -95,7 +94,7 @@
         :columns="columns"
         :show-auto-refresh="true"
         :on-load="reqTableDataFunc"
-        :search-data="searchForm"
+        :search-data="searchData"
         :on-download="handleExport"
         :show-download="true"
         state-key="refund_order_table_columns"
@@ -152,7 +151,7 @@ const mchList = ref([])
 const currentRefundOrderId = ref('')
 
 // 搜索表单
-const searchForm = reactive({
+const searchData = reactive({
   dateRange: '',
   refundOrderId: '',
   payOrderId: '',
@@ -251,32 +250,32 @@ const reqTableDataFunc = (params) => {
   }
   
   // 处理日期范围
-  if (searchForm.dateRange && searchForm.dateRange.length === 2) {
-    requestParams.createdStart = searchForm.dateRange[0]
-    requestParams.createdEnd = searchForm.dateRange[1]
+  if (searchData.dateRange && searchData.dateRange.length === 2) {
+    requestParams.createdStart = searchData.dateRange[0]
+    requestParams.createdEnd = searchData.dateRange[1]
   }
   
   // 处理订单号
-  if (searchForm.refundOrderId) {
-    requestParams.refundOrderId = searchForm.refundOrderId
+  if (searchData.refundOrderId) {
+    requestParams.refundOrderId = searchData.refundOrderId
   }
-  if (searchForm.payOrderId) {
-    requestParams.payOrderId = searchForm.payOrderId
+  if (searchData.payOrderId) {
+    requestParams.payOrderId = searchData.payOrderId
   }
   
   // 处理商户号
-  if (searchForm.mchNo) {
-    requestParams.mchNo = searchForm.mchNo
+  if (searchData.mchNo) {
+    requestParams.mchNo = searchData.mchNo
   }
   
   // 处理数字类型字段
-  if (searchForm.state) {
-    requestParams.state = parseInt(searchForm.state)
+  if (searchData.state) {
+    requestParams.state = parseInt(searchData.state)
   }
   
   // 处理其他字段
-  if (searchForm.appId) {
-    requestParams.appId = searchForm.appId
+  if (searchData.appId) {
+    requestParams.appId = searchData.appId
   }
   
   return orderApi.queryRefundOrderPage(requestParams)
@@ -305,7 +304,7 @@ const handleSearchMch = async (keyword) => {
 /**
  * 搜索
  */
-function onSearch() {
+function searchFunc() {
   message.success('开始搜索')
   tableRef.value.reload()
 }
@@ -314,12 +313,12 @@ function onSearch() {
  * 重置
  */
 function onReset() {
-  searchForm.dateRange = ''
-  searchForm.refundOrderId = ''
-  searchForm.payOrderId = ''
-  searchForm.mchNo = ''
-  searchForm.state = ''
-  searchForm.appId = ''
+  searchData.dateRange = ''
+  searchData.refundOrderId = ''
+  searchData.payOrderId = ''
+  searchData.mchNo = ''
+  searchData.state = ''
+  searchData.appId = ''
   tableRef.value.reload()
 }
 

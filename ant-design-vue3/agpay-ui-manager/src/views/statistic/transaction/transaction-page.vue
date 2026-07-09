@@ -1,57 +1,69 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <a-select
-              v-model:value="searchData.queryDateType"
-              placeholder=""
-              default-value=""
-              @change="queryDateTypeChange"
-            >
-              <a-select-option value="day">日报</a-select-option>
-              <a-select-option value="month">月报</a-select-option>
-              <a-select-option value="year">年报</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-range-picker
-              v-model:value="dateRangeValue"
-              style="width: 100%"
-              :format="dateFormat"
-              :placeholder="[
-                `开始${dateRangeMode === 'date' ? '日期' : dateRangeMode === 'month' ? '月份' : '年份'}`,
-                `结束${dateRangeMode === 'date' ? '日期' : dateRangeMode === 'month' ? '月份' : '年份'}`
-              ]"
-              :mode="[dateRangeMode, dateRangeMode]"
-              :disabled-date="disabledDate"
-              :open="dateRangeOpen"
-              @change="onChange"
-              @panel-change="onPanelChange"
-              @open-change="dateRangeOpen = !dateRangeOpen"
-            >
-              <template #suffixIcon>
-                <icons.SyncOutlined />
-              </template>
-            </a-range-picker>
-          </a-form-item>
-          <!-- <ag-input :placeholder="'商户号'" v-model="searchData.mchNo" /> -->
-          <a-form-item label="" class="table-head-layout">
-            <ag-select
-              v-model:value="searchData.mchNo"
-              :api="searchMch"
-              value-field="mchNo"
-              label-field="mchName"
-              placeholder="商户号(输入商户名称)"
-            />
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <ag-input v-model:value="searchData.agentNo" placeholder="代理商号" />
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <ag-input v-model:value="searchData.isvNo" placeholder="服务商号" />
-          </a-form-item>
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.queryDateType"
+                label="查询类型"
+                placeholder="请选择查询类型"
+                allow-clear
+                @change="queryDateTypeChange"
+                :options="[
+                  { value: 'day', label: '日报' },
+                  { value: 'month', label: '月报' },
+                  { value: 'year', label: '年报' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <a-range-picker
+                v-model:value="dateRangeValue"
+                style="width: 100%"
+                :format="dateFormat"
+                :placeholder="[
+                  `开始${dateRangeMode === 'date' ? '日期' : dateRangeMode === 'month' ? '月份' : '年份'}`,
+                  `结束${dateRangeMode === 'date' ? '日期' : dateRangeMode === 'month' ? '月份' : '年份'}`
+                ]"
+                :mode="[dateRangeMode, dateRangeMode]"
+                :disabled-date="disabledDate"
+                :open="dateRangeOpen"
+                @change="onChange"
+                @panel-change="onPanelChange"
+                @open-change="dateRangeOpen = !dateRangeOpen"
+              >
+                <template #suffixIcon>
+                  <icons.SyncOutlined />
+                </template>
+              </a-range-picker>
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.mchNo"
+                :api="searchMch"
+                value-field="mchNo"
+                label-field="mchName"
+                label="商户号"
+                placeholder="请输入商户号"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.agentNo" label="代理商号" placeholder="请输入代理商号" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.isvNo" label="服务商号" placeholder="请输入服务商号" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -223,6 +235,7 @@ import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import quarterOfYear from 'dayjs/plugin/quarterOfYear'
+import { downloadExcel } from '@/lib/ag-axios'
 
 dayjs.locale('zh-cn')
 dayjs.extend(relativeTime)
@@ -322,7 +335,7 @@ const setIsShowMore = (value) => {
   isShowMore.value = value
 }
 
-const queryFunc = () => {
+const searchFunc = () => {
   btnLoading.value = true
   infoTable.value.reload(true)
 }
@@ -337,36 +350,7 @@ const reqTableCountFunc = (params) => {
 }
 
 const reqDownloadDataFunc = (params) => {
-  statisticApi
-    .exportExcel(params)
-    .then((res) => {
-      // 将响应中的二进制数据转换为Blob对象
-      const blob = new Blob([res])
-      const fileName = '交易报表.xlsx' // 需要自定义文件名称
-      if ('download' in document.createElement('a')) {
-        // 非IE下载
-        // 创建一个a标签设置download属性和href属性，然后触发click事件下载文件
-        const elink = document.createElement('a')
-        elink.download = fileName
-        elink.style.display = 'none'
-        elink.href = URL.createObjectURL(blob) // 使用URL.createObjectURL(blob) URL对象生成Blob值赋给a标签的href属性
-        document.body.appendChild(elink)
-        elink.click()
-        URL.revokeObjectURL(elink.href) // 释放URL 引用
-        document.body.removeChild(elink)
-      } else {
-        // IE10+下载
-        navigator.msSaveBlob(blob, fileName)
-      }
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-}
-
-const searchFunc = () => {
-  // 触发查询按钮点击事件
-  infoTable.value.reload(true)
+  downloadExcel(statisticApi.exportExcel(params), '交易报表.xlsx')
 }
 
 const detailFunc = (groupDate) => {

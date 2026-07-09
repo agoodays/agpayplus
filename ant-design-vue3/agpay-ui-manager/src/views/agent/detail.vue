@@ -1,188 +1,76 @@
 ﻿<template>
-  <a-drawer v-model:open="localOpen" title="代理商详情" width="40%" @close="handleClose">
+  <ag-drawer
+    v-model:open="localOpen"
+    title="代理商详情"
+    width="40%"
+    :show-footer="false"
+    @close="handleClose"
+  >
     <a-spin :spinning="loading">
-      <a-row justify="space-between" type="flex">
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="代理商号">
-              {{ detailData.agentNo }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="代理商名称">
-              {{ detailData.agentName }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="登录名">
-              {{ detailData.loginUsername }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="代理商简称">
-              {{ detailData.agentShortName }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="上级代理商号">
-              {{ detailData.pid }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="服务商号">
-              {{ detailData.isvNo }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="服务商名称">
-              {{ detailData.isvName }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="联系人姓名">
-              {{ detailData.contactName }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="联系人手机号">
-              {{ detailData.contactTel }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="联系人邮箱">
-              {{ detailData.contactEmail }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="是否允许发展下级">
-              <a-tag :color="detailData.addAgentFlag === 1 ? 'green' : 'volcano'">
-                {{ detailData.addAgentFlag === 0 ? '否' : detailData.addAgentFlag === 1 ? '是' : '未知' }}
-              </a-tag>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="状态">
-              <a-tag :color="detailData.state === 1 ? 'green' : 'volcano'">
-                {{ detailData.state === 0 ? '禁用' : detailData.state === 1 ? '启用' : '未知' }}
-              </a-tag>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="钱包余额">
-              <a-tag :color="detailData.balanceAmount > 0 ? 'green' : 'volcano'">
-                {{ detailData.balanceAmount }}
-              </a-tag>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="不可用金额">
-              <a-tag :color="detailData.unAmount > 0 ? 'green' : 'volcano'">
-                {{ detailData.unAmount }}
-              </a-tag>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="在途佣金">
-              <a-tag :color="detailData.auditProfitAmount > 0 ? 'green' : 'volcano'">
-                {{ detailData.auditProfitAmount }}
-              </a-tag>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-row justify="start" type="flex">
-        <a-col :sm="24">
-          <a-form-item label="备注">
-            <a-textarea v-model:value="detailData.remark" :disabled="true" :rows="2" />
-          </a-form-item>
-        </a-col>
-      </a-row>
+      <!-- 基本信息 -->
+      <a-descriptions :column="2" :bordered="false">
+        <a-descriptions-item label="代理商号">{{ detailData.agentNo }}</a-descriptions-item>
+        <a-descriptions-item label="代理商名称">{{ detailData.agentName }}</a-descriptions-item>
+        <a-descriptions-item label="登录名">{{ detailData.loginUsername }}</a-descriptions-item>
+        <a-descriptions-item label="代理商简称">{{ detailData.agentShortName }}</a-descriptions-item>
+        <a-descriptions-item label="上级代理商号">{{ detailData.pid }}</a-descriptions-item>
+        <a-descriptions-item label="服务商号">{{ detailData.isvNo }}</a-descriptions-item>
+        <a-descriptions-item label="服务商名称">{{ detailData.isvName }}</a-descriptions-item>
+        <a-descriptions-item label="联系人姓名">{{ detailData.contactName }}</a-descriptions-item>
+        <a-descriptions-item label="联系人手机号">{{ detailData.contactTel }}</a-descriptions-item>
+        <a-descriptions-item label="联系人邮箱">{{ detailData.contactEmail }}</a-descriptions-item>
+        <a-descriptions-item label="是否允许发展下级">
+          <a-tag :color="detailData.addAgentFlag === 1 ? 'green' : 'volcano'">
+            {{ detailData.addAgentFlag === 0 ? '否' : detailData.addAgentFlag === 1 ? '是' : '未知' }}
+          </a-tag>
+        </a-descriptions-item>
+        <a-descriptions-item label="状态">
+          <a-tag :color="detailData.state === 1 ? 'green' : 'volcano'">
+            {{ detailData.state === 0 ? '禁用' : detailData.state === 1 ? '启用' : '未知' }}
+          </a-tag>
+        </a-descriptions-item>
+        <a-descriptions-item label="钱包余额">
+          <a-tag :color="detailData.balanceAmount > 0 ? 'green' : 'volcano'">
+            {{ detailData.balanceAmount }}
+          </a-tag>
+        </a-descriptions-item>
+        <a-descriptions-item label="不可用金额">
+          <a-tag :color="detailData.unAmount > 0 ? 'green' : 'volcano'">
+            {{ detailData.unAmount }}
+          </a-tag>
+        </a-descriptions-item>
+        <a-descriptions-item label="在途佣金">
+          <a-tag :color="detailData.auditProfitAmount > 0 ? 'green' : 'volcano'">
+            {{ detailData.auditProfitAmount }}
+          </a-tag>
+        </a-descriptions-item>
+        <a-descriptions-item label="备注" :span="2">{{ detailData.remark || '-' }}</a-descriptions-item>
+      </a-descriptions>
 
-      <!-- 账户信息板块 -->      
+      <!-- 账户信息 -->
       <a-divider orientation="left">
-        <a-tag color="#FF4B33">账户信息 </a-tag>
+        <a-tag color="#FF4B33">账户信息</a-tag>
       </a-divider>
-      <a-row justify="space-between" type="flex">
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="代理商类型">
-              {{ detailData.agentType === 1 ? '个人' : '企业' }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="收款账户类型">
-              {{ detailData.settAccountTypeName }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-row justify="space-between" type="flex">
-        <a-col v-if="detailData.settAccountType === 'BANK_PUBLIC'" :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="对公账户名称">
-              {{ detailData.settAccountName }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions>
-            <a-descriptions-item :label="detailData.settAccountNoLabel">
-              {{ detailData.settAccountNo }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col v-if="detailData.settAccountType === 'BANK_PUBLIC'" :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="开户银行名称">
-              {{ detailData.settAccountBank }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col v-if="detailData.settAccountType === 'BANK_PUBLIC'" :sm="12">
-          <a-descriptions>
-            <a-descriptions-item label="开户行支行名称">
-              {{ detailData.settAccountSubBank }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
+      <a-descriptions :column="2" :bordered="false">
+        <a-descriptions-item label="代理商类型">{{ detailData.agentType === 1 ? '个人' : '企业' }}</a-descriptions-item>
+        <a-descriptions-item label="收款账户类型">{{ detailData.settAccountTypeName }}</a-descriptions-item>
+        <a-descriptions-item v-if="detailData.settAccountType === 'BANK_PUBLIC'" label="对公账户名称">
+          {{ detailData.settAccountName }}
+        </a-descriptions-item>
+        <a-descriptions-item :label="detailData.settAccountNoLabel">{{ detailData.settAccountNo }}</a-descriptions-item>
+        <a-descriptions-item v-if="detailData.settAccountType === 'BANK_PUBLIC'" label="开户银行名称">
+          {{ detailData.settAccountBank }}
+        </a-descriptions-item>
+        <a-descriptions-item v-if="detailData.settAccountType === 'BANK_PUBLIC'" label="开户行支行名称">
+          {{ detailData.settAccountSubBank }}
+        </a-descriptions-item>
+      </a-descriptions>
 
-      <!-- 资料信息板块 -->
+      <!-- 资料信息 -->
       <a-divider orientation="left">
-        <a-tag color="#FF4B33"> 资料信息 </a-tag>
+        <a-tag color="#FF4B33">资料信息</a-tag>
       </a-divider>
-      <a-row justify="space-between" type="flex">
-        <!-- 企业 -->
+      <a-row :gutter="16">
         <a-col v-if="detailData.agentType === 2" :span="10">
           <a-form-item label="营业执照照片" name="licenseImg">
             <ag-upload
@@ -193,7 +81,6 @@
             />
           </a-form-item>
         </a-col>
-        <!-- 企业对公 -->
         <a-col v-if="detailData.agentType === 2 && detailData.settAccountType === 'BANK_PUBLIC'" :span="10">
           <a-form-item label="开户许可证照片" name="permitImg">
             <ag-upload
@@ -234,7 +121,6 @@
             />
           </a-form-item>
         </a-col>
-        <!-- 个人对私/企业对私 -->
         <a-col v-if="detailData.settAccountType === 'BANK_PRIVATE'" :span="10">
           <a-form-item :label="'[' + imgLabel + ']银行卡照片'" name="bankCardImg">
             <ag-upload
@@ -247,15 +133,20 @@
         </a-col>
       </a-row>
     </a-spin>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+/**
+ * 代理商详情抽屉组件
+ * 功能：展示代理商的详细信息，包含基本信息、账户信息、资料信息
+ */
 import { agentApi } from '@/api/business/agent/agent-api'
-import AgUpload from '@/components/ag-upload'
+import { AgDrawer, AgUpload } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 
+/** Props 定义 */
 const props = defineProps({
   open: {
     type: Boolean,
@@ -267,12 +158,19 @@ const props = defineProps({
   }
 })
 
+/** 事件定义 */
 const emit = defineEmits(['update:open'])
 
+/** 加载状态 */
 const loading = ref(false)
+
+/** 本地打开状态 */
 const localOpen = ref(false)
+
+/** 图片标签（联系人/法人） */
 const imgLabel = ref('联系人')
 
+/** 详情数据 */
 const detailData = reactive({
   agentNo: '',
   agentName: '',
@@ -297,6 +195,7 @@ const detailData = reactive({
   settAccountName: '',
   settAccountBank: '',
   settAccountSubBank: '',
+  settAccountNoLabel: '个人微信号',
   licenseImg: '',
   permitImg: '',
   idcard1Img: '',
@@ -305,6 +204,7 @@ const detailData = reactive({
   bankCardImg: ''
 })
 
+/** 重置详情数据 */
 function resetDetailData() {
   Object.assign(detailData, {
     agentNo: '',
@@ -330,6 +230,7 @@ function resetDetailData() {
     settAccountName: '',
     settAccountBank: '',
     settAccountSubBank: '',
+    settAccountNoLabel: '个人微信号',
     licenseImg: '',
     permitImg: '',
     idcard1Img: '',
@@ -340,37 +241,47 @@ function resetDetailData() {
   imgLabel.value = '联系人'
 }
 
+/** 规范化收款账户标签 */
 function normalizeSettleLabels(target) {
   switch (target.settAccountType) {
     case 'WX_CASH':
       target.settAccountTypeName = '个人微信'
+      target.settAccountNoLabel = '个人微信号'
       break
     case 'ALIPAY_CASH':
       target.settAccountTypeName = '个人支付宝'
+      target.settAccountNoLabel = '支付宝账号'
       break
     case 'BANK_PRIVATE':
       target.settAccountTypeName = '对私账户'
+      target.settAccountNoLabel = '收款银行卡号'
       break
     case 'BANK_PUBLIC':
       target.settAccountTypeName = '对公账户'
+      target.settAccountNoLabel = '对公账号'
       break
   }
 }
 
+/** 监听 open 属性变化 */
 watch(
   () => props.open,
-  (val) => {
+  async (val) => {
     localOpen.value = val
     if (val && props.recordId) {
-      loadDetail()
+      await loadDetail()
+    } else if (!val) {
+      resetDetailData()
     }
   }
 )
 
+/** 监听本地 open 变化，同步 emit */
 watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
+/** 加载详情数据 */
 const loadDetail = async () => {
   try {
     loading.value = true
@@ -386,9 +297,10 @@ const loadDetail = async () => {
   }
 }
 
+/** 处理关闭 */
 const handleClose = () => {
   resetDetailData()
-  emit('update:open', false)
+  localOpen.value = false
 }
 </script>
 

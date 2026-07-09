@@ -18,7 +18,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { AgPayConfigPanel as agPayConfigPanel } from './ag-pay-config-panel.vue'
+import AgPayConfigPanel from './ag-pay-config-panel.vue'
 
 const props = defineProps({
   permCode: { type: String, default: '' },
@@ -32,6 +32,9 @@ const payConfig = ref(null)
 const show = (infoIdVal, configMchAppIsIsvSubMch) => {
   infoId.value = infoIdVal
   visible.value = true
+  if (payConfig.value) {
+    payConfig.value.getPayConfig(infoIdVal, configMchAppIsIsvSubMch)
+  }
 }
 
 const onClose = () => {

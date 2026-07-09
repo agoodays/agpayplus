@@ -1,4 +1,4 @@
-﻿# AgDrawer - 抽屉组件
+# AgDrawer - 抽屉组件
 
 ## 📌 当前推荐用法（2026）
 
@@ -49,6 +49,7 @@
 | widthRatio | 按屏幕比例设置宽度（0-1之间）| number | 0 |
 | size | 预设尺寸（small/medium/large/xlarge） | string | '' |
 | closable | 是否显示关闭按钮 | boolean | true |
+| maskClosable | 点击遮罩是否可关闭 | boolean | true |
 | destroyOnClose | 关闭时销毁子元素 | boolean | true |
 | showFooter | 是否显示底部 | boolean | true |
 | showConfirm | 是否显示确认按钮 | boolean | false |

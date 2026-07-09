@@ -1,97 +1,114 @@
-﻿<template>
+<template>
   <div>
-    <a-card>
+    <a-card :bordered="false">
+      <!-- 搜索区域 -->
       <ag-search v-model="searchData" :collapsible="false" @search="searchFunc" @reset="resetFunc">
-        <template #default>
-          <a-col :xs="24" :sm="12" :md="8" :lg="6">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input v-model="searchData.isvNo" placeholder="服务商号" />
+              <ag-input v-model="searchData.isvNo" label="服务商号" placeholder="请输入服务商号" />
             </a-form-item>
           </a-col>
-          <a-col :xs="24" :sm="12" :md="8" :lg="6">
+          <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input v-model="searchData.isvName" placeholder="服务商名称" />
+              <ag-input v-model="searchData.isvName" label="服务商名称" placeholder="请输入服务商名称" />
             </a-form-item>
           </a-col>
-          <a-col :xs="24" :sm="12" :md="8" :lg="6">
+          <a-col v-bind="colSpan">
             <a-form-item label="">
-              <a-select v-model:value="searchData.state" placeholder="服务商状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">禁用</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-              </a-select>
+              <ag-select
+                v-model="searchData.state"
+                label="服务商状态"
+                placeholder="请选择服务商状态"
+                allow-clear
+                :options="[
+                  { value: '0', label: '禁用' },
+                  { value: '1', label: '启用' }
+                ]"
+              />
             </a-form-item>
           </a-col>
         </template>
       </ag-search>
-      <!-- 列表渲染 -->
+
+      <!-- 数据表格 -->
       <ag-table
-        ref="infoTable"
+        ref="tableRef"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
         row-key="isvNo"
       >
+        <!-- 工具栏左侧 -->
         <template #toolbar-left>
-          <div>
-            <a-button v-if="$access('ENT_ISV_INFO_ADD')" icon="plus" type="primary" class="mg-b-30" @click="addFunc"
-              >新增</a-button
-            >
-          </div>
+          <a-button v-if="hasPermission('ENT_ISV_INFO_ADD')" type="primary" @click="addFunc">
+            <plus-outlined /> 新增
+          </a-button>
         </template>
-        <template #isvNameSlot="{ record }"
-          ><b :title="record.isvName">{{ record.isvName }}</b></template
-        >
-        <!-- 自定义列 -->
+
+        <!-- 服务商名称列自定义渲染 -->
+        <template #isvNameSlot="{ record }">
+          <b :title="record.isvName">{{ record.isvName }}</b>
+        </template>
+
+        <!-- 服务商状态列自定义渲染 -->
         <template #stateSlot="{ record }">
           <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
         </template>
+
+        <!-- 操作列 -->
         <template #opSlot="{ record }">
-          <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_ISV_INFO_EDIT')" type="link" @click="editFunc(record.isvNo)">编辑</a-button>
-            <a-button
-              v-if="$access('ENT_ISV_OAUTH2_CONFIG_VIEW')"
-              type="link"
-              @click="payOauth2ConfigFunc(record.isvNo)"
-              >Oauth2配置</a-button
-            >
-            <a-button v-if="$access('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payConfigFunc(record.isvNo)"
-              >支付配置</a-button
-            >
-            <a-button v-if="$access('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="showPayIfConfigList(record.isvNo)"
-              >支付配置(新)</a-button
-            >
-            <a-button v-if="$access('ENT_ISV_INFO_DEL')" type="link" style="color: red" @click="delFunc(record.isvNo)"
-              >删除</a-button
-            >
+            <a-button v-if="hasPermission('ENT_ISV_INFO_EDIT')" type="link" @click="editFunc(record.isvNo)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_OAUTH2_CONFIG_VIEW')" type="link" @click="payOauth2ConfigFunc(record.isvNo)">Oauth2配置</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payConfigFunc(record.isvNo)">支付配置</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="showPayIfConfigList(record.isvNo)">支付配置(新)</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_INFO_DEL')" type="link" style="color: red" @click="delFunc(record.isvNo)">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
-    <!-- 新增/编辑页面弹窗  -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="searchFunc" />
-    <!-- 支付配置弹窗  -->
-    <ag-pay-config-drawer ref="payConfig" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" />
-    <!-- Oauth2配置弹窗  -->
-    <ag-pay-oauth2-config-drawer
-      ref="payOauth2Config"
-      :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'"
-      :config-mode="'mgrIsv'"
-    />
-    <!-- 支付接口配置列表页面弹窗  -->
-    <IsvPayIfConfigList ref="isvPayIfConfigList" />
+
+    <!-- 新增/编辑弹窗 -->
+    <InfoAddOrEdit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
+
+    <!-- 支付配置抽屉 -->
+    <ag-pay-config-drawer ref="payConfigRef" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" />
+
+    <!-- OAuth2配置抽屉 -->
+    <ag-pay-oauth2-config-drawer ref="payOauth2ConfigRef" :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'" :config-mode="'mgrIsv'" />
+
+    <!-- 支付接口配置列表 -->
+    <IsvPayIfConfigList ref="isvPayIfConfigListRef" />
   </div>
 </template>
+
 <script setup>
+/**
+ * 服务商列表页面组件
+ * 功能：展示服务商列表、搜索、新增、编辑、配置管理、删除等操作
+ */
+
 import { isvApi } from '@/api/business/isv/isv-api'
-import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions, AgPayConfigDrawer, AgPayOauth2ConfigDrawer } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { ref } from 'vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 import IsvPayIfConfigList from './isv-pay-if-config-list.vue'
 
-// eslint-disable-next-line no-unused-vars
+// 权限检查
+const { hasPermission } = usePermission()
+
+// 组件引用
+const payConfigRef = ref(null)
+const payOauth2ConfigRef = ref(null)
+const isvPayIfConfigListRef = ref(null)
+
+/**
+ * 表格列配置
+ */
 const tableColumns = [
   {
     key: 'isvName',
@@ -107,18 +124,19 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-const payOauth2Config = ref(null)
-const isvPayIfConfigList = ref(null)
-
+/**
+ * 使用 CRUD 表格页面组合式函数
+ * 提供表格引用、搜索数据、弹窗控制、增删改查等通用功能
+ */
 const {
-  infoTable,
-  infoAddOrEdit,
-  payConfig,
+  tableRef,
   searchData,
+  modalOpen,
+  currentRecordId,
   reloadTable,
   openCreate,
   openEdit,
-  openPayConfig,
+  closeModal,
   confirmDelete
 } = useCrudTablePage({
   deleteAction: (recordId) => isvApi.delById(recordId),
@@ -127,25 +145,72 @@ const {
   deleteSuccessMessage: '删除成功'
 })
 
-const reqTableDataFunc = (params) => isvApi.queryPage(params)
-
-const searchFunc = () => reloadTable()
-
-const resetFunc = () => reloadTable()
-
-const delFunc = (recordId) => confirmDelete(recordId)
-
-const addFunc = () => openCreate()
-
-const editFunc = (recordId) => openEdit(recordId)
-
-const payConfigFunc = (recordId) => openPayConfig(recordId)
-
-const payOauth2ConfigFunc = (recordId) => {
-  payOauth2Config.value?.show(recordId)
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await isvApi.queryPage(params)
 }
 
+/**
+ * 搜索回调函数
+ */
+const searchFunc = () => reloadTable()
+
+/**
+ * 重置回调函数
+ */
+const resetFunc = () => reloadTable()
+
+/**
+ * 确认删除
+ * @param {string} recordId - 服务商ID
+ */
+const delFunc = (recordId) => confirmDelete(recordId)
+
+/**
+ * 打开新增弹窗
+ */
+const addFunc = () => openCreate()
+
+/**
+ * 打开编辑弹窗
+ * @param {string} recordId - 服务商ID
+ */
+const editFunc = (recordId) => openEdit(recordId)
+
+/**
+ * 打开支付配置抽屉
+ * @param {string} recordId - 服务商ID
+ */
+const payConfigFunc = (recordId) => {
+  currentRecordId.value = recordId
+  payConfigRef.value?.show(recordId)
+}
+
+/**
+ * 打开OAuth2配置抽屉
+ * @param {string} recordId - 服务商ID
+ */
+const payOauth2ConfigFunc = (recordId) => {
+  payOauth2ConfigRef.value?.show(recordId)
+}
+
+/**
+ * 打开支付接口配置列表
+ * @param {string} recordId - 服务商ID
+ */
 const showPayIfConfigList = (recordId) => {
-  isvPayIfConfigList.value?.show(recordId)
+  isvPayIfConfigListRef.value?.show(recordId)
+}
+
+/**
+ * 弹窗操作成功回调
+ */
+const handleModalSuccess = () => {
+  closeModal()
+  reloadTable()
 }
 </script>

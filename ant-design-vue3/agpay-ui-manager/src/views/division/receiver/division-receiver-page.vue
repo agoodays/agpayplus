@@ -1,39 +1,61 @@
 ﻿<template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <ag-select
-              v-model="searchData.mchNo"
-              :api="searchMch"
-              value-field="mchNo"
-              label-field="mchName"
-              placeholder="商户号(支持按商户名称搜索)"
-            />
-          </a-form-item>
-          <ag-input v-model="searchData.appId" placeholder="应用ID[精确]" />
-          <ag-input v-model="searchData.receiverId" placeholder="收款账户ID[精确]" />
-          <ag-input v-model="searchData.receiverAlias" placeholder="收款账户别名[模糊]" />
-          <ag-input v-model="searchData.receiverGroupId" placeholder="分组ID[精确]" />
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.state" placeholder="账户状态(系统默认)" default-value="">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option value="1">正常可用</a-select-option>
-              <a-select-option value="0">暂停使用</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.ifCode" placeholder="支付接口">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
-                <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
-                  ><img class="icon" :src="item.icon" alt=""
-                /></span>
-                {{ item.ifName }}[{{ item.ifCode }}]
-              </a-select-option>
-            </a-select>
-          </a-form-item>
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model="searchData.mchNo"
+                :api="searchMch"
+                value-field="mchNo"
+                label-field="mchName"
+                placeholder="商户号(支持按商户名称搜索)"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.appId" placeholder="应用ID[精确]" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.receiverId" placeholder="收款账户ID[精确]" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.receiverAlias" placeholder="收款账户别名[模糊]" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.receiverGroupId" placeholder="分组ID[精确]" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <a-select v-model:value="searchData.state" placeholder="账户状态(系统默认)" default-value="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="1">正常可用</a-select-option>
+                <a-select-option value="0">暂停使用</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <a-select v-model:value="searchData.ifCode" placeholder="支付接口">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
+                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
+                    ><img class="icon" :src="item.icon" alt=""
+                  /></span>
+                  {{ item.ifName }}[{{ item.ifCode }}]
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -149,21 +171,8 @@ const tableColumns = [
   { key: 'accName', dataIndex: 'accName', title: '收款账户账号名称', width: 260 },
   { key: 'channelAccNo', dataIndex: 'channelAccNo', title: '渠道账号', width: 230 },
   { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '收款关系类型', width: 140 },
-  {
-    key: 'state',
-    dataIndex: 'state',
-    title: '状态',
-    width: 120,
-    customRender: 'stateSlot',
-    align: 'center'
-  },
-  {
-    key: 'divisionProfit',
-    dataIndex: 'divisionProfit',
-    title: '默认分账比例',
-    width: 160,
-    customRender: (text, record, index) => (text * 100).toFixed(2) + '%'
-  },
+  { key: 'state', dataIndex: 'state', title: '状态', width: 120, customRender: 'stateSlot', align: 'center' },
+  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', width: 160, customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
   { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间', width: 200 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
@@ -199,20 +208,9 @@ const reqIfDefineListFunc = () => {
 }
 
 // 搜索函数
-const queryFunc = () => {
+const searchFunc = () => {
   btnLoading.value = true
   infoTable.value.loadData()
-}
-
-const searchFunc = () => {
-  infoTable.value.loadData()
-}
-
-const resetFunc = () => {
-  Object.keys(searchData).forEach((key) => {
-    searchData[key] = ''
-  })
-  searchData.appId = ''
 }
 
 // 新增函数

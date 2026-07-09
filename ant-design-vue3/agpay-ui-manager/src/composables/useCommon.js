@@ -34,10 +34,10 @@ export function useTable(apiFn, options = {}) {
       dataSource.value = data.records || data.list || data
       pagination.total = data.total || 0
 
-      onSuccess && onSuccess(data)
+      onSuccess?.(data)
     } catch (error) {
       console.error('Failed to fetch data:', error)
-      onError && onError(error)
+      onError?.(error)
     } finally {
       loading.value = false
     }
@@ -151,7 +151,7 @@ export function useModal(options = {}) {
   const showModal = (data = {}) => {
     open.value = true
     Object.assign(modalData, data)
-    onOpen && onOpen(data)
+    onOpen?.(data)
   }
 
   const hideModal = () => {
@@ -160,7 +160,7 @@ export function useModal(options = {}) {
     Object.keys(modalData).forEach((key) => {
       delete modalData[key]
     })
-    onClose && onClose()
+    onClose?.()
   }
 
   const handleOk = async () => {
@@ -180,7 +180,7 @@ export function useModal(options = {}) {
   }
 
   const handleCancel = () => {
-    onCancel && onCancel()
+    onCancel?.()
     hideModal()
   }
 
@@ -265,7 +265,6 @@ export function useDebounce(fn, delay = 300) {
 }
 
 export function useThrottle(fn, delay = 300) {
-  let timer = null
   let lastTime = 0
 
   const throttledFn = (...args) => {
@@ -276,36 +275,36 @@ export function useThrottle(fn, delay = 300) {
     }
   }
 
-  onUnmounted(() => {
-    if (timer) {
-      clearTimeout(timer)
-    }
-  })
-
   return throttledFn
 }
 
-export function useDelete(deleteFn, refreshFn, options = {}) {
-  const { confirmText = translate('common.confirmDeleteContent'), successText = translate('common.deleteSuccess') } =
-    options
+export function useDelete(options = {}) {
+  const { deleteAction, refreshFn, confirmTitle = translate('common.confirmDeleteTitle'), confirmContent = translate('common.confirmDeleteContent'), successMessage = translate('common.deleteSuccess'), onDeleted } = options
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (recordId) => {
+    if (!deleteAction) {
+      throw new Error('useDelete: deleteAction is required')
+    }
+
     try {
       await new Promise((resolve, reject) => {
         Modal.confirm({
-          title: translate('common.confirmDeleteTitle'),
-          content: confirmText,
+          title: confirmTitle,
+          content: confirmContent,
+          okType: 'danger',
           onOk: () => resolve(),
           onCancel: () => reject()
         })
       })
 
-      await deleteFn(id)
-      message.success(successText)
-      refreshFn && refreshFn()
+      await deleteAction(recordId)
+      message.success(successMessage)
+      refreshFn?.()
+      onDeleted?.(recordId)
     } catch (error) {
       if (error !== undefined) {
         console.error('Delete error:', error)
+        message.error(error.msg || '删除失败')
       }
     }
   }

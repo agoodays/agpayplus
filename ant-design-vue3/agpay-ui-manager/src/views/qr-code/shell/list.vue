@@ -1,9 +1,13 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
-        <template #formItem>
-          <ag-input v-model="searchData.shellAlias" placeholder="模板名称" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc" @reset="resetFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.shellAlias" label="模板名称" placeholder="请输入模板名称" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -87,12 +91,8 @@ const btnLoading = ref(false)
 
 const reqTableDataFunc = (params) => qrcShellApi.queryCardList(params)
 
-function queryFunc() {
-  btnLoading.value = true
-  infoTable.value.loadData()
-}
-
 function searchFunc() {
+  btnLoading.value = true
   infoTable.value.loadData()
 }
 

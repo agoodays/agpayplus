@@ -2,42 +2,40 @@
   <div class="ent-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <div style="margin-bottom: 16px">
-        <ag-search
-          v-model:model-value="searchForm"
-          :collapsible="false"
-          @search="onSearch"
-          @reset="onReset"
-        >
-          <template #base="{ colSpan }">
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-select
-                  v-model:value="searchForm.sysType"
-                  label="系统类型"
-                  placeholder="选择系统菜单"
-                  :options="[
-                    { value: 'MGR', label: '显示菜单-运营平台' },
-                    { value: 'AGENT', label: '显示菜单-代理商系统' },
-                    { value: 'MCH', label: '显示菜单-商户系统' }
-                  ]"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <a-button
-                  v-if="hasPermission('ENT_UR_ROLE_ENT_EDIT')"
-                  type="primary"
-                  @click="setFunc"
-                >
-                  设置权限匹配规则
-                </a-button>
-              </a-form-item>
-            </a-col>
-          </template>
-        </ag-search>
-      </div>
+      <ag-search
+        v-model="searchData"
+        :collapsible="false"
+        @search="searchFunc"
+        @reset="onReset"
+      >
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.sysType"
+                label="系统类型"
+                placeholder="选择系统菜单"
+                :options="[
+                  { value: 'MGR', label: '显示菜单-运营平台' },
+                  { value: 'AGENT', label: '显示菜单-代理商系统' },
+                  { value: 'MCH', label: '显示菜单-商户系统' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <a-button
+                v-if="hasPermission('ENT_UR_ROLE_ENT_EDIT')"
+                type="primary"
+                @click="setFunc"
+              >
+                设置权限匹配规则
+              </a-button>
+            </a-form-item>
+          </a-col>
+        </template>
+      </ag-search>
 
       <!-- 数据表格 -->
       <ag-table
@@ -45,11 +43,12 @@
         :columns="columns"
         :show-auto-refresh="true"
         :on-load="reqTableDataFunc"
-        :search-data="searchForm"
+        :search-data="searchData"
         :pagination="false"
         :scroll-x="1450"
         state-key="ent_table_columns"
       >
+        <!-- 状态列自定义渲染 -->
         <template #state="{ record }">
           <ag-state-switch
             :state="record.state"
@@ -57,6 +56,8 @@
             :on-change="(state) => updateState(record.entId, state)"
           />
         </template>
+
+        <!-- 操作列 -->
         <template #actions="{ record }">
           <ag-table-actions :max-show-num="3">
             <a-button
@@ -72,34 +73,46 @@
       </ag-table>
     </a-card>
 
-    <!-- 新增 / 编辑 页面弹窗 -->
+    <!-- 新增/编辑弹窗 -->
     <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="refTable" />
-    <!-- 设置权限匹配规则 页面弹窗 -->
+
+    <!-- 设置权限匹配规则弹窗 -->
     <SetEntMatchRule ref="setEntMatchRule" :callback-func="refTable" />
   </div>
 </template>
 
 <script setup>
+/**
+ * 资源权限列表页面组件
+ * 功能：展示资源权限列表、搜索、编辑、状态切换、设置权限匹配规则等操作
+ */
+
 import { entApi } from '@/api/business/ent/ent-api'
 import { AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { onMounted, reactive, ref } from 'vue'
+import { message } from 'ant-design-vue'
 import InfoAddOrEdit from './add-or-edit.vue'
 import SetEntMatchRule from './set-ent-match-rule.vue'
 
+// 权限检查
 const { hasPermission } = usePermission()
 
-// State
+// 组件引用
 const tableRef = ref(null)
 const infoAddOrEdit = ref(null)
 const setEntMatchRule = ref(null)
 
-// 搜索表单
-const searchForm = reactive({
+/**
+ * 搜索表单数据
+ */
+const searchData = reactive({
   sysType: 'MGR'
 })
 
-// 表格列定义
+/**
+ * 表格列配置
+ */
 const columns = [
   {
     key: 'entId',
@@ -169,14 +182,17 @@ const columns = [
 onMounted(() => {
 })
 
-// 请求表格数据函数
-const reqTableDataFunc = (params) => {
-  return entApi.queryEntTree(searchForm.sysType).then(res => {
-    return {
-      records: res,
-      total: res.length
-    }
-  })
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  const res = await entApi.queryEntTree(searchData.sysType)
+  return {
+    records: res,
+    total: res.length
+  }
 }
 
 /**
@@ -188,12 +204,13 @@ const refTable = () => {
 
 /**
  * 更新状态
+ * @param {string} recordId - 资源权限ID
+ * @param {number} state - 状态值
  */
-const updateState = (recordId, state) => {
-  return entApi.updateStateById(recordId, state, searchForm.sysType).then(() => {
-    window.$message.success('更新成功')
-    refTable()
-  })
+const updateState = async (recordId, state) => {
+  await entApi.updateStateById(recordId, state, searchData.sysType)
+  message.success('更新成功')
+  refTable()
 }
 
 /**
@@ -205,23 +222,24 @@ const setFunc = () => {
 
 /**
  * 编辑
+ * @param {string} recordId - 资源权限ID
  */
 const editFunc = (recordId) => {
-  infoAddOrEdit.value?.show(recordId, searchForm.sysType)
+  infoAddOrEdit.value?.show(recordId, searchData.sysType)
 }
 
 /**
- * 搜索
+ * 搜索回调函数
  */
-function onSearch() {
+const searchFunc = () => {
   tableRef.value?.reload()
 }
 
 /**
- * 重置
+ * 重置回调函数
  */
-function onReset() {
-  searchForm.sysType = 'MGR'
+const onReset = () => {
+  searchData.sysType = 'MGR'
   tableRef.value?.reload()
 }
 </script>

@@ -1,19 +1,39 @@
 ﻿<template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.sysType" placeholder="所属系统" default-value="">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option value="MGR">运营平台</a-select-option>
-              <a-select-option value="AGENT">代理商</a-select-option>
-              <a-select-option value="MCH">商户</a-select-option>
-            </a-select>
-          </a-form-item>
-          <ag-input v-model="searchData.belongInfoId" placeholder="所属代理商/商户" />
-          <ag-input v-model="searchData.roleId" placeholder="角色ID" />
-          <ag-input v-model="searchData.roleName" placeholder="角色名称" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.sysType"
+                label="所属系统"
+                placeholder="请选择所属系统"
+                allow-clear
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: 'MGR', label: '运营平台' },
+                  { value: 'AGENT', label: '代理商' },
+                  { value: 'MCH', label: '商户' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.belongInfoId" label="所属代理商/商户" placeholder="请输入所属代理商/商户" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.roleId" label="角色ID" placeholder="请输入角色ID" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.roleName" label="角色名称" placeholder="请输入角色名称" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -75,7 +95,7 @@
       </ag-table>
     </a-card>
     <!-- 新增 / 编辑 页面弹窗  -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="queryFunc" />
+    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="searchFunc" />
   </div>
 </template>
 <script setup>
@@ -119,7 +139,7 @@ Object.assign(searchData, defaultSearchData)
 
 const reqTableDataFunc = (params) => roleApi.queryPage(params)
 
-const queryFunc = () => {
+const searchFunc = () => {
   btnLoading.value = true
   reloadTable()
 }

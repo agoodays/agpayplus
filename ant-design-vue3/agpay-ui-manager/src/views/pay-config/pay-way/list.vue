@@ -1,21 +1,36 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
-        <template #formItem>
-          <ag-input v-model="searchData.wayCode" placeholder="支付方式代码" />
-          <ag-input v-model="searchData.wayName" placeholder="支付方式名称" />
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.wayType" placeholder="支付类型" default-value="">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option value="WECHAT">微信</a-select-option>
-              <a-select-option value="ALIPAY">支付宝</a-select-option>
-              <a-select-option value="YSFPAY">云闪付</a-select-option>
-              <a-select-option value="UNIONPAY">银联</a-select-option>
-              <a-select-option value="DCEPPAY">数字人民币</a-select-option>
-              <a-select-option value="OTHER">其他</a-select-option>
-            </a-select>
-          </a-form-item>
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.wayCode" label="支付方式代码" placeholder="支付方式代码" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.wayName" label="支付方式名称" placeholder="支付方式名称" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model="searchData.state"
+                label="支付类型"
+                placeholder="请选择支付类型"
+                allow-clear
+                :options="[
+                  { value: 'WECHAT', label: '微信' },
+                  { value: 'ALIPAY', label: '支付宝' },
+                  { value: 'YSFPAY', label: '云闪付' },
+                  { value: 'UNIONPAY', label: '银联' },
+                  { value: 'DCEPPAY', label: '数字人民币' },
+                  { value: 'OTHER', label: '其他' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -57,7 +72,7 @@
       </ag-table>
     </a-card>
     <!-- 新增页面组件  -->
-    <info-add-or-edit ref="infoAddOrEdit" :callback-func="queryFunc"/>
+    <info-add-or-edit ref="infoAddOrEdit" :callback-func="searchFunc"/>
   </div>
 
 </template>
@@ -84,7 +99,7 @@ const reqTableDataFunc = (params) => {
   return payConfigApi.queryPayWayList(params)
 }
 
-const queryFunc = () => {
+const searchFunc = () => {
   btnLoading.value = true
   infoTable.value?.reload()
 }

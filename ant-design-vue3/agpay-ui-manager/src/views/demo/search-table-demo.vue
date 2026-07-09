@@ -5,7 +5,7 @@
         v-model:model-value="searchForm"
         :collapsible="true"
         :default-collapsed="true"
-        @search="onSearch"
+        @search="searchFunc"
         @reset="onReset"
       >
         <!-- 基础搜索条件（始终显示） -->
@@ -13,7 +13,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-input
-                v-model:value="searchForm.orderNo"
+                v-model="searchForm.orderNo"
                 label="订单号"
                 placeholder="请输入订单号"
                 :allow-clear="true"
@@ -23,7 +23,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchForm.state"
+                v-model="searchForm.state"
                 label="支付状态"
                 placeholder="支付状态"
                 allow-clear
@@ -289,7 +289,7 @@ function reqDownloadDataFunc(params) {
   })
 }
 
-function onSearch(vals) {
+function searchFunc(vals) {
   // AgSearch 已更新 searchForm，通过 searchForm 触发查询
   message.success('开始搜索')
 }

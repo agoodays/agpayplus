@@ -11,15 +11,15 @@
       @finish-failed="onFinishFailed"
     >
       <a-form-item name="username">
-        <ag-input v-model:value="loginObject.username" size="large" type="text" :label="t('auth.loginNameOrPhone')" />
+        <ag-input v-model="loginObject.username" size="large" type="text" :label="t('auth.loginNameOrPhone')" />
       </a-form-item>
       <a-form-item name="password">
-        <ag-input v-model:value="loginObject.password" type="password" size="large" :label="t('auth.password')" />
+        <ag-input v-model="loginObject.password" type="password" size="large" :label="t('auth.password')" />
       </a-form-item>
       <div class="vercode-container">
         <a-form-item name="vercode">
           <ag-input
-            v-model:value="loginObject.vercode"
+            v-model="loginObject.vercode"
             size="large"
             type="text"
             :label="t('auth.captcha')"

@@ -37,11 +37,6 @@ const props = defineProps({
     type: [String, Number, Array],
     default: undefined
   },
-  value: {
-    // ✅ 改为 value
-    type: [String, Number, Array],
-    default: undefined
-  },
   label: {
     type: String,
     default: ''
@@ -82,36 +77,31 @@ const props = defineProps({
     type: String,
     default: 'middle'
   },
-  // 最大显示标签数（多选模式）
   maxTagCount: {
     type: [Number, String],
     default: undefined
   },
-  // 标签溢出时的显示文本
   maxTagPlaceholder: {
     type: [String, Function],
     default: undefined
   },
-  // 浮动标签配置
   floatOptions: {
     type: Object,
     default: () => ({})
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'search'])
+const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'search'])
 
 const slots = useSlots()
 const selectRef = ref()
 const isOpen = ref(false)
-const selectValue = ref(props.modelValue ?? props.value)
+const selectValue = ref(props.modelValue)
 
-// 判断是否使用 options 属性（如果有插槽内容且 options 为空，则使用插槽）
 const useOptions = computed(() => {
   return !slots.default || props.options.length > 0
 })
 
-// 自定义值检查函数
 function hasValueCheck(value) {
   if (Array.isArray(value)) {
     return value.length > 0
@@ -119,7 +109,6 @@ function hasValueCheck(value) {
   return value !== undefined && value !== null && value !== ''
 }
 
-// 使用浮动标签 composable
 const { isFocused, labelClass, floatPlaceholder, handleFocus, handleBlur, clear } = useFloatLabel(
   props,
   emit,
@@ -132,7 +121,6 @@ const { isFocused, labelClass, floatPlaceholder, handleFocus, handleBlur, clear 
   }
 )
 
-// 动态事件处理器 - 只有当 showSearch 为 true 时才包含搜索事件
 const eventHandlers = computed(() => {
   const handlers = {
     focus: handleFocus,
@@ -141,7 +129,6 @@ const eventHandlers = computed(() => {
     'dropdown-visible-change': handleDropdownVisibleChange
   }
 
-  // 只有启用搜索时才添加搜索事件
   if (props.showSearch) {
     handlers.search = handleSearch
   }
@@ -149,24 +136,20 @@ const eventHandlers = computed(() => {
   return handlers
 })
 
-// 监听外部值变化（同时兼容 modelValue / value）
 watch(
-  () => [props.modelValue, props.value],
-  ([newModelValue, newValue]) => {
-    const resolved = newModelValue ?? newValue
-    if (resolved !== selectValue.value) {
-      selectValue.value = resolved
+  () => props.modelValue,
+  (newVal) => {
+    if (newVal !== selectValue.value) {
+      selectValue.value = newVal
     }
   },
   { deep: true, immediate: true }
 )
 
-// 监听内部值变化
 watch(
   selectValue,
   (newVal) => {
     emit('update:modelValue', newVal)
-    emit('update:value', newVal)
   },
   { deep: true }
 )
@@ -183,7 +166,6 @@ function handleDropdownVisibleChange(open) {
   isOpen.value = open
 }
 
-// 暴露方法
 function focus() {
   selectRef.value?.focus()
 }

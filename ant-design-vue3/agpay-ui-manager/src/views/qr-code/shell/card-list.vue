@@ -1,9 +1,13 @@
 <template>
   <div>
     <a-card style="margin-bottom: 10px">
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
-        <template #formItem>
-          <ag-input v-model="searchData.shellAlias" placeholder="模板别名" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc" @reset="resetFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.shellAlias" label="模板别名" placeholder="请输入模板别名" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
     </a-card>
@@ -92,14 +96,9 @@ const refCardList = (isToFirst) => {
   infoCard.value.refCardList(isToFirst)
 }
 
-// 搜索函数
-const queryFunc = () => {
+const searchFunc = () => {
   btnLoading.value = true
   refCardList(true)
-}
-
-const searchFunc = () => {
-  refCardList()
 }
 
 // 预览图片

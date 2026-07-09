@@ -2,13 +2,23 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
-          </a-form-item>
-          <ag-input v-model="searchData.ifCode" placeholder="通道编码" />
-          <ag-input v-model="searchData.ifName" placeholder="通道名称" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-date-range-picker v-model:value="searchData.queryDateRange" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.ifCode" label="通道编码" placeholder="请输入通道编码" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.ifName" label="通道名称" placeholder="请输入通道名称" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -167,6 +177,7 @@ const icons = { InfoCircleOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
 import { reactive, ref } from 'vue'
+import { downloadExcel } from '@/lib/ag-axios'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -228,30 +239,10 @@ const countInitData = {
 const reqTableDataFunc = (params) => statisticApi.queryOrderStatistic(params)
 
 const reqDownloadDataFunc = (params) => {
-  statisticApi
-    .exportExcel(params)
-    .then((res) => {
-      const blob = new Blob([res])
-      const fileName = '通道交易统计.xlsx'
-      if ('download' in document.createElement('a')) {
-        const elink = document.createElement('a')
-        elink.download = fileName
-        elink.style.display = 'none'
-        elink.href = URL.createObjectURL(blob)
-        document.body.appendChild(elink)
-        elink.click()
-        URL.revokeObjectURL(elink.href)
-        document.body.removeChild(elink)
-      } else {
-        navigator.msSaveBlob(blob, fileName)
-      }
-    })
-    .catch((error) => {
-      console.error(error)
-    })
+  downloadExcel(statisticApi.exportExcel(params), '通道交易统计.xlsx')
 }
 
-const queryFunc = () => {
+const searchFunc = () => {
   btnLoading.value = true
   infoTable.value?.reload()
 }

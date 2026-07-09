@@ -3,7 +3,7 @@
 ## 📌 当前推荐用法（2026）
 
 - 推荐导入：`import { AgInput } from '@/components'`
-- 推荐绑定：`v-model`（兼容 `v-model:value`，新代码建议统一 `v-model`）
+- 推荐绑定：`v-model`（内部使用 `modelValue` prop）
 - 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
 - 若历史文档出现 `AgFloatInput`，请统一替换为 `AgInput`
 
@@ -14,7 +14,7 @@
 ## ✨ 核心特性
 
 - 浮动标签（聚焦/有值/有 placeholder 时上浮）
-- 双向绑定（同时兼容 `modelValue` 与 `value`）
+- 双向绑定（使用 `modelValue`）
 - 前缀/后缀插槽
 - 必填星号标识
 - 尺寸支持：`small` / `middle` / `large`
@@ -43,8 +43,7 @@ const form = reactive({ userName: '' })
 
 | 参数 | 说明 | 类型 | 默认值 |
 | --- | --- | --- | --- |
-| modelValue | 绑定值（推荐） | `string \| number` | `undefined` |
-| value | 绑定值（兼容） | `string \| number` | `undefined` |
+| modelValue | 绑定值 | `string \| number` | `undefined` |
 | label | 浮动标签文本 | `string` | `''` |
 | placeholder | 占位文本 | `string` | `''` |
 | disabled | 禁用 | `boolean` | `false` |
@@ -55,13 +54,13 @@ const form = reactive({ userName: '' })
 | suffix | 后缀（透传） | `string` | `''` |
 | type | 输入类型 | `string` | `'text'` |
 | size | 尺寸 | `'small' \| 'middle' \| 'large'` | `'middle'` |
+| floatOptions | 浮动标签选项 | `object` | `{}` |
 
 ## 📤 Events
 
 | 事件名 | 说明 | 参数 |
 | --- | --- | --- |
 | update:modelValue | 值更新 | `(value)` |
-| update:value | 值更新（兼容） | `(value)` |
 | change | 值变化（原生 change） | `(event)` |
 | focus | 获取焦点 | `(event)` |
 | blur | 失去焦点 | `(event)` |
@@ -82,6 +81,7 @@ const form = reactive({ userName: '' })
 | --- | --- |
 | focus | 输入框聚焦 |
 | blur | 输入框失焦 |
+| clear | 清空输入框 |
 
 示例：
 
@@ -106,7 +106,7 @@ function focusInput() {
 
 ## 💡 使用建议
 
-- 新业务代码统一使用 `v-model`，仅在兼容历史页面时使用 `v-model:value`。
+- 新业务代码统一使用 `v-model`。
 - 建议始终传入 `label`，以保证浮动标签交互一致。
 - 在 `a-form-item` 中使用时，校验与布局仍按 Ant Design Vue 表单规则处理。
 

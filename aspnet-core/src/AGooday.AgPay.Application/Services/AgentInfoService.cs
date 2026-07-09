@@ -105,7 +105,7 @@ namespace AGooday.AgPay.Application.Services
                 .WhereIfNotEmpty(dto.Pid, w => w.Pid.Equals(dto.Pid))
                 .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))
                 .WhereIfNotEmpty(dto.AgentName, w => w.AgentName.Contains(dto.AgentName) || w.AgentShortName.Contains(dto.AgentName))
-                .WhereIfNotEmpty(dto.ContactTel, w => w.IsvNo.Equals(dto.ContactTel))
+                .WhereIfNotEmpty(dto.ContactTel, w => w.ContactTel.Equals(dto.ContactTel))
                 .WhereIfNotNull(dto.State, w => w.State.Equals(dto.State))
                 .OrderByDescending(o => o.CreatedAt);
             return agentInfos;

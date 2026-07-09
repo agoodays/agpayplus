@@ -93,9 +93,17 @@
     >
       <div class="content-box">
         <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc(true)" @reset="resetSearchFunc">
-          <template #formItem>
-            <ag-input v-model="searchData.wayCode" placeholder="支付方式代码" />
-            <ag-input v-model="searchData.wayName" placeholder="支付方式名称" />
+          <template #base="{ colSpan }">
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input v-model="searchData.wayCode" placeholder="支付方式代码" />
+              </a-form-item>
+            </a-col>
+            <a-col v-bind="colSpan">
+              <a-form-item label="">
+                <ag-input v-model="searchData.wayName" placeholder="支付方式名称" />
+              </a-form-item>
+            </a-col>
           </template>
         </ag-search>
         <div class="table-box">

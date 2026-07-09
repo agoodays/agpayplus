@@ -2,37 +2,72 @@
   <div>
     <a-card>
       <ag-search
-        :search-data="searchData"
-        :open-is-show-more="true"
-        :is-show-more="isShowMore"
-        :btn-loading="btnLoading"
-        @update-search-data="handleSearchFormData"
-        @set-is-show-more="setIsShowMore"
-        @query-func="queryFunc"
+        v-model="searchData"
+        :collapsible="true"
+        :default-collapsed="!isShowMore"
+        :search-loading="btnLoading"
+        @search="searchFunc"
+        @collapse-change="setIsShowMore"
       >
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <ag-date-range-picker v-model:value="searchData.queryDateRange" />
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.sysType" placeholder="所属系统">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option value="MGR">运营平台</a-select-option>
-              <a-select-option value="AGENT">代理商系统</a-select-option>
-              <a-select-option value="MCH">商户系统</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.logType" placeholder="日志类型">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option :value="0">登录日志</a-select-option>
-              <a-select-option :value="1">操作日志</a-select-option>
-            </a-select>
-          </a-form-item>
-          <AgInput :placeholder="'用户ID'" v-model:value="searchData.userId" />
-          <AgInput :placeholder="'用户名'" v-model:value="searchData.userName" />
-          <AgInput :placeholder="'用户IP地址'" v-model:value="searchData.userIp" />
-          <AgInput v-if="isShowMore" :placeholder="'操作描述'" v-model:value="searchData.methodRemark" />
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-date-range-picker v-model:value="searchData.queryDateRange" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.sysType"
+                label="所属系统"
+                placeholder="请选择所属系统"
+                allow-clear
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: 'MGR', label: '运营平台' },
+                  { value: 'AGENT', label: '代理商系统' },
+                  { value: 'MCH', label: '商户系统' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.logType"
+                label="日志类型"
+                placeholder="请选择日志类型"
+                allow-clear
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: '0', label: '登录日志' },
+                  { value: '1', label: '操作日志' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.userId" label="用户ID" placeholder="请输入用户ID" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.userName" label="用户名" placeholder="请输入用户名" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.userIp" label="用户IP地址" placeholder="请输入用户IP地址" />
+            </a-form-item>
+          </a-col>
+        </template>
+        <template #advanced="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.methodRemark" label="操作描述" placeholder="请输入操作描述" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <ag-table
@@ -66,96 +101,16 @@
         </template>
       </ag-table>
     </a-card>
-    <a-drawer
-      placement="right"
-      :closable="true"
-      :visible="visible"
-      :title="visible ? '日志详情' : ''"
-      @close="onClose"
-      :drawer-style="{ overflow: 'hidden' }"
-      :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-      width="40%"
-    >
-      <a-row :gutter="16">
-        <a-col :sm="12">
-          <a-descriptions :column="1" size="small">
-            <a-descriptions-item label="用户ID">{{ detailData.userId }}</a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions :column="1" size="small">
-            <a-descriptions-item label="用户IP">{{ detailData.userIp }}</a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions :column="1" size="small">
-            <a-descriptions-item label="用户名"><b>{{ detailData.userName }}</b></a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="12">
-          <a-descriptions :column="1" size="small">
-            <a-descriptions-item label="所属系统">
-              <a-tag :color="getSysTypeColor(detailData.sysType)">
-                {{ getSysTypeText(detailData.sysType) }}
-              </a-tag>
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-divider />
-      <a-row :gutter="16">
-        <a-col :sm="24">
-          <a-descriptions :column="1" size="small">
-            <a-descriptions-item label="操作描述">{{ detailData.methodRemark }}</a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="24">
-          <a-descriptions :column="1" size="small">
-            <a-descriptions-item label="请求方法">{{ detailData.methodName }}</a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-        <a-col :sm="24">
-          <a-descriptions :column="1" size="small">
-            <a-descriptions-item label="请求地址">{{ detailData.reqUrl }}</a-descriptions-item>
-          </a-descriptions>
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :sm="24">
-          <a-form-item label="请求参数">
-            <a-input
-              type="textarea"
-              :disabled="true"
-              style="background-color: black; color: #FFFFFF; height: 100px"
-              v-model:value="detailData.optReqParam"
-            />
-          </a-form-item>
-        </a-col>
-      </a-row>
-      <a-row>
-        <a-col :sm="24">
-          <a-form-item label="响应参数">
-            <a-input
-              type="textarea"
-              :disabled="true"
-              style="background-color: black; color: #FFFFFF; height: 150px"
-              v-model:value="detailData.optResInfo"
-            />
-          </a-form-item>
-        </a-col>
-      </a-row>
-    </a-drawer>
+    <detail-drawer v-model:open="visible" :sys-log-id="currentLogId" />
   </div>
 </template>
 
 <script setup>
 import { ref, reactive, computed } from 'vue'
 import { message, Modal } from 'ant-design-vue'
-import { AgSearch as agSearch } from '@/components/ag-search'
-import { AgTable as agTable } from '@/components/ag-table'
-import { AgDateRangePicker as agDateRangePicker } from '@/components/ag-date-range-picker'
-import AgInput from '@/components/ag-input/index.vue'
+import { AgSearch, AgTable, AgDateRangePicker, AgInput, AgSelect } from '@/components'
 import { sysApi } from '@/api/business/sys/sys-api'
+import DetailDrawer from './detail.vue'
 
 const tableColumns = [
   { key: 'userName', title: '用户名', width: 120, fixed: 'left', slots: { customRender: 'userNameSlot' } },
@@ -171,7 +126,7 @@ const tableColumns = [
 const searchData = reactive({})
 const selectedIds = ref([])
 const visible = ref(false)
-const detailData = reactive({})
+const currentLogId = ref('')
 const isShowMore = ref(false)
 const btnLoading = ref(false)
 const infoTable = ref(null)
@@ -195,10 +150,6 @@ const rowSelection = computed(() => ({
   }
 }))
 
-const handleSearchFormData = (data) => {
-  Object.assign(searchData, data)
-}
-
 const setIsShowMore = (val) => {
   isShowMore.value = val
 }
@@ -207,7 +158,7 @@ const reqTableDataFunc = (params) => {
   return sysApi.querySysLogPage(params)
 }
 
-const queryFunc = () => {
+const searchFunc = () => {
   btnLoading.value = true
   if (infoTable.value) {
     infoTable.value.refTable(true)
@@ -235,13 +186,7 @@ const delFunc = () => {
 }
 
 const detailFunc = (recordId) => {
-  sysApi.getSysLogById(recordId).then(res => {
-    Object.assign(detailData, res)
-  })
+  currentLogId.value = recordId
   visible.value = true
-}
-
-const onClose = () => {
-  visible.value = false
 }
 </script>

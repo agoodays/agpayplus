@@ -755,6 +755,43 @@ export const getDownload = function (url, params) {
 }
 
 /**
+ * 通用 Excel 下载工具函数
+ * 
+ * 使用方式：
+ * ```js
+ * import { downloadExcel } from '@/lib/ag-axios'
+ * 
+ * const reqDownloadDataFunc = (params) => {
+ *   downloadExcel(statisticApi.exportExcel(params), '代理商统计.xlsx')
+ * }
+ * ```
+ * 
+ * @param {Promise} apiPromise - API 请求 Promise（应返回 Blob 数据）
+ * @param {string} fileName - 下载文件名称（含扩展名）
+ */
+export const downloadExcel = (apiPromise, fileName) => {
+  apiPromise
+    .then((res) => {
+      const blob = new Blob([res])
+      if ('download' in document.createElement('a')) {
+        const elink = document.createElement('a')
+        elink.download = fileName
+        elink.style.display = 'none'
+        elink.href = URL.createObjectURL(blob)
+        document.body.appendChild(elink)
+        elink.click()
+        URL.revokeObjectURL(elink.href)
+        document.body.removeChild(elink)
+      } else {
+        navigator.msSaveBlob(blob, fileName)
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+}
+
+/**
  * 清除所有响应缓存
  */
 export const clearCache = () => {

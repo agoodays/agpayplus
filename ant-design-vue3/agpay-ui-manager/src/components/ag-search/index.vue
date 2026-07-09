@@ -1,31 +1,20 @@
 <template>
   <div class="ag-search">
-    <a-form :model="state.model" @submit.prevent>
+    <a-form :model="model" @submit.prevent>
       <a-row :gutter="[16, 16]" class="search-row">
-        <!-- 基础搜索条件（始终显示） -->
         <slot name="base" :col-span="colSpan" />
 
-        <!-- 高级搜索条件（可展开/收起） -->
         <transition name="search-collapse">
           <template v-if="!collapsed || !collapsible">
             <slot name="advanced" :col-span="colSpan" />
           </template>
         </transition>
 
-        <!-- 默认插槽（向后兼容） -->
         <template v-if="!$slots.base && !$slots.advanced">
           <slot :col-span="colSpan" />
         </template>
 
-        <!-- 操作按钮 - 响应式布局 -->
-        <a-col
-          :xs="24"
-          :sm="24"
-          :md="collapsible ? 24 : 8"
-          :lg="collapsible ? 8 : 6"
-          :xl="collapsible ? 6 : 6"
-          class="search-buttons"
-        >
+        <a-col :col-span="colSpan" class="search-buttons">
           <a-form-item>
             <a-space :size="8">
               <a-button type="primary" :loading="searchLoading" @click="onSearch">
@@ -46,7 +35,6 @@
         </a-col>
       </a-row>
 
-      <!-- 搜索历史 -->
       <transition name="history-fade">
         <div v-if="showHistory && searchHistory.length > 0" class="search-history">
           <div class="history-label">
@@ -75,13 +63,12 @@
 
 <script setup>
 import { DownOutlined, HistoryOutlined, RedoOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 const props = defineProps({
-  searchData: { type: Object, default: null },
   modelValue: { type: Object, default: () => ({}) },
   searchLoading: { type: Boolean, default: false },
   loading: { type: Boolean, default: undefined },
@@ -101,7 +88,7 @@ const props = defineProps({
       sm: 12,
       md: 8,
       lg: 6,
-      xl: 6
+      xl: 4
     })
   },
   enableQuickSearch: { type: Boolean, default: false },
@@ -113,10 +100,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'search', 'reset', 'collapse-change', 'quick-search'])
 
-const state = reactive({
-  model: props.modelValue || props.searchData || {}
-})
-
+const model = ref(props.modelValue)
 const collapsed = ref(props.defaultCollapsed)
 const showHistory = ref(false)
 const searchHistory = ref([])
@@ -144,7 +128,6 @@ defineExpose({
   onReset
 })
 
-// 加载搜索历史
 function loadSearchHistory() {
   if (!props.enableSearchHistory) return
   try {
@@ -158,7 +141,6 @@ function loadSearchHistory() {
   }
 }
 
-// 保存搜索历史
 function saveSearchHistory() {
   if (!props.enableSearchHistory) return
   try {
@@ -168,7 +150,6 @@ function saveSearchHistory() {
   }
 }
 
-// 添加搜索历史
 function addSearchHistory(item) {
   if (!props.enableSearchHistory) return
   const index = searchHistory.value.findIndex(h => JSON.stringify(h) === JSON.stringify(item))
@@ -182,26 +163,22 @@ function addSearchHistory(item) {
   saveSearchHistory()
 }
 
-// 清除搜索历史
 function clearHistory() {
   searchHistory.value = []
   saveSearchHistory()
 }
 
-// 删除单条历史
 function removeHistory(index) {
   searchHistory.value.splice(index, 1)
   saveSearchHistory()
 }
 
-// 应用历史搜索
 function applyHistory(item) {
-  Object.assign(state.model, item)
+  Object.assign(model.value, item)
   showHistory.value = false
   onSearch()
 }
 
-// 格式化历史显示
 function formatHistoryItem(item) {
   const parts = []
   for (const [key, value] of Object.entries(item)) {
@@ -212,30 +189,18 @@ function formatHistoryItem(item) {
   return parts.join(', ') || t('agSearch.emptySearch')
 }
 
-// 监听 modelValue 变化
 watch(
   () => props.modelValue,
   (val) => {
     if (val !== null && val !== undefined) {
-      state.model = val
+      model.value = val
     }
   },
   { deep: true }
 )
 
 watch(
-  () => props.searchData,
-  (val) => {
-    if (val !== null && val !== undefined && (!props.modelValue || Object.keys(props.modelValue).length === 0)) {
-      state.model = val
-    }
-  },
-  { deep: true }
-)
-
-// 快速搜索监听
-watch(
-  () => state.model,
+  () => model.value,
   () => {
     if (!props.enableQuickSearch) return
     
@@ -244,7 +209,7 @@ watch(
     }
     
     debounceTimer = setTimeout(() => {
-      emit('quick-search', { ...state.model })
+      emit('quick-search', { ...model.value })
     }, props.quickSearchDelay)
   },
   { deep: true }
@@ -267,21 +232,21 @@ function getResetValue() {
 }
 
 function onSearch() {
-  emit('search', state.model)
-  emit('update:modelValue', state.model)
-  addSearchHistory(state.model)
+  emit('search', model.value)
+  emit('update:modelValue', model.value)
+  addSearchHistory(model.value)
 }
 
 function onReset() {
   const resetValue = getResetValue()
-  const keys = Object.keys(state.model)
+  const keys = Object.keys(model.value)
   keys.forEach((key) => {
     if (props.resetExclude.includes(key)) return
     if (resetValue === '__AG_SEARCH_KEEP__') return
-    state.model[key] = Array.isArray(resetValue) ? [] : resetValue
+    model.value[key] = Array.isArray(resetValue) ? [] : resetValue
   })
-  emit('reset', state.model)
-  emit('update:modelValue', state.model)
+  emit('reset', model.value)
+  emit('update:modelValue', model.value)
 }
 
 function toggleCollapsed() {
@@ -292,7 +257,6 @@ function toggleCollapsed() {
 onMounted(() => {
   loadSearchHistory()
   
-  // 全局回车键搜索
   const handleKeydown = (e) => {
     if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
       const activeElement = document.activeElement
@@ -318,7 +282,7 @@ onMounted(() => {
   margin-bottom: 12px;
   padding: 12px 16px 0;
   background: var(--layout-surface);
-  border: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   transition: all 0.3s ease;
 }
@@ -328,7 +292,7 @@ onMounted(() => {
 }
 
 .search-buttons {
-  /* display: flex; */
+  display: flex;
   justify-content: flex-end;
   align-items: center;
 }

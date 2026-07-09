@@ -1,318 +1,266 @@
 ﻿<template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.infoType" placeholder="" default-value="">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option value="PLATFORM">运营平台</a-select-option>
-              <a-select-option value="AGENT">代理商</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.bizType" placeholder="业务类型" default-value="">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option :value="1">平台佣金收入</a-select-option>
-              <a-select-option :value="2">提现支出</a-select-option>
-              <a-select-option :value="3">佣金支出</a-select-option>
-              <a-select-option :value="4">充值收入</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.accountType" placeholder="账户类型" default-value="">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option :value="1">钱包账户</a-select-option>
-              <a-select-option :value="2">用途账户</a-select-option>
-            </a-select>
-          </a-form-item>
-          <ag-input v-model="searchData.infoId" placeholder="角色ID" />
-          <ag-input v-model="searchData.id" placeholder="流水号" />
-          <ag-input v-model="searchData.relaBizOrderId" placeholder="关联业务订单" />
+      <!-- 搜索区域 -->
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-date-range-picker
+                v-model:value="searchData.queryDateRange"
+                label="日期范围"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.infoType"
+                label="角色类型"
+                placeholder="请选择角色类型"
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: 'PLATFORM', label: '运营平台' },
+                  { value: 'AGENT', label: '代理商' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.infoType"
+                label="角色类型"
+                placeholder="请选择角色类型"
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: 'PLATFORM', label: '运营平台' },
+                  { value: 'AGENT', label: '代理商' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.bizType"
+                label="业务类型"
+                placeholder="请选择业务类型"
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: '1', label: '平台佣金收入' },
+                  { value: '2', label: '提现支出' },
+                  { value: '3', label: '佣金支出' },
+                  { value: '4', label: '充值收入' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.accountType"
+                label="账户类型"
+                placeholder="请选择账户类型"
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: '1', label: '钱包账户' },
+                  { value: '2', label: '用途账户' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.infoId" label="角色ID" placeholder="请输入角色ID" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.id" label="流水号" placeholder="请输入流水号" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.relaBizOrderId" label="关联业务订单" placeholder="请输入关联业务订单" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
-      <!-- 列表渲染 -->
+
+      <!-- 数据表格 -->
       <ag-table
-        ref="infoTable"
+        ref="tableRef"
         :init-data="true"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
-        :params="searchData"
-        row-key="orderId"
+        :search-data="searchData"
+        row-key="id"
         @btn-load-close="btnLoading = false"
       >
+        <!-- 业务类型列 -->
         <template #bizTypeSlot="{ record }">
-          {{
-            record.bizType === 1
-              ? '平台佣金收入'
-              : record.bizType === 2
-                ? '提现支出'
-                : record.bizType === 3
-                  ? '佣金支出'
-                  : record.bizType === 4
-                    ? '充值收入'
-                    : ''
-          }}
+          <a-tag :color="getBizTypeColor(record.bizType)">
+            {{ getBizTypeText(record.bizType) }}
+          </a-tag>
         </template>
+
+        <!-- 角色名称列 -->
         <template #infoNameSlot="{ record }">
-          <span v-if="record.infoType === 'PLATFORM'">
-            {{
-              record.infoId === 'PLATFORM_PROFIT'
-                ? '运营平台利润账户'
-                : record.infoId === 'PLATFORM_INACCOUNT'
-                  ? '运营平台收入账户'
-                  : ''
-            }}
-          </span>
-          <span v-if="record.infoType === 'AGENT'"> 代理商:{{ `${record.infoName}(${record.infoId})` }} </span>
+          {{ getInfoNameText(record) }}
         </template>
+
+        <!-- 操作列 -->
         <template #opSlot="{ record }">
-          <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_MCH_NOTIFY_VIEW')" type="link" @click="detailFunc(record.id)">详情</a-button>
+            <a-button v-if="hasPermission('ENT_MCH_NOTIFY_VIEW')" type="link" @click="detailFunc(record.id)">详情</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
-    <!-- 详情弹窗 -->
-    <template>
-      <a-drawer
-        placement="right"
-        :closable="true"
-        :visible="visible"
-        :title="visible === true ? '流水详情' : ''"
-        :drawer-style="{ overflow: 'hidden' }"
-        :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-        width="40%"
-        @close="onClose"
-      >
-        <a-row justify="space-between" type="flex">
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="流水号">
-                {{ detailData.id }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="账单号">
-                {{ detailData.billId }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="账户类型">
-                {{ detailData.accountType === 1 ? '钱包账户' : detailData.accountType === 2 ? '用途账户' : '' }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="业务类型">
-                {{
-                  detailData.bizType === 1
-                    ? '平台佣金收入'
-                    : detailData.bizType === 2
-                      ? '提现支出'
-                      : detailData.bizType === 3
-                        ? '佣金支出'
-                        : detailData.bizType === 4
-                          ? '充值收入'
-                          : ''
-                }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="角色名称">
-                <span v-if="detailData.infoType === 'PLATFORM'">
-                  {{
-                    detailData.infoId === 'PLATFORM_PROFIT'
-                      ? '运营平台利润账户'
-                      : detailData.infoId === 'PLATFORM_INACCOUNT'
-                        ? '运营平台收入账户'
-                        : ''
-                  }}
-                </span>
-                <span v-if="detailData.infoType === 'AGENT'">
-                  代理商:{{ `${detailData.infoName}(${detailData.infoId})` }}
-                </span>
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="关联业务订单类型">
-                <a-tag
-                  :color="
-                    detailData.relaBizOrderType === 1
-                      ? 'green'
-                      : detailData.relaBizOrderType === 2
-                        ? 'volcano'
-                        : detailData.relaBizOrderType === 3
-                          ? 'blue'
-                          : 'orange'
-                  "
-                >
-                  {{
-                    detailData.relaBizOrderType === 1
-                      ? '支付订单'
-                      : detailData.relaBizOrderType === 2
-                        ? '提现订单'
-                        : detailData.relaBizOrderType === 3
-                          ? '分润结算订单'
-                          : '未知'
-                  }}
-                </a-tag>
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="关联业务订单号">
-                <a-tag color="purple">
-                  {{ detailData.relaBizOrderId }}
-                </a-tag>
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="时间">
-                {{ detailData.createdAt }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="变动前余额">
-                <a-tag color="green">
-                  {{ detailData.beforeBalance / 100 }}
-                </a-tag>
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="变动金额">
-                <a-tag color="cyan">
-                  {{ detailData.changeAmount / 100 }}
-                </a-tag>
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="变动后余额">
-                <a-tag color="pink">
-                  {{ detailData.afterBalance / 100 }}
-                </a-tag>
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-        </a-row>
-        <a-row justify="space-between" type="flex">
-          <a-col :sm="12">
-            <a-descriptions>
-              <a-descriptions-item label="备注">
-                {{ detailData.remark }}
-              </a-descriptions-item>
-            </a-descriptions>
-          </a-col>
-        </a-row>
-      </a-drawer>
-    </template>
+
+    <!-- 详情抽屉 -->
+    <detail v-model:open="detailOpen" :record-id="currentRecordId" />
   </div>
 </template>
+
 <script setup>
+/**
+ * 账户流水列表页面组件
+ * 功能：展示账户流水列表、搜索、查看详情等操作
+ */
+
 import { accountBillApi } from '@/api/business/account-bill/account-bill-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
-import { onMounted, reactive, ref } from 'vue'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { onMounted, ref } from 'vue'
+import Detail from './detail.vue'
 
-// 表格列配置
-const tableColumns = [
-  { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
-  { key: 'bizType', title: '业务类型', width: 160, customRender: 'bizTypeSlot' },
-  { key: 'infoName', title: '角色名称', width: 260, customRender: 'infoNameSlot' },
-  {
-    key: 'beforeBalance',
-    dataIndex: 'beforeBalance',
-    title: '变动前账户余额',
-    width: 180,
-    customRender: (text) => '￥' + (text / 100).toFixed(2)
-  },
-  {
-    key: 'changeAmount',
-    dataIndex: 'changeAmount',
-    title: '变动金额',
-    width: 180,
-    customRender: (text) => '￥' + (text / 100).toFixed(2)
-  },
-  {
-    key: 'afterBalance',
-    dataIndex: 'afterBalance',
-    title: '变动后账户余额',
-    width: 180,
-    customRender: (text) => '￥' + (text / 100).toFixed(2)
-  },
-  { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联业务订单号', width: 200 },
-  { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
-]
+// 权限检查
+const { hasPermission } = usePermission()
 
-// 默认查询参数对象模板
+/**
+ * 使用 CRUD 表格页面组合式函数
+ */
+const {
+  tableRef,
+  searchData,
+  detailOpen,
+  currentRecordId,
+  reloadTable,
+  openDetail
+} = useCrudTablePage()
+
+/**
+ * 加载状态
+ */
+const btnLoading = ref(true)
+
+/**
+ * 默认查询参数
+ */
 const defaultSearchData = {
   queryDateRange: 'today',
   infoType: 'PLATFORM',
   accountType: 1
 }
 
-// 响应式数据
-const infoTable = ref(null)
-const btnLoading = ref(true)
-const searchData = reactive({ ...defaultSearchData })
-const visible = ref(false)
-const detailData = reactive({})
+/**
+ * 表格列配置
+ */
+const tableColumns = [
+  { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
+  { key: 'bizType', title: '业务类型', width: 160, customRender: 'bizTypeSlot' },
+  { key: 'infoName', title: '角色名称', width: 260, customRender: 'infoNameSlot' },
+  { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联业务订单号', width: 200 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
+  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+]
 
-// 查询函数
-const queryFunc = () => {
-  btnLoading.value = true
-  infoTable.value.loadData()
+/**
+ * 获取业务类型文本
+ * @param {number} bizType - 业务类型
+ * @returns {string} 类型文本
+ */
+const getBizTypeText = (bizType) => {
+  const map = {
+    1: '平台佣金收入',
+    2: '提现支出',
+    3: '佣金支出',
+    4: '充值收入'
+  }
+  return map[bizType] || ''
 }
 
-// 对接table接口函数
-const reqTableDataFunc = (params) => {
-  return accountBillApi.queryPage(params)
+/**
+ * 获取业务类型颜色
+ * @param {number} bizType - 业务类型
+ * @returns {string} 颜色值
+ */
+const getBizTypeColor = (bizType) => {
+  const map = {
+    1: 'green',
+    2: 'red',
+    3: 'orange',
+    4: 'cyan'
+  }
+  return map[bizType] || 'default'
 }
 
-// 搜索函数
+/**
+ * 获取角色名称文本
+ * @param {Object} record - 记录数据
+ * @returns {string} 角色名称
+ */
+const getInfoNameText = (record) => {
+  if (record.infoType === 'PLATFORM') {
+    if (record.infoId === 'PLATFORM_PROFIT') {
+      return '运营平台利润账户'
+    }
+    if (record.infoId === 'PLATFORM_INACCOUNT') {
+      return '运营平台收入账户'
+    }
+    return ''
+  }
+  if (record.infoType === 'AGENT') {
+    return `代理商: ${record.infoName}(${record.infoId})`
+  }
+  return ''
+}
+
+/**
+ * 搜索触发
+ */
 const searchFunc = () => {
-  // 点击查询按钮事件
-  infoTable.value.loadData()
+  btnLoading.value = true
+  reloadTable()
 }
 
-// 详情函数
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await accountBillApi.queryPage(params)
+}
+
+/**
+ * 查看详情
+ * @param {string} recordId - 流水ID
+ */
 const detailFunc = (recordId) => {
-  accountBillApi.getById(recordId).then((res) => {
-    Object.assign(detailData, res)
-  })
-  visible.value = true
+  openDetail(recordId)
 }
 
-// 关闭函数
-const onClose = () => {
-  visible.value = false
-}
-
-// 组件挂载时
+/**
+ * 组件挂载时
+ */
 onMounted(() => {
-  // 组件初始化时将默认数据赋值给 searchData
   Object.assign(searchData, defaultSearchData)
 })
 </script>

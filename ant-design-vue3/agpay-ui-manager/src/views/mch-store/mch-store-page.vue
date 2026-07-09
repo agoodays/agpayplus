@@ -4,17 +4,17 @@
       <!-- 搜索表单 -->
       <div style="margin-bottom: 16px">
         <ag-search
-          v-model:model-value="searchForm"
+          v-model="searchData"
           :collapsible="true"
           :default-collapsed="false"
-          @search="onSearch"
+          @search="searchFunc"
           @reset="onReset"
         >
           <template #base="{ colSpan }">
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-select
-                  v-model:value="searchForm.mchNo"
+                  v-model="searchData.mchNo"
                   label="商户号"
                   placeholder="请选择商户"
                   allow-clear
@@ -28,7 +28,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-input
-                  v-model:value="searchForm.storeId"
+                  v-model="searchData.storeId"
                   label="门店编号"
                   placeholder="请输入门店编号"
                   :allow-clear="true"
@@ -38,7 +38,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-input
-                  v-model:value="searchForm.storeName"
+                  v-model="searchData.storeName"
                   label="门店名称"
                   placeholder="请输入门店名称"
                   :allow-clear="true"
@@ -64,7 +64,7 @@
         ref="tableRef"
         :columns="columns"
         :on-load="reqTableDataFunc"
-        :search-data="searchForm"
+        :search-data="searchData"
         state-key="mch_store_table_columns"
       >
         <template #storeName="{ record }">
@@ -150,7 +150,7 @@ const currentBindAppId = ref('')
 const currentMchNo = ref('')
 
 // 搜索表单
-const searchForm = reactive({
+const searchData = reactive({
   mchNo: '',
   storeId: '',
   storeName: ''
@@ -222,7 +222,7 @@ const columns = [
  */
 onMounted(() => {
   if (route.query.mchNo) {
-    searchForm.mchNo = route.query.mchNo
+    searchData.mchNo = route.query.mchNo
   }
 })
 
@@ -232,14 +232,14 @@ function reqTableDataFunc(params) {
     pageNumber: params.pageNumber,
     pageSize: params.pageSize
   }
-  if (searchForm.mchNo) {
-    requestParams.mchNo = searchForm.mchNo
+  if (searchData.mchNo) {
+    requestParams.mchNo = searchData.mchNo
   }
-  if (searchForm.storeId) {
-    requestParams.storeId = searchForm.storeId
+  if (searchData.storeId) {
+    requestParams.storeId = searchData.storeId
   }
-  if (searchForm.storeName) {
-    requestParams.storeName = searchForm.storeName
+  if (searchData.storeName) {
+    requestParams.storeName = searchData.storeName
   }
   return mchStoreApi.queryPage(requestParams)
 }
@@ -267,7 +267,7 @@ const handleSearchMch = async (keyword) => {
 /**
  * 搜索
  */
-function onSearch() {
+function searchFunc() {
   message.success('开始搜索')
   tableRef.value.reload()
 }
@@ -276,9 +276,9 @@ function onSearch() {
  * 重置
  */
 function onReset() {
-  searchForm.mchNo = ''
-  searchForm.storeId = ''
-  searchForm.storeName = ''
+  searchData.mchNo = ''
+  searchData.storeId = ''
+  searchData.storeName = ''
   tableRef.value.reload()
 }
 

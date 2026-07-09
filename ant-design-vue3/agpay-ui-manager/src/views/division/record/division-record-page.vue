@@ -1,12 +1,15 @@
 ﻿<template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc" @reset="resetFunc">
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc" @reset="resetFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
             <ag-select
               v-model="searchData.mchNo"
               :api="searchMch"
@@ -15,31 +18,56 @@
               placeholder="商户号(支持按商户名称搜索)"
             />
           </a-form-item>
-          <ag-input v-model="searchData.appId" placeholder="应用AppId" />
-          <ag-input v-model="searchData.payOrderId" placeholder="支付订单号" />
-          <ag-input v-model="searchData.receiverId" placeholder="收款账户ID" />
-          <ag-input v-model="searchData.receiverGroupId" placeholder="收款账户分组ID" />
-          <ag-input v-model="searchData.accNo" placeholder="收款账户账号" />
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.state" placeholder="分账状态" default-value="">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option value="0">待分账</a-select-option>
-              <a-select-option value="1">分账成功</a-select-option>
-              <a-select-option value="2">分账失败</a-select-option>
-              <a-select-option value="3">已退款</a-select-option>
-            </a-select>
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <a-select v-model:value="searchData.ifCode" placeholder="支付接口">
-              <a-select-option value="">全部</a-select-option>
-              <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
-                <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
-                  ><img class="icon" :src="item.icon" alt=""
-                /></span>
-                {{ item.ifName }}[{{ item.ifCode }}]
-              </a-select-option>
-            </a-select>
-          </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.appId" placeholder="应用AppId" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.payOrderId" placeholder="支付订单号" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.receiverId" placeholder="收款账户ID" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.receiverGroupId" placeholder="收款账户分组ID" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.accNo" placeholder="收款账户账号" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <a-select v-model:value="searchData.state" placeholder="分账状态" default-value="">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="0">待分账</a-select-option>
+                <a-select-option value="1">分账成功</a-select-option>
+                <a-select-option value="2">分账失败</a-select-option>
+                <a-select-option value="3">已退款</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <a-select v-model:value="searchData.ifCode" placeholder="支付接口">
+                <a-select-option value="">全部</a-select-option>
+                <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
+                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
+                    ><img class="icon" :src="item.icon" alt=""
+                  /></span>
+                  {{ item.ifName }}[{{ item.ifCode }}]
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -52,9 +80,7 @@
         row-key="recordId"
         @btn-load-close="btnLoading = false"
       >
-        <template #amountSlot="{ record }"
-          ><b>¥{{ record.calDivisionAmount / 100 }}</b></template
-        >
+        <template #amountSlot="{ record }"><b>¥{{ record.calDivisionAmount / 100 }}</b></template>
         <!-- 自定义列 -->
         <!-- 支付接口 -->
         <template #ifCodeSlot="{ record }">
@@ -169,7 +195,7 @@ const searchMch = (params) => {
 }
 
 // 查询函数
-const queryFunc = () => {
+const searchFunc = () => {
   btnLoading.value = true
   infoTable.value.loadData()
 }
@@ -191,7 +217,7 @@ const resetFunc = () => {
     searchData[key] = ''
   })
   searchData.queryDateRange = 'today'
-  queryFunc()
+  searchFunc()
 }
 
 // 详情函数

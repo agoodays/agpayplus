@@ -4,17 +4,17 @@
       <!-- 搜索表单 -->
       <div style="margin-bottom: 16px">
         <ag-search
-          v-model:model-value="searchForm"
-          :collapsible="true"
+          v-model="searchData"
+          :collapsible="false"
           :default-collapsed="false"
-          @search="onSearch"
+          @search="searchFunc"
           @reset="onReset"
         >
           <template #base="{ colSpan }">
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-select
-                  v-model:value="searchForm.mchNo"
+                  v-model="searchData.mchNo"
                   label="商户号"
                   placeholder="请选择商户"
                   allow-clear
@@ -28,7 +28,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-input
-                  v-model:value="searchForm.appId"
+                  v-model="searchData.appId"
                   label="应用AppId"
                   placeholder="请输入应用AppId"
                   :allow-clear="true"
@@ -38,7 +38,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-input
-                  v-model:value="searchForm.appName"
+                  v-model="searchData.appName"
                   label="应用名称"
                   placeholder="请输入应用名称"
                   :allow-clear="true"
@@ -48,7 +48,7 @@
             <a-col v-bind="colSpan">
               <a-form-item label="">
                 <ag-select
-                  v-model:value="searchForm.state"
+                  v-model="searchData.state"
                   label="状态"
                   placeholder="请选择状态"
                   allow-clear
@@ -79,7 +79,7 @@
         ref="tableRef"
         :columns="columns"
         :on-load="reqTableDataFunc"
-        :search-data="searchForm"
+        :search-data="searchData"
         state-key="mch_app_table_columns"
       >
         <template #appId="{ record }">
@@ -161,7 +161,7 @@ const currentRecordId = ref('')
 const currentMchNo = ref('')
 
 // 搜索表单
-const searchForm = reactive({
+const searchData = reactive({
   mchNo: '',
   appId: '',
   appName: '',
@@ -233,7 +233,7 @@ const columns = [
  */
 onMounted(() => {
   if (route.query.mchNo) {
-    searchForm.mchNo = route.query.mchNo
+    searchData.mchNo = route.query.mchNo
     currentMchNo.value = route.query.mchNo
   }
 })
@@ -244,17 +244,17 @@ function reqTableDataFunc(params) {
     pageNumber: params.pageNumber,
     pageSize: params.pageSize
   }
-  if (searchForm.mchNo) {
-    requestParams.mchNo = searchForm.mchNo
+  if (searchData.mchNo) {
+    requestParams.mchNo = searchData.mchNo
   }
-  if (searchForm.appId) {
-    requestParams.appId = searchForm.appId
+  if (searchData.appId) {
+    requestParams.appId = searchData.appId
   }
-  if (searchForm.appName) {
-    requestParams.appName = searchForm.appName
+  if (searchData.appName) {
+    requestParams.appName = searchData.appName
   }
-  if (searchForm.state) {
-    requestParams.state = parseInt(searchForm.state)
+  if (searchData.state) {
+    requestParams.state = parseInt(searchData.state)
   }
   return mchAppApi.queryPage(requestParams)
 }
@@ -282,8 +282,7 @@ const handleSearchMch = async (keyword) => {
 /**
  * 搜索
  */
-function onSearch() {
-  message.success('开始搜索')
+function searchFunc() {
   tableRef.value.reload()
 }
 
@@ -291,10 +290,10 @@ function onSearch() {
  * 重置
  */
 function onReset() {
-  searchForm.mchNo = ''
-  searchForm.appId = ''
-  searchForm.appName = ''
-  searchForm.state = ''
+  searchData.mchNo = ''
+  searchData.appId = ''
+  searchData.appName = ''
+  searchData.state = ''
   tableRef.value.reload()
 }
 
@@ -303,7 +302,7 @@ function onReset() {
  */
 const handleAdd = () => {
   currentRecordId.value = ''
-  currentMchNo.value = searchForm.mchNo || ''
+  currentMchNo.value = searchData.mchNo || ''
   showModal()
 }
 

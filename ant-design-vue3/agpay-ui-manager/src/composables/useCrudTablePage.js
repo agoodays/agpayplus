@@ -10,8 +10,7 @@ export function useCrudTablePage(options = {}) {
     onDeleted
   } = options
 
-  const infoTable = ref(null)
-  const payConfig = ref(null)
+  const tableRef = ref(null)
 
   const isShowMore = ref(false)
   const searchData = reactive({})
@@ -21,7 +20,7 @@ export function useCrudTablePage(options = {}) {
   const currentRecordId = ref('')
 
   function reloadTable() {
-    infoTable.value?.reload()
+    tableRef.value?.reload()
   }
 
   function openCreate() {
@@ -37,11 +36,6 @@ export function useCrudTablePage(options = {}) {
   function openDetail(recordId) {
     currentRecordId.value = recordId
     detailOpen.value = true
-  }
-
-  function openPayConfig(recordId) {
-    currentRecordId.value = recordId
-    payConfig.value?.show(recordId)
   }
 
   function closeModal() {
@@ -78,8 +72,7 @@ export function useCrudTablePage(options = {}) {
   }
 
   return {
-    infoTable,
-    payConfig,
+    tableRef,
     isShowMore,
     searchData,
     modalOpen,
@@ -89,7 +82,6 @@ export function useCrudTablePage(options = {}) {
     openCreate,
     openEdit,
     openDetail,
-    openPayConfig,
     closeModal,
     closeDetail,
     confirmDelete

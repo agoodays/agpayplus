@@ -1,13 +1,17 @@
 <template>
   <a-card>
-    <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
-      <template #formItem>
-        <a-form-item label="" class="table-head-layout">
-          <ag-date-range-picker v-model:value="searchData.queryDateRange" />
-        </a-form-item>
-        <a-form-item label="" class="table-head-layout">
-          <ag-input v-model:value="searchData.wayCode" placeholder="支付方式编码" />
-        </a-form-item>
+    <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+      <template #base="{ colSpan }">
+        <a-col v-bind="colSpan">
+          <a-form-item label="">
+            <ag-date-range-picker v-model:value="searchData.queryDateRange" />
+          </a-form-item>
+        </a-col>
+        <a-col v-bind="colSpan">
+          <a-form-item label="">
+            <ag-input v-model="searchData.wayCode" label="支付方式编码" placeholder="请输入支付方式编码" />
+          </a-form-item>
+        </a-col>
       </template>
     </ag-search>
     <!-- 列表渲染 -->
@@ -166,6 +170,7 @@ const icons = { InfoCircleOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
 import { onMounted, reactive, ref } from 'vue'
+import { downloadExcel } from '@/lib/ag-axios'
 
 // 定义组件属性
 const props = defineProps({
@@ -250,12 +255,6 @@ const setIsShowMore = (value) => {
   isShowMore.value = value
 }
 
-// 查询函数
-const queryFunc = () => {
-  btnLoading.value = true
-  infoTable.value.reload(true)
-}
-
 // 表格接口方法
 const reqTableDataFunc = (params) => {
   return statisticApi.queryOrderStatistic(params)
@@ -266,38 +265,13 @@ const reqTableCountFunc = (params) => {
   return statisticApi.queryOrderStatisticTotal(params)
 }
 
-// 下载数据方法
 const reqDownloadDataFunc = (params) => {
-  statisticApi
-    .exportExcel(params)
-    .then((res) => {
-      // 将响应数据的流转为Blob对象
-      const blob = new Blob([res])
-      const fileName = '支付方式统计.xlsx' // 要下载的文件名称
-      if ('download' in document.createElement('a')) {
-        // 非IE下载
-        // 创建一个a标签，设置download属性和href属性，然后触发click事件下载文件
-        const elink = document.createElement('a')
-        elink.download = fileName
-        elink.style.display = 'none'
-        elink.href = URL.createObjectURL(blob) // 使用URL.createObjectURL(blob) URL编码二进制值到a标签的href属性
-        document.body.appendChild(elink)
-        elink.click()
-        URL.revokeObjectURL(elink.href) // 释放URL 对象
-        document.body.removeChild(elink)
-      } else {
-        // IE10+下载
-        navigator.msSaveBlob(blob, fileName)
-      }
-    })
-    .catch((error) => {
-      console.error(error)
-    })
+  downloadExcel(statisticApi.exportExcel(params), '支付方式统计.xlsx')
 }
 
 // 搜索函数
 const searchFunc = () => {
-  // 点击查询按钮事件
+  btnLoading.value = true
   infoTable.value.reload(true)
 }
 

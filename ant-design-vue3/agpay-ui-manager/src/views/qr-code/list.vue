@@ -1,33 +1,47 @@
 <template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="queryFunc">
-        <template #formItem>
-          <a-form-item label="" class="table-head-layout">
-            <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
-          </a-form-item>
-          <!-- <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo" />
-          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/> -->
-          <a-form-item label="" class="table-head-layout">
-            <ag-select
-              v-model="searchData.agentNo"
-              :api="searchAgent"
-              value-field="agentNo"
-              label-field="agentName"
-              placeholder="代理商号(支持按代理商名称搜索)"
-            />
-          </a-form-item>
-          <a-form-item label="" class="table-head-layout">
-            <ag-select
-              v-model="searchData.mchNo"
-              :api="searchMch"
-              value-field="mchNo"
-              label-field="mchName"
-              placeholder="商户号(支持按商户名称搜索)"
-            />
-          </a-form-item>
-          <ag-input v-model="searchData.appId" placeholder="应用AppId" />
-          <ag-input v-model="searchData.qrcId" placeholder="二维码ID" />
+      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-date-range-picker v-model:value="searchData.queryDateRange" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model="searchData.agentNo"
+                :api="searchAgent"
+                value-field="agentNo"
+                label-field="agentName"
+                label="代理商号"
+                placeholder="请输入代理商号"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model="searchData.mchNo"
+                :api="searchMch"
+                value-field="mchNo"
+                label-field="mchName"
+                label="商户号"
+                placeholder="请输入商户号"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.appId" label="应用AppId" placeholder="请输入应用AppId" />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input v-model="searchData.qrcId" label="二维码ID" placeholder="请输入二维码ID" />
+            </a-form-item>
+          </a-col>
         </template>
       </ag-search>
       <!-- 列表渲染 -->
@@ -107,8 +121,8 @@
       </ag-table>
     </a-card>
     <!-- 新增/编辑页面弹窗  -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="queryFunc" />
-    <Bind ref="bind" :callback-func="queryFunc" />
+    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="searchFunc" />
+    <Bind ref="bind" :callback-func="searchFunc" />
   </div>
 </template>
 <script setup>
@@ -149,12 +163,8 @@ function reloadTable() {
   infoTable.value?.reload()
 }
 
-function queryFunc() {
-  btnLoading.value = true
-  searchFunc(true)
-}
-
 function searchFunc(isToFirst = false) {
+  btnLoading.value = true
   infoTable.value?.reload(isToFirst)
 }
 
@@ -235,6 +245,6 @@ function updateState(recordId, state) {
 
 onMounted(() => {
   searchData.mchNo = route.query.mchNo
-  queryFunc()
+  searchFunc()
 })
 </script>

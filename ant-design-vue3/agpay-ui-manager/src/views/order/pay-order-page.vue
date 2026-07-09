@@ -2,108 +2,102 @@
   <div class="pay-order-page">
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <div style="margin-bottom: 16px">
-        <ag-search
-          v-model:model-value="searchForm"
-          :collapsible="true"
-          :default-collapsed="false"
-          @search="onSearch"
-          @reset="onReset"
-        >
-          <!-- 基础搜索条件 -->
-          <template #base="{ colSpan }">
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-date-range-picker
-                  v-model:value="searchForm.dateRange"
-                  label="创建时间"
-                  :show-time="{ format: 'HH:mm:ss' }"
-                  format="YYYY-MM-DD HH:mm:ss"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-input
-                  v-model:value="searchForm.payOrderId"
-                  label="支付订单号"
-                  placeholder="请输入订单号"
-                  :allow-clear="true"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-input
-                  v-model:value="searchForm.mchOrderNo"
-                  label="商户订单号"
-                  placeholder="请输入商户订单号"
-                  :allow-clear="true"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-select
-                  v-model:value="searchForm.state"
-                  label="支付状态"
-                  placeholder="请选择状态"
-                  allow-clear
-                  :options="[
-                    { value: '', label: '全部' },
-                    { value: '0', label: '订单生成' },
-                    { value: '1', label: '支付中' },
-                    { value: '2', label: '支付成功' },
-                    { value: '3', label: '支付失败' },
-                    { value: '4', label: '已撤销' },
-                    { value: '5', label: '已退款' },
-                    { value: '6', label: '订单关闭' }
-                  ]"
-                />
-              </a-form-item>
-            </a-col>
-          </template>
+      <ag-search
+        v-model="searchData"
+        :collapsible="true"
+        :default-collapsed="false"
+        @search="searchFunc"
+        @reset="onReset"
+      >
+        <!-- 基础搜索条件 -->
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-date-range-picker
+                v-model:value="searchData.dateRange"
+                label="创建时间"
+                :show-time="{ format: 'HH:mm:ss' }"
+                format="YYYY-MM-DD HH:mm:ss"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input
+                v-model="searchData.payOrderId"
+                label="支付订单号"
+                placeholder="请输入订单号"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input
+                v-model="searchData.mchOrderNo"
+                label="商户订单号"
+                placeholder="请输入商户订单号"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.state"
+                label="支付状态"
+                placeholder="请选择状态"
+                allow-clear
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: '0', label: '订单生成' },
+                  { value: '1', label: '支付中' },
+                  { value: '2', label: '支付成功' },
+                  { value: '3', label: '支付失败' },
+                  { value: '4', label: '已撤销' },
+                  { value: '5', label: '已退款' },
+                  { value: '6', label: '订单关闭' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+        </template>
 
-          <!-- 高级搜索条件 -->
-          <template #advanced="{ colSpan }">
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-select
-                  v-model:value="searchForm.notifyState"
-                  label="回调状态"
-                  placeholder="请选择状态"
-                  allow-clear
-                  :options="[
-                    { value: '', label: '全部' },
-                    { value: '0', label: '未发送' },
-                    { value: '1', label: '已发送' }
-                  ]"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-input
-                  v-model:value="searchForm.appId"
-                  label="应用ID"
-                  placeholder="请输入应用ID"
-                  :allow-clear="true"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-input
-                  v-model:value="searchForm.storeId"
-                  label="门店ID"
-                  placeholder="请输入门店ID"
-                  :allow-clear="true"
-                />
-              </a-form-item>
-            </a-col>
-          </template>
-        </ag-search>
-      </div>
+        <!-- 高级搜索条件 -->
+        <template #advanced="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model:value="searchData.notifyState"
+                label="回调状态"
+                placeholder="请选择状态"
+                allow-clear
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: '0', label: '未发送' },
+                  { value: '1', label: '已发送' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input
+                v-model="searchData.appId"
+                label="应用ID"
+                placeholder="请输入应用ID"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input
+                v-model="searchData.storeId"
+                label="门店ID"
+                placeholder="请输入门店ID"
+              />
+            </a-form-item>
+          </a-col>
+        </template>
+      </ag-search>
 
       <!-- 统计信息 -->
       <a-card v-if="statistics" class="statistics-card" :bordered="false">
@@ -162,7 +156,7 @@
         :show-auto-refresh="true"
         :on-load="loadData"
         :on-load-statistics="loadStatistics"
-        :search-data="searchForm"
+        :search-data="searchData"
         :on-download="handleExport"
         :show-download="true"
         :enable-statistics="true"
@@ -229,6 +223,11 @@
 </template>
 
 <script setup>
+/**
+ * 支付订单列表页面组件
+ * 功能：展示支付订单列表、搜索、查看详情、退款、统计等操作
+ */
+
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
@@ -244,20 +243,28 @@ import { useI18n } from 'vue-i18n'
 import DetailDrawer from './detail-drawer.vue'
 import RefundModal from './refund-modal.vue'
 
+// 国际化
 const { t } = useI18n()
 
+// 弹窗控制
 const { open: detailOpen, showModal: showDetail } = useModal()
 const { open: refundOpen, showModal: showRefund } = useModal()
+
+// 权限检查
 const { hasPermission } = usePermission()
 
-// State
+/**
+ * 组件引用
+ */
 const tableRef = ref(null)
 const currentPayOrderId = ref('')
 const currentPayOrder = ref(null)
 const statistics = ref(null)
 
-// 搜索表单
-const searchForm = reactive({
+/**
+ * 搜索表单数据
+ */
+const searchData = reactive({
   dateRange: '',
   payOrderId: '',
   mchOrderNo: '',
@@ -268,118 +275,109 @@ const searchForm = reactive({
   storeId: ''
 })
 
-// 请求表格数据函数
-const loadData = (params) => {
-  // 构建请求参数
-  const requestParams = {
-    pageNumber: params.pageNumber,
-    pageSize: params.pageSize
-  }
-  
-  // 处理日期范围
-  if (searchForm.dateRange && searchForm.dateRange.length === 2) {
-    requestParams.createdStart = searchForm.dateRange[0]
-    requestParams.createdEnd = searchForm.dateRange[1]
-  }
-  
-  // 处理订单号
-  if (searchForm.payOrderId) {
-    requestParams.payOrderId = searchForm.payOrderId
-  }
-  if (searchForm.mchOrderNo) {
-    requestParams.mchOrderNo = searchForm.mchOrderNo
-  }
-  if (searchForm.channelOrderNo) {
-    requestParams.channelOrderNo = searchForm.channelOrderNo
-  }
-  
-  // 处理数字类型字段
-  if (searchForm.state) {
-    requestParams.state = parseInt(searchForm.state)
-  }
-  if (searchForm.notifyState) {
-    requestParams.notifyState = parseInt(searchForm.notifyState)
-  }
-  
-  // 处理其他字段
-  if (searchForm.appId) {
-    requestParams.appId = searchForm.appId
-  }
-  if (searchForm.storeId) {
-    requestParams.storeId = searchForm.storeId
-  }
-  
-  console.log('请求参数:', requestParams)
-  return orderApi.queryPayOrderPage(requestParams)
-}
-
-// 请求统计数据函数
-const loadStatistics = (params) => {  
-  // 构建请求参数
+/**
+ * 构建请求参数
+ * @param {Object} searchData - 搜索表单数据
+ * @returns {Object} 请求参数
+ */
+const buildRequestParams = (searchData) => {
   const requestParams = {}
 
   // 处理日期范围
-  if (searchForm.dateRange && searchForm.dateRange.length === 2) {
-    requestParams.createdStart = searchForm.dateRange[0]
-    requestParams.createdEnd = searchForm.dateRange[1]
+  if (searchData.dateRange && searchData.dateRange.length === 2) {
+    requestParams.createdStart = searchData.dateRange[0]
+    requestParams.createdEnd = searchData.dateRange[1]
   }
   
   // 处理订单号
-  if (searchForm.payOrderId) {
-    requestParams.payOrderId = searchForm.payOrderId
+  if (searchData.payOrderId) {
+    requestParams.payOrderId = searchData.payOrderId
   }
-  if (searchForm.mchOrderNo) {
-    requestParams.mchOrderNo = searchForm.mchOrderNo
+  if (searchData.mchOrderNo) {
+    requestParams.mchOrderNo = searchData.mchOrderNo
   }
-  if (searchForm.channelOrderNo) {
-    requestParams.channelOrderNo = searchForm.channelOrderNo
+  if (searchData.channelOrderNo) {
+    requestParams.channelOrderNo = searchData.channelOrderNo
   }
   
   // 处理数字类型字段
-  if (searchForm.state) {
-    requestParams.state = parseInt(searchForm.state)
+  if (searchData.state) {
+    requestParams.state = parseInt(searchData.state)
   }
-  if (searchForm.notifyState) {
-    requestParams.notifyState = parseInt(searchForm.notifyState)
+  if (searchData.notifyState) {
+    requestParams.notifyState = parseInt(searchData.notifyState)
   }
   
   // 处理其他字段
-  if (searchForm.appId) {
-    requestParams.appId = searchForm.appId
+  if (searchData.appId) {
+    requestParams.appId = searchData.appId
   }
-  if (searchForm.storeId) {
-    requestParams.storeId = searchForm.storeId
+  if (searchData.storeId) {
+    requestParams.storeId = searchData.storeId
   }
-  
-  console.log('统计请求参数:', requestParams)
-  return orderApi.queryPayOrderCount(requestParams)
+
+  return requestParams
 }
 
-function onSearch() {
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const loadData = async (params) => {
+  const requestParams = {
+    pageNumber: params.pageNumber,
+    pageSize: params.pageSize,
+    ...buildRequestParams(searchData)
+  }
+  return await orderApi.queryPayOrderPage(requestParams)
+}
+
+/**
+ * 请求统计数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 统计数据
+ */
+const loadStatistics = async (params) => {  
+  const requestParams = buildRequestParams(searchData)
+  return await orderApi.queryPayOrderCount(requestParams)
+}
+
+/**
+ * 搜索回调函数
+ */
+const searchFunc = () => {
   message.success('开始搜索')
   refresh()
 }
 
-function onReset() {
-  searchForm.dateRange = ''
-  searchForm.payOrderId = ''
-  searchForm.mchOrderNo = ''
-  searchForm.channelOrderNo = ''
-  searchForm.state = ''
-  searchForm.notifyState = ''
-  searchForm.appId = ''
-  searchForm.storeId = ''
-}
-
-function refresh() {
-  // 调用 ag-table 的 reload 方法，触发搜索数据和数据统计
-  tableRef.value.reload()
-  // 调用 ag-table 的 reloadStatistics 方法，触发数据统计
-  tableRef.value.reloadStatistics()
+/**
+ * 重置回调函数
+ */
+const onReset = () => {
+  searchData.dateRange = ''
+  searchData.payOrderId = ''
+  searchData.mchOrderNo = ''
+  searchData.channelOrderNo = ''
+  searchData.state = ''
+  searchData.notifyState = ''
+  searchData.appId = ''
+  searchData.storeId = ''
+  refresh()
 }
 
 /**
- * 获取状态颜色
+ * 刷新表格数据和统计信息
+ */
+const refresh = () => {
+  tableRef.value?.reload()
+  tableRef.value?.reloadStatistics()
+}
+
+/**
+ * 获取支付状态颜色
+ * @param {number} state - 支付状态值
+ * @returns {string} 状态颜色
  */
 const getStateColor = (state) => {
   const colorMap = {
@@ -395,7 +393,9 @@ const getStateColor = (state) => {
 }
 
 /**
- * 获取状态文本
+ * 获取支付状态文本
+ * @param {number} state - 支付状态值
+ * @returns {string} 状态文本
  */
 const getStateText = (state) => {
   const textMap = {
@@ -412,6 +412,7 @@ const getStateText = (state) => {
 
 /**
  * 查看详情
+ * @param {Object} record - 订单记录
  */
 const handleDetail = (record) => {
   currentPayOrderId.value = record.payOrderId
@@ -420,6 +421,7 @@ const handleDetail = (record) => {
 
 /**
  * 退款
+ * @param {Object} record - 订单记录
  */
 const handleRefund = (record) => {
   currentPayOrder.value = record
@@ -427,7 +429,7 @@ const handleRefund = (record) => {
 }
 
 /**
- * 退款成功
+ * 退款成功回调
  */
 const handleRefundSuccess = () => {
   refresh()
@@ -440,7 +442,9 @@ const handleExport = () => {
   message.info(t('common.exportInDevelopment'))
 }
 
-// 表格列定义
+/**
+ * 表格列配置
+ */
 const columns = [
   {
     title: '支付订单号',
@@ -552,7 +556,6 @@ const columns = [
     margin-bottom: 16px;
   }
 
-  // 调整复制图标的垂直对齐
   :deep(.ant-typography) {
     display: flex;
     align-items: center;
