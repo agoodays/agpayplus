@@ -20,7 +20,7 @@
         row-key="articleId"
         @btn-load-close="btnLoading = false"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button v-if="$access('ENT_NOTICE_ADD')" type="primary" icon="plus" class="mg-b-30" @click="addFunc"
               >新增</a-button

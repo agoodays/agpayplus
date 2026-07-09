@@ -27,7 +27,7 @@
         row-key="teamId"
         @btn-load-close="btnLoading = false"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button v-if="$access('ENT_UR_TEAM_ADD')" type="primary" icon="plus" class="mg-b-30" @click="addFunc"
               >新增</a-button

@@ -32,7 +32,7 @@
         row-key="sysUserId"
         @btn-load-close="btnLoading = false"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button v-if="$access('ENT_UR_USER_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
           </div>

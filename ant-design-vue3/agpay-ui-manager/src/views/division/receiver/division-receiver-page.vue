@@ -46,7 +46,7 @@
         row-key="receiverId"
         @btn-load-close="btnLoading = false"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button
               v-if="$access('ENT_DIVISION_RECEIVER_ADD')"

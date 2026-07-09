@@ -1,7 +1,7 @@
 <template>
   <a-drawer v-model:open="localOpen" title="退款订单详情" :width="720" @close="handleClose">
     <a-spin :spinning="loading">
-      <a-descriptions :column="2" bordered size="small">
+      <a-descriptions :column="2">
         <a-descriptions-item label="退款订单号" :span="2">
           <a-typography-text copyable
             ><b>{{ detailData.refundOrderId }}</b></a-typography-text

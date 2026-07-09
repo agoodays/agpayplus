@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/modules/system/user'
 import { upload } from '@/lib/ag-axios'
@@ -57,11 +57,10 @@ const emit = defineEmits(['change', 'success', 'error', 'uploadSuccess'])
 const fileList = ref([])
 const loading = ref(false)
 
-function getHeaders() {
-  const headers = {}
-  headers[ACCESS_TOKEN_NAME] = `Bearer ${useUserStore().getToken}`
-  return headers
-}
+const headers = computed(() => {
+  const token = useUserStore().getToken
+  return token ? { [ACCESS_TOKEN_NAME]: `Bearer ${token}` } : {}
+})
 
 function getFileItems(fileList) {
   const fileItems = []
@@ -185,7 +184,6 @@ function handlePreview(info) {
 
 defineExpose({
   loading,
-  headers: getHeaders(),
   fileList,
   handleChange,
   customRequest

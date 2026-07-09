@@ -1,18 +1,16 @@
 <template>
   <a-drawer
+    v-model:open="localOpen"
     :mask-closable="false"
-    :visible="visible"
     :title="isAdd ? '新增代理商' : '修改代理商'"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+    :body-style="{ paddingBottom: '80px' }"
     width="40%"
-    class="drawer-width"
     @close="onClose"
   >
     <a-form
-      v-if="visible"
+      v-if="localOpen"
       ref="infoForm"
-      :model="{ ...saveObject, newPwd, ...sysPassword }"
+      :model="saveObject"
       layout="vertical"
       :rules="rules"
     >
@@ -27,8 +25,6 @@
             <a-input v-model:value="saveObject.loginUsername" placeholder="请输入代理商登录名" :disabled="!isAdd" />
           </a-form-item>
         </a-col>
-      </a-row>
-      <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-item label="代理商简称" name="agentShortName">
             <a-input v-model:value="saveObject.agentShortName" placeholder="请输入代理商简称" />
@@ -39,8 +35,6 @@
             <a-input v-model:value="saveObject.contactName" placeholder="请输入联系人姓名" />
           </a-form-item>
         </a-col>
-      </a-row>
-      <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-item label="联系人邮箱" name="contactEmail">
             <a-input v-model:value="saveObject.contactEmail" placeholder="请输入联系人邮箱" />
@@ -52,8 +46,6 @@
             <p class="agpay-tip-text">(同步更改登录手机号)</p>
           </a-form-item>
         </a-col>
-      </a-row>
-      <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-item label="上级代理商号" name="pid">
             <ag-select
@@ -95,26 +87,19 @@
             </a-radio-group>
           </a-form-item>
         </a-col>
-      </a-row>
-      <a-row justify="space-between" type="flex">
         <a-col :span="24">
           <a-form-item label="备注" name="remark">
-            <a-input v-model:value="saveObject.remark" placeholder="请输入备注" type="textarea" />
+            <a-textarea v-model:value="saveObject.remark" placeholder="请输入备注" />
           </a-form-item>
         </a-col>
       </a-row>
 
       <!-- 账户安全板块 -->
-      <a-row justify="space-between" type="flex">
-        <a-col :span="24">
-          <a-divider orientation="left">
-            <a-tag color="var(--error-color)">账户安全</a-tag>
-          </a-divider>
-        </a-col>
-      </a-row>
-
-      <div>
-        <a-row v-if="isAdd" justify="space-between" type="flex">
+      <a-divider orientation="left">
+        <a-tag color="var(--error-color)">账户安全</a-tag>
+      </a-divider>
+      <div v-if="isAdd">
+        <a-row justify="space-between" type="flex">
           <a-col :span="10">
             <a-form-item label="是否发送开通提醒" name="isNotify">
               <a-radio-group v-model:value="saveObject.isNotify">
@@ -124,7 +109,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row v-if="isAdd" justify="space-between" type="flex">
+        <a-row justify="space-between" type="flex">
           <a-col :span="10">
             <a-form-item label="密码设置" name="passwordType">
               <a-radio-group v-model:value="saveObject.passwordType">
@@ -138,7 +123,6 @@
               <a-input v-model:value="saveObject.loginPassword" placeholder="请输入登录密码" />
             </a-form-item>
             <a-button
-              icon="file-sync"
               :style="{ marginRight: '8px', color: 'var(--primary-color)', borderColor: 'var(--primary-color)' }"
               @click="genRandomPassword"
             >
@@ -147,26 +131,25 @@
           </a-col>
         </a-row>
       </div>
-
       <!-- 重置密码板块 -->
-      <div>
+      <div v-else>
         <a-row justify="space-between" type="flex">
           <a-col :span="10">
-            <a-form-item v-if="resetIsShow" label="">
-              重置支付密码：<a-checkbox v-model:checked="sysPassword.resetPayPass"></a-checkbox>
+            <a-form-item label="">
+              重置支付密码：<a-checkbox v-model:checked="sysPassword.resetPayPass" />
             </a-form-item>
           </a-col>
         </a-row>
 
         <a-row justify="space-between" type="flex">
           <a-col :span="10">
-            <a-form-item v-if="resetIsShow" label="">
-              重置密码：<a-checkbox v-model:checked="sysPassword.resetPass"></a-checkbox>
+            <a-form-item label="">
+              重置密码：<a-checkbox v-model:checked="sysPassword.resetPass" />
             </a-form-item>
           </a-col>
           <a-col :span="10">
             <a-form-item v-if="sysPassword.resetPass" label="">
-              恢复默认密码：<a-checkbox v-model:checked="sysPassword.defaultPass" @click="isResetPass"></a-checkbox>
+              恢复默认密码：<a-checkbox v-model:checked="sysPassword.defaultPass" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -174,14 +157,17 @@
         <a-row v-if="sysPassword.resetPass && !sysPassword.defaultPass" justify="space-between" type="flex">
           <a-col :span="10">
             <a-form-item label="新密码：" name="newPwd">
-              <a-input-password v-model:value="newPwd" autocomplete="new-password" :disabled="sysPassword.defaultPass" />
+              <a-input-password
+                v-model:value="saveObject.newPwd"
+                autocomplete="new-password"
+                :disabled="sysPassword.defaultPass"
+              />
             </a-form-item>
           </a-col>
-
           <a-col :span="10">
             <a-form-item label="确认新密码：" name="confirmPwd">
               <a-input-password
-                v-model="sysPassword.confirmPwd"
+                v-model:value="saveObject.confirmPwd"
                 autocomplete="new-password"
                 :disabled="sysPassword.defaultPass"
               />
@@ -190,239 +176,219 @@
         </a-row>
       </div>
 
-      <!-- 账户信息板块 -->
+      <!-- 账户信息板块 -->      
+      <a-divider orientation="left">
+        <a-tag color="var(--error-color)">账户信息</a-tag>
+      </a-divider>
       <a-row justify="space-between" type="flex">
-        <a-col :span="24">
-          <a-divider orientation="left">
-            <a-tag color="var(--error-color)">账户信息</a-tag>
-          </a-divider>
+        <a-col :span="10">
+          <a-form-item label="代理商类型" name="agentType">
+            <a-select v-model:value="saveObject.agentType" placeholder="请选择代理商类型" @change="agentTypeChange">
+              <a-select-option v-for="d in agentTypeList" :key="d.agentType" :value="d.agentType">
+                {{ d.agentTypeName }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col :span="10">
+          <a-form-item label="收款账户类型" name="settAccountType">
+            <a-select
+              v-model:value="saveObject.settAccountType"
+              placeholder="请选择收款账户类型"
+              @change="settAccountTypeChange"
+            >
+              <a-select-option v-for="d in settAccountTypeList" :key="d.settAccountType" :value="d.settAccountType">
+                {{ d.settAccountTypeName }}
+              </a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
+        <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
+          <a-form-item label="对公账户名称" name="settAccountName">
+            <a-input v-model:value="saveObject.settAccountName" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="10">
+          <a-form-item :label="settAccountNoLabel" name="settAccountNo">
+            <a-input v-model:value="saveObject.settAccountNo" />
+          </a-form-item>
+        </a-col>
+        <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
+          <a-form-item label="开户银行名称" name="settAccountBank">
+            <a-input v-model:value="saveObject.settAccountBank" />
+          </a-form-item>
+        </a-col>
+        <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
+          <a-form-item label="开户行支行名称" name="settAccountSubBank">
+            <a-input v-model:value="saveObject.settAccountSubBank" />
+          </a-form-item>
         </a-col>
       </a-row>
-      <div>
-        <a-row justify="space-between" type="flex">
-          <a-col :span="10">
-            <a-form-item label="代理商类型" name="agentType">
-              <a-select v-model:value="saveObject.agentType" placeholder="请选择代理商类型" @change="agentTypeChange">
-                <a-select-option v-for="d in agentTypeList" :key="d.agentType" :value="d.agentType">
-                  {{ d.agentTypeName }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-          <a-col :span="10">
-            <a-form-item label="收款账户类型" name="settAccountType">
-              <a-select
-                v-model="saveObject.settAccountType"
-                placeholder="请选择收款账户类型"
-                @change="settAccountTypeChange"
-              >
-                <a-select-option v-for="d in settAccountTypeList" :key="d.settAccountType" :value="d.settAccountType">
-                  {{ d.settAccountTypeName }}
-                </a-select-option>
-              </a-select>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row justify="space-between" type="flex">
-          <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
-            <a-form-item label="对公账户名称" name="settAccountName">
-              <a-input v-model:value="saveObject.settAccountName" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="10">
-            <a-form-item :label="settAccountNoLabel" name="settAccountNo">
-              <a-input v-model:value="saveObject.settAccountNo" />
-            </a-form-item>
-          </a-col>
-          <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
-            <a-form-item label="开户银行名称" name="settAccountBank">
-              <a-input v-model:value="saveObject.settAccountBank" />
-            </a-form-item>
-          </a-col>
-          <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
-            <a-form-item label="开户行支行名称" name="settAccountSubBank">
-              <a-input v-model:value="saveObject.settAccountSubBank" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </div>
 
       <!-- 手续费信息板块 -->
+      <a-divider orientation="left">
+        <a-tag color="var(--error-color)">手续费信息</a-tag>
+      </a-divider>
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
-          <a-divider orientation="left">
-            <a-tag color="var(--error-color)">手续费信息</a-tag>
-          </a-divider>
+          <div class="ant-col ant-form-item-label"><label title="设置提现手续费规则">设置提现手续费规则</label></div>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item class="cashout-fee" label="配置类型：" name="cashoutFeeRuleType">
+            <a-radio-group v-model:value="saveObject.cashoutFeeRuleType">
+              <a-radio :value="1">使用系统默认</a-radio>
+              <a-radio :value="2">自定义</a-radio>
+            </a-radio-group>
+          </a-form-item>
         </a-col>
       </a-row>
-      <div>
-        <a-row justify="space-between" type="flex">
-          <a-col :span="24">
-            <div class="ant-col ant-form-item-label"><label title="设置提现手续费规则">设置提现手续费规则</label></div>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item class="cashout-fee" label="配置类型：" name="cashoutFeeRuleType">
-              <a-radio-group v-model:value="saveObject.cashoutFeeRuleType">
-                <a-radio :value="1">使用系统默认</a-radio>
-                <a-radio :value="2">自定义</a-radio>
-              </a-radio-group>
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row v-if="saveObject.cashoutFeeRuleType === 2" justify="space-between" type="flex">
-          <a-col :span="24">
-            <a-form-item
-              class="cashout-fee"
-              :title="'额度：设置最低' + cashoutFeeRule.applyLimit + '元可发起提现'"
-              name="applyLimit"
-            >
-              <div class="ant-col ant-form-item-label cashout-fee-label"><label>额度：设置最低</label></div>
-              <a-input-number v-model:value="cashoutFeeRule.applyLimit" />
-              <div class="ant-col ant-form-item-label cashout-fee-label"><label>元可发起提现</label></div>
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item
-              class="cashout-fee"
-              :title="'规则：提现' + cashoutFeeRule.freeLimit + '元以内免收手续费'"
-              name="freeLimit"
-            >
-              <div class="ant-col ant-form-item-label cashout-fee-label"><label>规则：提现</label></div>
-              <a-input-number v-model:value="cashoutFeeRule.freeLimit" />
-              <div class="ant-col ant-form-item-label cashout-fee-label"><label>元以内免收手续费</label></div>
-            </a-form-item>
-          </a-col>
-          <a-col :span="24">
-            <a-form-item class="cashout-fee-type" label="手续费计算模式：" name="feeType">
-              <a-radio-group v-model:value="cashoutFeeRule.feeType">
-                <a-radio value="FIX">
-                  单笔固定
-                  <div v-if="cashoutFeeRule.feeType === 'FIX'" style="display: contents">
-                    <a-input-number v-model:value="cashoutFeeRule.fixFee" />
-                    元
-                  </div>
-                </a-radio>
-                <a-radio value="SINGLE">
-                  单笔费率
-                  <div v-if="cashoutFeeRule.feeType === 'SINGLE'" style="display: contents">
-                    <a-input-number v-model:value="cashoutFeeRule.feeRate" />
-                    %
-                  </div>
-                </a-radio>
-                <a-radio value="FIXANDRATE">
-                  固定+费率
-                  <div v-if="cashoutFeeRule.feeType === 'FIXANDRATE'" style="display: contents">
-                    <a-input-number v-model:value="cashoutFeeRule.fixFee" />
-                    元 +
-                    <a-input-number v-model:value="cashoutFeeRule.feeRate" />
-                    %
-                  </div>
-                </a-radio>
-              </a-radio-group>
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </div>
+      <a-row v-if="saveObject.cashoutFeeRuleType === 2" justify="space-between" type="flex">
+        <a-col :span="24">
+          <a-form-item
+            class="cashout-fee"
+            :title="'额度：设置最低' + cashoutFeeRule.applyLimit + '元可发起提现'"
+            name="applyLimit"
+          >
+            <div class="ant-col ant-form-item-label cashout-fee-label"><label>额度：设置最低</label></div>
+            <a-input-number v-model:value="cashoutFeeRule.applyLimit" />
+            <div class="ant-col ant-form-item-label cashout-fee-label"><label>元可发起提现</label></div>
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item
+            class="cashout-fee"
+            :title="'规则：提现' + cashoutFeeRule.freeLimit + '元以内免收手续费'"
+            name="freeLimit"
+          >
+            <div class="ant-col ant-form-item-label cashout-fee-label"><label>规则：提现</label></div>
+            <a-input-number v-model:value="cashoutFeeRule.freeLimit" />
+            <div class="ant-col ant-form-item-label cashout-fee-label"><label>元以内免收手续费</label></div>
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item class="cashout-fee-type" label="手续费计算模式：" name="feeType">
+            <a-radio-group v-model:value="cashoutFeeRule.feeType">
+              <a-radio value="FIX">
+                单笔固定
+                <div v-if="cashoutFeeRule.feeType === 'FIX'" style="display: contents">
+                  <a-input-number v-model:value="cashoutFeeRule.fixFee" />
+                  元
+                </div>
+              </a-radio>
+              <a-radio value="SINGLE">
+                单笔费率
+                <div v-if="cashoutFeeRule.feeType === 'SINGLE'" style="display: contents">
+                  <a-input-number v-model:value="cashoutFeeRule.feeRate" />
+                  %
+                </div>
+              </a-radio>
+              <a-radio value="FIXANDRATE">
+                固定+费率
+                <div v-if="cashoutFeeRule.feeType === 'FIXANDRATE'" style="display: contents">
+                  <a-input-number v-model:value="cashoutFeeRule.fixFee" />
+                  元 +
+                  <a-input-number v-model:value="cashoutFeeRule.feeRate" />
+                  %
+                </div>
+              </a-radio>
+            </a-radio-group>
+          </a-form-item>
+        </a-col>
+      </a-row>
 
       <!-- 资料信息板块 -->
+      <a-divider orientation="left">
+        <a-tag color="var(--error-color)">资料信息</a-tag>
+      </a-divider>
       <a-row justify="space-between" type="flex">
-        <a-col :span="24">
-          <a-divider orientation="left">
-            <a-tag color="var(--error-color)">资料信息</a-tag>
-          </a-divider>
+        <!-- 企业 -->
+        <a-col v-if="saveObject.agentType === 2" :span="10">
+          <a-form-item label="营业执照照片" name="licenseImg">
+            <ag-upload
+              :action="action"
+              bind-name="licenseImg"
+              :urls="[saveObject.licenseImg]"
+              @upload-success="uploadSuccess"
+            >
+              <template #uploadSlot="{ loading }">
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+              </template>
+            </ag-upload>
+          </a-form-item>
+        </a-col>
+        <!-- 企业对公 -->
+        <a-col v-if="saveObject.agentType === 2 && saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
+          <a-form-item label="开户许可证照片" name="permitImg">
+            <ag-upload
+              :action="action"
+              bind-name="permitImg"
+              :urls="[saveObject.permitImg]"
+              @upload-success="uploadSuccess"
+            >
+              <template #uploadSlot="{ loading }">
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+              </template>
+            </ag-upload>
+          </a-form-item>
+        </a-col>
+        <a-col :span="10">
+          <a-form-item :label="'[' + imgLabel + ']身份证人像面照片'" name="idcard1Img">
+            <ag-upload
+              :action="action"
+              bind-name="idcard1Img"
+              :urls="[saveObject.idcard1Img]"
+              @upload-success="uploadSuccess"
+            >
+              <template #uploadSlot="{ loading }">
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+              </template>
+            </ag-upload>
+          </a-form-item>
+        </a-col>
+        <a-col :span="10">
+          <a-form-item :label="'[' + imgLabel + ']身份证国徽面照片'" name="idcard2Img">
+            <ag-upload
+              :action="action"
+              bind-name="idcard2Img"
+              :urls="[saveObject.idcard2Img]"
+              @upload-success="uploadSuccess"
+            >
+              <template #uploadSlot="{ loading }">
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+              </template>
+            </ag-upload>
+          </a-form-item>
+        </a-col>
+        <a-col :span="10">
+          <a-form-item label="[联系人]手持身份证照片" name="idcardInHandImg">
+            <ag-upload
+              :action="action"
+              bind-name="idcardInHandImg"
+              :urls="[saveObject.idcardInHandImg]"
+              @upload-success="uploadSuccess"
+            >
+              <template #uploadSlot="{ loading }">
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+              </template>
+            </ag-upload>
+          </a-form-item>
+        </a-col>
+        <!-- 个人对私/企业对私 -->
+        <a-col v-if="saveObject.settAccountType === 'BANK_PRIVATE'" :span="10">
+          <a-form-item :label="'[' + imgLabel + ']银行卡照片'" name="bankCardImg">
+            <ag-upload
+              :action="action"
+              bind-name="bankCardImg"
+              :urls="[saveObject.bankCardImg]"
+              @upload-success="uploadSuccess"
+            >
+              <template #uploadSlot="{ loading }">
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+              </template>
+            </ag-upload>
+          </a-form-item>
         </a-col>
       </a-row>
-      <div>
-        <a-row justify="space-between" type="flex">
-          <!-- 企业 -->
-          <a-col v-if="saveObject.agentType === 2" :span="10">
-            <a-form-item label="营业执照照片" name="licenseImg">
-              <ag-upload
-                :action="action"
-                bind-name="licenseImg"
-                :urls="[saveObject.licenseImg]"
-                @upload-success="uploadSuccess"
-              >
-                <template #uploadSlot="{ loading }">
-                  <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
-                </template>
-              </ag-upload>
-            </a-form-item>
-          </a-col>
-          <!-- 企业对公 -->
-          <a-col v-if="saveObject.agentType === 2 && saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
-            <a-form-item label="开户许可证照片" name="permitImg">
-              <ag-upload
-                :action="action"
-                bind-name="permitImg"
-                :urls="[saveObject.permitImg]"
-                @upload-success="uploadSuccess"
-              >
-                <template #uploadSlot="{ loading }">
-                  <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
-                </template>
-              </ag-upload>
-            </a-form-item>
-          </a-col>
-          <a-col :span="10">
-            <a-form-item :label="'[' + imgLabel + ']身份证人像面照片'" name="idcard1Img">
-              <ag-upload
-                :action="action"
-                bind-name="idcard1Img"
-                :urls="[saveObject.idcard1Img]"
-                @upload-success="uploadSuccess"
-              >
-                <template #uploadSlot="{ loading }">
-                  <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
-                </template>
-              </ag-upload>
-            </a-form-item>
-          </a-col>
-          <a-col :span="10">
-            <a-form-item :label="'[' + imgLabel + ']身份证国徽面照片'" name="idcard2Img">
-              <ag-upload
-                :action="action"
-                bind-name="idcard2Img"
-                :urls="[saveObject.idcard2Img]"
-                @upload-success="uploadSuccess"
-              >
-                <template #uploadSlot="{ loading }">
-                  <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
-                </template>
-              </ag-upload>
-            </a-form-item>
-          </a-col>
-          <a-col :span="10">
-            <a-form-item label="[联系人]手持身份证照片" name="idcardInHandImg">
-              <ag-upload
-                :action="action"
-                bind-name="idcardInHandImg"
-                :urls="[saveObject.idcardInHandImg]"
-                @upload-success="uploadSuccess"
-              >
-                <template #uploadSlot="{ loading }">
-                  <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
-                </template>
-              </ag-upload>
-            </a-form-item>
-          </a-col>
-          <!-- 个人对私/企业对私 -->
-          <a-col v-if="saveObject.settAccountType === 'BANK_PRIVATE'" :span="10">
-            <a-form-item :label="'[' + imgLabel + ']银行卡照片'" name="bankCardImg">
-              <ag-upload
-                :action="action"
-                bind-name="bankCardImg"
-                :urls="[saveObject.bankCardImg]"
-                @upload-success="uploadSuccess"
-              >
-                <template #uploadSlot="{ loading }">
-                  <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
-                </template>
-              </ag-upload>
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </div>
     </a-form>
     <div class="drawer-btn-center">
       <a-button @click="onClose">
@@ -444,23 +410,29 @@ import { basicApi } from '@/api/system/basic-api'
 import AgSelect from '@/components/ag-select'
 import AgUpload from '@/components/ag-upload'
 import { upload } from '@/lib/ag-axios'
-import { Base64 } from 'js-base64'
-import { computed, reactive, ref } from 'vue'
 import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { Base64 } from 'js-base64'
+import { computed, reactive, ref, watch } from 'vue'
 const icons = { LoadingOutlined, UploadOutlined }
 
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: {
+    type: Boolean,
+    default: false
+  },
+  recordId: {
+    type: String,
+    default: ''
+  }
 })
 
+const emit = defineEmits(['update:open', 'success'])
+
 const infoForm = ref(null)
-const visible = ref(false)
+const localOpen = ref(false)
 const isAdd = ref(true)
-const recordId = ref(null)
 const btnLoading = ref(false)
-const newPwd = ref('')
-const resetIsShow = ref(false)
 const imgLabel = ref('联系人')
 const settAccountNoLabel = ref('个人微信号')
 
@@ -492,8 +464,7 @@ const settAccountTypeList = ref([...baseSettAccountTypeList])
 const sysPassword = reactive({
   resetPayPass: false,
   resetPass: false,
-  defaultPass: true,
-  confirmPwd: ''
+  defaultPass: true
 })
 
 const cashoutFeeRule = reactive({
@@ -519,18 +490,24 @@ const rules = computed(() => ({
   loginPassword: [
     { required: true, message: '请输入登录密码', trigger: 'blur' },
     {
-      validator: (rule, value, callback) => {
-        if (saveObject.value.passwordType === 'custom') {
-          if (passwordRules.regexpRules && passwordRules.errTips) {
-            const regex = new RegExp(passwordRules.regexpRules)
-            const isMatch = regex.test(saveObject.value.loginPassword)
-            if (!isMatch) {
-              callback(passwordRules.errTips)
-              return
-            }
+      async validator() {
+        if (saveObject.value.passwordType !== 'custom') {
+          return Promise.resolve()
+        }
+
+        const loginPassword = saveObject.value.loginPassword || ''
+        if (!loginPassword) {
+          return Promise.reject(new Error('请输入登录密码'))
+        }
+
+        if (passwordRules.regexpRules && passwordRules.errTips) {
+          const regex = new RegExp(passwordRules.regexpRules)
+          if (!regex.test(loginPassword)) {
+            return Promise.reject(new Error(passwordRules.errTips))
           }
         }
-        callback()
+
+        return Promise.resolve()
       }
     }
   ],
@@ -539,12 +516,11 @@ const rules = computed(() => ({
   isvNo: [
     {
       required: true,
-      validator: (rule, value, callback) => {
+      async validator(rule, value) {
         if (!value) {
-          callback(new Error('请选择服务商'))
-          return
+          return Promise.reject(new Error('请选择服务商'))
         }
-        callback()
+        return Promise.resolve()
       },
       trigger: 'blur'
     }
@@ -562,20 +538,20 @@ const rules = computed(() => ({
     {
       required: true,
       trigger: 'blur',
-      validator: (rule, value, callback) => {
-        if (!newPwd.value) {
-          callback('请输入新密码')
-          return
+      async validator() {
+        const newPassword = saveObject.value.newPwd || ''
+        if (!newPassword) {
+          return Promise.reject(new Error('请输入新密码'))
         }
+
         if (passwordRules.regexpRules && passwordRules.errTips) {
           const regex = new RegExp(passwordRules.regexpRules)
-          const isMatch = regex.test(newPwd.value)
-          if (!isMatch) {
-            callback(passwordRules.errTips)
-            return
+          if (!regex.test(newPassword)) {
+            return Promise.reject(new Error(passwordRules.errTips))
           }
         }
-        callback()
+
+        return Promise.resolve()
       }
     }
   ],
@@ -583,24 +559,24 @@ const rules = computed(() => ({
     {
       required: true,
       trigger: 'blur',
-      validator: (rule, value, callback) => {
-        if (!sysPassword.confirmPwd) {
-          callback('请输入确认新密码')
-          return
+      async validator() {
+        const confirmPassword = saveObject.value.confirmPwd || ''
+        if (!confirmPassword) {
+          return Promise.reject(new Error('请输入确认新密码'))
         }
+
         if (passwordRules.regexpRules && passwordRules.errTips) {
           const regex = new RegExp(passwordRules.regexpRules)
-          const isMatch = regex.test(sysPassword.confirmPwd)
-          if (!isMatch) {
-            callback(passwordRules.errTips)
-            return
+          if (!regex.test(confirmPassword)) {
+            return Promise.reject(new Error(passwordRules.errTips))
           }
         }
-        if (newPwd.value !== sysPassword.confirmPwd) {
-          callback('新密码与确认密码不一致')
-          return
+
+        if (saveObject.value.newPwd !== confirmPassword) {
+          return Promise.reject(new Error('新密码与确认密码不一致'))
         }
-        callback()
+
+        return Promise.resolve()
       }
     }
   ]
@@ -615,7 +591,9 @@ function getDefaultSaveObject() {
     cashoutFeeRuleType: 1,
     isNotify: 0,
     passwordType: 'default',
-    loginPassword: ''
+    loginPassword: '',
+    newPwd: '',
+    confirmPwd: ''
   }
 }
 
@@ -623,12 +601,11 @@ function resetSysPasswordState() {
   sysPassword.resetPayPass = false
   sysPassword.resetPass = false
   sysPassword.defaultPass = true
-  sysPassword.confirmPwd = ''
 }
 
 function resetPassEmpty() {
-  newPwd.value = ''
-  sysPassword.confirmPwd = ''
+  saveObject.value.newPwd = ''
+  saveObject.value.confirmPwd = ''
 }
 
 function normalizeSettAccountTypeList(agentType) {
@@ -661,10 +638,8 @@ function setSettAccountNoLabel(value) {
   }
 }
 
-function show(currentRecordId) {
+async function initForm(currentRecordId) {
   isAdd.value = !currentRecordId
-  recordId.value = currentRecordId || null
-  resetIsShow.value = false
   saveObject.value = getDefaultSaveObject()
   resetSysPasswordState()
   resetPassEmpty()
@@ -677,17 +652,32 @@ function show(currentRecordId) {
   }
 
   if (!isAdd.value) {
-    resetIsShow.value = true
-    agentApi.getById(currentRecordId).then((res) => {
+    try {
+      const res = await agentApi.getById(currentRecordId)
       saveObject.value = { ...res }
       normalizeSettAccountTypeList(saveObject.value.agentType)
       imgLabel.value = saveObject.value.agentType === 2 ? '法人' : '联系人'
       setSettAccountNoLabel(saveObject.value.settAccountType)
-    })
+    } catch (error) {
+      console.error('加载代理商信息失败:', error)
+      message.error(error.msg || '加载代理商信息失败')
+    }
   }
-
-  visible.value = true
 }
+
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val) {
+      initForm(props.recordId)
+    }
+  }
+)
+
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
 
 function searchAgent(params) {
   return agentApi.queryPage(params)
@@ -743,8 +733,8 @@ async function handleOkFunc() {
       btnLoading.value = true
       await agentApi.add(saveObject.value)
       message.success('新增成功')
-      visible.value = false
-      props.callbackFunc()
+      localOpen.value = false
+      emit('success')
       btnLoading.value = false
       return
     }
@@ -752,38 +742,43 @@ async function handleOkFunc() {
     if (sysPassword.resetPayPass) {
       sysPassword.sipw = null
     }
-    sysPassword.confirmPwd = Base64.encode(sysPassword.confirmPwd)
-    Object.assign(saveObject.value, sysPassword)
+
+    const payload = {
+      ...saveObject.value,
+      ...sysPassword,
+      confirmPwd: Base64.encode(saveObject.value.confirmPwd || '')
+    }
 
     btnLoading.value = true
-    await agentApi.updateById(recordId.value, saveObject.value)
+    await agentApi.updateById(props.recordId, payload)
     message.success('修改成功')
-    visible.value = false
-    props.callbackFunc()
+    localOpen.value = false
+    emit('success')
   } catch (error) {
     if (!error.errorFields) {
       message.error('操作失败')
     }
   } finally {
     btnLoading.value = false
-    resetIsShow.value = true
     resetSysPasswordState()
     resetPassEmpty()
   }
 }
 
 function onClose() {
-  visible.value = false
-  resetIsShow.value = false
+  localOpen.value = false
   resetSysPasswordState()
   resetPassEmpty()
 }
 
-function isResetPass() {
-  if (!sysPassword.defaultPass) {
-    resetPassEmpty()
+watch(
+  () => sysPassword.defaultPass,
+  (val) => {
+    if (val) {
+      resetPassEmpty()
+    }
   }
-}
+)
 
 function pidChange(val, selected) {
   if (selected) {
@@ -815,15 +810,17 @@ function uploadSuccess(name, fileList) {
   saveObject.value[name] = firstItem?.url
 }
 
-basicApi.getPwdRulesRegexp().then((res) => {
-  passwordRules.regexpRules = res.regexpRules
-  passwordRules.errTips = res.errTips
-})
+async function loadPwdRules() {
+  try {
+    const res = await basicApi.getPwdRulesRegexp()
+    passwordRules.regexpRules = res.regexpRules
+    passwordRules.errTips = res.errTips
+  } catch (error) {
+    console.error('加载密码规则失败:', error)
+  }
+}
 
-defineExpose({
-  show,
-  onClose
-})
+loadPwdRules()
 </script>
 
 <style lang="less">

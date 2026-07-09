@@ -1,13 +1,6 @@
+import { message, Modal } from 'ant-design-vue'
 import { reactive, ref } from 'vue'
 
-/**
- * 通用 CRUD 表格页组合式逻辑。
- *
- * 设计目标：
- * 1. 统一列表页“新增/编辑/详情/删除/刷新”行为，减少重复代码。
- * 2. 让页面层只保留业务差异，交互胶水逻辑下沉到 composable。
- * 3. 便于后续模块按同一约定扩展。
- */
 export function useCrudTablePage(options = {}) {
   const {
     deleteAction,
@@ -18,32 +11,47 @@ export function useCrudTablePage(options = {}) {
   } = options
 
   const infoTable = ref(null)
-  const infoAddOrEdit = ref(null)
-  const infoDetail = ref(null)
   const payConfig = ref(null)
 
-  // 统一列表页常见状态，避免每个页面重复声明。
   const isShowMore = ref(false)
   const searchData = reactive({})
+
+  const modalOpen = ref(false)
+  const detailOpen = ref(false)
+  const currentRecordId = ref('')
 
   function reloadTable() {
     infoTable.value?.reload()
   }
 
   function openCreate() {
-    infoAddOrEdit.value?.show()
+    currentRecordId.value = ''
+    modalOpen.value = true
   }
 
   function openEdit(recordId) {
-    infoAddOrEdit.value?.show(recordId)
+    currentRecordId.value = recordId
+    modalOpen.value = true
   }
 
   function openDetail(recordId) {
-    infoDetail.value?.show(recordId)
+    currentRecordId.value = recordId
+    detailOpen.value = true
   }
 
   function openPayConfig(recordId) {
+    currentRecordId.value = recordId
     payConfig.value?.show(recordId)
+  }
+
+  function closeModal() {
+    modalOpen.value = false
+    currentRecordId.value = ''
+  }
+
+  function closeDetail() {
+    detailOpen.value = false
+    currentRecordId.value = ''
   }
 
   function confirmDelete(recordId) {
@@ -51,26 +59,39 @@ export function useCrudTablePage(options = {}) {
       throw new Error('useCrudTablePage: deleteAction is required for confirmDelete')
     }
 
-    window.$infoBox.confirmDanger(deleteConfirmTitle, deleteConfirmContent, async () => {
-      await deleteAction(recordId)
-      reloadTable()
-      window.$message.success(deleteSuccessMessage)
-      onDeleted?.(recordId)
+    Modal.confirm({
+      title: deleteConfirmTitle,
+      content: deleteConfirmContent,
+      okType: 'danger',
+      async onOk() {
+        try {
+          await deleteAction(recordId)
+          reloadTable()
+          message.success(deleteSuccessMessage)
+          onDeleted?.(recordId)
+        } catch (error) {
+          console.error('Delete error:', error)
+          message.error(error.msg || '删除失败')
+        }
+      }
     })
   }
 
   return {
     infoTable,
-    infoAddOrEdit,
-    infoDetail,
     payConfig,
     isShowMore,
     searchData,
+    modalOpen,
+    detailOpen,
+    currentRecordId,
     reloadTable,
     openCreate,
     openEdit,
     openDetail,
     openPayConfig,
+    closeModal,
+    closeDetail,
     confirmDelete
   }
 }

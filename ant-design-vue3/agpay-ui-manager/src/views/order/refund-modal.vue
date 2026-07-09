@@ -15,7 +15,7 @@
         style="margin-bottom: 24px"
       />
 
-      <a-descriptions :column="1" bordered size="small" style="margin-bottom: 24px">
+      <a-descriptions :column="1" style="margin-bottom: 24px">
         <a-descriptions-item :label="t('refund.payOrderId')">
           <a-typography-text copyable>{{ payOrder?.payOrderId }}</a-typography-text>
         </a-descriptions-item>

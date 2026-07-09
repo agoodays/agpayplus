@@ -27,7 +27,7 @@
         row-key="wayCode"
         @btn-load-close="btnLoading = false"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button v-if="true" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
           </div>

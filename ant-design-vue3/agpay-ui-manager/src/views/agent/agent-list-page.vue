@@ -1,7 +1,14 @@
 ﻿<template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :collapsible="true" :default-collapsed="!isShowMore">
+    <a-card :bordered="false">
+      <ag-search
+        v-model="searchData"
+        :collapsible="true"
+        :default-collapsed="!isShowMore"
+        @search="searchFunc"
+        @reset="resetFunc"
+        @collapse-change="handleCollapseChange"
+      >
         <template #default>
           <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="">
@@ -35,7 +42,7 @@
           </a-col>
           <a-col v-if="isShowMore" :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="">
-              <a-select v-model:value="searchData.state" placeholder="代理商状态" default-value="">
+              <a-select v-model:value="searchData.state" placeholder="代理商状态" allow-clear>
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option value="0">禁用</a-select-option>
                 <a-select-option value="1">启用</a-select-option>
@@ -44,7 +51,7 @@
           </a-col>
         </template>
       </ag-search>
-      <!-- 列表渲染 -->
+
       <ag-table
         ref="infoTable"
         :columns="tableColumns"
@@ -52,11 +59,11 @@
         :search-data="searchData"
         row-key="agentNo"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
-            <a-button v-if="$access('ENT_AGENT_INFO_ADD')" type="primary" icon="plus" class="mg-b-30" @click="addFunc"
-              >新增</a-button
-            >
+            <a-button v-if="$access('ENT_AGENT_INFO_ADD')" type="primary" class="mg-b-30" @click="addFunc">
+              <plus-outlined /> 新增
+            </a-button>
           </div>
         </template>
         <template #agentNameSlot="{ record }">
@@ -65,12 +72,10 @@
             ><b>{{ record.agentName }}</b></a
           >
         </template>
-        <!-- 自定义列 -->
         <template #stateSlot="{ record }">
           <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
         </template>
         <template #opSlot="{ record }">
-          <!-- 操作按钮 -->
           <ag-table-actions>
             <a-button v-if="$access('ENT_AGENT_INFO_EDIT')" type="link" @click="editFunc(record.agentNo)"
               >编辑</a-button
@@ -89,12 +94,12 @@
         </template>
       </ag-table>
     </a-card>
-    <!-- 新增/编辑页面弹窗  -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="searchFunc" />
-    <!-- 详情页面弹窗  -->
-    <InfoDetail ref="infoDetail" :callback-func="searchFunc" />
-    <!-- 支付配置弹窗  -->
-    <ag-pay-config ref="payConfig" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'mgrAgent'" />
+
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
+
+    <detail v-model:open="detailOpen" :record-id="currentRecordId" />
+
+    <ag-pay-config ref="payConfig" :info-id="currentRecordId" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'mgrAgent'" />
   </div>
 </template>
 
@@ -103,10 +108,10 @@ import { agentApi } from '@/api/business/agent/agent-api'
 import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import AgPayConfig from '@/components/ag-pay-config'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import InfoAddOrEdit from './add-or-edit.vue'
-import InfoDetail from './detail.vue'
+import { PlusOutlined } from '@ant-design/icons-vue'
+import AddOrEdit from './add-or-edit.vue'
+import Detail from './detail.vue'
 
-// 表格列配置
 const tableColumns = [
   {
     key: 'agentName',
@@ -131,16 +136,17 @@ const tableColumns = [
 
 const {
   infoTable,
-  infoAddOrEdit,
-  infoDetail,
   payConfig,
   isShowMore,
   searchData,
+  modalOpen,
+  detailOpen,
+  currentRecordId,
   reloadTable,
   openCreate,
   openEdit,
   openDetail,
-  openPayConfig,
+  closeModal,
   confirmDelete
 } = useCrudTablePage({
   deleteAction: (recordId) => agentApi.delById(recordId),
@@ -149,8 +155,15 @@ const {
   deleteSuccessMessage: '删除成功'
 })
 
-// 领域 API 查询入口：后续可直接挂接缓存、埋点、容错。
-const reqTableDataFunc = (params) => agentApi.queryPage(params)
+const reqTableDataFunc = async (params) => {
+  return await agentApi.queryPage(params)
+}
+
+const searchFunc = () => reloadTable()
+
+const resetFunc = () => reloadTable()
+
+const handleCollapseChange = (collapsed) => isShowMore.value = !collapsed
 
 const addFunc = () => openCreate()
 
@@ -158,11 +171,17 @@ const editFunc = (recordId) => openEdit(recordId)
 
 const detailFunc = (recordId) => openDetail(recordId)
 
-const payConfigFunc = (recordId) => openPayConfig(recordId)
-
-const searchFunc = () => reloadTable()
+const payConfigFunc = (recordId) => {
+  currentRecordId.value = recordId
+  payConfig.value?.show(recordId)
+}
 
 const delFunc = (recordId) => confirmDelete(recordId)
+
+const handleModalSuccess = () => {
+  closeModal()
+  reloadTable()
+}
 </script>
 
 <style scoped></style>

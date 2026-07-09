@@ -63,14 +63,14 @@ export const defaultLayoutConfig = {
 export const asyncRouteDefine = {
   CurrentUserInfo: { defaultPath: '/current/userinfo', component: () => import('@/views/current/user-info-page.vue') }, // 用户设置
   MainPage: { defaultPath: '/main', component: () => import('@/views/main/main-page.vue') },
-  SysUserTeamPage: { defaultPath: '/teams', component: () => import('@/views/sys-user-team/team-list.vue') },
-  RolePage: { defaultPath: '/roles', component: () => import('@/views/role/role-page.vue') },
+  SysUserTeamPage: { defaultPath: '/teams', component: () => import('@/views/sys-user-team/team-list-page.vue') },
+  RolePage: { defaultPath: '/roles', component: () => import('@/views/role/role-list-page.vue') },
   EntPage: { defaultPath: '/ents', component: () => import('@/views/ent/ent-page.vue') },
   PayWayPage: { defaultPath: '/payways', component: () => import('@/views/pay-config/pay-config-page.vue') },
   QrCodePage: { defaultPath: '/qrc', component: () => import('@/views/qr-code/list.vue') },
   QrCodeShellPage: { defaultPath: '/shell', component: () => import('@/views/qr-code/shell/list.vue') },
-  IsvListPage: { defaultPath: '/isv', component: () => import('@/views/isv/isv-list.vue') }, // 服务商列表
-  AgentListPage: { defaultPath: '/agent', component: () => import('@/views/agent/agent-list.vue') }, // 代理商列表
+  IsvListPage: { defaultPath: '/isv', component: () => import('@/views/isv/isv-list-page.vue') }, // 服务商列表
+  AgentListPage: { defaultPath: '/agent', component: () => import('@/views/agent/agent-list-page.vue') }, // 代理商列表
   AccountBillPage: { defaultPath: '/accountBill', component: () => import('@/views/account-bill/account-bill-page.vue') }, // 代理商列表
   MchListPage: { defaultPath: '/mch', component: () => import('@/views/mch/mch-list-page.vue') }, // 商户列表
   MchAppPage: { defaultPath: '/apps', component: () => import('@/views/mch-app/mch-app-page.vue') }, // 商户应用列表
@@ -87,16 +87,13 @@ export const asyncRouteDefine = {
   DivisionReceiverPage: { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/division-receiver-page.vue') }, // 分账账号管理
   DivisionRecordPage: { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/division-record-page.vue') }, // 分账记录
   SysConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') }, // 系统配置
-  NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/notice/notice-list.vue') }, // 公告管理
+  NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/notice/notice-list-page.vue') }, // 公告管理
 
   // 兼容后端遗留 componentName（Vue2 -> Vue3 迁移期间）
   IfDefinePage: { defaultPath: '/ifdefines', component: () => import('@/views/pay-config/pay-config-page.vue') },
   SysUserPage: { defaultPath: '/users', component: () => import('@/views/sys-user/sys-user-page.vue') },
   MchConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') },
-  MchNotifyListPage: { defaultPath: '/notify', component: () => import('@/views/notice/notice-list.vue') },
-  PlatformProfitPage: {
-    defaultPath: '/platformProfits',
-    component: () => import('@/views/statistic/agent/agent-count-page.vue')
-  },
+  MchNotifyListPage: { defaultPath: '/notify', component: () => import('@/views/notice/notice-list-page.vue') },
+  PlatformProfitPage: { defaultPath: '/platformProfits', component: () => import('@/views/statistic/agent/agent-count-page.vue') },
   SysLogPage: { defaultPath: '/log', component: () => import('@/views/exception/404.vue') }
 }

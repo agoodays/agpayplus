@@ -43,7 +43,6 @@
                   :preview-mode="item.previewMode || 'file'"
                   :action="item.action"
                   :data="item.data"
-                  :headers="item.headers"
                   :accept="item.accept"
                   :file-list="item.fileList"
                   :remove="item.remove"

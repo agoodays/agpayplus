@@ -1,7 +1,7 @@
 ﻿<template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :collapsible="false">
+      <ag-search v-model="searchData" :collapsible="false" @search="searchFunc" @reset="resetFunc">
         <template #default>
           <a-col :xs="24" :sm="12" :md="8" :lg="6">
             <a-form-item label="">
@@ -32,7 +32,7 @@
         :search-data="searchData"
         row-key="isvNo"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button v-if="$access('ENT_ISV_INFO_ADD')" icon="plus" type="primary" class="mg-b-30" @click="addFunc"
               >新增</a-button
@@ -130,6 +130,8 @@ const {
 const reqTableDataFunc = (params) => isvApi.queryPage(params)
 
 const searchFunc = () => reloadTable()
+
+const resetFunc = () => reloadTable()
 
 const delFunc = (recordId) => confirmDelete(recordId)
 

@@ -16,7 +16,7 @@
         row-key="id"
         @btn-load-close="btnLoading = false"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button
               v-if="$access('ENT_DEVICE_QRC_SHELL_ADD')"

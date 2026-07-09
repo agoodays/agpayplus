@@ -26,7 +26,7 @@
         row-key="roleName"
         @btn-load-close="btnLoading = false"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button v-if="$access('ENT_UR_ROLE_ADD')" type="primary" icon="plus" class="mg-b-30" @click="addFunc"
               >新增</a-button

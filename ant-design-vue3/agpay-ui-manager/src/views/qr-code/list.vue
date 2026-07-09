@@ -40,7 +40,7 @@
         row-key="qrcId"
         @btn-load-close="btnLoading = false"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button v-if="$access('ENT_DEVICE_QRC_ADD')" type="primary" icon="plus" class="mg-b-30" @click="addFunc"
               >生成二维码</a-button

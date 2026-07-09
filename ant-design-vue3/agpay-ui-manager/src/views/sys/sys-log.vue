@@ -45,7 +45,7 @@
         :row-selection="rowSelection"
         row-key="sysLogId"
       >
-        <template #topLeftSlot>
+        <template #toolbar-left>
           <div>
             <a-button icon="delete" type="danger" @click="delFunc" class="mg-b-30">删除</a-button>
           </div>
