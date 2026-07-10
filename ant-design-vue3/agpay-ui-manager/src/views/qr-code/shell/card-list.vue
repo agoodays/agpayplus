@@ -1,7 +1,8 @@
-<template>
+﻿<template>
   <div>
-    <a-card style="margin-bottom: 10px">
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc" @reset="resetFunc">
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc" @reset="resetFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -21,7 +22,6 @@
       :add-authority="agpayCard.addAuthority"
       :use-pagination="true"
       :page-size="11"
-      @btn-load-close="btnLoading = false"
       @add-ag-card="addFunc"
     >
       <template #cardContentSlot="{ record }">
@@ -30,7 +30,7 @@
             <!-- 卡片自定义样式 -->
             <div class="ag-card-content-header" :style="{ height: agpayCard.height - 100 + 'px' }">
               <img
-                v-if="$access('ENT_DEVICE_QRC_SHELL_VIEW')"
+                v-if="hasPermission('ENT_DEVICE_QRC_SHELL_VIEW')"
                 :style="{ height: agpayCard.height - 100 + 'px', width: (agpayCard.height - 100) / 1.415 + 'px' }"
                 :src="record.shellImgViewUrl"
                 @click="onPreview(record.shellImgViewUrl)"
@@ -48,10 +48,10 @@
             </div>
             <!-- 卡片底部操作栏 -->
             <div class="ag-card-ops">
-              <a-tooltip v-if="$access('ENT_DEVICE_QRC_SHELL_EDIT')" placement="top" title="编辑">
+              <a-tooltip v-if="hasPermission('ENT_DEVICE_QRC_SHELL_EDIT')" placement="top" title="编辑">
                 <icons.EditOutlined />
               </a-tooltip>
-              <a-tooltip v-if="$access('ENT_DEVICE_QRC_SHELL_DEL')" placement="top" title="删除">
+              <a-tooltip v-if="hasPermission('ENT_DEVICE_QRC_SHELL_DEL')" placement="top" title="删除">
                 <icons.DeleteOutlined />
               </a-tooltip>
             </div>
@@ -60,48 +60,83 @@
       </template>
     </ag-card>
     <!-- 新增页面组件 -->
-    <info-add-or-edit ref="infoAddOrEdit" :callback-func="searchFunc" />
+    <add-or-edit v-model:open="addOrEditOpen" :record-id="editRecordId" @success="searchFunc" />
   </div>
 </template>
 <script setup>
+/**
+ * 二维码模板卡片列表页面组件
+ * 功能：展示二维码模板卡片列表，支持搜索、预览、新增、编辑、删除操作
+ */
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
-const icons = { DeleteOutlined, EditOutlined }
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
 import { AgCard, AgInput, AgSearch } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { reactive, ref } from 'vue'
-import InfoAddOrEdit from './add-or-edit.vue'
+import AddOrEdit from './add-or-edit.vue'
 import { message } from 'ant-design-vue'
 
-// 响应式数据
-const infoCard = ref(null)
-const infoAddOrEdit = ref(null)
-const searchData = reactive({})
-const btnLoading = ref(false)
+const icons = { DeleteOutlined, EditOutlined }
 
-// 卡片配置
+// 权限检查
+const { hasPermission } = usePermission()
+
+/**
+ * 组件引用
+ */
+const infoCard = ref(null)
+const addOrEditOpen = ref(false)
+const editRecordId = ref(null)
+
+/**
+ * 搜索表单数据
+ */
+const searchData = reactive({})
+
+/**
+ * 加载状态
+ */
+const loading = ref(false)
+
+/**
+ * 卡片配置
+ */
 const agpayCard = reactive({
   name: '码牌模版',
   height: 360,
   span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 },
-  addAuthority: window.$access('ENT_DEVICE_QRC_SHELL_ADD')
+  addAuthority: hasPermission('ENT_DEVICE_QRC_SHELL_ADD')
 })
 
-// 请求卡片列表数据
-const reqCardListFunc = (params) => {
-  return qrcShellApi.queryCardList(params)
+/**
+ * 请求卡片列表数据
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 卡片列表数据
+ */
+const reqCardListFunc = async (params) => {
+  return await qrcShellApi.queryCardList(params)
 }
 
-// 刷新card列表
+/**
+ * 刷新卡片列表
+ * @param {boolean} isToFirst - 是否跳转到第一页
+ */
 const refCardList = (isToFirst) => {
-  infoCard.value.refCardList(isToFirst)
+  infoCard.value?.refCardList(isToFirst)
 }
 
+/**
+ * 搜索函数
+ */
 const searchFunc = () => {
-  btnLoading.value = true
+  loading.value = true
   refCardList(true)
 }
 
-// 预览图片
+/**
+ * 预览图片
+ * @param {string} url - 图片URL
+ */
 const onPreview = (url) => {
   window.$viewerApi({
     images: [url],
@@ -111,25 +146,37 @@ const onPreview = (url) => {
   })
 }
 
-// 新增函数
+/**
+ * 新增模板
+ */
 const addFunc = () => {
-  // 业务通用【新增】 函数
-  infoAddOrEdit.value.show()
+  editRecordId.value = null
+  addOrEditOpen.value = true
 }
 
-// 编辑函数
+/**
+ * 编辑模板
+ * @param {string} recordId - 模板ID
+ */
 const editFunc = (recordId) => {
-  // 业务通用【修改】 函数
-  infoAddOrEdit.value.show(recordId)
+  editRecordId.value = recordId
+  addOrEditOpen.value = true
 }
 
-// 删除函数
-const delFunc = (recordId) => {
-  window.$infoBox.confirmDanger('确认删除？', '', () => {
-    qrcShellApi.delById(recordId).then(() => {
+/**
+ * 删除模板
+ * @param {string} recordId - 模板ID
+ */
+const delFunc = async (recordId) => {
+  const { infoBox } = await import('@/utils/info-box')
+  infoBox.confirmDanger('确认删除？', '', async () => {
+    try {
+      await qrcShellApi.delById(recordId)
       message.success('删除成功！')
       refCardList()
-    })
+    } catch (error) {
+      console.error('删除模板失败:', error)
+    }
   })
 }
 </script>

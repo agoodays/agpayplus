@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="form-demo-container">
     <a-card title="表单组件综合示例" class="mb-4">
       <a-alert
@@ -103,7 +103,8 @@
 
 <script setup>
 import { AgDateRangePicker, AgSelect, AgUpload } from '@/components'
-import AgEditor from '@/components/ag-editor'
+
+import { AgEditor } from '@/components'
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { reactive, ref } from 'vue'

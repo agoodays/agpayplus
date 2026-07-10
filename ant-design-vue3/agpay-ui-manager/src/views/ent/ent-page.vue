@@ -1,5 +1,5 @@
-<template>
-  <div class="ent-page">
+﻿<template>
+  <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
       <ag-search
@@ -40,7 +40,7 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
-        :columns="columns"
+        :columns="tableColumns"
         :show-auto-refresh="true"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
@@ -49,7 +49,7 @@
         state-key="ent_table_columns"
       >
         <!-- 状态列自定义渲染 -->
-        <template #state="{ record }">
+        <template #stateSlot="{ record }">
           <ag-state-switch
             :state="record.state"
             :show-switch-type="hasPermission('ENT_UR_ROLE_ENT_EDIT')"
@@ -58,7 +58,7 @@
         </template>
 
         <!-- 操作列 -->
-        <template #actions="{ record }">
+        <template #opSlot="{ record }">
           <ag-table-actions :max-show-num="3">
             <a-button
               v-if="hasPermission('ENT_UR_ROLE_ENT_EDIT')"
@@ -74,10 +74,10 @@
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="refTable" />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" :sys-type="searchData.sysType" @success="handleModalSuccess" />
 
     <!-- 设置权限匹配规则弹窗 -->
-    <SetEntMatchRule ref="setEntMatchRule" :callback-func="refTable" />
+    <set-ent-match-rule v-model:open="setRuleOpen" @success="handleSetRuleSuccess" />
   </div>
 </template>
 
@@ -89,19 +89,22 @@
 
 import { entApi } from '@/api/business/ent/ent-api'
 import { AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
-import { usePermission } from '@/composables/useCommon'
+import { useModal, usePermission } from '@/composables/useCommon'
 import { onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
-import InfoAddOrEdit from './add-or-edit.vue'
+import AddOrEdit from './add-or-edit.vue'
 import SetEntMatchRule from './set-ent-match-rule.vue'
 
-// 权限检查
+/** 权限检查 */
 const { hasPermission } = usePermission()
 
-// 组件引用
+/** 弹窗控制 */
+const { open: modalOpen, showModal: showEditModal, hideModal: closeModal } = useModal()
+const { open: setRuleOpen, showModal: showSetRuleModal, hideModal: closeSetRuleModal } = useModal()
+
+/** 组件引用 */
 const tableRef = ref(null)
-const infoAddOrEdit = ref(null)
-const setEntMatchRule = ref(null)
+const currentRecordId = ref('')
 
 /**
  * 搜索表单数据
@@ -113,74 +116,18 @@ const searchData = reactive({
 /**
  * 表格列配置
  */
-const columns = [
-  {
-    key: 'entId',
-    dataIndex: 'entId',
-    title: '资源权限ID',
-    width: 380
-  },
-  {
-    key: 'entName',
-    dataIndex: 'entName',
-    title: '资源名称',
-    width: 200
-  },
-  {
-    key: 'menuIcon',
-    dataIndex: 'menuIcon',
-    title: '图标'
-  },
-  {
-    key: 'menuUri',
-    dataIndex: 'menuUri',
-    title: '路径'
-  },
-  {
-    key: 'componentName',
-    dataIndex: 'componentName',
-    title: '组件名称'
-  },
-  {
-    key: 'entType',
-    dataIndex: 'entType',
-    title: '类型',
-    width: 60
-  },
-  {
-    key: 'state',
-    title: '状态',
-    align: 'center',
-    width: 100,
-    customRender: 'state'
-  },
-  {
-    key: 'entSort',
-    dataIndex: 'entSort',
-    title: '排序',
-    width: 60
-  },
-  {
-    key: 'updatedAt',
-    dataIndex: 'updatedAt',
-    title: '修改时间',
-    width: 200
-  },
-  {
-    key: 'actions',
-    title: '操作',
-    width: 100,
-    fixed: 'right',
-    align: 'center',
-    customRender: 'actions'
-  }
+const tableColumns = [
+  { key: 'entId', dataIndex: 'entId', title: '资源权限ID', width: 380 },
+  { key: 'entName', dataIndex: 'entName', title: '资源名称', width: 200 },
+  { key: 'menuIcon', dataIndex: 'menuIcon', title: '图标' },
+  { key: 'menuUri', dataIndex: 'menuUri', title: '路径' },
+  { key: 'componentName', dataIndex: 'componentName', title: '组件名称' },
+  { key: 'entType', dataIndex: 'entType', title: '类型', width: 60 },
+  { key: 'state', title: '状态', align: 'center', width: 100, customRender: 'stateSlot' },
+  { key: 'entSort', dataIndex: 'entSort', title: '排序', width: 60 },
+  { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
-
-/**
- * 初始化
- */
-onMounted(() => {
-})
 
 /**
  * 请求表格数据函数
@@ -198,7 +145,7 @@ const reqTableDataFunc = async (params) => {
 /**
  * 刷新表格
  */
-const refTable = () => {
+const reloadTable = () => {
   tableRef.value?.reload()
 }
 
@@ -210,14 +157,14 @@ const refTable = () => {
 const updateState = async (recordId, state) => {
   await entApi.updateStateById(recordId, state, searchData.sysType)
   message.success('更新成功')
-  refTable()
+  reloadTable()
 }
 
 /**
  * 设置权限匹配规则
  */
 const setFunc = () => {
-  setEntMatchRule.value?.show()
+  showSetRuleModal()
 }
 
 /**
@@ -225,14 +172,15 @@ const setFunc = () => {
  * @param {string} recordId - 资源权限ID
  */
 const editFunc = (recordId) => {
-  infoAddOrEdit.value?.show(recordId, searchData.sysType)
+  currentRecordId.value = recordId
+  showEditModal()
 }
 
 /**
  * 搜索回调函数
  */
 const searchFunc = () => {
-  tableRef.value?.reload()
+  reloadTable()
 }
 
 /**
@@ -240,15 +188,31 @@ const searchFunc = () => {
  */
 const onReset = () => {
   searchData.sysType = 'MGR'
-  tableRef.value?.reload()
+  reloadTable()
 }
+
+/**
+ * 编辑成功回调
+ */
+const handleModalSuccess = () => {
+  closeModal()
+  reloadTable()
+}
+
+/**
+ * 设置权限匹配规则成功回调
+ */
+const handleSetRuleSuccess = () => {
+  closeSetRuleModal()
+  reloadTable()
+}
+
+/**
+ * 初始化
+ */
+onMounted(() => {
+})
 </script>
 
 <style lang="less" scoped>
-.ent-page {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-}
 </style>

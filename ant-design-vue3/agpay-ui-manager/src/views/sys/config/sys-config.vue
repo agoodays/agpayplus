@@ -18,13 +18,10 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display: flex; justify-content: center">
-                  <a-button
-                    type="primary"
-                    icon="check-circle"
-                    :loading="btnLoading"
-                    @click="confirm($event, '域名地址')"
-                    >确认更新</a-button
-                  >
+                  <a-button type="primary" :loading="loading" @click="confirm($event, '域名地址')">
+                    <template #icon><CheckCircleOutlined /></template>
+                    确认更新
+                  </a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -55,13 +52,10 @@
                 <a-row>
                   <a-col :span="24">
                     <a-form-item style="display: flex; justify-content: center">
-                      <a-button
-                        type="primary"
-                        icon="check-circle"
-                        :loading="btnLoading"
-                        @click="confirm($event, '商户通条约')"
-                        >确认更新</a-button
-                      >
+                      <a-button type="primary" :loading="loading" @click="confirm($event, '商户通条约')">
+                        <template #icon><CheckCircleOutlined /></template>
+                        确认更新
+                      </a-button>
                     </a-form-item>
                   </a-col>
                 </a-row>
@@ -88,13 +82,10 @@
                 <a-row>
                   <a-col :span="24">
                     <a-form-item style="display: flex; justify-content: center">
-                      <a-button
-                        type="primary"
-                        icon="check-circle"
-                        :loading="btnLoading"
-                        @click="confirm($event, '展业宝条约')"
-                        >确认更新</a-button
-                      >
+                      <a-button type="primary" :loading="loading" @click="confirm($event, '展业宝条约')">
+                        <template #icon><CheckCircleOutlined /></template>
+                        确认更新
+                      </a-button>
                     </a-form-item>
                   </a-col>
                 </a-row>
@@ -275,13 +266,10 @@
                   <a-row justify="space-between" type="flex">
                     <a-col :span="21" :offset="1">
                       <a-form-item style="display: flex; justify-content: center">
-                        <a-button
-                          type="primary"
-                          icon="check-circle"
-                          :loading="btnLoading"
-                          @click="confirm($event, '短信配置')"
-                          >确认更新</a-button
-                        >
+                        <a-button type="primary" :loading="loading" @click="confirm($event, '短信配置')">
+                        <template #icon><CheckCircleOutlined /></template>
+                        确认更新
+                      </a-button>
                       </a-form-item>
                     </a-col>
                   </a-row>
@@ -382,13 +370,10 @@
                   <a-row justify="space-between" type="flex" style="padding-top: 20px">
                     <a-col :span="20" :offset="1">
                       <a-form-item style="display: flex; justify-content: center">
-                        <a-button
-                          type="primary"
-                          icon="check-circle"
-                          :loading="btnLoading"
-                          @click="confirm($event, 'OCR配置')"
-                          >确认更新</a-button
-                        >
+                        <a-button type="primary" :loading="loading" @click="confirm($event, 'OCR配置')">
+                        <template #icon><CheckCircleOutlined /></template>
+                        确认更新
+                      </a-button>
                       </a-form-item>
                     </a-col>
                   </a-row>
@@ -503,13 +488,10 @@
                   <a-row justify="space-between" type="flex">
                     <a-col :span="24">
                       <a-form-item style="display: flex; justify-content: center">
-                        <a-button
-                          type="primary"
-                          icon="check-circle"
-                          :loading="btnLoading"
-                          @click="confirm($event, '存储配置')"
-                          >确认更新</a-button
-                        >
+                        <a-button type="primary" :loading="loading" @click="confirm($event, '存储配置')">
+                        <template #icon><CheckCircleOutlined /></template>
+                        确认更新
+                      </a-button>
                       </a-form-item>
                     </a-col>
                   </a-row>
@@ -534,13 +516,10 @@
                   <a-row>
                     <a-col :span="8">
                       <a-form-item style="display: flex; justify-content: center">
-                        <a-button
-                          type="primary"
-                          icon="check-circle"
-                          :loading="btnLoading"
-                          @click="confirm($event, '地图配置')"
-                          >确认更新</a-button
-                        >
+                        <a-button type="primary" :loading="loading" @click="confirm($event, '地图配置')">
+                        <template #icon><CheckCircleOutlined /></template>
+                        确认更新
+                      </a-button>
                       </a-form-item>
                     </a-col>
                   </a-row>
@@ -580,13 +559,10 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display: flex; justify-content: center">
-                  <a-button
-                    type="primary"
-                    icon="check-circle"
-                    :loading="btnLoading"
-                    @click="confirm($event, '安全配置')"
-                    >确认更新</a-button
-                  >
+                  <a-button type="primary" :loading="loading" @click="confirm($event, '安全配置')">
+                    <template #icon><CheckCircleOutlined /></template>
+                    确认更新
+                  </a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -601,14 +577,14 @@
   </div>
 </template>
 <script setup>
-import { FireOutlined } from '@ant-design/icons-vue'
-const icons = { FireOutlined }
+import { CheckCircleOutlined, FireOutlined } from '@ant-design/icons-vue'
+const icons = { CheckCircleOutlined, FireOutlined }
 import { sysConfigApi } from '@/api/business/sys/sys-config-api'
-import agEditor from '@/components/ag-editor'
+import { AgEditor } from '@/components'
 import { message } from 'ant-design-vue'
 import { onMounted, reactive, ref } from 'vue'
 
-const btnLoading = ref(false)
+const loading = ref(false)
 const configData = ref([])
 const groupKey = ref('applicationConfig')
 
@@ -758,7 +734,7 @@ const passwordRegexpChange = () => {
 
 const confirm = (_e, title, content) => {
   window.$infoBox.confirmPrimary(`确认修改${title}吗？`, content, async () => {
-    btnLoading.value = true
+    loading.value = true
     try {
       const jsonObject = {}
       for (const item of configData.value) {
@@ -810,7 +786,7 @@ const confirm = (_e, title, content) => {
       await sysConfigApi.updateGroupConfigs(groupKey.value, jsonObject)
       message.success('修改成功')
     } finally {
-      btnLoading.value = false
+      loading.value = false
     }
   })
 }

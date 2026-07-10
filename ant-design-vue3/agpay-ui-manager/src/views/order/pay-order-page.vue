@@ -1,5 +1,5 @@
-<template>
-  <div class="pay-order-page">
+﻿<template>
+  <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
       <ag-search
@@ -99,60 +99,9 @@
         </template>
       </ag-search>
 
-      <!-- 统计信息 -->
-      <a-card v-if="statistics" class="statistics-card" :bordered="false">
-        <a-row :gutter="16">
-          <a-col :span="6">
-            <a-statistic title="成交订单" :value="statistics.payAmount" :precision="2" suffix="元">
-              <template #prefix>
-                <transaction-outlined style="color: var(--primary-color)" />
-              </template>
-            </a-statistic>
-            <div class="statistic-detail">{{ statistics.payCount }} 笔</div>
-          </a-col>
-
-          <a-col :span="6">
-            <a-statistic title="手续费金额" :value="statistics.mchFeeAmount" :precision="2" suffix="元">
-              <template #prefix>
-                <dollar-outlined style="color: var(--warning-color)" />
-              </template>
-            </a-statistic>
-          </a-col>
-
-          <a-col :span="6">
-            <a-statistic
-              title="实际收款"
-              :value="statistics.payAmount - statistics.mchFeeAmount"
-              :precision="2"
-              suffix="元"
-            >
-              <template #prefix>
-                <wallet-outlined style="color: var(--success-color)" />
-              </template>
-            </a-statistic>
-          </a-col>
-
-          <a-col :span="6">
-            <a-statistic
-              title="退款订单"
-              :value="statistics.refundAmount"
-              :precision="2"
-              suffix="元"
-              :value-style="{ color: 'var(--error-color)' }"
-            >
-              <template #prefix>
-                <undo-outlined />
-              </template>
-            </a-statistic>
-            <div class="statistic-detail">{{ statistics.refundCount }} 笔</div>
-          </a-col>
-        </a-row>
-      </a-card>
-
-      <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
-        :columns="columns"
+        :columns="tableColumns"
         :show-auto-refresh="true"
         :on-load="loadData"
         :on-load-statistics="loadStatistics"
@@ -162,54 +111,242 @@
         :enable-statistics="true"
         state-key="pay_order_table_columns"
       >
-        <!-- 支付订单号 -->
-        <template #payOrderId="{ record }">
-          <a-typography-text copyable>{{ record.payOrderId }}</a-typography-text>
+        <!-- 统计信息 -->
+        <template #statistics="{ data: statistics }">
+          <div class="data-statistics">
+            <div class="statistics-list">
+              <div class="item item-primary">
+                <div class="icon-wrapper">
+                  <WalletOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">
+                    实际收款金额
+                    <a-tooltip title="扣除手续费后的实际到账金额">
+                      <InfoCircleOutlined class="info-icon" />
+                    </a-tooltip>
+                  </div>
+                  <div class="amount">
+                    <span class="amount-num">{{ ((statistics?.payAmount || 0) - (statistics?.mchFeeAmount || 0)).toFixed(2) }}</span>
+                    <span class="amount-unit">元</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item item-transaction">
+                <div class="icon-wrapper">
+                  <TransactionOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">成交订单</div>
+                  <div class="amount">
+                    <span class="amount-num">{{ (statistics?.payAmount || 0).toFixed(2) }}</span>
+                    <span class="amount-unit">元</span>
+                  </div>
+                  <div class="detail">
+                    <span>{{ statistics?.payCount || 0 }}笔</span>
+                    <span class="detail-text" @click="detailVisible = true">明细</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item item-warning">
+                <div class="icon-wrapper">
+                  <DollarOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">手续费金额</div>
+                  <div class="amount">
+                    <span class="amount-num">{{ (statistics?.mchFeeAmount || 0).toFixed(2) }}</span>
+                    <span class="amount-unit">元</span>
+                  </div>
+                </div>
+              </div>
+              <div class="item item-error">
+                <div class="icon-wrapper">
+                  <UndoOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">退款订单</div>
+                  <div class="amount">
+                    <span class="amount-num">{{ (statistics?.refundAmount || 0).toFixed(2) }}</span>
+                    <span class="amount-unit">元</span>
+                  </div>
+                  <div class="detail">
+                    <span>{{ statistics?.refundCount || 0 }}笔</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a-modal :open="detailVisible" :footer="null" @cancel="detailVisible = false" width="560px">
+            <div class="modal-title">成交订单详细</div>
+            <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
+            <div class="detail-statistics">
+              <div class="detail-item">
+                <div class="icon-wrapper">
+                  <WalletOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">创建订单</div>
+                  <a-tooltip placement="top">
+                    <template #title>
+                      <span>{{ (statistics?.allPayAmount || 0).toFixed(2) }}元</span>
+                    </template>
+                    <div class="amount">
+                      <span class="amount-num">{{ (statistics?.allPayAmount || 0).toFixed(2) }}</span>
+                      <span class="amount-unit">元</span>
+                    </div>
+                  </a-tooltip>
+                  <div class="detail">
+                    <span>{{ statistics?.allPayCount || 0 }}笔</span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-item">
+                <div class="icon-wrapper">
+                  <TransactionOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">成交订单</div>
+                  <a-tooltip placement="top">
+                    <template #title>
+                      <span>{{ (statistics?.payAmount || 0).toFixed(2) }}元</span>
+                    </template>
+                    <div class="amount">
+                      <span class="amount-num">{{ (statistics?.payAmount || 0).toFixed(2) }}</span>
+                      <span class="amount-unit">元</span>
+                    </div>
+                  </a-tooltip>
+                  <div class="detail">
+                    <span>{{ statistics?.payCount || 0 }}笔</span>
+                  </div>
+                </div>
+              </div>
+              <div class="detail-item">
+                <div class="icon-wrapper">
+                  <UndoOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">未付款订单</div>
+                  <a-tooltip placement="top">
+                    <template #title>
+                      <span>{{ (statistics?.failPayAmount || 0).toFixed(2) }}元</span>
+                    </template>
+                    <div class="amount">
+                      <span class="amount-num">{{ (statistics?.failPayAmount || 0).toFixed(2) }}</span>
+                      <span class="amount-unit">元</span>
+                    </div>
+                  </a-tooltip>
+                  <div class="detail">
+                    <span>{{ statistics?.failPayCount || 0 }}笔</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="close">
+              <a-button type="primary" @click="detailVisible = false">知道了</a-button>
+            </div>
+          </a-modal>
         </template>
 
-        <!-- 商户订单号 -->
-        <template #mchOrderNo="{ record }">
-          <a-typography-text copyable>{{ record.mchOrderNo }}</a-typography-text>
+        <template #orderSlot="{ record }">
+          <div class="order-no-container">
+            <div class="order-no-item">
+              <a-tag color="blue" class="order-tag">支付</a-tag>
+              <a-tooltip placement="bottom">
+                <template #title>{{ record.payOrderId }}</template>
+                <span class="order-no-text">{{ record.payOrderId }}</span>
+              </a-tooltip>
+              <a-tooltip placement="bottom" title="复制">
+                <a-button type="link" size="small" class="copy-btn" @click="copyOrderNo(record.payOrderId)">
+                  <template #icon><CopyOutlined /></template>
+                </a-button>
+              </a-tooltip>
+            </div>
+            <div class="order-no-item" v-if="record.mchOrderNo">
+              <a-tag color="green" class="order-tag">商户</a-tag>
+              <a-tooltip placement="bottom">
+                <template #title>{{ record.mchOrderNo }}</template>
+                <span class="order-no-text">{{ changeStr2ellipsis(record.mchOrderNo, record.payOrderId?.length) }}</span>
+              </a-tooltip>
+              <a-tooltip placement="bottom" title="复制">
+                <a-button type="link" size="small" class="copy-btn" @click="copyOrderNo(record.mchOrderNo)">
+                  <template #icon><CopyOutlined /></template>
+                </a-button>
+              </a-tooltip>
+            </div>
+            <div class="order-no-item" v-if="record.channelOrderNo">
+              <a-tag color="orange" class="order-tag">渠道</a-tag>
+              <a-tooltip placement="bottom">
+                <template #title>{{ record.channelOrderNo }}</template>
+                <span class="order-no-text">{{ changeStr2ellipsis(record.channelOrderNo, record.payOrderId?.length) }}</span>
+              </a-tooltip>
+              <a-tooltip placement="bottom" title="复制">
+                <a-button type="link" size="small" class="copy-btn" @click="copyOrderNo(record.channelOrderNo)">
+                  <template #icon><CopyOutlined /></template>
+                </a-button>
+              </a-tooltip>
+            </div>
+          </div>
         </template>
 
-        <!-- 支付金额 -->
-        <template #amount="{ record }">
-          <span style="color: var(--primary-color); font-weight: 500"> ¥{{ (record.amount / 100).toFixed(2) }} </span>
+        <template #amountSlot="{ record }">
+          <b>￥{{ (record.amount / 100).toFixed(2) }}</b>
         </template>
 
-        <!-- 手续费 -->
-        <template #mchFeeAmount="{ record }">
-          <span>¥{{ (record.mchFeeAmount / 100).toFixed(2) }}</span>
+        <template #refundAmountSlot="{ record }">
+          ￥{{ (record.refundAmount / 100).toFixed(2) }}
         </template>
 
-        <!-- 支付状态 -->
-        <template #state="{ record }">
+        <template #mchFeeAmountSlot="{ record }">
+          ￥{{ (record.mchFeeAmount / 100).toFixed(2) }}
+        </template>
+
+        <template #mchOrderFeeAmountSlot="{ record }">
+          ￥{{ (record.mchOrderFeeAmount / 100).toFixed(2) }}
+        </template>
+
+        <template #ifCodeSlot="{ record }">
+          <a-tooltip placement="bottom">
+            <template #title>
+              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }"/>
+              {{ record.ifName }}[{{ record.ifCode }}]
+            </template>
+            <span v-if="record.ifCode">
+              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }"/>
+              {{ record.ifName }}[{{ record.ifCode }}]
+            </span>
+          </a-tooltip>
+        </template>
+
+        <template #stateSlot="{ record }">
           <a-tag :color="getStateColor(record.state)">
             {{ getStateText(record.state) }}
           </a-tag>
         </template>
 
-        <!-- 回调状态 -->
-        <template #notifyState="{ record }">
-          <a-badge :status="record.notifyState === 1 ? 'success' : 'default'" :text="record.notifyState === 1 ? '已发送' : '未发送'" />
+        <template #notifyStateSlot="{ record }">
+          <a-badge :status="record.notifyState === 1 ? 'processing' : 'error'" :text="record.notifyState === 1 ? '已发送' : '未发送'" />
         </template>
 
-        <!-- 操作 -->
-        <template #actions="{ record }">
-          <a-space>
-            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" size="small" @click="handleDetail(record)">
-              详情
-            </a-button>
+        <template #divisionStateSlot="{ record }">
+          <span v-if="record.divisionState == 0"> - </span>
+          <a-tag color="orange" v-else-if="record.divisionState == 1">待分账</a-tag>
+          <a-tag color="red" v-else-if="record.divisionState == 2">分账处理中</a-tag>
+          <a-tag color="green" v-else-if="record.divisionState == 3">任务已结束</a-tag>
+          <span v-else>未知</span>
+        </template>
 
+        <template #opSlot="{ record }">
+          <ag-table-actions>
+            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" @click="handleDetail(record)">详情</a-button>
             <a-button
-              v-if="hasPermission('ENT_PAY_ORDER_REFUND') && record.state === 2"
+              v-if="hasPermission('ENT_PAY_ORDER_REFUND') && record.state === 2 && record.refundState !== 2"
               type="link"
-              size="small"
+              style="color: red"
               @click="handleRefund(record)"
-            >
-              退款
-            </a-button>
-          </a-space>
+            >退款</a-button>
+          </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
@@ -229,10 +366,12 @@
  */
 
 import { orderApi } from '@/api/business/order/order-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable } from '@/components'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
 import {
+    CopyOutlined,
     DollarOutlined,
+    InfoCircleOutlined,
     TransactionOutlined,
     UndoOutlined,
     WalletOutlined
@@ -260,6 +399,7 @@ const tableRef = ref(null)
 const currentPayOrderId = ref('')
 const currentPayOrder = ref(null)
 const statistics = ref(null)
+const detailVisible = ref(false)
 
 /**
  * 搜索表单数据
@@ -443,129 +583,342 @@ const handleExport = () => {
 }
 
 /**
+ * 字符串截断处理
+ * @param {string} str - 原始字符串
+ * @param {number} len - 最大长度
+ * @returns {string} 截断后的字符串
+ */
+const changeStr2ellipsis = (str, len) => {
+  if (!str) return ''
+  if (!len || str.length <= len) return str
+  return str.substring(0, len) + '...'
+}
+
+/**
+ * 复制订单号到剪贴板
+ * @param {string} orderNo - 订单号
+ */
+const copyOrderNo = async (orderNo) => {
+  if (!orderNo) return
+  try {
+    await navigator.clipboard.writeText(orderNo)
+    message.success('复制成功')
+  } catch (err) {
+    const textArea = document.createElement('textarea')
+    textArea.value = orderNo
+    document.body.appendChild(textArea)
+    textArea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textArea)
+    message.success('复制成功')
+  }
+}
+
+/**
  * 表格列配置
  */
-const columns = [
-  {
-    title: '支付订单号',
-    key: 'payOrderId',
-    dataIndex: 'payOrderId',
-    width: 180,
-    fixed: 'left',
-    customRender: 'payOrderId'
-  },
-  {
-    title: '商户订单号',
-    key: 'mchOrderNo',
-    dataIndex: 'mchOrderNo',
-    width: 180,
-    customRender: 'mchOrderNo'
-  },
-  {
-    title: '商户名称',
-    key: 'mchName',
-    dataIndex: 'mchName',
-    width: 150,
-    ellipsis: true
-  },
-  {
-    title: '支付金额',
-    key: 'amount',
-    dataIndex: 'amount',
-    width: 120,
-    align: 'right',
-    customRender: 'amount'
-  },
-  {
-    title: '手续费',
-    key: 'mchFeeAmount',
-    dataIndex: 'mchFeeAmount',
-    width: 100,
-    align: 'right',
-    customRender: 'mchFeeAmount'
-  },
-  {
-    title: '支付方式',
-    key: 'wayName',
-    dataIndex: 'wayName',
-    width: 120
-  },
-  {
-    title: '支付状态',
-    key: 'state',
-    dataIndex: 'state',
-    width: 100,
-    customRender: 'state'
-  },
-  {
-    title: '回调状态',
-    key: 'notifyState',
-    dataIndex: 'notifyState',
-    width: 100,
-    customRender: 'notifyState'
-  },
-  {
-    title: '创建时间',
-    key: 'createdAt',
-    dataIndex: 'createdAt',
-    width: 180
-  },
-  {
-    title: '操作',
-    key: 'actions',
-    width: 150,
-    fixed: 'right',
-    customRender: 'actions'
-  }
+const tableColumns = [
+  { key: 'orderNo', title: '订单号', width: 235, fixed: 'left', customRender: 'orderSlot' },
+  { key: 'amount', dataIndex: 'amount', title: '支付金额', width: 108, ellipsis: true, customRender: 'amountSlot' },
+  { key: 'refundAmount', dataIndex: 'refundAmount', title: '退款金额', width: 108, customRender: 'refundAmountSlot' },
+  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '实际手续费', width: 110, align: 'right', customRender: 'mchFeeAmountSlot' },
+  { key: 'mchOrderFeeAmount', dataIndex: 'mchOrderFeeAmount', title: '收单手续费', width: 110, align: 'right', customRender: 'mchOrderFeeAmountSlot' },
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140, ellipsis: true },
+  { key: 'ifCode', title: '支付接口', width: 180, ellipsis: true, customRender: 'ifCodeSlot' },
+  { key: 'wayName', dataIndex: 'wayName', title: '支付方式', width: 120 },
+  { key: 'state', dataIndex: 'state', title: '支付状态', width: 100, customRender: 'stateSlot' },
+  { key: 'notifyState', dataIndex: 'notifyState', title: '回调状态', width: 100, customRender: 'notifyStateSlot' },
+  { key: 'divisionState', dataIndex: 'divisionState', title: '分账状态', width: 100, customRender: 'divisionStateSlot' },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
+  { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 </script>
 
 <style lang="less" scoped>
-.pay-order-page {
-  .search-form {
-    margin-bottom: 16px;
-  }
+.data-statistics {
+  padding: 24px 0;
+  border-radius: 8px;
+  transform: translateY(-10px);
+  background: var(--layout-surface);
+  border: 1px solid var(--border-color);
+}
 
-  .statistics-card {
-    margin-bottom: 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.statistics-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
 
-    :deep(.ant-card-body) {
-      padding: 24px;
-    }
+.statistics-list .item {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
 
-    :deep(.ant-statistic-title) {
-      color: rgba(255, 255, 255, 0.85);
-      font-size: 14px;
-    }
-
-    :deep(.ant-statistic-content) {
-      color: #fff;
-      font-size: 24px;
-      font-weight: 600;
-    }
-
-    .statistic-detail {
-      margin-top: 8px;
-      color: rgba(255, 255, 255, 0.65);
-      font-size: 12px;
-    }
-  }
-
-  .table-operations {
-    margin-bottom: 16px;
-  }
-
-  :deep(.ant-typography) {
+  .icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    line-height: 1;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
 
-    .ant-typography-copy {
-      display: inline-flex;
+  .content {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      color: var(--text-color-weak);
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: flex;
       align-items: center;
-      margin-left: 4px;
+
+      .info-icon {
+        font-size: 12px;
+        margin-left: 4px;
+        cursor: help;
+      }
     }
+
+    .amount {
+      display: flex;
+      align-items: baseline;
+
+      .amount-num {
+        font-weight: 600;
+        font-size: 22px;
+        margin-right: 4px;
+      }
+
+      .amount-unit {
+        font-size: 12px;
+        color: var(--text-color-muted);
+      }
+    }
+
+    .detail {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-color-muted);
+
+      .detail-text {
+        color: var(--primary-color);
+        padding-left: 8px;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  &.item-primary {
+    .icon-wrapper {
+      background: rgba(26, 102, 255, 0.1);
+      color: rgb(26, 102, 255);
+    }
+    .amount .amount-num {
+      color: rgb(26, 102, 255);
+    }
+  }
+
+  &.item-transaction {
+    .icon-wrapper {
+      background: rgba(26, 189, 159, 0.1);
+      color: rgb(26, 189, 159);
+    }
+    .amount .amount-num {
+      color: var(--text-color);
+    }
+  }
+
+  &.item-warning {
+    .icon-wrapper {
+      background: rgba(250, 173, 20, 0.1);
+      color: rgb(250, 173, 20);
+    }
+    .amount .amount-num {
+      color: rgb(250, 173, 20);
+    }
+  }
+
+  &.item-error {
+    .icon-wrapper {
+      background: rgba(255, 77, 79, 0.1);
+      color: rgb(255, 77, 79);
+    }
+    .amount .amount-num {
+      color: rgb(255, 77, 79);
+    }
+  }
+}
+
+.statistics-list .line {
+  width: 1px;
+  height: 40px;
+  border-right: 1px solid var(--border-color);
+  margin: auto 0;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-color);
+}
+
+.modal-describe {
+  color: var(--text-color-muted);
+  margin-bottom: 24px;
+}
+
+.detail-statistics {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-statistics .detail-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: var(--layout-surface);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+
+  .icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-right: 16px;
+    flex-shrink: 0;
+    background: rgba(26, 102, 255, 0.1);
+    color: rgb(26, 102, 255);
+  }
+
+  &:nth-child(2) .icon-wrapper {
+    background: rgba(26, 189, 159, 0.1);
+    color: rgb(26, 189, 159);
+  }
+
+  &:nth-child(3) .icon-wrapper {
+    background: rgba(250, 173, 20, 0.1);
+    color: rgb(250, 173, 20);
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    .title {
+      color: var(--text-color-weak);
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .amount {
+      display: flex;
+      align-items: baseline;
+
+      .amount-num {
+        font-weight: 600;
+        font-size: 20px;
+        color: var(--text-color);
+        margin-right: 4px;
+      }
+
+      .amount-unit {
+        font-size: 12px;
+        color: var(--text-color-muted);
+      }
+    }
+
+    .detail {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-color-muted);
+    }
+  }
+}
+
+.close {
+  text-align: center;
+  margin-top: 24px;
+}
+
+.order-no-container {
+  .order-no-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+    font-size: 13px;
+
+    .order-tag {
+      margin-right: 4px;
+      font-size: 10px;
+      padding: 0 4px;
+      line-height: 16px;
+    }
+
+    .order-no-text {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--text-color);
+    }
+
+    .copy-btn {
+      margin-left: 4px;
+      padding: 0;
+      font-size: 12px;
+      color: var(--text-color-muted);
+
+      &:hover {
+        color: var(--primary-color);
+      }
+    }
+  }
+}
+
+:root[data-theme='dark'] {
+  :deep(.data-statistics) {
+    background: var(--layout-surface);
+    border-color: var(--border-color);
+  }
+
+  :deep(.statistics-list .item .title) {
+    color: var(--text-color-weak);
+  }
+
+  :deep(.statistics-list .item .detail-text) {
+    color: var(--primary-color);
+  }
+
+  :deep(.statistics-list .line) {
+    border-color: var(--border-color);
+  }
+
+  :deep(.modal-title) {
+    color: var(--text-color);
+  }
+
+  :deep(.modal-describe) {
+    color: var(--text-color-muted);
+  }
+
+  :deep(.order-list .icon-style) {
+    border-color: var(--border-color);
   }
 }
 </style>

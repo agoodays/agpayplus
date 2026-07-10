@@ -1,100 +1,96 @@
 <template>
-  <div class="mch-app-page">
+  <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <div style="margin-bottom: 16px">
-        <ag-search
-          v-model="searchData"
-          :collapsible="false"
-          :default-collapsed="false"
-          @search="searchFunc"
-          @reset="onReset"
-        >
-          <template #base="{ colSpan }">
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-select
-                  v-model="searchData.mchNo"
-                  label="商户号"
-                  placeholder="请选择商户"
-                  allow-clear
-                  :options="mchOptions"
-                  :show-search="true"
-                  :filter-option="false"
-                  @search="handleSearchMch"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-input
-                  v-model="searchData.appId"
-                  label="应用AppId"
-                  placeholder="请输入应用AppId"
-                  :allow-clear="true"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-input
-                  v-model="searchData.appName"
-                  label="应用名称"
-                  placeholder="请输入应用名称"
-                  :allow-clear="true"
-                />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-select
-                  v-model="searchData.state"
-                  label="状态"
-                  placeholder="请选择状态"
-                  allow-clear
-                  :options="[
-                    { value: '', label: '全部' },
-                    { value: '1', label: '启用' },
-                    { value: '0', label: '禁用' }
-                  ]"
-                />
-              </a-form-item>
-            </a-col>
-          </template>
-        </ag-search>
-      </div>
-
-      <!-- 操作按钮 -->
-      <div class="table-operations" style="margin-bottom: 16px">
-        <a-space>
-          <a-button v-if="hasPermission('ENT_MCH_APP_ADD')" type="primary" @click="handleAdd">
-            <plus-outlined />
-            新建
-          </a-button>
-        </a-space>
-      </div>
+      <ag-search
+        v-model="searchData"
+        :collapsible="false"
+        :default-collapsed="false"
+        @search="searchFunc"
+        @reset="onReset"
+      >
+        <template #base="{ colSpan }">
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model="searchData.mchNo"
+                label="商户号"
+                placeholder="请选择商户"
+                allow-clear
+                :options="mchOptions"
+                :show-search="true"
+                :filter-option="false"
+                @search="handleSearchMch"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input
+                v-model="searchData.appId"
+                label="应用AppId"
+                placeholder="请输入应用AppId"
+                :allow-clear="true"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-input
+                v-model="searchData.appName"
+                label="应用名称"
+                placeholder="请输入应用名称"
+                :allow-clear="true"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model="searchData.state"
+                label="状态"
+                placeholder="请选择状态"
+                allow-clear
+                :options="[
+                  { value: '', label: '全部' },
+                  { value: '1', label: '启用' },
+                  { value: '0', label: '禁用' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+        </template>
+      </ag-search>
 
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
-        :columns="columns"
+        :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
         state-key="mch_app_table_columns"
       >
-        <template #appId="{ record }">
+        <!-- 操作按钮 -->
+        <template #toolbar-left>
+          <a-button v-if="hasPermission('ENT_MCH_APP_ADD')" type="primary" @click="handleAdd">
+            <template #icon><PlusOutlined /></template>
+            新建
+          </a-button>
+        </template>
+        
+        <template #appIdSlot="{ record }">
           <b>{{ record.appId }}</b>
         </template>
-        <template #state="{ record }">
+        <template #stateSlot="{ record }">
           <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
         </template>
-        <template #defaultFlag="{ record }">
+        <template #defaultFlagSlot="{ record }">
           <a-badge
             :status="record.defaultFlag === 0 ? 'error' : 'processing'"
             :text="record.defaultFlag === 0 ? '否' : '是'"
           />
         </template>
-        <template #actions="{ record }">
+        <template #opSlot="{ record }">
           <ag-table-actions :max-show-num="4">
             <a-button v-if="hasPermission('ENT_MCH_APP_EDIT')" type="link" size="small" @click="handleEdit(record)">
               修改
@@ -115,20 +111,22 @@
             >
               支付配置
             </a-button>
-            <a-popconfirm
+            <a-button
               v-if="hasPermission('ENT_MCH_APP_DEL')"
-              title="确认删除该应用吗？"
-              @confirm="() => handleDelete(record)"
+              type="link"
+              size="small"
+              danger
+              @click="delFunc(record.appId)"
             >
-              <a-button type="link" size="small" danger> 删除 </a-button>
-            </a-popconfirm>
+              删除
+            </a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <add-or-edit-modal
+    <add-or-edit
       v-model:open="modalOpen"
       :record-id="currentRecordId"
       :mch-no="currentMchNo"
@@ -138,37 +136,72 @@
 </template>
 
 <script setup>
+/**
+ * 商户应用列表页面组件
+ * 功能：展示商户应用列表，支持搜索、新增、编辑、删除、配置等操作
+ */
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { useModal, usePermission } from '@/composables/useCommon'
+import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { message, Modal } from 'ant-design-vue'
-import { onMounted, reactive, ref, computed } from 'vue'
+import { message } from 'ant-design-vue'
+import { onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
-import AddOrEditModal from './add-or-edit.vue'
+import AddOrEdit from './add-or-edit.vue'
 
 const route = useRoute()
 const { t } = useI18n()
 
-const { open: modalOpen, showModal, hideModal } = useModal()
+/**
+ * 权限检查
+ */
 const { hasPermission } = usePermission()
 
-// State
-const tableRef = ref(null)
+/**
+ * 商户列表
+ */
 const mchList = ref([])
-const currentRecordId = ref('')
+
+/**
+ * 当前商户号
+ */
 const currentMchNo = ref('')
 
-// 搜索表单
-const searchData = reactive({
+/**
+ * 使用 CRUD 表格页面组合式函数
+ */
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  currentRecordId,
+  reloadTable,
+  openCreate,
+  openEdit,
+  closeModal,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: (recordId) => mchAppApi.delById(recordId),
+  deleteConfirmTitle: '确认删除',
+  deleteConfirmContent: '确认删除该应用吗？',
+  deleteSuccessMessage: '删除成功'
+})
+
+/**
+ * 初始化搜索数据
+ */
+Object.assign(searchData, {
   mchNo: '',
   appId: '',
   appName: '',
   state: ''
 })
 
-// 商户选项（用于下拉选择）
+/**
+ * 商户选项（用于下拉选择）
+ */
 const mchOptions = computed(() => {
   return mchList.value.map(item => ({
     value: item.mchNo,
@@ -176,56 +209,17 @@ const mchOptions = computed(() => {
   }))
 })
 
-// 表格列定义
-const columns = [
-  {
-    title: '应用AppId',
-    dataIndex: 'appId',
-    key: 'appId',
-    width: 320,
-    fixed: 'left',
-    customRender: 'appId'
-  },
-  {
-    title: '应用名称',
-    dataIndex: 'appName',
-    key: 'appName',
-    width: 200
-  },
-  {
-    title: '商户号',
-    dataIndex: 'mchNo',
-    key: 'mchNo',
-    width: 140
-  },
-  {
-    title: '状态',
-    dataIndex: 'state',
-    key: 'state',
-    width: 80,
-    customRender: 'state'
-  },
-  {
-    title: '默认应用',
-    dataIndex: 'defaultFlag',
-    key: 'defaultFlag',
-    width: 100,
-    customRender: 'defaultFlag'
-  },
-  {
-    title: '创建日期',
-    dataIndex: 'createdAt',
-    key: 'createdAt',
-    width: 180
-  },
-  {
-    title: '操作',
-    key: 'actions',
-    width: 200,
-    fixed: 'right',
-    align: 'center',
-    customRender: 'actions'
-  }
+/**
+ * 表格列定义
+ */
+const tableColumns = [
+  { key: 'appId', dataIndex: 'appId', title: '应用AppId', width: 320, fixed: 'left', customRender: 'appIdSlot' },
+  { key: 'appName', dataIndex: 'appName', title: '应用名称', width: 200 },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
+  { key: 'state', dataIndex: 'state', title: '状态', width: 80, customRender: 'stateSlot' },
+  { key: 'defaultFlag', dataIndex: 'defaultFlag', title: '默认应用', width: 100, customRender: 'defaultFlagSlot' },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
+  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
@@ -238,8 +232,12 @@ onMounted(() => {
   }
 })
 
-// 请求表格数据函数
-function reqTableDataFunc(params) {
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
   const requestParams = {
     pageNumber: params.pageNumber,
     pageSize: params.pageSize
@@ -256,7 +254,7 @@ function reqTableDataFunc(params) {
   if (searchData.state) {
     requestParams.state = parseInt(searchData.state)
   }
-  return mchAppApi.queryPage(requestParams)
+  return await mchAppApi.queryPage(requestParams)
 }
 
 /**
@@ -280,58 +278,44 @@ const handleSearchMch = async (keyword) => {
 }
 
 /**
- * 搜索
+ * 搜索函数
  */
-function searchFunc() {
-  tableRef.value.reload()
+const searchFunc = () => {
+  reloadTable()
 }
 
 /**
- * 重置
+ * 重置搜索条件
  */
-function onReset() {
+const onReset = () => {
   searchData.mchNo = ''
   searchData.appId = ''
   searchData.appName = ''
   searchData.state = ''
-  tableRef.value.reload()
+  reloadTable()
 }
 
 /**
  * 新建应用
  */
 const handleAdd = () => {
-  currentRecordId.value = ''
   currentMchNo.value = searchData.mchNo || ''
-  showModal()
+  openCreate()
 }
 
 /**
  * 编辑应用
  */
 const handleEdit = (record) => {
-  currentRecordId.value = record.appId
   currentMchNo.value = record.mchNo
-  showModal()
+  openEdit(record.appId)
 }
 
 /**
  * 删除应用
  */
-const handleDelete = async (record) => {
-  Modal.confirm({
-    title: '确认删除',
-    content: '确认删除该应用吗？',
-    onOk: async () => {
-      try {
-        await mchAppApi.delById(record.appId)
-        message.success('删除成功')
-        tableRef.value.reload()
-      } catch (error) {
-        console.error('删除失败:', error)
-      }
-    }
-  })
+const delFunc = (recordId) => {
+  confirmDelete(recordId)
 }
 
 /**
@@ -352,16 +336,10 @@ const handlePayConfig = () => {
  * 弹窗操作成功
  */
 const handleModalSuccess = () => {
-  hideModal()
-  tableRef.value.reload()
+  closeModal()
+  reloadTable()
 }
 </script>
 
 <style lang="less" scoped>
-.mch-app-page {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-}
 </style>

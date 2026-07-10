@@ -8,10 +8,14 @@
       <div class="search">
         <a-input v-model:value="ifCodeListSearchData.ifName" class="if-input" placeholder="搜索渠道名称" />
         <a-input v-model:value="ifCodeListSearchData.ifCode" class="if-input" placeholder="搜索渠道代码" />
-        <a-button type="primary" icon="SearchOutlined" @click="searchIfCodeFunc">查询</a-button>
-        <a-button style="margin-left: 8px" icon="ReloadOutlined" @click="() => (ifCodeListSearchData = {})"
-          >重置</a-button
-        >
+        <a-button type="primary" @click="searchIfCodeFunc">
+          <template #icon><SearchOutlined /></template>
+          查询
+        </a-button>
+        <a-button style="margin-left: 8px" @click="() => (ifCodeListSearchData = {})">
+          <template #icon><ReloadOutlined /></template>
+          重置
+        </a-button>
       </div>
       <div class="pay-list-wrapper" :style="{ height: isShowMore ? 'auto' : '110px' }">
         <div v-for="(item, key) in ifCodeList" :key="key" class="pay-item-wrapper">
@@ -92,7 +96,7 @@
       :tab="'支付渠道的选择'"
     >
       <div class="content-box">
-        <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc(true)" @reset="resetSearchFunc">
+        <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc(true)" @reset="resetSearchFunc">
           <template #base="{ colSpan }">
             <a-col v-bind="colSpan">
               <a-form-item label="">
@@ -111,8 +115,6 @@
             <!-- 列表渲染 -->
             <ag-table
               ref="infoTableRef"
-              :init-data="true"
-              :is-show-table-top="false"
               :on-load="reqTableDataFunc"
               :columns="tableColumns"
               :params="searchData"
@@ -131,8 +133,6 @@
             <!-- 列表渲染 -->
             <ag-table
               ref="passageInfoTableRef"
-              :init-data="false"
-              :is-show-table-top="false"
               :on-load="reqPassageTableDataFunc"
               :columns="passageTableColumns"
               :params="passageSearchData"
@@ -203,8 +203,8 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { DownOutlined, UpOutlined } from '@ant-design/icons-vue'
-const icons = { DownOutlined, UpOutlined }
+import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
+const icons = { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined }
 import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
@@ -230,7 +230,7 @@ const props = defineProps({
 const infoId = ref(null)
 const infoType = ref(null)
 const ifDefine = ref(null)
-const btnLoading = ref(false)
+const loading = ref(false)
 const isShowMore = ref(true)
 const topTabsVal = ref('paramsAndRateTab')
 const topTabData = ref([
@@ -321,7 +321,7 @@ const getPayConfig = (infoIdVal, configMchAppIsIsvSubMch) => {
 const reset = () => {
   const [firstTopTab] = topTabData.value
   const [firstTab] = tabData.value
-  btnLoading.value = false
+  loading.value = false
   isShowMore.value = true
   topTabsVal.value = firstTopTab.code
   currentIfCode.value = null

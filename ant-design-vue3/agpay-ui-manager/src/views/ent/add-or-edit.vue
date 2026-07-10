@@ -1,9 +1,11 @@
-﻿﻿<template>
+﻿<template>
   <a-modal
-    v-model:visible="isShow"
+    :open="localOpen"
     :title="isAdd ? '新增菜单' : '修改菜单'"
     :confirm-loading="confirmLoading"
     @ok="handleOkFunc"
+    @cancel="handleCancel"
+    @update:open="handleUpdateOpen"
   >
     <a-form
       ref="infoForm"
@@ -81,24 +83,69 @@
 </template>
 
 <script setup>
+/**
+ * 资源权限编辑弹窗组件
+ * 功能：新增/编辑资源权限信息，配置匹配规则
+ */
 import { entApi } from '@/api/business/ent/ent-api'
 import { message } from 'ant-design-vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
+/**
+ * 组件属性
+ */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: { type: Boolean, default: false },
+  recordId: { type: String, default: '' },
+  sysType: { type: String, default: 'MGR' }
 })
 
+/**
+ * 组件事件
+ */
+const emit = defineEmits(['update:open', 'success'])
+
+/**
+ * 表单引用
+ */
 const infoForm = ref(null)
+
+/**
+ * 确认加载状态
+ */
 const confirmLoading = ref(false)
+
+/**
+ * 是否新增
+ */
 const isAdd = ref(true)
-const isShow = ref(false)
-const recordId = ref(null)
-const sysType = ref('MGR')
+
+/**
+ * 本地打开状态
+ */
+const localOpen = ref(false)
+
+/**
+ * 当前记录ID
+ */
+const currentRecordId = ref('')
+
+/**
+ * 当前系统类型
+ */
+const currentSysType = ref('MGR')
+
+/**
+ * 表单验证规则
+ */
 const rules = {
   entName: [{ required: true, message: '请输入资源名称', trigger: 'blur' }]
 }
 
+/**
+ * 创建默认保存对象
+ * @returns {Object} 默认保存对象
+ */
 const createDefaultSaveObject = () => ({
   matchRule: {
     epUserEnt: null,
@@ -108,34 +155,65 @@ const createDefaultSaveObject = () => ({
   }
 })
 
+/**
+ * 保存对象
+ */
 const saveObject = ref(createDefaultSaveObject())
 
-const show = async (id, currentSysType) => {
-  isAdd.value = !id
-  sysType.value = currentSysType
+/**
+ * 监听open变化
+ */
+watch(() => props.open, async (newVal) => {
+  localOpen.value = newVal
+  if (newVal) {
+    await initForm()
+  }
+})
+
+/**
+ * 处理open更新事件
+ */
+const handleUpdateOpen = (val) => {
+  localOpen.value = val
+  emit('update:open', val)
+}
+
+/**
+ * 初始化表单
+ */
+const initForm = async () => {
+  isAdd.value = !props.recordId
+  currentRecordId.value = props.recordId || ''
+  currentSysType.value = props.sysType || 'MGR'
   saveObject.value = createDefaultSaveObject()
   confirmLoading.value = false
 
-  if (infoForm.value !== undefined) {
+  if (infoForm.value) {
     infoForm.value.resetFields()
   }
 
   if (!isAdd.value) {
-    recordId.value = id
-    const res = await entApi.getBySysType(id, currentSysType)
+    const res = await entApi.getBySysType(currentRecordId.value, currentSysType.value)
     const current = res || {}
     if (!current.matchRule) {
       current.matchRule = createDefaultSaveObject().matchRule
     }
     saveObject.value = current
   }
-  isShow.value = true
 }
 
+/**
+ * 拓展员权限变更处理
+ * @param {Event} e - 事件对象
+ */
 const onEpUserEntChange = (e) => {
   saveObject.value.matchRule.epUserEnt = e.target.checked ? true : null
 }
 
+/**
+ * 商户类型变更处理
+ * @param {number} value - 商户类型值
+ */
 const onMchTypeChange = (value) => {
   if (saveObject.value.matchRule.mchType === value) {
     saveObject.value.matchRule.mchType = null
@@ -144,6 +222,9 @@ const onMchTypeChange = (value) => {
   }
 }
 
+/**
+ * 处理确认操作
+ */
 const handleOkFunc = async () => {
   try {
     await infoForm.value.validate()
@@ -157,17 +238,22 @@ const handleOkFunc = async () => {
       await entApi.add(saveObject.value)
       message.success('新增成功')
     } else {
-      await entApi.updateById(recordId.value, saveObject.value)
+      await entApi.updateById(currentRecordId.value, saveObject.value)
       message.success('修改成功')
     }
-    isShow.value = false
-    props.callbackFunc()
+    emit('update:open', false)
+    emit('success')
   } finally {
     confirmLoading.value = false
   }
 }
 
-defineExpose({ show })
+/**
+ * 处理取消操作
+ */
+const handleCancel = () => {
+  emit('update:open', false)
+}
 </script>
 
 <style scoped>

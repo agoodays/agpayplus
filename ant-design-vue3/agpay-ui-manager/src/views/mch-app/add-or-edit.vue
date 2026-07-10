@@ -1,22 +1,24 @@
-<template>
-  <a-drawer
+﻿<template>
+  <ag-drawer
     v-model:open="localOpen"
     :title="isAdd ? '新增应用' : '修改应用'"
-    :width="720"
+    width="40%"
     :mask-closable="false"
-    :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
+    :show-confirm="true"
+    :confirm-loading="loading"
+    @confirm="handleSubmit"
   >
     <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 基本信息 -->
       <a-row :gutter="16">
-        <a-col v-if="!isAdd" :span="12">
+        <a-col v-if="!isAdd" :span="10">
           <a-form-item label="应用AppId" name="appId">
             <a-input v-model:value="saveObject.appId" placeholder="应用AppId" disabled />
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="商户号" name="mchNo">
             <a-select
               v-model:value="saveObject.mchNo"
@@ -33,21 +35,19 @@
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="应用名称" name="appName">
             <a-input v-model:value="saveObject.appName" placeholder="请输入应用名称" />
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="备注" name="remark">
             <a-input v-model:value="saveObject.remark" placeholder="请输入备注" />
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="状态" name="state">
             <a-radio-group v-model:value="saveObject.state">
               <a-radio :value="1">启用</a-radio>
@@ -55,10 +55,8 @@
             </a-radio-group>
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="是否设置为默认应用" name="defaultFlag">
             <a-radio-group v-model:value="saveObject.defaultFlag">
               <a-radio :value="0">否</a-radio>
@@ -125,26 +123,11 @@
         </a-row>
       </template>
     </a-form>
-
-    <!-- 底部按钮 -->
-    <template #footer>
-      <div style="text-align: center">
-        <a-space>
-          <a-button @click="handleClose">
-            <close-outlined />
-            取消
-          </a-button>
-          <a-button type="primary" :loading="loading" @click="handleSubmit">
-            <check-outlined />
-            保存
-          </a-button>
-        </a-space>
-      </div>
-    </template>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+import { AgDrawer } from '@/components'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { basicApi } from '@/api/system/basic-api'
 import { CheckOutlined, CloseOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'

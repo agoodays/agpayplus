@@ -1,6 +1,7 @@
 <template>
-  <a-card>
-    <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+  <a-card :bordered="false">
+    <!-- 搜索表单 -->
+    <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -16,9 +17,9 @@
     </ag-search>
     <!-- 列表渲染 -->
     <ag-table
-      ref="infoTable"
+      ref="tableRef"
       :columns="tableColumns"
-      :loading="btnLoading"
+      :loading="loading"
       :on-load="reqTableDataFunc"
       :on-download="reqDownloadDataFunc"
       :search-data="searchData"
@@ -182,42 +183,20 @@ const props = defineProps({
 const tableColumns = [
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称', width: 140, ellipsis: true },
   { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式编码', width: 140 },
-  {
-    key: 'payAmount',
-    title: '交易金额',
-    width: 110,
-    ellipsis: true,
-    customRender: 'payAmountSlot'
-  },
-  {
-    key: 'amount',
-    title: '实际收入',
-    width: 110,
-    ellipsis: true,
-    customRender: 'amountSlot'
-  },
+  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot' },
+  { key: 'amount', title: '实际收入', width: 110, ellipsis: true, customRender: 'amountSlot' },
   { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
-  {
-    key: 'refundFee',
-    title: '退款手续费',
-    width: 125,
-    customRender: 'refundFeeSlot'
-  },
-  {
-    key: 'refundCount',
-    title: '退款笔数',
-    width: 110,
-    customRender: 'refundCountSlot'
-  },
+  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot' },
+  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot' },
   { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
   { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot' }
 ]
 
 // 响应式数据
-const infoTable = ref(null)
+const tableRef = ref(null)
 const isShowMore = ref(false)
-const btnLoading = ref(false)
+const loading = ref(false)
 
 // 默认搜索数据
 const defaultSearchData = {
@@ -271,8 +250,8 @@ const reqDownloadDataFunc = (params) => {
 
 // 搜索函数
 const searchFunc = () => {
-  btnLoading.value = true
-  infoTable.value.reload(true)
+  loading.value = true
+  tableRef.value.reload(true)
 }
 
 // 组件挂载时

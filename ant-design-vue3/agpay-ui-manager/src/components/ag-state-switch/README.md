@@ -97,7 +97,7 @@ async function handleStateChange(newState) {
 
 ```vue
 <template>
-  <ag-table :table-columns="columns" :req-table-data-func="loadData">
+  <ag-table :columns="columns" :on-load="loadData">
     <template #state="{ record }">
       <ag-state-switch :state="record.state" />
     </template>
@@ -120,7 +120,7 @@ const columns = ref([
 
 ```vue
 <template>
-  <ag-table :table-columns="columns" :req-table-data-func="loadData">
+  <ag-table :columns="columns" :on-load="loadData">
     <template #state="{ record }">
       <ag-state-switch
         :state="record.state"
@@ -246,8 +246,8 @@ function handleFormStateChange(newState) {
 <template>
   <a-card title="用户管理">
     <ag-table
-      :table-columns="columns"
-      :req-table-data-func="loadUsers"
+      :columns="columns"
+      :on-load="loadUsers"
       column-state-key="user_list"
     >
       <template #state="{ record }">

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="empty">
     <a-empty description="暂无数据" />
   </div>

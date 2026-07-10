@@ -1,7 +1,8 @@
-﻿<template>
+<template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc" @reset="resetFunc">
+      <!-- 搜索区域 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc" @reset="resetFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -70,17 +71,32 @@
           </a-col>
         </template>
       </ag-search>
+      
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
-        :init-data="true"
+        ref="tableRef"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :params="searchData"
         row-key="recordId"
-        @btn-load-close="btnLoading = false"
       >
         <template #amountSlot="{ record }"><b>¥{{ record.calDivisionAmount / 100 }}</b></template>
+
+        <!-- 订单金额列 -->
+        <template #payOrderAmountSlot="{ record }">
+          {{ (record.payOrderAmount / 100).toFixed(2) }}
+        </template>
+
+        <!-- 分账基数列 -->
+        <template #payOrderDivisionAmountSlot="{ record }">
+          {{ (record.payOrderDivisionAmount / 100).toFixed(2) }}
+        </template>
+
+        <!-- 分账比例列 -->
+        <template #divisionProfitSlot="{ record }">
+          {{ (record.divisionProfit * 100).toFixed(2) }}%
+        </template>
+
         <!-- 自定义列 -->
         <!-- 支付接口 -->
         <template #ifCodeSlot="{ record }">
@@ -124,94 +140,118 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_DIVISION_RECORD_VIEW')" type="link" @click="detailFunc(record.recordId)"
-              >详情</a-button
-            >
-            <a-button
-              v-if="record.state == 2 && $access('ENT_DIVISION_RECORD_RESEND')"
-              type="link"
-              @click="redivFunc(record.recordId)"
-              >重发</a-button
-            >
+            <a-button v-if="hasPermission('ENT_DIVISION_RECORD_VIEW')" type="link" @click="detailFunc(record.recordId)">详情</a-button>
+            <a-button v-if="record.state == 2 && hasPermission('ENT_DIVISION_RECORD_RESEND')" type="link" @click="redivFunc(record.recordId)">重发</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
-    <Detail ref="recordDetail" />
+    <detail v-model:open="detailOpen" :record-id="currentRecordId" />
   </div>
 </template>
 <script setup>
+/**
+ * 分账记录列表页面组件
+ * 功能：展示分账记录列表，支持搜索、查看详情、重发分账等操作
+ */
 import { divisionRecordApi } from '@/api/business/division/division-record-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { onMounted, reactive, ref } from 'vue'
 import Detail from './detail.vue'
 
-// 表格列配置
+// 权限检查
+const { hasPermission } = usePermission()
+
+/**
+ * 表格列配置
+ */
 const tableColumns = [
   { key: 'calDivisionAmount', title: '分账金额', width: 108, customRender: 'amountSlot' },
   { key: 'batchOrderId', dataIndex: 'batchOrderId', title: '分账批次号', width: 120 },
   { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号', width: 220 },
   { key: 'ifCode', title: '支付接口', width: 200, customRender: 'ifCodeSlot' },
-  {
-    key: 'payOrderAmount',
-    dataIndex: 'payOrderAmount',
-    title: '订单金额',
-    width: 108,
-    customRender: (text) => (text / 100).toFixed(2)
-  },
-  {
-    key: 'payOrderDivisionAmount',
-    dataIndex: 'payOrderDivisionAmount',
-    title: '分账基数',
-    width: 108,
-    customRender: (text) => (text / 100).toFixed(2)
-  },
+  { key: 'payOrderAmount', dataIndex: 'payOrderAmount', title: '订单金额', width: 108, customRender: 'payOrderAmountSlot' },
+  { key: 'payOrderDivisionAmount', dataIndex: 'payOrderDivisionAmount', title: '分账基数', width: 108, customRender: 'payOrderDivisionAmountSlot' },
   { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账户别名', width: 120 },
   { key: 'accNo', dataIndex: 'accNo', title: '收款账号', width: 120 },
   { key: 'accName', dataIndex: 'accName', title: '账号名称', width: 120 },
   { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '收款关系类型', width: 120 },
-  {
-    key: 'divisionProfit',
-    dataIndex: 'divisionProfit',
-    title: '分账比例',
-    width: 108,
-    customRender: (text) => (text * 100).toFixed(2) + '%'
-  },
+  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '分账比例', width: 108, customRender: 'divisionProfitSlot' },
   { key: 'state', title: '分账状态', width: 100, customRender: 'stateSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-// 响应式数据
-const infoTable = ref(null)
-const recordDetail = ref(null)
-const btnLoading = ref(false)
+/**
+ * 组件引用
+ */
+const tableRef = ref(null)
+
+/**
+ * 详情弹窗状态
+ */
+const detailOpen = ref(false)
+const currentRecordId = ref('')
+
+/**
+ * 加载状态
+ */
+const loading = ref(false)
+
+/**
+ * 搜索表单数据
+ */
 const searchData = reactive({
   queryDateRange: 'today'
 })
+
+/**
+ * 支付接口定义列表
+ */
 const ifDefineList = ref([])
+
+/**
+ * 搜索商户
+ * @param {Object} params - 搜索参数
+ * @returns {Promise<Object>} 商户列表
+ */
 const searchMch = (params) => {
   return divisionRecordApi.listMch(params)
 }
 
-// 查询函数
-const searchFunc = () => {
-  btnLoading.value = true
-  infoTable.value.loadData()
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await divisionRecordApi.queryPage(params)
 }
 
-// 对接table接口函数
-const reqTableDataFunc = (params) => {
-  return divisionRecordApi.queryPage(params)
-}
-
-// 查询支付接口定义列表
-const reqIfDefineListFunc = () => {
-  divisionRecordApi.listIfDefine({ state: 1 }).then((res) => {
+/**
+ * 查询支付接口定义列表
+ */
+const reqIfDefineListFunc = async () => {
+  try {
+    const res = await divisionRecordApi.listIfDefine({ state: 1 })
     ifDefineList.value = res
-  })
+  } catch (error) {
+    console.error('加载支付接口定义失败:', error)
+  }
 }
 
+/**
+ * 搜索函数
+ */
+const searchFunc = () => {
+  loading.value = true
+  tableRef.value?.reload()
+}
+
+/**
+ * 重置搜索条件
+ */
 const resetFunc = () => {
   Object.keys(searchData).forEach((key) => {
     searchData[key] = ''
@@ -220,22 +260,35 @@ const resetFunc = () => {
   searchFunc()
 }
 
-// 详情函数
+/**
+ * 查看分账记录详情
+ * @param {string} recordId - 分账记录ID
+ */
 const detailFunc = (recordId) => {
-  recordDetail.value.show(recordId)
+  currentRecordId.value = recordId
+  detailOpen.value = true
 }
 
-// 重新分账
-const redivFunc = (recordId) => {
-  window.$infoBox.confirmPrimary('确定重新分账?', '重新分账将重新触发分账操作,可能会导致重复分账', () => {
-    divisionRecordApi.resendDivision(recordId).then(() => {
-      infoTable.value.loadData()
+/**
+ * 重新分账
+ * @param {string} recordId - 分账记录ID
+ */
+const redivFunc = async (recordId) => {
+  const { infoBox } = await import('@/utils/info-box')
+  infoBox.confirmPrimary('确定重新分账?', '重新分账将重新触发分账操作,可能会导致重复分账', async () => {
+    try {
+      await divisionRecordApi.resendDivision(recordId)
+      tableRef.value?.reload()
       window.$message.warning('等待接口返回状态')
-    })
+    } catch (error) {
+      console.error('重新分账失败:', error)
+    }
   })
 }
 
-// 组件挂载时
+/**
+ * 组件挂载时初始化
+ */
 onMounted(() => {
   reqIfDefineListFunc()
 })

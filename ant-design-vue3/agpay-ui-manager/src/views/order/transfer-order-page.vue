@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="transfer-order-page">
     <a-card :bordered="false">
       <a-result status="info" :title="t('transferOrder.comingSoonTitle')" :sub-title="t('common.comingSoon')">

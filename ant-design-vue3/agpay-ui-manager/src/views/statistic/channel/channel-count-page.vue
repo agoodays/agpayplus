@@ -1,8 +1,9 @@
 ?
 <template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -21,9 +22,10 @@
           </a-col>
         </template>
       </ag-search>
+      
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
+        ref="tableRef"
         :on-load="reqTableDataFunc"
         :on-download="reqDownloadDataFunc"
         :columns="tableColumns"
@@ -183,33 +185,12 @@ import { downloadExcel } from '@/lib/ag-axios'
 const tableColumns = [
   { key: 'ifName', dataIndex: 'ifName', title: '通道名称', width: 140, ellipsis: true },
   { key: 'ifCode', dataIndex: 'ifCode', title: '通道编码', width: 100 },
-  {
-    key: 'payAmount',
-    title: '交易金额',
-    width: 110,
-    ellipsis: true,
-    customRender: 'payAmountSlot'
-  },
-  {
-    key: 'amount',
-    title: '实际收入',
-    width: 110,
-    customRender: 'amountSlot'
-  },
+  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot' },
+  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot' },
   { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
-  {
-    key: 'refundFee',
-    title: '退款手续费',
-    width: 125,
-    customRender: 'refundFeeSlot'
-  },
-  {
-    key: 'refundCount',
-    title: '退款笔数',
-    width: 110,
-    customRender: 'refundCountSlot'
-  },
+  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot' },
+  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot' },
   { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
   { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot' }
 ]
@@ -220,8 +201,8 @@ const defaultSearchData = {
   queryDateRange: 'today' // 查询日期范围
 }
 
-const infoTable = ref(null)
-const btnLoading = ref(false)
+const tableRef = ref(null)
+const loading = ref(false)
 const searchData = reactive({ ...defaultSearchData })
 
 const countInitData = {
@@ -243,8 +224,8 @@ const reqDownloadDataFunc = (params) => {
 }
 
 const searchFunc = () => {
-  btnLoading.value = true
-  infoTable.value?.reload()
+  loading.value = true
+  tableRef.value?.reload()
 }
 </script>
 <style lang="less" scoped>

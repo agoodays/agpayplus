@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="select-infinite-demo-container">
     <a-card title="ag-select-infinite 分页下拉选择器">
       <a-alert

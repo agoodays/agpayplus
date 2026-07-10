@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-modal
     v-model:open="localOpen"
     :title="t('mchStore.bindAppTitle')"

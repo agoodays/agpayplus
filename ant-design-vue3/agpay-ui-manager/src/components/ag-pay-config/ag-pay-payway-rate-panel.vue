@@ -52,10 +52,11 @@
                     style="margin-left: 8px"
                     size="small"
                     shape="round"
-                    icon="BulbOutlined"
                     @click="onReadDefaultFeeRate(mergeFeeItem.isMergeMode, payWayItem.wayCode)"
-                    >读取默认费率</a-button
                   >
+                    <template #icon><BulbOutlined /></template>
+                    读取默认费率
+                  </a-button>
                 </a-popover>
               </div>
               <div class="h-right h-right2" style="display: flex">
@@ -187,9 +188,10 @@
                         cancel-text="取消"
                         @confirm="deleteLevelFee(payWayItem.wayCode, levelItem.id)"
                       >
-                        <a-button v-if="!configTypeReadonlyMaps.length" type="link" icon="DeleteOutlined" danger
-                          >删除</a-button
-                        >
+                        <a-button v-if="!configTypeReadonlyMaps.length" type="link" danger @click.stop>
+                          <template #icon><DeleteOutlined /></template>
+                          删除
+                        </a-button>
                       </a-popconfirm>
                     </div>
                   </div>
@@ -317,10 +319,11 @@
                   style="margin-left: 8px"
                   size="small"
                   shape="round"
-                  icon="BulbOutlined"
                   @click="onReadDefaultFeeRate(mergeFeeItem.isMergeMode, mergeFeeKey)"
-                  >读取默认费率</a-button
                 >
+                  <template #icon><BulbOutlined /></template>
+                  读取默认费率
+                </a-button>
               </a-popover>
             </div>
             <div class="h-right h-right2" style="display: flex">
@@ -447,9 +450,10 @@
                       cancel-text="取消"
                       @confirm="deleteLevelFee(mergeFeeItem.mainFee.wayCode, levelItem.id, mergeFeeItem)"
                     >
-                      <a-button v-if="!configTypeReadonlyMaps.length" type="link" icon="DeleteOutlined" danger
-                        >删除</a-button
-                      >
+                      <a-button v-if="!configTypeReadonlyMaps.length" type="link" danger @click.stop>
+                        <template #icon><DeleteOutlined /></template>
+                        删除
+                      </a-button>
                     </a-popconfirm>
                   </div>
                 </div>
@@ -548,7 +552,10 @@
         </a-collapse-panel>
       </a-collapse>
       <div :class="isDrawer ? 'drawer-btn-center' : 'btn-center'">
-        <a-button type="primary" icon="CheckOutlined" :loading="btnLoading" @click="onSubmit">保存</a-button>
+        <a-button type="primary" :loading="loading" @click="onSubmit">
+          <template #icon><CheckOutlined /></template>
+          保存
+        </a-button>
       </div>
     </div>
   </div>
@@ -557,8 +564,8 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
-import { QuestionCircleOutlined } from '@ant-design/icons-vue'
-const icons = { QuestionCircleOutlined }
+import { BulbOutlined, CheckOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
+const icons = { BulbOutlined, CheckOutlined, DeleteOutlined, QuestionCircleOutlined }
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { infoBox } from '@/utils/info-box'
 
@@ -594,7 +601,7 @@ const props = defineProps({
 })
 
 // State
-const btnLoading = ref(false)
+const loading = ref(false)
 const currentIfCode = ref(props.ifCode)
 const configTypeReadonlyMaps = ref([])
 const configTypeMaps = ref([])
@@ -1493,10 +1500,10 @@ const onSubmit = () => {
       .then((res) => {
         message.success('保存成功')
         typeof originSavedListVal === 'object' && (originSavedList.value = originSavedListVal)
-        btnLoading.value = false
+        loading.value = false
       })
       .catch((res) => {
-        btnLoading.value = false
+        loading.value = false
       })
   })
 }

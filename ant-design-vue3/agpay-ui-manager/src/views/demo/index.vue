@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="demo-index-container">
     <a-card class="welcome-card mb-4">
       <template #title>

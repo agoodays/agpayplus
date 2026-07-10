@@ -16,21 +16,19 @@
 
         <a-col :col-span="colSpan" class="search-buttons">
           <a-form-item>
-            <a-space :size="8">
-              <a-button type="primary" :loading="searchLoading" @click="onSearch">
-                <search-outlined />
-                {{ searchText }}
-              </a-button>
-              <a-button @click="onReset">
-                <redo-outlined />
-                {{ resetText }}
-              </a-button>
-              <a-button v-if="collapsible" type="link" class="collapse-link-btn" @click="toggleCollapsed">
-                {{ collapsed ? expandText : collapseText }}
-                <down-outlined v-if="collapsed" />
-                <up-outlined v-else />
-              </a-button>
-            </a-space>
+            <a-button type="primary" :loading="searchLoading" @click="onSearch">
+              <search-outlined />
+              {{ searchText }}
+            </a-button>
+            <a-button @click="onReset">
+              <redo-outlined />
+              {{ resetText }}
+            </a-button>
+            <a-button v-if="collapsible" type="link" class="collapse-link-btn" @click="toggleCollapsed">
+              {{ collapsed ? expandText : collapseText }}
+              <down-outlined v-if="collapsed" />
+              <up-outlined v-else />
+            </a-button>
           </a-form-item>
         </a-col>
       </a-row>
@@ -72,7 +70,6 @@ const props = defineProps({
   modelValue: { type: Object, default: () => ({}) },
   searchLoading: { type: Boolean, default: false },
   loading: { type: Boolean, default: undefined },
-  btnLoading: { type: Boolean, default: undefined },
   resetMode: {
     type: String,
     default: 'undefined',
@@ -108,7 +105,6 @@ let debounceTimer = null
 
 const searchLoading = computed(() => {
   if (props.loading !== undefined) return props.loading
-  if (props.btnLoading !== undefined) return props.btnLoading
   return props.searchLoading
 })
 
@@ -280,8 +276,8 @@ onMounted(() => {
 <style scoped>
 .ag-search {
   margin-bottom: 12px;
-  padding: 12px 16px 0;
-  background: var(--layout-surface);
+  padding: 18px 16px 0;
+  /* background: var(--layout-surface); */
   border-bottom: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   transition: all 0.3s ease;
@@ -289,12 +285,6 @@ onMounted(() => {
 
 .search-row {
   margin-bottom: 12px;
-}
-
-.search-buttons {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
 }
 
 .search-buttons :deep(.ant-form-item) {

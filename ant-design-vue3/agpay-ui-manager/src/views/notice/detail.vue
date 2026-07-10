@@ -1,11 +1,11 @@
-<template>
-  <a-drawer
-    :visible="visible"
-    :title="true ? '公告详情' : ''"
+﻿<template>
+  <ag-drawer
+    v-model:open="localOpen"
+    title="公告详情"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
-    @close="onClose"
+    @close="handleClose"
   >
     <div class="article-container">
       <div class="title">{{ detailData.title }}</div>
@@ -15,37 +15,89 @@
       </div>
       <div class="content" v-html="detailData.content"></div>
     </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+/**
+ * 公告详情抽屉组件
+ * 功能：展示公告的详细信息
+ */
+import { AgDrawer } from '@/components'
 import { noticeApi } from '@/api/business/notice/notice-api'
-import { ref } from 'vue'
+import { message } from 'ant-design-vue'
+import { reactive, ref, watch } from 'vue'
 
-defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+/** Props 定义 */
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false
+  },
+  recordId: {
+    type: String,
+    default: ''
+  }
 })
 
-const detailData = ref({})
-const recordId = ref(null)
-const visible = ref(false)
+/** 事件定义 */
+const emit = defineEmits(['update:open'])
 
-function show(currentRecordId) {
-  recordId.value = currentRecordId
-  visible.value = true
-  noticeApi.getById(currentRecordId).then((res) => {
-    detailData.value = res || {}
+/** 本地打开状态 */
+const localOpen = ref(false)
+
+/** 详情数据 */
+const detailData = reactive({
+  title: '',
+  publisher: '',
+  publishTime: '',
+  content: ''
+})
+
+/** 重置详情数据 */
+function resetDetailData() {
+  Object.assign(detailData, {
+    title: '',
+    publisher: '',
+    publishTime: '',
+    content: ''
   })
 }
 
-function onClose() {
-  visible.value = false
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  async (val) => {
+    localOpen.value = val
+    if (val && props.recordId) {
+      await loadDetail()
+    } else if (!val) {
+      resetDetailData()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+/** 加载详情数据 */
+const loadDetail = async () => {
+  try {
+    const res = await noticeApi.getById(props.recordId)
+    Object.assign(detailData, res || {})
+  } catch (error) {
+    console.error('加载详情失败:', error)
+    message.error(error?.msg || error?.message || '加载详情失败')
+  }
 }
 
-defineExpose({
-  show,
-  onClose
-})
+/** 处理关闭 */
+const handleClose = () => {
+  resetDetailData()
+  localOpen.value = false
+}
 </script>
 
 <style lang="less">

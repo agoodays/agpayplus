@@ -1,7 +1,8 @@
 <template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -37,9 +38,10 @@
           </a-col>
         </template>
       </ag-search>
+      
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
+        ref="tableRef"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :on-download="reqDownloadDataFunc"
@@ -48,7 +50,6 @@
         :show-download="true"
         :enable-statistics="true"
         row-key="mchNo"
-        :stripe="true"
       >
         <template #dataStatisticsSlot="{ countData }">
           <div class="data-statistics" style="background: rgb(250, 250, 250)">
@@ -188,75 +189,58 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button
-              v-if="
-                $access('ENT_STATISTIC_MCH_STORE') ||
-                $access('ENT_STATISTIC_MCH_WAY_CODE') ||
-                $access('ENT_STATISTIC_MCH_WAY_TYPE')
-              "
-              type="link"
-              @click="detailFunc(record.mchNo)"
-              >详情</a-button
-            >
+            <a-button v-if="hasPermission('ENT_STATISTIC_MCH_STORE') || hasPermission('ENT_STATISTIC_MCH_WAY_CODE') || hasPermission('ENT_STATISTIC_MCH_WAY_TYPE')" type="link" @click="detailFunc(record.mchNo)">详情</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
-    <!-- 详情页面组件  -->
-    <info-detail ref="infoDetail" :callback-func="searchFunc" />
+    <!-- 详情抽屉 -->
+    <detail v-model:open="detailOpen" :record-id="currentRecordId" :query-date-range="detailQueryDateRange" />
   </div>
 </template>
 <script setup>
+/**
+ * 商户交易统计页面组件
+ * 功能：展示商户交易统计数据，支持搜索、导出和查看详情
+ */
 import { InfoCircleOutlined } from '@ant-design/icons-vue'
-const icons = { InfoCircleOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
-
-dayjs.locale('zh-cn')
-
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import InfoDetail from './detail.vue'
+import Detail from './detail.vue'
 import { downloadExcel } from '@/lib/ag-axios'
+
+const icons = { InfoCircleOutlined }
+
+// 权限检查
+const { hasPermission } = usePermission()
+
+dayjs.locale('zh-cn')
 
 // 表格列配置
 const tableColumns = [
   { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 200, fixed: 'left', ellipsis: true },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
-  {
-    key: 'payAmount',
-    width: 110,
-    ellipsis: true,
-    customRender: 'payAmountSlot', titleSlot: 'payAmountTitle'
-  },
-  {
-    key: 'amount',
-    width: 110,
-    customRender: 'amountSlot', titleSlot: 'amountTitle'
-  },
-  { key: 'fee', width: 110, customRender: 'feeSlot', titleSlot: 'feeTitle' },
+  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot', titleSlot: 'payAmountTitle' },
+  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot', titleSlot: 'amountTitle' },
+  { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot', titleSlot: 'feeTitle' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
-  {
-    key: 'refundFee',
-    width: 125,
-    customRender: 'refundFeeSlot', titleSlot: 'refundFeeTitle'
-  },
-  {
-    key: 'refundCount',
-    width: 110,
-    customRender: 'refundCountSlot', titleSlot: 'refundCountTitle'
-  },
+  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot', titleSlot: 'refundFeeTitle' },
+  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot', titleSlot: 'refundCountTitle' },
   { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
-  { key: 'round', width: 110, customRender: 'roundSlot', titleSlot: 'roundTitle' },
+  { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot', titleSlot: 'roundTitle' },
   { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 // 响应式数据
-const infoTable = ref(null)
-const infoDetail = ref(null)
-const btnLoading = ref(false)
+const tableRef = ref(null)
+const detailOpen = ref(false)
+const currentRecordId = ref(null)
+const loading = ref(false)
 const route = useRoute()
 
 // 初始化查询参数
@@ -325,15 +309,15 @@ const reqDownloadDataFunc = (params) => {
 
 // 搜索函数
 const searchFunc = () => {
-  btnLoading.value = true
+  loading.value = true
   detailQueryDateRange.value = searchData.queryDateRange
-  infoTable.value.reload()
+  tableRef.value.reload()
 }
 
 // 详情函数
 const detailFunc = (mchNo) => {
-  // 商户详情页面
-  infoDetail.value.show(mchNo, detailQueryDateRange.value)
+  currentRecordId.value = mchNo
+  detailOpen.value = true
 }
 
 // 组件挂载时

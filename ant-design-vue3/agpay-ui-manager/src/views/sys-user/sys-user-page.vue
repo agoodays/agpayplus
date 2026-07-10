@@ -1,8 +1,8 @@
-<template>
+﻿<template>
   <div>
-    <a-card>
+    <a-card :bordered="false">
       <!-- 搜索区域 -->
-      <ag-search v-if="hasPermission('ENT_UR_USER_SEARCH')" v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+      <ag-search v-if="hasPermission('ENT_UR_USER_SEARCH')" v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -50,18 +50,18 @@
 
       <!-- 数据表格 -->
       <ag-table
-        ref="infoTable"
+        ref="tableRef"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
         row-key="sysUserId"
-        @btn-load-close="btnLoading = false"
       >
         <!-- 工具栏左侧 -->
         <template #toolbar-left>
-          <div>
-            <a-button v-if="hasPermission('ENT_UR_USER_ADD')" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-          </div>
+          <a-button v-if="hasPermission('ENT_UR_USER_ADD')" type="primary" @click="addFunc">
+            <template #icon><PlusOutlined /></template>
+            新建
+          </a-button>
         </template>
 
         <!-- 头像列 -->
@@ -75,6 +75,11 @@
             {{ record.realname }}
             <a-tag v-if="record.initUser" :color="'green'">初始</a-tag>
           </span>
+        </template>
+
+        <!-- 性别列 -->
+        <template #sexSlot="{ record }">
+          {{ record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知' }}
         </template>
 
         <!-- 所属系统列 -->
@@ -92,8 +97,12 @@
         <!-- 邀请码列 -->
         <template #inviteCodeSlot="{ record }" v-if="record.inviteCode">
           <b>{{ record.inviteCode }}</b>
-          <a-button icon="copy" type="link" @click="copyFunc(record.inviteCode)"/>
-          <a-button icon="info-circle" type="link" @click="inviteCodeFunc(record.inviteCode, record.sysType)"/>
+          <a-button type="link" @click="copyFunc(record.inviteCode)">
+            <template #icon><CopyOutlined /></template>
+          </a-button>
+          <a-button type="link" @click="openInviteCode(record.inviteCode, record.sysType)">
+            <template #icon><InfoCircleOutlined /></template>
+          </a-button>
         </template>
 
         <!-- 状态列 -->
@@ -111,7 +120,7 @@
             <a-button
               v-if="hasPermission('ENT_UR_USER_UPD_ROLE') && record.userType === 2"
               type="link"
-              @click="roleDist(record.sysUserId, record.sysType, record.belongInfoId)"
+              @click="openRoleDist(record.sysUserId, record.sysType, record.belongInfoId)"
             >
               变更角色
             </a-button>
@@ -143,14 +152,14 @@
       </ag-table>
     </a-card>
 
-    <!-- 新增/编辑弹窗 -->
-    <info-add-or-edit ref="infoAddOrEdit" :callback-func="searchFunc" />
+    <!-- 新增/编辑抽屉 -->
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" :sys-type="searchData.sysType" :belong-info-id="currentBelongInfoId" @success="handleModalSuccess" />
 
-    <!-- 邀请码窗口 -->
-    <invite-code ref="inviteCodeRef" />
+    <!-- 邀请码弹窗 -->
+    <invite-code v-model:open="inviteCodeOpen" :invite-code="currentInviteCode" :sys-type="currentSysType" />
 
-    <!-- 分配角色弹窗 -->
-    <role-dist ref="roleDistRef" />
+    <!-- 分配角色抽屉 -->
+    <role-dist v-model:open="roleDistOpen" :record-id="currentRoleDistId" :sys-type="currentRoleDistSysType" :belong-info-id="currentRoleDistBelongInfoId" @success="handleRoleDistSuccess" />
   </div>
 </template>
 
@@ -160,16 +169,20 @@
  * 功能：展示系统用户列表、搜索、新增、编辑、删除、状态切换、分配角色等操作
  */
 
+import { CopyOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
 import { AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { onMounted, reactive, ref } from 'vue'
-import { message } from 'ant-design-vue'
-import InfoAddOrEdit from './add-or-edit.vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { reactive, ref } from 'vue'
+import { message, Modal } from 'ant-design-vue'
+import AddOrEdit from './add-or-edit.vue'
 import InviteCode from './invite-code.vue'
 import RoleDist from './role-dist.vue'
 
-// 权限检查
+/**
+ * 权限检查
+ */
 const { hasPermission } = usePermission()
 
 /**
@@ -192,19 +205,6 @@ const defaultSearchData = {
 }
 
 /**
- * 组件引用
- */
-const infoTable = ref(null)
-const infoAddOrEdit = ref(null)
-const inviteCodeRef = ref(null)
-const roleDistRef = ref(null)
-
-/**
- * 搜索数据
- */
-const searchData = reactive({ ...defaultSearchData })
-
-/**
  * 用户类型选项
  */
 const userTypeOptions = userTypeList
@@ -212,7 +212,52 @@ const userTypeOptions = userTypeList
 /**
  * 加载状态
  */
-const btnLoading = ref(false)
+const loading = ref(false)
+
+/**
+ * 当前所属信息ID（用于编辑）
+ */
+const currentBelongInfoId = ref('')
+
+/**
+ * 邀请码弹窗状态
+ */
+const inviteCodeOpen = ref(false)
+const currentInviteCode = ref('')
+const currentSysType = ref('')
+
+/**
+ * 角色分配弹窗状态
+ */
+const roleDistOpen = ref(false)
+const currentRoleDistId = ref('')
+const currentRoleDistSysType = ref('')
+const currentRoleDistBelongInfoId = ref('')
+
+/**
+ * 使用 CRUD 表格页面组合式函数
+ */
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  currentRecordId,
+  reloadTable,
+  openCreate,
+  openEdit,
+  closeModal,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: (recordId) => sysUserApi.delById(recordId),
+  deleteConfirmTitle: '确认删除？',
+  deleteConfirmContent: '',
+  deleteSuccessMessage: '删除成功！'
+})
+
+/**
+ * 初始化搜索数据
+ */
+Object.assign(searchData, defaultSearchData)
 
 /**
  * 表格列配置
@@ -221,7 +266,7 @@ const tableColumns = [
   { key: 'avatar', title: '头像', width: 65, fixed: 'left', customRender: 'avatarSlot' },
   { key: 'realname', title: '姓名', width: 135, fixed: 'left', customRender: 'realnameSlot' },
   { key: 'sysUserId', dataIndex: 'sysUserId', title: '用户ID', width: 120, fixed: 'left' },
-  { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: (text, record) => (record.sex === 1 ? '男' : record.sex === 2 ? '女' : '未知') },
+  { key: 'sex', dataIndex: 'sex', title: '性别', width: 65, customRender: 'sexSlot' },
   { key: 'userNo', dataIndex: 'userNo', title: '编号', width: 125 },
   { key: 'telphone', dataIndex: 'telphone', title: '手机号', width: 160 },
   { key: 'sysType', title: '所属系统', width: 120, customRender: 'sysTypeSlot' },
@@ -280,10 +325,12 @@ const copyFunc = (text) => {
 /**
  * 打开邀请码详情窗口
  * @param {string} inviteCodeValue - 邀请码
- * @param {string} sysType - 系统类型
+ * @param {string} sysTypeValue - 系统类型
  */
-const inviteCodeFunc = (inviteCodeValue, sysType) => {
-  inviteCodeRef.value.show(inviteCodeValue, sysType)
+const openInviteCode = (inviteCodeValue, sysTypeValue) => {
+  currentInviteCode.value = inviteCodeValue
+  currentSysType.value = sysTypeValue
+  inviteCodeOpen.value = true
 }
 
 /**
@@ -293,18 +340,6 @@ const inviteCodeFunc = (inviteCodeValue, sysType) => {
  */
 const getUserTypeName = (userType) => {
   return userTypeList.find(f => f.userType === userType)?.userTypeName || ''
-}
-
-/**
- * 处理搜索表单数据
- * @param {Object} data - 搜索数据
- */
-const handleSearchFormData = (data) => {
-  if (!data || Object.keys(data).length === 0) {
-    Object.assign(searchData, defaultSearchData)
-  } else {
-    Object.assign(searchData, data)
-  }
 }
 
 /**
@@ -318,27 +353,28 @@ const reqTableDataFunc = async (params) => {
 
 /**
  * 搜索函数
- * @param {boolean} isToFirst - 是否跳转到第一页
  */
-const searchFunc = (isToFirst = false) => {
-  infoTable.value?.reload(isToFirst)
+const searchFunc = () => {
+  reloadTable()
 }
 
 /**
- * 打开新增弹窗
+ * 打开新增抽屉
  */
 const addFunc = () => {
-  infoAddOrEdit.value.show()
+  currentBelongInfoId.value = ''
+  openCreate()
 }
 
 /**
- * 打开编辑弹窗
+ * 打开编辑抽屉
  * @param {string} recordId - 用户ID
  * @param {string} sysType - 系统类型
  * @param {string} belongInfoId - 所属信息ID
  */
 const editFunc = (recordId, sysType, belongInfoId) => {
-  infoAddOrEdit.value.show(recordId, sysType, belongInfoId)
+  currentBelongInfoId.value = belongInfoId
+  openEdit(recordId)
 }
 
 /**
@@ -346,11 +382,15 @@ const editFunc = (recordId, sysType, belongInfoId) => {
  * @param {string} recordId - 用户ID
  */
 const relieveFunc = async (recordId) => {
-  const { infoBox } = await import('@/utils/info-box')
-  infoBox.confirmDanger('确认解除吗？', '', async () => {
-    await sysUserApi.relieveLoginLimit(recordId)
-    message.success('解除成功！')
-    infoTable.value?.reload(false)
+  Modal.confirm({
+    title: '确认解除吗？',
+    content: '',
+    okType: 'danger',
+    async onOk() {
+      await sysUserApi.relieveLoginLimit(recordId)
+      message.success('解除成功！')
+      reloadTable()
+    }
   })
 }
 
@@ -358,23 +398,21 @@ const relieveFunc = async (recordId) => {
  * 删除用户
  * @param {string} recordId - 用户ID
  */
-const delFunc = async (recordId) => {
-  const { infoBox } = await import('@/utils/info-box')
-  infoBox.confirmDanger('确认删除？', '', async () => {
-    await sysUserApi.delById(recordId)
-    message.success('删除成功！')
-    infoTable.value?.reload(false)
-  })
+const delFunc = (recordId) => {
+  confirmDelete(recordId)
 }
 
 /**
- * 分配角色
+ * 打开分配角色抽屉
  * @param {string} recordId - 用户ID
  * @param {string} sysType - 系统类型
  * @param {string} belongInfoId - 所属信息ID
  */
-const roleDist = (recordId, sysType, belongInfoId) => {
-  roleDistRef.value.show(recordId, sysType, belongInfoId)
+const openRoleDist = (recordId, sysType, belongInfoId) => {
+  currentRoleDistId.value = recordId
+  currentRoleDistSysType.value = sysType
+  currentRoleDistBelongInfoId.value = belongInfoId
+  roleDistOpen.value = true
 }
 
 /**
@@ -383,30 +421,45 @@ const roleDist = (recordId, sysType, belongInfoId) => {
  * @param {number} state - 状态值
  */
 const updateState = async (recordId, state) => {
-  const { infoBox } = await import('@/utils/info-box')
   const title = state === 1 ? '确认[启用]该用户？' : '确认[停用]该用户？'
   const content = state === 1 ? '启用后用户可进行登陆等一系列操作' : '停用后该用户将立即退出系统并不可再次登陆'
 
   return new Promise((resolve, reject) => {
-    infoBox.confirmDanger(title, content, async () => {
-      try {
-        await sysUserApi.updateStateById(recordId, { state })
-        searchFunc()
-        resolve()
-      } catch (err) {
-        reject(err)
+    Modal.confirm({
+      title,
+      content,
+      okType: 'danger',
+      async onOk() {
+        try {
+          await sysUserApi.updateStateById(recordId, { state })
+          reloadTable()
+          resolve()
+        } catch (err) {
+          reject(err)
+        }
+      },
+      onCancel() {
+        reject(new Error())
       }
-    }, () => {
-      reject(new Error())
     })
   })
 }
 
 /**
- * 初始化
+ * 处理新增/编辑成功
  */
-onMounted(() => {
-})
+const handleModalSuccess = () => {
+  closeModal()
+  reloadTable()
+}
+
+/**
+ * 处理角色分配成功
+ */
+const handleRoleDistSuccess = () => {
+  roleDistOpen.value = false
+  reloadTable()
+}
 </script>
 
 <style scoped>

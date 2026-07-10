@@ -1,13 +1,17 @@
 <template>
-  <a-modal :title="'邀请码'" :open="isShow" :footer="null">
+  <a-modal :title="'邀请码'" :open="localOpen" :footer="null" @update:open="handleUpdateOpen">
     <div>
       <span>邀请码：{{ inviteCode }}</span>
-      <a-button icon="copy" type="link" @click="copyFunc(inviteCode,'邀请码已复制')"/>
+      <a-button type="link" @click="copyFunc(inviteCode,'邀请码已复制')">
+            <template #icon><CopyOutlined /></template>
+          </a-button>
     </div>
     <div>
       <div>
         <span>商户注册链接：{{ mchRegisterUrl }}</span>
-        <a-button icon="copy" type="link" @click="copyFunc(mchRegisterUrl)"/>
+        <a-button type="link" @click="copyFunc(mchRegisterUrl)">
+            <template #icon><CopyOutlined /></template>
+          </a-button>
       </div>
       <div>
         <span>商户注册二维码：</span>
@@ -19,7 +23,9 @@
     <div v-if="sysType!=='MCH'">
       <div>
         <span>代理商注册链接：{{ agentRegisterUrl }}</span>
-        <a-button icon="copy" type="link" @click="copyFunc(agentRegisterUrl)"/>
+        <a-button type="link" @click="copyFunc(agentRegisterUrl)">
+            <template #icon><CopyOutlined /></template>
+          </a-button>
       </div>
       <div>
         <span>代理商注册二维码：</span>
@@ -32,41 +38,86 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+/**
+ * 邀请码弹窗组件
+ * 功能：展示用户邀请码、注册链接和二维码
+ */
+import { CopyOutlined } from '@ant-design/icons-vue'
+import { ref, watch } from 'vue'
 import VueQr from 'vue-qr'
+import { message } from 'ant-design-vue'
 
-const isShow = ref(false)
-const inviteCode = ref(null)
-const sysType = ref(null)
-const mchRegisterUrl = ref(null)
-const agentRegisterUrl = ref(null)
+/**
+ * 组件属性定义
+ */
+const props = defineProps({
+  open: { type: Boolean, default: false },
+  inviteCode: { type: String, default: '' },
+  sysType: { type: String, default: 'MGR' }
+})
 
+/**
+ * 组件事件定义
+ */
+const emit = defineEmits(['update:open'])
+
+/**
+ * 本地打开状态
+ */
+const localOpen = ref(false)
+
+/**
+ * 商户注册链接
+ */
+const mchRegisterUrl = ref('')
+
+/**
+ * 代理商注册链接
+ */
+const agentRegisterUrl = ref('')
+
+/**
+ * 复制文本到剪贴板
+ * @param {string} text - 要复制的文本
+ * @param {string} msg - 复制成功提示信息
+ * @returns {void}
+ */
 const copyFunc = (text, msg) => {
-  // text是复制文本
-  // 创建input元素
   const el = document.createElement('input')
-  // 给input元素赋值需要复制的文本
   el.setAttribute('value', text)
-  // 将input元素插入页面
   document.body.appendChild(el)
-  // 选中input元素的文本
   el.select()
-  // 复制内容到剪贴板
   document.execCommand('copy')
-  // 删除input元素
   document.body.removeChild(el)
-  import('ant-design-vue').then(({ message }) => {
-    message.success(msg || '复制成功')
-  })
+  message.success(msg || '复制成功')
 }
 
-const show = (inviteCodeParam, sysTypeParam) => {
-  inviteCode.value = inviteCodeParam
-  sysType.value = sysTypeParam
-  mchRegisterUrl.value = 'https://mch.s.agpay.com/register?c=' + inviteCodeParam
-  agentRegisterUrl.value = 'https://agent.s.agpay.com/register?c=' + inviteCodeParam
-  isShow.value = true // 立马展示弹层信息
+/**
+ * 加载邀请码数据
+ * @returns {void}
+ */
+const loadData = () => {
+  mchRegisterUrl.value = 'https://mch.s.agpay.com/register?c=' + props.inviteCode
+  agentRegisterUrl.value = 'https://agent.s.agpay.com/register?c=' + props.inviteCode
 }
+
+/**
+ * 处理open更新事件
+ */
+const handleUpdateOpen = (val) => {
+  localOpen.value = val
+  emit('update:open', val)
+}
+
+/**
+ * 监听 open 属性变化，加载数据
+ */
+watch(() => props.open, (newVal) => {
+  localOpen.value = newVal
+  if (newVal) {
+    loadData()
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>

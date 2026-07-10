@@ -1,7 +1,13 @@
-<template>
-  <a-drawer v-model:open="localOpen" title="支付订单详情" :width="720" @close="handleClose">
+﻿<template>
+  <ag-drawer
+    v-model:open="localOpen"
+    title="支付订单详情"
+    width="40%"
+    :show-footer="false"
+    @close="handleClose"
+  >
     <a-spin :spinning="loading">
-      <a-descriptions :column="2">
+      <a-descriptions :column="2" :bordered="false">
         <a-descriptions-item label="支付订单号" :span="2">
           <a-typography-text copyable
             ><b>{{ detailData.payOrderId }}</b></a-typography-text
@@ -85,10 +91,11 @@
         </a-descriptions-item>
       </a-descriptions>
     </a-spin>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+import { AgDrawer } from '@/components'
 import { orderApi } from '@/api/business/order/order-api'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'

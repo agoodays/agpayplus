@@ -1,7 +1,8 @@
-<template>
+﻿<template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -44,22 +45,20 @@
           </a-col>
         </template>
       </ag-search>
+      
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
-        :init-data="false"
+        ref="tableRef"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :params="searchData"
         row-key="qrcId"
-        @btn-load-close="btnLoading = false"
       >
         <template #toolbar-left>
-          <div>
-            <a-button v-if="$access('ENT_DEVICE_QRC_ADD')" type="primary" icon="plus" class="mg-b-30" @click="addFunc"
-              >生成二维码</a-button
-            >
-          </div>
+          <a-button v-if="hasPermission('ENT_DEVICE_QRC_ADD')" type="primary" @click="addFunc">
+            <template #icon><PlusOutlined /></template>
+            生成二维码
+          </a-button>
         </template>
         <template #qrcIdSlot="{ record }">
           <span>
@@ -90,12 +89,8 @@
         <template #stateSlot="{ record }">
           <ag-state-switch
             :state="record.state"
-            :show-switch-type="$access('ENT_DEVICE_QRC_EDIT')"
-            :on-change="
-              (state) => {
-                return updateState(record.qrcId, state)
-              }
-            "
+            :show-switch-type="hasPermission('ENT_DEVICE_QRC_EDIT')"
+            :on-change="(state) => updateState(record.qrcId, state)"
           />
         </template>
         <template #fixedPayAmountSlot="{ record }">
@@ -104,38 +99,43 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_DEVICE_QRC_VIEW')" type="link" @click="onPreview(record.qrcId)">预览</a-button>
-            <a-button v-if="$access('ENT_DEVICE_QRC_EDIT')" type="link" @click="editFunc(record.qrcId)">编辑</a-button>
-            <a-button v-if="$access('ENT_DEVICE_QRC_EDIT')" type="link" @click="bindFunc(record.qrcId)">绑定</a-button>
-            <a-button
-              v-if="$access('ENT_DEVICE_QRC_EDIT') && record.bindState === 1"
-              type="link"
-              @click="unbindFunc(record.qrcId)"
-              >解绑</a-button
-            >
-            <a-button v-if="$access('ENT_DEVICE_QRC_DEL')" type="link" style="color: red" @click="delFunc(record.qrcId)"
-              >删除</a-button
-            >
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_VIEW')" type="link" @click="onPreview(record.qrcId)">预览</a-button>
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT')" type="link" @click="editFunc(record.qrcId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT')" type="link" @click="bindFunc(record.qrcId)">绑定</a-button>
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT') && record.bindState === 1" type="link" @click="unbindFunc(record.qrcId)">解绑</a-button>
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_DEL')" type="link" style="color: red" @click="delFunc(record.qrcId)">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
     <!-- 新增/编辑页面弹窗  -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="searchFunc" />
-    <Bind ref="bind" :callback-func="searchFunc" />
+    <add-or-edit v-model:open="addOrEditOpen" :record-id="editRecordId" @success="searchFunc" />
+    <bind v-model:open="bindOpen" :record-id="bindRecordId" @success="searchFunc" />
   </div>
 </template>
 <script setup>
-import { ExclamationCircleOutlined, QrcodeOutlined } from '@ant-design/icons-vue'
-const icons = { ExclamationCircleOutlined, QrcodeOutlined }
+/**
+ * 二维码列表页面组件
+ * 功能：展示二维码列表，支持搜索、生成、预览、编辑、绑定、解绑、删除等操作
+ */
+import { ExclamationCircleOutlined, PlusOutlined, QrcodeOutlined } from '@ant-design/icons-vue'
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import InfoAddOrEdit from './add-or-edit.vue'
+import AddOrEdit from './add-or-edit.vue'
 import Bind from './bind.vue'
 import { message } from 'ant-design-vue'
 
+const icons = { ExclamationCircleOutlined, QrcodeOutlined }
+
+// 权限检查
+const { hasPermission } = usePermission()
+
+/**
+ * 表格列配置
+ */
 const tableColumns = [
   { key: 'qrcId', fixed: 'left', title: '二维码ID', width: 180, customRender: 'qrcIdSlot' },
   { key: 'batchId', dataIndex: 'batchId', title: '批次号', width: 135 },
@@ -148,101 +148,179 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
+/**
+ * 路由实例
+ */
 const route = useRoute()
-const infoTable = ref(null)
-const infoAddOrEdit = ref(null)
-const bind = ref(null)
-const btnLoading = ref(false)
+
+/**
+ * 组件引用
+ */
+const tableRef = ref(null)
+const addOrEditOpen = ref(false)
+const editRecordId = ref(null)
+const bindOpen = ref(false)
+const bindRecordId = ref(null)
+
+/**
+ * 加载状态
+ */
+const loading = ref(false)
+
+/**
+ * 搜索表单数据
+ */
 const searchData = reactive({})
 
+/**
+ * 搜索代理商
+ * @param {Object} params - 搜索参数
+ * @returns {Promise<Object>} 代理商列表
+ */
 const searchAgent = (params) => qrcApi.searchAgent(params)
+
+/**
+ * 搜索商户
+ * @param {Object} params - 搜索参数
+ * @returns {Promise<Object>} 商户列表
+ */
 const searchMch = (params) => qrcApi.searchMch(params)
-const reqTableDataFunc = (params) => qrcApi.queryPage(params)
 
-function reloadTable() {
-  infoTable.value?.reload()
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await qrcApi.queryPage(params)
 }
 
-function searchFunc(isToFirst = false) {
-  btnLoading.value = true
-  infoTable.value?.reload(isToFirst)
+/**
+ * 刷新表格数据
+ */
+const reloadTable = () => {
+  tableRef.value?.reload()
 }
 
-function onPreview(recordId) {
-  qrcApi.viewQrc(recordId).then((res) => {
+/**
+ * 搜索函数
+ * @param {boolean} isToFirst - 是否跳转到第一页
+ */
+const searchFunc = (isToFirst = false) => {
+  loading.value = true
+  tableRef.value?.reload(isToFirst)
+}
+
+/**
+ * 预览二维码
+ * @param {string} recordId - 二维码ID
+ */
+const onPreview = async (recordId) => {
+  try {
+    const res = await qrcApi.viewQrc(recordId)
     window.$viewerApi({
       images: [res],
       options: {
         initialViewIndex: 0
       }
     })
+  } catch (error) {
+    console.error('预览二维码失败:', error)
+  }
+}
+
+/**
+ * 生成二维码
+ */
+const addFunc = () => {
+  editRecordId.value = null
+  addOrEditOpen.value = true
+}
+
+/**
+ * 编辑二维码
+ * @param {string} qrcId - 二维码ID
+ */
+const editFunc = (qrcId) => {
+  editRecordId.value = qrcId
+  addOrEditOpen.value = true
+}
+
+/**
+ * 绑定二维码
+ * @param {string} qrcId - 二维码ID
+ */
+const bindFunc = (qrcId) => {
+  bindRecordId.value = qrcId
+  bindOpen.value = true
+}
+
+/**
+ * 删除二维码
+ * @param {string} qrcId - 二维码ID
+ */
+const delFunc = async (qrcId) => {
+  const { infoBox } = await import('@/utils/info-box')
+  infoBox.confirmDanger('确定删除吗', '', async () => {
+    try {
+      await qrcApi.delById(qrcId)
+      message.success('删除成功')
+      reloadTable()
+    } catch (error) {
+      console.error('删除二维码失败:', error)
+    }
   })
 }
 
-function addFunc() {
-  infoAddOrEdit.value?.show()
-}
-
-function editFunc(qrcId) {
-  infoAddOrEdit.value?.show(qrcId)
-}
-
-function bindFunc(qrcId) {
-  bind.value?.show(qrcId)
-}
-
-function delFunc(qrcId) {
-  window.$infoBox.confirmDanger('确定删除吗', '', () => {
-    qrcApi.delById(qrcId).then(() => {
-      message.success('删除成功')
-      reloadTable()
+/**
+ * 解绑二维码
+ * @param {string} recordId - 二维码ID
+ * @returns {Promise} 操作结果
+ */
+const unbindFunc = async (recordId) => {
+  const { infoBox } = await import('@/utils/info-box')
+  return new Promise((resolve, reject) => {
+    infoBox.confirmDanger('确认解绑', '解绑后商户将无法使用该二维码', async () => {
+      try {
+        await qrcApi.unbindById(recordId)
+        searchFunc()
+        resolve()
+      } catch (err) {
+        reject(err)
+      }
+    }, () => {
+      reject(new Error())
     })
   })
 }
 
-function unbindFunc(recordId) {
-  return new Promise((resolve, reject) => {
-    window.$infoBox.confirmDanger(
-      '确认解绑',
-      '解绑后商户将无法使用该二维码',
-      () => {
-        return qrcApi
-          .unbindById(recordId)
-          .then(() => {
-            searchFunc()
-            resolve()
-          })
-          .catch((err) => reject(err))
-      },
-      () => {
-        reject(new Error())
-      }
-    )
-  })
-}
-
-function updateState(recordId, state) {
+/**
+ * 更新二维码状态
+ * @param {string} recordId - 二维码ID
+ * @param {number} state - 状态值
+ * @returns {Promise} 操作结果
+ */
+const updateState = async (recordId, state) => {
+  const { infoBox } = await import('@/utils/info-box')
   const title = state === 1 ? '确认[启用]吗' : '确认[停用]吗'
   return new Promise((resolve, reject) => {
-    window.$infoBox.confirmDanger(
-      title,
-      '',
-      () => {
-        return qrcApi
-          .updateStateById(recordId, state)
-          .then(() => {
-            searchFunc()
-            resolve()
-          })
-          .catch((err) => reject(err))
-      },
-      () => {
-        reject(new Error())
+    infoBox.confirmDanger(title, '', async () => {
+      try {
+        await qrcApi.updateStateById(recordId, state)
+        searchFunc()
+        resolve()
+      } catch (err) {
+        reject(err)
       }
-    )
+    }, () => {
+      reject(new Error())
+    })
   })
 }
 
+/**
+ * 组件挂载时初始化
+ */
 onMounted(() => {
   searchData.mchNo = route.query.mchNo
   searchFunc()

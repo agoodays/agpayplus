@@ -1,7 +1,8 @@
-<template>
+﻿<template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -25,9 +26,10 @@
           </a-col>
         </template>
       </ag-search>
+      
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
+        ref="tableRef"
         :on-load="reqTableDataFunc"
         :on-download="reqDownloadDataFunc"
         :columns="tableColumns"
@@ -174,9 +176,7 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_STATISTIC_MCH')" type="link" @click="detailFunc(record.agentNo)"
-              >商户统计</a-button
-            >
+            <a-button v-if="hasPermission('ENT_STATISTIC_MCH')" type="link" @click="detailFunc(record.agentNo)">商户统计</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -184,45 +184,33 @@
   </div>
 </template>
 <script setup>
+/**
+ * 代理商交易统计页面组件
+ * 功能：展示代理商交易统计数据，支持搜索、导出和查看商户统计详情
+ */
 import { InfoCircleOutlined } from '@ant-design/icons-vue'
-const icons = { InfoCircleOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { downloadExcel } from '@/lib/ag-axios'
+
+const icons = { InfoCircleOutlined }
+
+// 权限检查
+const { hasPermission } = usePermission()
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
   { key: 'agentName', dataIndex: 'agentName', title: '代理商名称', width: 160, fixed: 'left', ellipsis: true },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
-  {
-    key: 'payAmount',
-    title: '交易金额',
-    width: 110,
-    ellipsis: true,
-    customRender: 'payAmountSlot'
-  },
-  {
-    key: 'amount',
-    title: '实际收入',
-    width: 110,
-    customRender: 'amountSlot'
-  },
+  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot' },
+  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot' },
   { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
-  {
-    key: 'refundFee',
-    title: '退款手续费',
-    width: 125,
-    customRender: 'refundFeeSlot'
-  },
-  {
-    key: 'refundCount',
-    title: '退款笔数',
-    width: 110,
-    customRender: 'refundCountSlot'
-  },
+  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot' },
+  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot' },
   { key: 'count', title: '成功/总笔数', width: 120, customRender: 'countSlot' },
   { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot' },
   { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', customRender: 'opSlot' }
@@ -231,8 +219,8 @@ const tableColumns = [
 const route = useRoute()
 const router = useRouter()
 
-const infoTable = ref(null)
-const btnLoading = ref(false)
+const tableRef = ref(null)
+const loading = ref(false)
 const queryDateRange = route.query.queryDateRange || 'today'
 const isvNo = route.query.isvNo || ''
 const detailQueryDateRange = ref(queryDateRange)
@@ -264,9 +252,9 @@ const reqDownloadDataFunc = (params) => {
 }
 
 const searchFunc = () => {
-  btnLoading.value = true
+  loading.value = true
   detailQueryDateRange.value = searchData.queryDateRange
-  infoTable.value?.reload()
+  tableRef.value?.reload()
 }
 
 const detailFunc = (agentNo) => {

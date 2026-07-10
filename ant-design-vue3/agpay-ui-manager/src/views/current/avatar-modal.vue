@@ -1,12 +1,12 @@
 <template>
   <a-modal
     title="修改头像"
-    :visible="visible"
+    v-model:open="localOpen"
     :mask-closable="false"
     :confirm-loading="confirmLoading"
     :width="800"
     :footer="null"
-    @cancel="cancelHandel"
+    @cancel="handleClose"
   >
     <a-row>
       <a-col :xs="24" :md="12" style="height: '350px'">
@@ -34,7 +34,10 @@
     <br />
     <a-row>
       <a-col :lg="2" :md="2">
-        <a-button icon="upload" @click="triggerUpload">选择图片</a-button>
+        <a-button @click="triggerUpload">
+          <template #icon><UploadOutlined /></template>
+          选择图片
+        </a-button>
       </a-col>
       <a-col :lg="{ span: 2, offset: 18 }" :md="2">
         <a-button type="primary" @click="finish">保存</a-button>
@@ -44,17 +47,30 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+/**
+ * 修改头像模态框组件
+ * 功能：上传和裁剪用户头像
+ */
+import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { upload } from '@/lib/ag-axios'
-import AgUpload from '@/components/ag-upload'
+import { AgUpload } from '@/components'
 
-const icons = { PlusOutlined }
+const icons = { PlusOutlined, UploadOutlined }
 
-const emit = defineEmits(['ok'])
+/** Props 定义 */
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false
+  }
+})
 
-const visible = ref(false)
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'ok'])
+
+const localOpen = ref(false)
 const confirmLoading = ref(false)
 const options = reactive({
   img: '',
@@ -65,16 +81,22 @@ const options = reactive({
 })
 const previews = reactive({})
 
-const show = (id) => {
-  visible.value = true
-}
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+  }
+)
 
-const close = () => {
-  visible.value = false
-}
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
 
-const cancelHandel = () => {
-  close()
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
 }
 
 const triggerUpload = () => {
@@ -98,11 +120,9 @@ const finish = () => {
     confirmLoading.value = false
     message.success('上传成功')
     emit('ok', options.img)
-    visible.value = false
+    localOpen.value = false
   }, 500)
 }
-
-defineExpose({ show })
 </script>
 
 <style lang="less" scoped>

@@ -7,10 +7,18 @@
 </template>
 
 <script setup>
+/**
+ * 角色权限分配组件
+ * 功能：展示权限树，支持选择权限点
+ */
 import { roleApi } from '@/api/business/role/role-api'
+import { usePermission } from '@/composables/useCommon'
 import { reactive, ref } from 'vue'
 
-const hasEnt = window.$access('ENT_UR_ROLE_DIST')
+// 权限检查
+const { hasPermission } = usePermission()
+
+const hasEnt = hasPermission('ENT_UR_ROLE_DIST')
 const recordId = ref(null)
 const treeData = ref([])
 const replaceFields = { key: 'entId', title: 'entName' }

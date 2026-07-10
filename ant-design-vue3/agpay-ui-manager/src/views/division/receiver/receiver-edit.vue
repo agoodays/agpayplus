@@ -1,12 +1,12 @@
 <template>
-  <a-drawer
-    :visible="isShow"
+  <ag-drawer
+    v-model:open="localOpen"
     title="修改分账用户信息"
     width="30%"
     :mask-closable="false"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    @close="onClose"
+    @close="handleClose"
   >
     <a-form
       ref="infoForm"
@@ -39,28 +39,48 @@
     </a-form>
 
     <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" icon="close" @click="onClose">取消</a-button>
-      <a-button type="primary" :loading="confirmLoading" icon="check" @click="handleOkFunc">保存</a-button>
+      <a-button :style="{ marginRight: '8px' }" @click="onClose">
+        <template #icon><CloseOutlined /></template>
+        取消
+      </a-button>
+      <a-button type="primary" :loading="confirmLoading" @click="handleOkFunc">
+        <template #icon><CheckOutlined /></template>
+        保存
+      </a-button>
     </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+/**
+ * 分账接收者编辑组件
+ * 功能：修改分账接收者信息
+ */
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
+import { AgDrawer } from '@/components'
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
 import { message } from 'ant-design-vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
+/** Props 定义 */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: {
+    type: Boolean,
+    default: false
+  },
+  recordId: {
+    type: String,
+    default: ''
+  }
 })
 
-const emit = defineEmits(['close'])
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'success'])
 
 const infoForm = ref(null)
 const confirmLoading = ref(false)
-const isShow = ref(false)
+const localOpen = ref(false)
 const saveObject = ref({})
-const recordId = ref(null)
 const allReceiverGroup = ref([])
 
 const rules = {
@@ -70,14 +90,30 @@ const rules = {
   state: [{ required: true, message: '请选择状态', trigger: 'blur' }]
 }
 
-const show = async (id) => {
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  async (val) => {
+    localOpen.value = val
+    if (val && props.recordId) {
+      await initForm()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+/** 初始化表单 */
+const initForm = async () => {
   saveObject.value = {}
   confirmLoading.value = false
   infoForm.value?.resetFields?.()
-  recordId.value = id
 
   const [res, groupRes] = await Promise.all([
-    divisionReceiverApi.getById(id),
+    divisionReceiverApi.getById(props.recordId),
     divisionReceiverApi.listReceiverGroup({ pageSize: -1 })
   ])
   
@@ -86,8 +122,6 @@ const show = async (id) => {
   saveObject.value = current
   
   allReceiverGroup.value = groupRes.records || []
-  
-  isShow.value = true
 }
 
 const handleOkFunc = async () => {
@@ -106,19 +140,17 @@ const handleOkFunc = async () => {
       state: saveObject.value.state
     }
 
-    await divisionReceiverApi.updateById(recordId.value, reqObject)
+    await divisionReceiverApi.updateById(props.recordId, reqObject)
     message.success('修改成功')
-    isShow.value = false
-    props.callbackFunc()
+    localOpen.value = false
+    emit('success')
   } finally {
     confirmLoading.value = false
   }
 }
 
-const onClose = () => {
-  isShow.value = false
-  emit('close')
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
 }
-
-defineExpose({ show })
 </script>

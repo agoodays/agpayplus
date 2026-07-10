@@ -1,15 +1,14 @@
-<template>
-  <a-drawer
+﻿<template>
+  <ag-drawer
+    :open="localOpen"
     :title="isAdd ? '新增操作员' : '修改操作员'"
-    placement="right"
-    :closable="true"
-    @ok="handleOkFunc"
-    :open="isShow"
-    width="600"
-    @close="onClose"
+    width="40%"
     :mask-closable="false"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+    :show-confirm="true"
+    :confirm-loading="confirmLoading"
+    @confirm="handleConfirm"
+    @close="handleClose"
+    @update:open="handleUpdateOpen"
   >
     <a-form
       ref="infoForm"
@@ -129,7 +128,8 @@
             <a-form-item label="登录密码" name="loginPassword">
               <a-input placeholder="请输入登录密码" v-model:value="saveObject.loginPassword"/>
             </a-form-item>
-            <a-button icon="file-sync" :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword">
+            <a-button :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword">
+              <template #icon><FileSyncOutlined /></template>
               随机生成密码
             </a-button>
           </a-col>
@@ -174,44 +174,93 @@
         </div>
       </div>
 
-      <div class="drawer-btn-center">
-        <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
-        <a-button type="primary" @click="handleOkFunc" icon="check" :loading="confirmLoading">保存</a-button>
-      </div>
-
     </a-form>
 
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+/**
+ * 系统用户新增/编辑抽屉组件
+ * 功能：支持新增和修改系统用户，包含用户基本信息、密码设置、角色分配等
+ */
+import { CheckOutlined, CloseOutlined, FileSyncOutlined } from '@ant-design/icons-vue'
+import { AgDrawer } from '@/components'
 import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
 import { Base64 } from '@/lib/encrypt'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
+import { message } from 'ant-design-vue'
 
+/**
+ * 组件属性定义
+ */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => ({}) }
+  open: { type: Boolean, default: false },
+  recordId: { type: String, default: '' },
+  sysType: { type: String, default: 'MGR' },
+  belongInfoId: { type: String, default: '' }
 })
 
+/**
+ * 组件事件定义
+ */
+const emit = defineEmits(['update:open', 'success'])
+
+/**
+ * 表单引用
+ */
 const infoForm = ref(null)
+
+/**
+ * 是否为新增操作
+ */
 const isAdd = ref(true)
-const isShow = ref(false)
+
+/**
+ * 本地打开状态
+ */
+const localOpen = ref(false)
+
+/**
+ * 确认按钮加载状态
+ */
 const confirmLoading = ref(false)
+
+/**
+ * 是否显示重置密码选项
+ */
 const resetIsShow = ref(false)
+
+/**
+ * 新密码输入框值
+ */
 const newPwd = ref('')
+
+/**
+ * 团队列表
+ */
 const teamList = ref([])
 
-const sysPassword = reactive({
-  resetPass: false, // 重置密码
-  defaultPass: true, // 使用默认密码
-  confirmPwd: '' //  确认密码
-})
-
+/**
+ * 用户类型选项列表
+ */
 const userTypeOptions = ref([
   { userTypeName: '超级管理员', userType: 1 },
   { userTypeName: '普通操作员', userType: 2 }
 ])
 
+/**
+ * 密码相关状态
+ */
+const sysPassword = reactive({
+  resetPass: false,
+  defaultPass: true,
+  confirmPwd: ''
+})
+
+/**
+ * 保存表单数据对象
+ */
 const saveObject = reactive({
   state: 1,
   sex: 1,
@@ -222,11 +271,17 @@ const saveObject = reactive({
   loginPassword: ''
 })
 
+/**
+ * 密码规则配置
+ */
 const passwordRules = reactive({
   regexpRules: '',
   errTips: ''
 })
 
+/**
+ * 表单验证规则
+ */
 const rules = reactive({
   realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }],
   userType: [{ required: true, validator: (rule, value, callback) => {
@@ -255,7 +310,7 @@ const rules = reactive({
       }
       callBack()
     }
-  }], // 新密码
+  }],
   confirmPwd: [{
     required: true,
     trigger: 'blur',
@@ -274,104 +329,100 @@ const rules = reactive({
       newPwd.value === sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
       callBack()
     }
-  }] // 确认新密码
+  }]
 })
 
-const recordId = ref(null)
-
-// 随机生成密码
+/**
+ * 随机生成密码
+ * @returns {void}
+ */
 const genRandomPassword = () => {
-  const passwordLength = 6 // 密码长度
+  const passwordLength = 6
   let password = ''
   let characters = 'abcdefghijklmnopqrstuvwxyz'
 
-  // 根据用户选择动态添加字符集
-  const includeUpperCase = true // 包含大写字母
-  const includeNumber = false // 包含数字
-  const includeSymbol = false // 包含符号
+  const includeUpperCase = true
+  const includeNumber = false
+  const includeSymbol = false
 
   if (includeUpperCase) characters += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   if (includeNumber) characters += '0123456789'
   if (includeSymbol) characters += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
 
-  // 如果密码规则未定义，使用默认逻辑生成密码
   if (!passwordRules.regexpRules) {
     for (let i = 0; i < passwordLength; i++) {
       password += characters.charAt(Math.floor(Math.random() * characters.length))
     }
   } else {
-    // 使用密码规则生成密码
-    const regex = new RegExp(passwordRules.regexpRules) // 使用密码规则的正则表达式
-
-    // 提取长度规则（例如 ^.{8,}$ 表示最少 8 位）
+    const regex = new RegExp(passwordRules.regexpRules)
     const lengthMatch = passwordRules.regexpRules.match(/\{(\d+),?(\d+)?\}/)
-    const minLength = lengthMatch ? parseInt(lengthMatch[1], 10) : passwordLength // 默认最小长度为 6
-    const maxLength = lengthMatch && lengthMatch[2] ? parseInt(lengthMatch[2], 10) : minLength // 如果没有最大长度，则使用最小长度
+    const minLength = lengthMatch ? parseInt(lengthMatch[1], 10) : passwordLength
+    const maxLength = lengthMatch && lengthMatch[2] ? parseInt(lengthMatch[2], 10) : minLength
+    const generatedLength = Math.min(maxLength, minLength)
 
-    const generatedLength = Math.min(maxLength, minLength) // 使用最小长度或最大长度
-
-    // 循环生成密码，直到符合规则
     do {
       password = ''
       for (let i = 0; i < generatedLength; i++) {
         password += characters.charAt(Math.floor(Math.random() * characters.length))
       }
-    } while (!regex.test(password)) // 验证生成的密码是否符合规则
+    } while (!regex.test(password))
   }
 
   saveObject.loginPassword = password
 }
 
-// 点击【确认】按钮事件
-const handleOkFunc = () => {
-  infoForm.value.validate().then(() => {
-    confirmLoading.value = true // 显示loading
+/**
+ * 处理确认按钮点击
+ * @returns {Promise<void>}
+ */
+const handleConfirm = async () => {
+  try {
+    await infoForm.value.validate()
+    confirmLoading.value = true
     if (isAdd.value) {
-      sysUserApi.add(saveObject).then(res => {
-        import('ant-design-vue').then(({ message }) => {
-          message.success('新增成功')
-          isShow.value = false
-          props.callbackFunc() // 刷新列表
-        })
-      }).catch((res) => {
-        confirmLoading.value = false
-      })
+      await sysUserApi.add(saveObject)
+      message.success('新增成功')
+      emit('success')
     } else {
       sysPassword.confirmPwd = Base64.encode(sysPassword.confirmPwd)
-      Object.assign(saveObject, sysPassword) // 拼接对象
-      sysUserApi.updateById(recordId.value, saveObject).then(res => {
-        import('ant-design-vue').then(({ message }) => {
-          message.success('修改成功')
-          isShow.value = false
-          props.callbackFunc() // 刷新列表
-          resetIsShow.value = false // 取消展示
-          sysPassword.resetPass = false
-          sysPassword.defaultPass = true // 是否使用默认密码默认为true
-          resetPassEmpty() // 清空密码
-        })
-      }).catch(res => {
-        confirmLoading.value = false
-        resetIsShow.value = false // 取消展示
-        sysPassword.resetPass = false
-        sysPassword.defaultPass = true // 是否使用默认密码默认为true
-        resetPassEmpty() // 清空密码
-      })
+      Object.assign(saveObject, sysPassword)
+      await sysUserApi.updateById(props.recordId, saveObject)
+      message.success('修改成功')
+      emit('success')
+      resetIsShow.value = false
+      sysPassword.resetPass = false
+      sysPassword.defaultPass = true
+      resetPassEmpty()
     }
-  }).catch(error => {
-    console.error('验证失败:', error)
-  })
+  } catch (error) {
+    console.error('操作失败:', error)
+  } finally {
+    confirmLoading.value = false
+    if (!isAdd.value) {
+      resetIsShow.value = false
+      sysPassword.resetPass = false
+      sysPassword.defaultPass = true
+      resetPassEmpty()
+    }
+  }
 }
 
-// 关闭抽屉
-const onClose = () => {
-  isShow.value = false
-  resetIsShow.value = false // 取消重置密码板块展示
-  resetPassEmpty() // 清空密码
-  sysPassword.resetPass = false // 关闭密码输入
-  sysPassword.defaultPass = true // 是否使用默认密码默认为true
+/**
+ * 处理关闭按钮点击
+ * @returns {void}
+ */
+const handleClose = () => {
+  resetIsShow.value = false
+  resetPassEmpty()
+  sysPassword.resetPass = false
+  sysPassword.defaultPass = true
+  emit('update:open', false)
 }
 
-// 使用默认密码重置是否为true
+/**
+ * 恢复默认密码时清空输入
+ * @returns {void}
+ */
 const isResetPass = () => {
   if (!sysPassword.defaultPass) {
     newPwd.value = ''
@@ -379,34 +430,41 @@ const isResetPass = () => {
   }
 }
 
-// 保存后清空密码
+/**
+ * 清空密码输入
+ * @returns {void}
+ */
 const resetPassEmpty = () => {
   newPwd.value = ''
   sysPassword.confirmPwd = ''
 }
 
-// 弹层打开事件
-const show = (recordIdParam, sysType, belongInfoId) => {
+/**
+ * 加载用户详情数据
+ * @param {string} recordIdParam - 用户ID
+ * @returns {void}
+ */
+const loadDetail = async () => {
   if (infoForm.value) {
     infoForm.value.resetFields()
   }
 
-  isAdd.value = !recordIdParam
-  sysType = sysType?.length > 0 ? sysType : 'MGR'
+  isAdd.value = !props.recordId
+  const sysTypeVal = props.sysType?.length > 0 ? props.sysType : 'MGR'
   userTypeOptions.value = [
     { userTypeName: '超级管理员', userType: 1 },
     { userTypeName: '普通操作员', userType: 2 }
   ]
-  if (sysType === 'MGR' || sysType === 'AGENT') {
+
+  if (sysTypeVal === 'MGR' || sysTypeVal === 'AGENT') {
     userTypeOptions.value.push({ userTypeName: '商户拓展员', userType: 3 })
   }
 
-  if (sysType === 'MCH') {
+  if (sysTypeVal === 'MCH') {
     userTypeOptions.value.push({ userTypeName: '店长', userType: 11 })
     userTypeOptions.value.push({ userTypeName: '店员', userType: 12 })
   }
 
-  // 数据恢复为默认数据
   Object.assign(saveObject, {
     state: 1,
     sex: 1,
@@ -417,7 +475,7 @@ const show = (recordIdParam, sysType, belongInfoId) => {
     loginPassword: ''
   })
   rules.loginUsername = []
-  confirmLoading.value = false // 关闭loading
+  confirmLoading.value = false
 
   if (isAdd.value) {
     rules.loginUsername.push({
@@ -428,27 +486,41 @@ const show = (recordIdParam, sysType, belongInfoId) => {
     })
   }
 
-  sysUserApi.queryTeamPage({ pageSize: -1, sysType: sysType, belongInfoId: belongInfoId }).then(res => { // 用户团队下拉选择列表
-    teamList.value = res.records
-  })
-  if (!isAdd.value) { // 修改信息 延迟展示弹层
-    resetIsShow.value = true // 展示重置密码板块
-    recordId.value = recordIdParam
-    sysUserApi.getById(recordIdParam).then(res => { 
-      Object.assign(saveObject, res) 
-    })
-    isShow.value = true
-  } else {
-    isShow.value = true // 立马展示弹层信息
+  const teamRes = await sysUserApi.queryTeamPage({ pageSize: -1, sysType: sysTypeVal, belongInfoId: props.belongInfoId })
+  teamList.value = teamRes.records
+
+  if (!isAdd.value) {
+    resetIsShow.value = true
+    const res = await sysUserApi.getById(props.recordId)
+    Object.assign(saveObject, res)
   }
 }
 
+/**
+ * 监听 open 属性变化，加载数据
+ */
+watch(() => props.open, (newVal) => {
+  localOpen.value = newVal
+  if (newVal) {
+    loadDetail()
+  }
+}, { immediate: true })
+
+/**
+ * 处理open更新事件
+ */
+const handleUpdateOpen = (val) => {
+  localOpen.value = val
+  emit('update:open', val)
+}
+
+/**
+ * 组件挂载时加载密码规则
+ */
 onMounted(() => {
   sysUserApi.queryPwdRulesRegexp().then((res) => {
     passwordRules.regexpRules = res.regexpRules
     passwordRules.errTips = res.errTips
   })
 })
-
-defineExpose({ show })
 </script>

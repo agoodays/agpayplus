@@ -2,7 +2,7 @@
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -91,12 +91,10 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
-        :init-data="true"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
         row-key="id"
-        @btn-load-close="btnLoading = false"
       >
         <!-- 业务类型列 -->
         <template #bizTypeSlot="{ record }">
@@ -108,6 +106,21 @@
         <!-- 角色名称列 -->
         <template #infoNameSlot="{ record }">
           {{ getInfoNameText(record) }}
+        </template>
+
+        <!-- 变动前账户余额列 -->
+        <template #beforeBalanceSlot="{ record }">
+          ￥{{ (record.beforeBalance / 100).toFixed(2) }}
+        </template>
+
+        <!-- 变动金额列 -->
+        <template #changeAmountSlot="{ record }">
+          ￥{{ (record.changeAmount / 100).toFixed(2) }}
+        </template>
+
+        <!-- 变动后账户余额列 -->
+        <template #afterBalanceSlot="{ record }">
+          ￥{{ (record.afterBalance / 100).toFixed(2) }}
         </template>
 
         <!-- 操作列 -->
@@ -155,7 +168,7 @@ const {
 /**
  * 加载状态
  */
-const btnLoading = ref(true)
+const loading = ref(true)
 
 /**
  * 默认查询参数
@@ -173,9 +186,9 @@ const tableColumns = [
   { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
   { key: 'bizType', title: '业务类型', width: 160, customRender: 'bizTypeSlot' },
   { key: 'infoName', title: '角色名称', width: 260, customRender: 'infoNameSlot' },
-  { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
-  { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
-  { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: (text) => '￥' + (text / 100).toFixed(2) },
+  { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 180, customRender: 'beforeBalanceSlot' },
+  { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 180, customRender: 'changeAmountSlot' },
+  { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: 'afterBalanceSlot' },
   { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联业务订单号', width: 200 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
@@ -236,7 +249,7 @@ const getInfoNameText = (record) => {
  * 搜索触发
  */
 const searchFunc = () => {
-  btnLoading.value = true
+  loading.value = true
   reloadTable()
 }
 

@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
@@ -54,50 +54,44 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
-        :columns="columns"
+        :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
         row-key="mchNo"
       >
-        <!-- 工具栏左侧 -->
         <template #toolbar-left>
-          <div>
-            <a-button v-if="hasPermission('ENT_MCH_INFO_ADD')" type="primary" class="mg-b-30" @click="addFunc">
-              <plus-outlined /> 新建商户
-            </a-button>
-          </div>
+          <a-button v-if="hasPermission('ENT_MCH_INFO_ADD')" type="primary" @click="addFunc">
+            <plus-outlined /> 新建商户
+          </a-button>
         </template>
 
-        <!-- 状态列自定义渲染 -->
-        <template #state="{ record }">
+        <template #stateSlot="{ record }">
           <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
         </template>
 
-        <!-- 商户类型列自定义渲染 -->
-        <template #type="{ record }">
+        <template #typeSlot="{ record }">
           <a-tag :color="record.type === 1 ? 'green' : 'orange'">
             {{ record.type === 1 ? '普通商户' : '特约商户' }}
           </a-tag>
         </template>
 
-        <!-- 操作列 -->
-        <template #actions="{ record }">
-          <ag-table-actions :max-show-num="4">
-            <a-button type="link" size="small" @click="detailFunc(record)">查看</a-button>
-            <a-button type="link" size="small" @click="editFunc(record)">修改</a-button>
-            <a-button type="link" size="small" @click="appConfigFunc(record)">应用配置</a-button>
-            <a-button type="link" size="small" @click="advancedConfigFunc(record)">高级功能</a-button>
-            <a-button v-if="hasPermission('ENT_MCH_INFO_DEL')" type="link" size="small" style="color: red" @click="delFunc(record)">删除</a-button>
+        <template #opSlot="{ record }">
+          <ag-table-actions>
+            <a-button type="link" @click="detailFunc(record)">查看</a-button>
+            <a-button type="link" @click="editFunc(record)">修改</a-button>
+            <a-button type="link" @click="appConfigFunc(record)">应用配置</a-button>
+            <a-button type="link" @click="advancedConfigFunc(record)">高级功能</a-button>
+            <a-button v-if="hasPermission('ENT_MCH_INFO_DEL')" type="link" style="color: red" @click="delFunc(record)">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <add-or-edit-modal v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
 
     <!-- 详情抽屉 -->
-    <detail-drawer v-model:open="detailOpen" :record-id="currentRecordId" />
+    <detail v-model:open="detailOpen" :record-id="currentRecordId" />
   </div>
 </template>
 
@@ -113,8 +107,8 @@ import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
-import AddOrEditModal from './add-or-edit.vue'
-import DetailDrawer from './detail.vue'
+import AddOrEdit from './add-or-edit.vue'
+import Detail from './detail.vue'
 
 // 路由实例
 const router = useRouter()
@@ -125,65 +119,16 @@ const { hasPermission } = usePermission()
 /**
  * 表格列配置
  */
-const columns = [
-  {
-    title: '商户名称',
-    key: 'mchName',
-    dataIndex: 'mchName',
-    width: 200,
-    fixed: 'left',
-    ellipsis: true
-  },
-  {
-    title: '商户号',
-    key: 'mchNo',
-    dataIndex: 'mchNo',
-    width: 140
-  },
-  {
-    title: '手机号',
-    key: 'contactTel',
-    dataIndex: 'contactTel',
-    width: 140
-  },
-  {
-    title: '代理商号',
-    key: 'agentNo',
-    dataIndex: 'agentNo',
-    width: 140
-  },
-  {
-    title: '服务商号',
-    key: 'isvNo',
-    dataIndex: 'isvNo',
-    width: 140
-  },
-  {
-    title: '状态',
-    key: 'state',
-    width: 80,
-    customRender: 'state'
-  },
-  {
-    title: '商户类型',
-    key: 'type',
-    width: 100,
-    customRender: 'type'
-  },
-  {
-    title: '创建日期',
-    key: 'createdAt',
-    dataIndex: 'createdAt',
-    width: 180
-  },
-  {
-    title: '操作',
-    key: 'actions',
-    customRender: 'actions',
-    width: 200,
-    fixed: 'right',
-    align: 'center'
-  }
+const tableColumns = [
+  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 200, fixed: 'left', ellipsis: true },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
+  { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
+  { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
+  { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
+  { key: 'state', title: '状态', width: 80, customRender: 'stateSlot' },
+  { key: 'type', title: '商户类型', width: 100, customRender: 'typeSlot' },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
+  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**

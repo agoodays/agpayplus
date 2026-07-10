@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="pay-config-page">
     <a-card :bordered="false">
       <a-result status="info" :title="t('payConfig.comingSoonTitle')" :sub-title="t('common.comingSoon')">

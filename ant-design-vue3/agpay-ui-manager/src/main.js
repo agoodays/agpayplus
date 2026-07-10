@@ -126,14 +126,6 @@ async function initializeApp() {
   // 注册全局方法
   app.config.globalProperties.$infoBox = infoBox
 
-  // 注册全局权限检查方法
-  app.config.globalProperties.$access = (entId) => {
-    const userStore = useUserStore()
-    if (!entId) return true
-    if (userStore.isAdmin) return true
-    return userStore.accessList && userStore.accessList.includes(entId)
-  }
-
   // 批量注册 Ant Design 图标组件
   registerAntIcons(app)
 

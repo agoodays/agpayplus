@@ -1,13 +1,14 @@
 ﻿<template>
-  <a-drawer
+  <ag-drawer
     :mask-closable="false"
-    :visible="visible"
+    :open="localOpen"
     :title="'设置权限匹配规则'"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
     class="drawer-width"
     @close="onClose"
+    @update:open="handleUpdateOpen"
   >
     <a-row>
       <a-col span="24">
@@ -45,9 +46,7 @@
           </a-form-item>
           <a-form-item v-if="sysType === 'MCH'" name="mchType">
             <a-checkbox :checked="matchRule.mchType === 1" @change="onMchTypeChange(1)">普通商户特有权限</a-checkbox>
-            <a-checkbox :checked="matchRule.mchType === 2" @change="onMchTypeChange(2)"
-              >特约商户(服务商模式)特有权限</a-checkbox
-            >
+            <a-checkbox :checked="matchRule.mchType === 2" @change="onMchTypeChange(2)">特约商户(服务商模式)特有权限</a-checkbox>
           </a-form-item>
           <a-form-item v-if="sysType === 'MCH'" name="mchLevelArray">
             <a-checkbox-group v-model="matchRule.mchLevelArray">
@@ -59,54 +58,128 @@
       </a-col>
     </a-row>
     <div class="drawer-btn-center">
-      <a-button icon="close" :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
+      <a-button :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
+        <template #icon><CloseOutlined /></template>
         取消
       </a-button>
-      <a-button
-        type="primary"
-        :style="{ marginRight: '8px' }"
-        icon="check"
-        :loading="addLoading"
-        @click="handleOkFunc('add')"
-      >
+      <a-button type="primary" :style="{ marginRight: '8px' }" :loading="addLoading" @click="handleOkFunc('add')">
+        <template #icon><CheckOutlined /></template>
         添加匹配规则
       </a-button>
-      <a-button type="danger" icon="delete" :loading="deleteLoading" @click="handleOkFunc('delete')">
+      <a-button type="danger" :loading="deleteLoading" @click="handleOkFunc('delete')">
+        <template #icon><DeleteOutlined /></template>
         删除匹配规则
       </a-button>
     </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+/**
+ * 设置权限匹配规则组件
+ * 功能：配置系统菜单的权限匹配规则
+ */
+import { CheckOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { AgDrawer } from '@/components'
 import { entApi } from '@/api/business/ent/ent-api'
-import { ref } from 'vue'
+import { usePermission } from '@/composables/useCommon'
+import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
 
+/** 权限检查 */
+const { hasPermission } = usePermission()
+
+/**
+ * 组件属性
+ */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: { type: Boolean, default: false }
 })
 
-const visible = ref(false)
+/**
+ * 组件事件
+ */
+const emit = defineEmits(['update:open', 'success'])
+
+/**
+ * 系统类型
+ */
 const sysType = ref('MGR')
+
+/**
+ * 本地打开状态
+ */
+const localOpen = ref(false)
+
+/**
+ * 添加加载状态
+ */
 const addLoading = ref(false)
+
+/**
+ * 删除加载状态
+ */
 const deleteLoading = ref(false)
-const hasEnt = window.$access?.('ENT_UR_ROLE_DIST') ?? false
+
+/**
+ * 是否有角色分配权限
+ */
+const hasEnt = hasPermission('ENT_UR_ROLE_DIST')
+
+/**
+ * 树数据
+ */
 const treeData = ref([])
+
+/**
+ * 树字段替换配置
+ */
 const replaceFields = { key: 'entId', title: 'entName' }
+
+/**
+ * 选中的节点键
+ */
 const checkedKeys = ref([])
+
+/**
+ * 所有权限点列表
+ */
 const allEntList = ref({})
+
+/**
+ * 匹配规则
+ */
 const matchRule = ref({})
 
-const show = () => {
-  entTree(sysType.value)
-  visible.value = true
-}
+/**
+ * 监听open变化
+ */
+watch(() => props.open, (newVal) => {
+  localOpen.value = newVal
+  if (newVal) {
+    entTree(sysType.value)
+  }
+})
 
+/**
+ * 关闭弹窗
+ */
 const onClose = () => {
-  visible.value = false
+  emit('update:open', false)
 }
 
+/**
+ * 处理open更新事件
+ */
+const handleUpdateOpen = (val) => {
+  localOpen.value = val
+  emit('update:open', val)
+}
+
+/**
+ * 拓展员权限变更处理
+ * @param {Event} e - 事件对象
+ */
 const onEpUserEntChange = (e) => {
   if (e.target.checked) {
     matchRule.value.epUserEnt = true
@@ -115,6 +188,10 @@ const onEpUserEntChange = (e) => {
   }
 }
 
+/**
+ * 商户类型变更处理
+ * @param {number} value - 商户类型值
+ */
 const onMchTypeChange = (value) => {
   if (matchRule.value.mchType === value) {
     matchRule.value.mchType = null
@@ -123,41 +200,41 @@ const onMchTypeChange = (value) => {
   }
 }
 
-const handleOkFunc = (opType) => {
+/**
+ * 处理确认操作
+ * @param {string} opType - 操作类型：add 或 delete
+ */
+const handleOkFunc = async (opType) => {
   if (opType === 'add') {
     addLoading.value = true
   } else {
     deleteLoading.value = true
   }
 
-  const selectedEntIdList = getSelectedEntIdList()
-  entApi
-    .setMatchRule({
+  try {
+    const selectedEntIdList = getSelectedEntIdList()
+    await entApi.setMatchRule({
       sysType: sysType.value,
       opType,
       entIds: selectedEntIdList,
       matchRule: matchRule.value
     })
-    .then(() => {
-      window.$message.success(opType === 'add' ? '添加成功' : '删除成功')
-      if (opType === 'add') {
-        addLoading.value = false
-      } else {
-        deleteLoading.value = false
-      }
-      visible.value = false
-      props.callbackFunc()
-    })
-    .catch(() => {
-      if (opType === 'add') {
-        addLoading.value = false
-      } else {
-        deleteLoading.value = false
-      }
-    })
+    message.success(opType === 'add' ? '添加成功' : '删除成功')
+    emit('update:open', false)
+    emit('success')
+  } catch (error) {
+    console.error('设置匹配规则失败:', error)
+  } finally {
+    addLoading.value = false
+    deleteLoading.value = false
+  }
 }
 
-const entTree = (currentSysType) => {
+/**
+ * 获取权限树
+ * @param {string} currentSysType - 当前系统类型
+ */
+const entTree = async (currentSysType) => {
   if (!hasEnt) {
     return false
   }
@@ -167,24 +244,27 @@ const entTree = (currentSysType) => {
   allEntList.value = {}
 
   const resolvedSysType = currentSysType?.length > 0 ? currentSysType : 'MGR'
-  entApi.queryEntTree(resolvedSysType).then((res) => {
-    treeData.value = res
-    recursionTreeData(res, (item) => {
-      allEntList.value[item.entId] = { pid: item.pid, children: item.children || [] }
-    })
+  const res = await entApi.queryEntTree(resolvedSysType)
+  treeData.value = res
+  recursionTreeData(res, (item) => {
+    allEntList.value[item.entId] = { pid: item.pid, children: item.children || [] }
   })
 }
 
+/**
+ * 获取选中的权限ID列表
+ * @returns {Array|boolean} 选中的权限ID列表或false
+ */
 const getSelectedEntIdList = () => {
   if (!hasEnt) {
     return false
   }
 
   const reqData = []
-  checkedKeys.value.map((item) => {
+  checkedKeys.value.forEach((item) => {
     const pidList = []
     getAllPid(item, pidList)
-    pidList.map((pid) => {
+    pidList.forEach((pid) => {
       if (reqData.indexOf(pid) < 0) {
         reqData.push(pid)
       }
@@ -193,6 +273,11 @@ const getSelectedEntIdList = () => {
   return reqData
 }
 
+/**
+ * 递归处理树数据
+ * @param {Array} entTreeData - 树数据
+ * @param {Function} func - 处理函数
+ */
 const recursionTreeData = (entTreeData, func) => {
   for (let i = 0; i < entTreeData.length; i++) {
     const thisEnt = entTreeData[i]
@@ -203,6 +288,11 @@ const recursionTreeData = (entTreeData, func) => {
   }
 }
 
+/**
+ * 获取所有父级ID
+ * @param {string} entId - 当前ID
+ * @param {Array} array - 结果数组
+ */
 const getAllPid = (entId, array) => {
   if (allEntList.value[entId] && entId !== 'ROOT') {
     array.push(entId)

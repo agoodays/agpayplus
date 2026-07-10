@@ -1,11 +1,13 @@
-<template>
-  <a-drawer
+﻿<template>
+  <ag-drawer
     v-model:open="localOpen"
     :title="isAdd ? '新增门店' : '修改门店'"
-    :width="720"
+    width="40%"
     :mask-closable="false"
-    :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
+    :show-confirm="true"
+    :confirm-loading="loading"
+    @confirm="handleSubmit"
   >
     <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 商户号（仅新增时显示） -->
@@ -29,13 +31,13 @@
 
       <!-- 门店基本信息 -->
       <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="门店名称" name="storeName">
             <a-input v-model:value="saveObject.storeName" placeholder="请输入门店名称" />
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="联系人电话" name="contactPhone">
             <a-input v-model:value="saveObject.contactPhone" placeholder="请输入联系人电话" />
           </a-form-item>
@@ -109,7 +111,7 @@
 
       <!-- 地址信息 -->
       <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="24">
           <a-form-item label="选址省/市/区" name="areas">
             <a-cascader
               v-model:value="areas"
@@ -120,21 +122,19 @@
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="24">
           <a-form-item label="具体位置" name="address">
             <a-input v-model:value="saveObject.address" placeholder="请输入详细地址" />
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="经度" name="lng">
             <a-input-number v-model:value="saveObject.lng" placeholder="请输入经度" :precision="6" style="width: 100%" />
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="纬度" name="lat">
             <a-input-number v-model:value="saveObject.lat" placeholder="请输入纬度" :precision="6" style="width: 100%" />
           </a-form-item>
@@ -156,31 +156,16 @@
       <img :src="previewImage" style="width: 100%" alt="preview" />
     </a-modal>
 
-    <!-- 底部按钮 -->
-    <template #footer>
-      <div style="text-align: center">
-        <a-space>
-          <a-button @click="handleClose">
-            <close-outlined />
-            取消
-          </a-button>
-          <a-button type="primary" :loading="loading" @click="handleSubmit">
-            <check-outlined />
-            保存
-          </a-button>
-        </a-space>
-      </div>
-    </template>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+import { AgDrawer, AgUpload } from '@/components'
 import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
 import { CheckOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import AgUpload from '@/components/ag-upload'
 
 const { t } = useI18n()
 

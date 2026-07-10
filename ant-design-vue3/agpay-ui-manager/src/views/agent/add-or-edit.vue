@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <ag-drawer
     v-model:open="localOpen"
     :mask-closable="false"
@@ -6,7 +6,7 @@
     width="40%"
     @close="handleClose"
     :show-confirm="true"
-    :confirm-loading="btnLoading"
+    :confirm-loading="loading"
     @confirm="handleConfirm"
   >
     <a-form
@@ -432,7 +432,7 @@ const infoForm = ref(null)
 /** 本地状态 */
 const localOpen = ref(false)
 const isAdd = ref(true)
-const btnLoading = ref(false)
+const loading = ref(false)
 const imgLabel = ref('联系人')
 const settAccountNoLabel = ref('个人微信号')
 
@@ -747,12 +747,12 @@ async function handleConfirm() {
     }
 
     if (isAdd.value) {
-      btnLoading.value = true
+      loading.value = true
       await agentApi.add(saveObject.value)
       message.success('新增成功')
       localOpen.value = false
       emit('success')
-      btnLoading.value = false
+      loading.value = false
       return
     }
 
@@ -766,7 +766,7 @@ async function handleConfirm() {
       confirmPwd: Base64.encode(saveObject.value.confirmPwd || '')
     }
 
-    btnLoading.value = true
+    loading.value = true
     await agentApi.updateById(props.recordId, payload)
     message.success('修改成功')
     localOpen.value = false
@@ -776,7 +776,7 @@ async function handleConfirm() {
       message.error('操作失败')
     }
   } finally {
-    btnLoading.value = false
+    loading.value = false
     resetSysPasswordState()
     resetPassEmpty()
   }

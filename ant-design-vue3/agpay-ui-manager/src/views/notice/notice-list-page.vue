@@ -1,7 +1,8 @@
-<template>
+﻿<template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+    <a-card :bordered="false">
+      <!-- 搜索区域 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -22,50 +23,54 @@
       </ag-search>
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
-        :init-data="true"
+        ref="tableRef"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :params="searchData"
         row-key="articleId"
-        @btn-load-close="btnLoading = false"
       >
         <template #toolbar-left>
-          <div>
-            <a-button v-if="$access('ENT_NOTICE_ADD')" type="primary" icon="plus" class="mg-b-30" @click="addFunc"
-              >新增</a-button
-            >
-          </div>
+          <a-button v-if="hasPermission('ENT_NOTICE_ADD')" type="primary" @click="addFunc">
+            <template #icon><PlusOutlined /></template>
+            新增
+          </a-button>
         </template>
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_NOTICE_EDIT')" type="link" @click="editFunc(record.articleId)">编辑</a-button>
-            <a-button v-if="$access('ENT_NOTICE_VIEW')" type="link" @click="detailFunc(record.articleId)"
-              >详情</a-button
-            >
-            <a-button v-if="$access('ENT_NOTICE_DEL')" type="link" style="color: red" @click="delFunc(record.articleId)"
-              >删除</a-button
-            >
+            <a-button v-if="hasPermission('ENT_NOTICE_EDIT')" type="link" @click="editFunc(record.articleId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_NOTICE_VIEW')" type="link" @click="detailFunc(record.articleId)">详情</a-button>
+            <a-button v-if="hasPermission('ENT_NOTICE_DEL')" type="link" style="color: red" @click="delFunc(record.articleId)">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
     <!-- 新增/编辑页面弹窗  -->
-    <info-add-or-edit ref="infoAddOrEdit" :callback-func="searchFunc" />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="reloadTable" />
     <!-- 详情页面弹窗  -->
-    <info-detail ref="infoDetail" :callback-func="searchFunc" />
+    <detail v-model:open="detailOpen" :record-id="currentRecordId" />
   </div>
 </template>
 <script setup>
+/**
+ * 公告列表页面组件
+ * 功能：展示公告列表，支持搜索、新增、编辑、查看详情、删除等操作
+ */
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { noticeApi } from '@/api/business/notice/notice-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { ref } from 'vue'
-import InfoAddOrEdit from './add-or-edit.vue'
-import InfoDetail from './detail.vue'
+import AddOrEdit from './add-or-edit.vue'
+import Detail from './detail.vue'
 
-// 表格列配置
+// 权限检查
+const { hasPermission } = usePermission()
+
+/**
+ * 表格列配置
+ */
 const tableColumns = [
   { key: 'articleId', dataIndex: 'articleId', title: '公告ID', width: 80, fixed: 'left' },
   { key: 'title', dataIndex: 'title', title: '公告标题', width: 200 },
@@ -75,14 +80,23 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
+/**
+ * 默认搜索条件
+ */
 const defaultSearchData = {
-  articleType: 1 // 文章类型: 1-公告
+  articleType: 1
 }
 
-const btnLoading = ref(false)
+/**
+ * 加载状态
+ */
+const loading = ref(false)
 
+/**
+ * 使用 CRUD 表格页面组合式函数
+ */
 const {
-  infoTable,
+  tableRef,
   infoAddOrEdit,
   infoDetail,
   searchData,
@@ -100,20 +114,43 @@ const {
 
 Object.assign(searchData, defaultSearchData)
 
-// 对接table接口函数
-const reqTableDataFunc = (params) => noticeApi.queryPage(params)
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await noticeApi.queryPage(params)
+}
 
-// 搜索函数
+/**
+ * 搜索函数
+ */
 const searchFunc = () => {
-  btnLoading.value = true
+  loading.value = true
   reloadTable()
 }
 
+/**
+ * 打开新增弹窗
+ */
 const addFunc = () => openCreate()
 
+/**
+ * 打开编辑弹窗
+ * @param {string} recordId - 公告ID
+ */
 const editFunc = (recordId) => openEdit(recordId)
 
+/**
+ * 打开详情弹窗
+ * @param {string} recordId - 公告ID
+ */
 const detailFunc = (recordId) => openDetail(recordId)
 
+/**
+ * 确认删除公告
+ * @param {string} recordId - 公告ID
+ */
 const delFunc = (recordId) => confirmDelete(recordId)
 </script>

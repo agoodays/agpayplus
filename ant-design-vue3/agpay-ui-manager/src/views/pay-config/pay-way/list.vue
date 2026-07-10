@@ -1,7 +1,8 @@
-<template>
+﻿<template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -33,19 +34,20 @@
           </a-col>
         </template>
       </ag-search>
+
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
+        ref="tableRef"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
         row-key="wayCode"
-        @btn-load-close="btnLoading = false"
       >
         <template #toolbar-left>
-          <div>
-            <a-button v-if="true" type="primary" icon="plus" @click="addFunc" class="mg-b-30">新建</a-button>
-          </div>
+          <a-button v-if="true" type="primary" @click="addFunc">
+            <template #icon><PlusOutlined /></template>
+            新建
+          </a-button>
         </template>
         <template #wayCodeSlot="{record}"><b>{{ record.wayCode }}</b></template> <!-- 自定义插槽 -->
         <template #wayTypeSlot="{record}">
@@ -72,17 +74,25 @@
       </ag-table>
     </a-card>
     <!-- 新增页面组件  -->
-    <info-add-or-edit ref="infoAddOrEdit" :callback-func="searchFunc"/>
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleSuccess" />
   </div>
 
 </template>
 <script setup>
+/**
+ * 支付方式列表页面组件
+ * 功能：展示支付方式列表，支持搜索、新增、编辑、删除操作
+ */
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { reactive, ref } from 'vue'
-import InfoAddOrEdit from './add-or-edit.vue'
+import AddOrEdit from './add-or-edit.vue'
 import { message } from 'ant-design-vue'
 
+/**
+ * 表格列配置
+ */
 const tableColumns = [
   { key: 'wayCode', fixed: 'left', title: '支付方式代码', width: 180, customRender: 'wayCodeSlot' },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称', width: 180 },
@@ -90,34 +100,82 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-const infoTable = ref(null)
-const infoAddOrEdit = ref(null)
-const btnLoading = ref(false)
+/**
+ * 组件引用
+ */
+const tableRef = ref(null)
+
+/**
+ * 弹窗状态
+ */
+const modalOpen = ref(false)
+const currentRecordId = ref('')
+
+/**
+ * 加载状态
+ */
+const loading = ref(false)
+
+/**
+ * 搜索表单数据
+ */
 const searchData = reactive({})
 
-const reqTableDataFunc = (params) => {
-  return payConfigApi.queryPayWayList(params)
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await payConfigApi.queryPayWayList(params)
 }
 
+/**
+ * 搜索函数
+ */
 const searchFunc = () => {
-  btnLoading.value = true
-  infoTable.value?.reload()
+  loading.value = true
+  tableRef.value?.reload()
 }
 
+/**
+ * 新增支付方式
+ */
 const addFunc = () => {
-  infoAddOrEdit.value.show()
+  currentRecordId.value = ''
+  modalOpen.value = true
 }
 
+/**
+ * 编辑支付方式
+ * @param {string} wayCode - 支付方式代码
+ */
 const editFunc = (wayCode) => {
-  infoAddOrEdit.value.show(wayCode)
+  currentRecordId.value = wayCode
+  modalOpen.value = true
 }
 
-const delFunc = (wayCode) => {
-  window.$infoBox.confirmDanger('确认删除？', '', () => {
-    payConfigApi.delPayWayById(wayCode).then(() => {
+/**
+ * 操作成功回调
+ */
+const handleSuccess = () => {
+  searchFunc()
+}
+
+/**
+ * 删除支付方式
+ * @param {string} wayCode - 支付方式代码
+ */
+const delFunc = async (wayCode) => {
+  const { infoBox } = await import('@/utils/info-box')
+  infoBox.confirmDanger('确认删除？', '', async () => {
+    try {
+      await payConfigApi.delPayWayById(wayCode)
       message.success('删除成功！')
-      infoTable.value?.reload()
-    })
+      tableRef.value?.reload()
+    } catch (error) {
+      console.error('删除支付方式失败:', error)
+    }
   })
 }
 </script>

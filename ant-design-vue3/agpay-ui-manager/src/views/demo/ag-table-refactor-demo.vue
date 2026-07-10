@@ -94,7 +94,7 @@
     </ag-table>
 
     <!-- 详情抽屉 -->
-    <a-drawer v-model:open="detailOpen" title="订单详情" width="600">
+    <ag-drawer v-model:open="detailOpen" title="订单详情" width="600">
       <div v-if="currentRecord">
         <a-descriptions :column="1" bordered>
           <a-descriptions-item label="订单号">
@@ -114,7 +114,7 @@
           </a-descriptions-item>
         </a-descriptions>
       </div>
-    </a-drawer>
+    </ag-drawer>
 
     <!-- 编辑弹窗 -->
     <a-modal v-model:open="editOpen" title="编辑订单" ok-text="保存" cancel-text="取消" @ok="handleSaveEdit">

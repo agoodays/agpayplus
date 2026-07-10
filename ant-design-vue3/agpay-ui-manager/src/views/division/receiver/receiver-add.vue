@@ -1,17 +1,21 @@
-﻿<template>
+<template>
   <ag-drawer
-    :visible="visible"
+    v-model:open="localOpen"
     title="绑定分账接收者账号"
     :closable="true"
     :mask-closable="false"
     width="80%"
-    @close="onClose"
+    @close="handleClose"
   >
     <template #footer>
-      <a-button type="primary" icon="rocket" :style="{ marginRight: '8px' }" @click="reqBatchBindReceiver(0)">
+      <a-button type="primary" :style="{ marginRight: '8px' }" @click="reqBatchBindReceiver(0)">
+        <template #icon><RocketOutlined /></template>
         发起绑定请求
       </a-button>
-      <a-button icon="close" @click="onClose">关闭</a-button>
+      <a-button @click="onClose">
+        <template #icon><CloseOutlined /></template>
+        关闭
+      </a-button>
     </template>
 
     <a-form>
@@ -52,11 +56,11 @@
               <a-button
                 v-if="hasPermission('ENT_DIVISION_RECEIVER_GROUP_ADD')"
                 type="primary"
-                icon="plus"
                 class="mg-b-30"
                 style="margin-bottom: 0px; margin-left: 20px"
                 @click="addGroupFunc"
               >
+                <template #icon><PlusOutlined /></template>
                 新建
               </a-button>
             </div>
@@ -87,7 +91,8 @@
     <!-- 微信账号表格 -->
     <a-card v-show="ifCode === 'wxpay'" title="微信账号">
       <template #extra>
-        <a-button style="background: green; color: white" icon="wechat" @click="addReceiverRow('wxpay')">
+        <a-button style="background: green; color: white" @click="addReceiverRow('wxpay')">
+          <template #icon><WechatOutlined /></template>
           添加【微信官方】分账接收账号
         </a-button>
       </template>
@@ -170,7 +175,8 @@
     <!-- 支付宝账号表格 -->
     <a-card v-show="ifCode === 'alipay'" title="支付宝账号">
       <template #extra>
-        <a-button style="background: dodgerblue; color: white" icon="alipay-circle" @click="addReceiverRow('alipay')">
+        <a-button style="background: dodgerblue; color: white" @click="addReceiverRow('alipay')">
+          <template #icon><AlipayCircleOutlined /></template>
           添加【支付宝官方】分账接收账号
         </a-button>
       </template>
@@ -254,32 +260,52 @@
 </template>
 
 <script setup>
+/**
+ * 分账接收者账号绑定组件
+ * 功能：批量绑定微信/支付宝分账接收者账号
+ */
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
 import { AgDrawer, AgSelect, AgTable } from '@/components'
-import ChannelUserModal from '@/components/channel-user'
+import { ChannelUserModal } from '@/components/channel-user'
 import { genRowKey } from '@/utils/util'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { usePermission } from '@/composables/useCommon'
 import {
+  AlipayCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  CloseOutlined,
   InfoCircleOutlined,
-  QrcodeOutlined
+  PlusOutlined,
+  QrcodeOutlined,
+  RocketOutlined,
+  WechatOutlined
 } from '@ant-design/icons-vue'
 import InfoAddOrEdit from '../group/add-or-edit.vue'
 
 const { hasPermission } = usePermission()
 
+/** Props 定义 */
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false
+  }
+})
+
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'success'])
+
 const accTableColumns = [
-  { key: 'reqBindState', title: '状态', width: 120, slots: { customRender: 'reqBindStateSlot' } },
-  { key: 'receiverAlias', title: '账号别名', width: 120, slots: { customRender: 'receiverAliasSlot' } },
-  { key: 'accType', title: '账号类型', width: 120, slots: { customRender: 'accTypeSlot' } },
-  { key: 'accNo', title: '接收方账号', width: 200, slots: { customRender: 'accNoSlot' } },
-  { key: 'accName', title: '接收方姓名', width: 200, slots: { customRender: 'accNameSlot' } },
-  { key: 'relationType', title: '分账关系', width: 200, slots: { customRender: 'relationTypeSlot' } },
-  { key: 'relationTypeName', title: '关系名称', width: 200, slots: { customRender: 'relationTypeNameSlot' } },
-  { key: 'divisionProfit', title: '默认分账比例', width: 120, slots: { customRender: 'divisionProfitSlot' } },
-  { key: 'op', title: '操作', slots: { customRender: 'opSlot' } }
+  { key: 'reqBindState', title: '状态', width: 120, customRender: 'reqBindStateSlot' },
+  { key: 'receiverAlias', title: '账号别名', width: 120, customRender: 'receiverAliasSlot' },
+  { key: 'accType', title: '账号类型', width: 120, customRender: 'accTypeSlot' },
+  { key: 'accNo', title: '接收方账号', width: 200, customRender: 'accNoSlot' },
+  { key: 'accName', title: '接收方姓名', width: 200, customRender: 'accNameSlot' },
+  { key: 'relationType', title: '分账关系', width: 200, customRender: 'relationTypeSlot' },
+  { key: 'relationTypeName', title: '关系名称', width: 200, customRender: 'relationTypeNameSlot' },
+  { key: 'divisionProfit', title: '默认分账比例', width: 120, customRender: 'divisionProfitSlot' },
+  { key: 'op', title: '操作', customRender: 'opSlot' }
 ]
 
 const defaultReceiverTemplate = {
@@ -310,19 +336,10 @@ const relationOptions = [
   { key: 'CUSTOM', label: '自定义' }
 ]
 
-const props = defineProps({
-  callbackFunc: {
-    type: Function,
-    default: () => ({})
-  }
-})
-
-const emit = defineEmits(['close'])
-
 const infoAddOrEdit = ref(null)
 const channelUserModal = ref(null)
 
-const visible = ref(false)
+const localOpen = ref(false)
 const mchNo = ref(null)
 const appId = ref(null)
 const ifCode = ref(null)
@@ -332,10 +349,21 @@ const allReceiverGroup = ref([])
 const appSupportIfCodes = ref([])
 const receiverTableData = ref([])
 
-const show = () => {
-  reset()
-  visible.value = true
-}
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val) {
+      reset()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
 
 const reset = () => {
   mchNo.value = null
@@ -390,10 +418,10 @@ const changeAppId = (value) => {
   })
 }
 
-const onClose = () => {
-  props.callbackFunc()
-  visible.value = false
-  emit('close')
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
+  emit('success')
 }
 
 const delRow = (item) => {
@@ -473,7 +501,7 @@ const reqBatchBindReceiver = (i) => {
     })
 }
 
-defineExpose({ show })
+
 </script>
 
 <style scoped>

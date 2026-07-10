@@ -1,11 +1,12 @@
-<template>
+﻿<template>
   <div>
-    <a-card>
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
       <ag-search
         v-model="searchData"
         :collapsible="true"
         :default-collapsed="!isShowMore"
-        :search-loading="btnLoading"
+        :search-loading="loading"
         @search="searchFunc"
         @collapse-change="setIsShowMore"
       >
@@ -71,21 +72,20 @@
         </template>
       </ag-search>
       <ag-table
-        @btn-load-close="btnLoading = false"
-        ref="infoTable"
-        :init-data="true"
-        :req-table-data-func="reqTableDataFunc"
-        :table-columns="tableColumns"
+        ref="tableRef"
+        :columns="tableColumns"
+        :on-load="reqTableDataFunc"
         :search-data="searchData"
         :row-selection="rowSelection"
         row-key="sysLogId"
+        @load-complete="loading = false"
       >
         <template #toolbar-left>
-          <div>
-            <a-button icon="delete" type="danger" @click="delFunc" class="mg-b-30">删除</a-button>
-          </div>
+          <a-button type="danger" @click="delFunc">删除</a-button>
         </template>
-        <template #userNameSlot="{ record }"><b>{{ record.userName }}</b></template>
+        <template #userNameSlot="{ record }">
+          <b>{{ record.userName }}</b>
+        </template>
         <template #sysTypeSlot="{ record }">
           <a-tag :color="getSysTypeColor(record.sysType)">
             {{ getSysTypeText(record.sysType) }}
@@ -97,50 +97,95 @@
           </a-tag>
         </template>
         <template #opSlot="{ record }">
-          <a-button type="link" @click="detailFunc(record.sysLogId)">详情</a-button>
+          <ag-table-actions>
+            <a-button type="link" @click="detailFunc(record.sysLogId)">详情</a-button>
+          </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
-    <detail-drawer v-model:open="visible" :sys-log-id="currentLogId" />
+    <detail v-model:open="detailOpen" :sys-log-id="currentLogId" />
   </div>
 </template>
 
 <script setup>
+/**
+ * 系统日志列表页面组件
+ * 功能：展示系统操作日志和登录日志，支持搜索、批量删除、查看详情等操作
+ */
 import { ref, reactive, computed } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { AgSearch, AgTable, AgDateRangePicker, AgInput, AgSelect } from '@/components'
 import { sysApi } from '@/api/business/sys/sys-api'
-import DetailDrawer from './detail.vue'
+import Detail from './detail.vue'
 
+/**
+ * 表格列配置
+ */
 const tableColumns = [
-  { key: 'userName', title: '用户名', width: 120, fixed: 'left', slots: { customRender: 'userNameSlot' } },
+  { key: 'userName', title: '用户名', width: 120, fixed: 'left', customRender: 'userNameSlot' },
   { key: 'userId', dataIndex: 'userId', title: '用户ID', width: 120 },
   { key: 'userIp', dataIndex: 'userIp', title: '用户IP', width: 120 },
-  { key: 'sysType', title: '所属系统', width: 120, slots: { customRender: 'sysTypeSlot' } },
-  { key: 'logType', title: '日志类型', width: 120, slots: { customRender: 'logTypeSlot' } },
+  { key: 'sysType', title: '所属系统', width: 120, customRender: 'sysTypeSlot' },
+  { key: 'logType', title: '日志类型', width: 120, customRender: 'logTypeSlot' },
   { key: 'methodRemark', dataIndex: 'methodRemark', title: '操作描述', width: 200, ellipsis: true },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', slots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
+/**
+ * 搜索表单数据
+ */
 const searchData = reactive({})
-const selectedIds = ref([])
-const visible = ref(false)
-const currentLogId = ref('')
-const isShowMore = ref(false)
-const btnLoading = ref(false)
-const infoTable = ref(null)
 
+/**
+ * 选中的日志ID列表
+ */
+const selectedIds = ref([])
+
+/**
+ * 详情抽屉状态
+ */
+const detailOpen = ref(false)
+const currentLogId = ref('')
+
+/**
+ * 搜索区域展开状态
+ */
+const isShowMore = ref(false)
+
+/**
+ * 加载状态
+ */
+const loading = ref(false)
+
+/**
+ * 表格组件引用
+ */
+const tableRef = ref(null)
+
+/**
+ * 获取系统类型颜色
+ * @param {string} sysType - 系统类型
+ * @returns {string} 颜色值
+ */
 const getSysTypeColor = (sysType) => {
   const colors = { MGR: 'green', AGENT: 'cyan', MCH: 'geekblue' }
   return colors[sysType] || 'default'
 }
 
+/**
+ * 获取系统类型文本
+ * @param {string} sysType - 系统类型
+ * @returns {string} 文本值
+ */
 const getSysTypeText = (sysType) => {
   const texts = { MGR: '运营平台', AGENT: '代理商系统', MCH: '商户系统' }
   return texts[sysType] || '其他'
 }
 
+/**
+ * 表格行选择配置
+ */
 const rowSelection = computed(() => ({
   onChange: (selectedRowKeys, selectedRows) => {
     selectedIds.value = []
@@ -150,22 +195,35 @@ const rowSelection = computed(() => ({
   }
 }))
 
+/**
+ * 设置搜索区域展开状态
+ * @param {boolean} val - 是否展开
+ */
 const setIsShowMore = (val) => {
   isShowMore.value = val
 }
 
-const reqTableDataFunc = (params) => {
-  return sysApi.querySysLogPage(params)
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await sysApi.querySysLogPage(params)
 }
 
+/**
+ * 搜索函数
+ */
 const searchFunc = () => {
-  btnLoading.value = true
-  if (infoTable.value) {
-    infoTable.value.refTable(true)
-  }
+  loading.value = true
+  tableRef.value?.reload()
 }
 
-const delFunc = () => {
+/**
+ * 批量删除日志
+ */
+const delFunc = async () => {
   if (selectedIds.value.length === 0) {
     message.error('请选择要删除的日志')
     return false
@@ -173,20 +231,25 @@ const delFunc = () => {
   Modal.confirm({
     title: '确认删除' + selectedIds.value.length + '条日志吗？',
     okType: 'danger',
-    onOk: () => {
-      sysApi.delSysLogById(selectedIds.value).then(() => {
+    onOk: async () => {
+      try {
+        await sysApi.delSysLogById(selectedIds.value)
         selectedIds.value = []
-        if (infoTable.value) {
-          infoTable.value.refTable(true)
-        }
+        tableRef.value?.reload()
         message.success('删除成功')
-      })
+      } catch (error) {
+        console.error('删除日志失败:', error)
+      }
     }
   })
 }
 
+/**
+ * 查看日志详情
+ * @param {string} recordId - 日志ID
+ */
 const detailFunc = (recordId) => {
   currentLogId.value = recordId
-  visible.value = true
+  detailOpen.value = true
 }
 </script>

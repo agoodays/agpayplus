@@ -1,9 +1,10 @@
-<template>
-  <a-drawer
-    :open="isShow"
+﻿<template>
+  <ag-drawer
+    :open="localOpen"
     title="分配角色"
     :mask-closable="true"
-    @close="isShow = false"
+    @close="handleClose"
+    @update:open="handleUpdateOpen"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="30%">
@@ -21,87 +22,152 @@
     </div>
 
     <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" icon="close" @click="isShow = false">取消</a-button>
-      <a-button type="primary" @click="handleOkFunc" icon="check" :loading="confirmLoading">保存</a-button>
+      <a-button :style="{ marginRight: '8px' }" @click="handleClose">
+        <template #icon><CloseOutlined /></template>
+        取消
+      </a-button>
+      <a-button type="primary" @click="handleConfirm" :loading="confirmLoading">
+        <template #icon><CheckOutlined /></template>
+        保存
+      </a-button>
     </div>
-  </a-drawer>
+  </ag-drawer>
 
 </template>
 
 <script setup>
+/**
+ * 分配角色抽屉组件
+ * 功能：为用户分配角色权限，支持全选和单选
+ */
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
+import { AgDrawer } from '@/components'
 import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
+import { message } from 'ant-design-vue'
 
+/**
+ * 组件属性定义
+ */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: { type: Boolean, default: false },
+  recordId: { type: String, default: '' },
+  sysType: { type: String, default: 'MGR' },
+  belongInfoId: { type: String, default: '' }
 })
 
-const isShow = ref(false)
+/**
+ * 组件事件定义
+ */
+const emit = defineEmits(['update:open', 'success'])
+
+/**
+ * 本地打开状态
+ */
+const localOpen = ref(false)
+
+/**
+ * 确认按钮加载状态
+ */
 const confirmLoading = ref(false)
-const recordId = ref(null)
-const sysType = ref(null)
-const belongInfoId = ref(null)
+
+/**
+ * 角色列表
+ */
 const allRoleList = ref([])
+
+/**
+ * 已选中的角色ID列表
+ */
 const checkedVal = ref([])
 
-const show = (recordIdParam, sysTypeParam, belongInfoIdParam) => {
-  // 重置数据
+/**
+ * 加载角色列表数据
+ * @returns {void}
+ */
+const loadRoles = async () => {
   allRoleList.value = []
   checkedVal.value = []
-  confirmLoading.value = false // 关闭loading
-  recordId.value = recordIdParam
-  sysType.value = sysTypeParam
-  belongInfoId.value = belongInfoIdParam
+  confirmLoading.value = false
 
-  // 查询所有角色列表
-  sysUserApi.queryRolePageWithLoading({ pageSize: -1, sysType: sysType.value, belongInfoId: belongInfoId.value }).then(res => {
-    if (res.total <= 0) {
-      import('ant-design-vue').then(({ message }) => {
-        message.error(`当前暂无角色，请先行添加`)
-      })
-      return
-    }
-
-    allRoleList.value = []
-    res.records.map(role => {
-      allRoleList.value.push({ label: role.roleName, value: role.roleId })
-      isShow.value = true
-    })
-
-    // 查询已分配的列表
-    sysUserApi.queryUserRoleRelaPage({ pageSize: -1, userId: recordIdParam }).then(relaRes => {
-      checkedVal.value = []
-      relaRes.records.map(rela => {
-          checkedVal.value.push(rela.roleId)
-      })
-    })
+  const roleRes = await sysUserApi.queryRolePageWithLoading({
+    pageSize: -1,
+    sysType: props.sysType,
+    belongInfoId: props.belongInfoId
   })
+
+  if (roleRes.total <= 0) {
+    message.error('当前暂无角色，请先行添加')
+    return
+  }
+
+  allRoleList.value = roleRes.records.map(role => ({
+    label: role.roleName,
+    value: role.roleId
+  }))
+
+  const relaRes = await sysUserApi.queryUserRoleRelaPage({
+    pageSize: -1,
+    userId: props.recordId
+  })
+
+  checkedVal.value = relaRes.records.map(rela => rela.roleId)
 }
 
-const handleOkFunc = () => {
-  confirmLoading.value = true // 显示loading
-  sysUserApi.updateUserRoleRela(recordId.value, checkedVal.value).then(res => {
-    import('ant-design-vue').then(({ message }) => {
-      message.success('更新成功！')
-      isShow.value = false
-
-      if (props.callbackFunc !== undefined) {
-        props.callbackFunc() // 刷新列表
-      }
-    })
-  }).catch(res => { 
-    confirmLoading.value = false 
-  }) // 恢复loading
+/**
+ * 处理确认按钮点击
+ * @returns {void}
+ */
+const handleConfirm = async () => {
+  confirmLoading.value = true
+  try {
+    await sysUserApi.updateUserRoleRela(props.recordId, checkedVal.value)
+    message.success('更新成功！')
+    emit('success')
+  } catch (error) {
+    console.error('更新失败:', error)
+  } finally {
+    confirmLoading.value = false
+  }
 }
 
+/**
+ * 处理关闭按钮点击
+ * @returns {void}
+ */
+const handleClose = () => {
+  emit('update:open', false)
+}
+
+/**
+ * 处理open更新事件
+ */
+const handleUpdateOpen = (val) => {
+  localOpen.value = val
+  emit('update:open', val)
+}
+
+/**
+ * 全选/取消全选处理
+ * @param {Event} e - 复选框事件
+ * @returns {void}
+ */
 const onCheckAllChange = (e) => {
   checkedVal.value = []
-  if (e.target.checked) { // 全选
-    allRoleList.value.map(role => { 
-      checkedVal.value.push(role.value) 
+  if (e.target.checked) {
+    allRoleList.value.forEach(role => {
+      checkedVal.value.push(role.value)
     })
   }
 }
 
-defineExpose({ show })
+/**
+ * 监听 open 属性变化，加载角色数据
+ */
+watch(() => props.open, (newVal) => {
+  localOpen.value = newVal
+  if (newVal) {
+    loadRoles()
+  }
+}, { immediate: true })
 </script>

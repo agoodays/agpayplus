@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-modal :title="isAdd ? '新增支付方式' : '修改支付方式'" :open="isShow" :width="700" @ok="handleOkFunc" @cancel="isShow = false">
     <a-form
       ref="infoForm"

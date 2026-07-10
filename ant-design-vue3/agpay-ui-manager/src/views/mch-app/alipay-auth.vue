@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-modal :visible="isShow" title="支付宝子商户扫码授权" @ok="handleOkFunc" @cancel="handleOkFunc">
     <div style="text-align: center">
       <p>方式1： <br/> 请商家登录【支付宝】APP, 扫描如下二维码, 按提示授权：</p>

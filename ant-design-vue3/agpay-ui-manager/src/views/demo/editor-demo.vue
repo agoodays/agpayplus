@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="editor-demo-container">
     <a-space direction="vertical" style="width: 100%" :size="24">
       <!-- 基础编辑器 -->
@@ -167,7 +167,7 @@
 </template>
 
 <script setup>
-import AgEditor from '@/components/ag-editor'
+import { AgEditor } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref } from 'vue'
 

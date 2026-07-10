@@ -48,21 +48,6 @@ import { AgTableActions } from '@/components'
   </a-table>
 </template>
 ```
-    :req-table-data-func="reqTableDataFunc"
-  >
-    <template #actions="{ record }">
-      <ag-table-action-columns :max-show-num="3">
-        <a-button type="link" size="small" @click="onView(record)">查看</a-button>
-        <a-button type="link" size="small" @click="onEdit(record)">编辑</a-button>
-        <a-button type="link" size="small" @click="onCopy(record)">复制</a-button>
-        <a-popconfirm title="确认删除？" @confirm="() => onDelete(record)">
-          <a-button type="link" size="small" danger>删除</a-button>
-        </a-popconfirm>
-        <a-button type="link" size="small" @click="onExport(record)">导出</a-button>
-      </ag-table-action-columns>
-    </template>
-  </ag-table>
-</template>
 
 <script setup>
 import { AgTable, AgTableActions } from '@/components'

@@ -1,13 +1,16 @@
 <template>
-  <a-drawer
+  <ag-drawer
     title="填写参数"
     width="40%"
     :closable="true"
     :mask-closable="false"
-    :visible="visible"
+    v-model:open="localOpen"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    @close="onClose"
+    :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')"
+    :confirm-loading="loading"
+    @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
@@ -129,33 +132,95 @@
         </a-col>
       </a-row>
     </a-form>
-    <div v-if="$access('ENT_MCH_PAY_CONFIG_ADD')" class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" icon="close" @click="onClose">取消</a-button>
-      <a-button type="primary" icon="check" :loading="btnLoading" @click="onSubmit">保存</a-button>
-    </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+/**
+ * 服务商微信支付配置组件
+ * 功能：配置服务商微信支付相关参数
+ */
+import { AgDrawer, AgUpload } from '@/components'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-const icons = { LoadingOutlined, UploadOutlined }
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
-import AgUpload from '@/components/ag-upload'
+import { usePermission } from '@/composables/useCommon'
 import { message } from 'ant-design-vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
+const icons = { LoadingOutlined, UploadOutlined }
+
+// 权限检查
+const { hasPermission } = usePermission()
+
+/** Props 定义 */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: {
+    type: Boolean,
+    default: false
+  },
+  isvNo: {
+    type: String,
+    default: ''
+  },
+  record: {
+    type: Object,
+    default: () => ({})
+  }
 })
+
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'success'])
 
 const infoForm = ref(null)
 const isvParamForm = ref(null)
-const btnLoading = ref(false)
-const visible = ref(false)
+const loading = ref(false)
+const localOpen = ref(false)
 const isAdd = ref(true)
 const action = isvPayConfigApi.certUploadAction
 const saveObject = ref({})
 const ifParams = ref({ apiVersion: 'V2' })
+
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  async (val) => {
+    localOpen.value = val
+    if (val && props.isvNo && props.record.ifCode) {
+      await initForm()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+/** 初始化表单 */
+async function initForm() {
+  infoForm.value?.resetFields?.()
+  isvParamForm.value?.resetFields?.()
+
+  saveObject.value = {
+    infoId: props.isvNo,
+    ifCode: props.record.ifCode,
+    state: props.record.ifConfigState === 0 ? 0 : 1
+  }
+
+  ifParams.value = {
+    apiVersion: 'V2',
+    appSecret: '',
+    appSecret_ph: '请输入',
+    key: '',
+    key_ph: '请输入',
+    apiV3Key: '',
+    apiV3Key_ph: '请输入',
+    serialNo: '',
+    serialNo_ph: '请输入'
+  }
+
+  await getIsvPayConfig()
+}
 
 const rules = {
   ifRate: [
@@ -267,32 +332,6 @@ function parseJsonObject(rawValue) {
   }
 }
 
-async function show(isvNo, record) {
-  infoForm.value?.resetFields?.()
-  isvParamForm.value?.resetFields?.()
-
-  saveObject.value = {
-    infoId: isvNo,
-    ifCode: record.ifCode,
-    state: record.ifConfigState === 0 ? 0 : 1
-  }
-
-  ifParams.value = {
-    apiVersion: 'V2',
-    appSecret: '',
-    appSecret_ph: '请输入',
-    key: '',
-    key_ph: '请输入',
-    apiV3Key: '',
-    apiV3Key_ph: '请输入',
-    serialNo: '',
-    serialNo_ph: '请输入'
-  }
-
-  visible.value = true
-  await getIsvPayConfig()
-}
-
 async function getIsvPayConfig() {
   const res = await isvPayConfigApi.getUnique(saveObject.value.infoId, saveObject.value.ifCode)
   if (res?.ifParams) {
@@ -334,12 +373,15 @@ function clearEmptyKey(key) {
   ifParams.value[key + '_ph'] = undefined
 }
 
-async function onSubmit() {
+/**
+ * 确认提交
+ */
+async function handleConfirm() {
   const valid = await validateForm(infoForm)
   const valid2 = await validateForm(isvParamForm)
   if (!valid || !valid2) return
 
-  btnLoading.value = true
+  loading.value = true
   try {
     if (Object.keys(ifParams.value).length === 0) {
       message.error('参数不能为空！')
@@ -362,26 +404,27 @@ async function onSubmit() {
 
     await isvPayConfigApi.save(reqParams)
     message.success('保存成功')
-    visible.value = false
-    props.callbackFunc()
+    localOpen.value = false
+    emit('success')
   } finally {
-    btnLoading.value = false
+    loading.value = false
   }
 }
 
+/**
+ * 上传成功回调
+ * @param {string} name - 字段名
+ * @param {Array} fileList - 文件列表
+ */
 function uploadSuccess(name, fileList) {
   const [firstItem] = fileList
   ifParams.value[name] = firstItem?.url
 }
 
-function onClose() {
-  visible.value = false
+/** 处理关闭 */
+function handleClose() {
+  localOpen.value = false
 }
-
-defineExpose({
-  show,
-  onClose
-})
 </script>
 <style lang="less" scoped>
 .ag-upload-btn {

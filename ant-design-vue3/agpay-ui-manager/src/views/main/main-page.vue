@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="main-page">
     <a-card :bordered="false" class="welcome-card">
       <a-row :gutter="24">

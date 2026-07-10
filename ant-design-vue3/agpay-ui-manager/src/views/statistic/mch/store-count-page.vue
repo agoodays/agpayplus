@@ -1,6 +1,7 @@
 <template>
-  <a-card>
-    <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+  <a-card :bordered="false">
+    <!-- 搜索表单 -->
+    <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -21,7 +22,7 @@
     </ag-search>
     <!-- 列表渲染 -->
     <ag-table
-      ref="infoTable"
+      ref="tableRef"
       :columns="tableColumns"
       :on-load="reqTableDataFunc"
       :on-download="reqDownloadDataFunc"
@@ -30,7 +31,6 @@
       :show-download="true"
       :enable-statistics="true"
       row-key="storeId"
-      :stripe="true"
     >
       <template #dataStatisticsSlot="{ countData }">
         <div class="data-statistics" style="background: rgb(250, 250, 250)">
@@ -181,33 +181,12 @@ import { downloadExcel } from '@/lib/ag-axios'
 const tableColumns = [
   { key: 'storeName', dataIndex: 'storeName', title: '门店名称', width: 100, ellipsis: true },
   { key: 'storeId', dataIndex: 'storeId', title: '门店ID', width: 140 },
-  {
-    key: 'payAmount',
-    width: 110,
-    ellipsis: true,
-    title: '交易金额',
-    customRender: 'payAmountSlot'
-  },
-  {
-    key: 'amount',
-    width: 110,
-    title: '实际收入',
-    customRender: 'amountSlot'
-  },
-  { key: 'fee', width: 110, title: '手续费', customRender: 'feeSlot' },
+  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot' },
+  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot' },
+  { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
-  {
-    key: 'refundFee',
-    width: 125,
-    title: '退款手续费',
-    customRender: 'refundFeeSlot'
-  },
-  {
-    key: 'refundCount',
-    width: 110,
-    title: '退款笔数',
-    customRender: 'refundCountSlot'
-  },
+  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot' },
+  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot' },
   { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
   { key: 'round', width: 110, title: '成功率', customRender: 'roundSlot' }
 ]
@@ -217,8 +196,8 @@ const props = defineProps({
   queryDateRange: { type: String, default: '' }
 })
 
-const infoTable = ref(null)
-const btnLoading = ref(false)
+const tableRef = ref(null)
+const loading = ref(false)
 
 const defaultSearchData = {
   method: 'store',
@@ -247,8 +226,8 @@ const reqDownloadDataFunc = (params) => {
 }
 
 const searchFunc = () => {
-  btnLoading.value = true
-  infoTable.value?.reload()
+  loading.value = true
+  tableRef.value?.reload()
 }
 </script>
 

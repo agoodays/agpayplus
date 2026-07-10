@@ -1,7 +1,8 @@
-﻿<template>
+<template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -42,20 +43,17 @@
       </ag-search>
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
-        :init-data="true"
+        ref="tableRef"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :params="searchData"
         row-key="teamId"
-        @btn-load-close="btnLoading = false"
       >
         <template #toolbar-left>
-          <div>
-            <a-button v-if="$access('ENT_UR_TEAM_ADD')" type="primary" icon="plus" class="mg-b-30" @click="addFunc"
-              >新增</a-button
-            >
-          </div>
+          <a-button v-if="hasPermission('ENT_UR_TEAM_ADD')" type="primary" @click="addFunc">
+            <template #icon><PlusOutlined /></template>
+            新增
+          </a-button>
         </template>
         <template #statRangeTypeSlot="{ record }">
           <!-- 自定义渲染 -->
@@ -100,34 +98,45 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_UR_TEAM_EDIT')" type="link" @click="editFunc(record.teamId)">编辑</a-button>
-            <a-button v-if="$access('ENT_UR_TEAM_DEL')" type="link" style="color: red" @click="delFunc(record.teamId)"
-              >删除</a-button
-            >
+            <a-button v-if="hasPermission('ENT_UR_TEAM_EDIT')" type="link" @click="editFunc(record.teamId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_UR_TEAM_DEL')" type="link" style="color: red" @click="delFunc(record.teamId)">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
     <!-- 新增/编辑弹窗  -->
-    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="searchFunc" />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleSuccess" />
     <!-- 详情弹窗  -->
-    <InfoDetail ref="infoDetail" :callback-func="searchFunc" />
+    <detail v-model:open="detailOpen" :record-id="currentRecordId" />
   </div>
 </template>
 <script setup>
+/**
+ * 用户团队列表页面组件
+ * 功能：展示用户团队列表，支持搜索、新增、编辑、删除操作
+ */
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
 import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { usePermission } from '@/composables/useCommon'
 import { ref } from 'vue'
-import InfoAddOrEdit from './add-or-edit.vue'
-import InfoDetail from './detail.vue'
+import AddOrEdit from './add-or-edit.vue'
+import Detail from './detail.vue'
 
-// 默认查询参数对象模板
+// 权限检查
+const { hasPermission } = usePermission()
+
+/**
+ * 默认查询参数对象模板
+ */
 const defaultSearchData = {
-  sysType: 'MGR' // 所属系统: MGR-运营平台, AGENT-代理商, MCH-商户
+  sysType: 'MGR'
 }
 
-// eslint-disable-next-line no-unused-vars
+/**
+ * 表格列配置
+ */
 const tableColumns = [
   { key: 'teamId', dataIndex: 'teamId', title: '团队ID', width: 80, fixed: 'left' },
   { key: 'teamName', dataIndex: 'teamName', title: '团队名称', width: 200 },
@@ -139,17 +148,20 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-const btnLoading = ref(false)
+/**
+ * 加载状态
+ */
+const loading = ref(false)
 
+/**
+ * 使用CRUD表格页面组合式函数
+ */
 const {
-  infoTable,
-  infoAddOrEdit,
-  infoDetail,
+  tableRef,
   searchData,
+  detailOpen,
+  currentRecordId,
   reloadTable,
-  openCreate,
-  openEdit,
-  openDetail,
   confirmDelete
 } = useCrudTablePage({
   deleteAction: (recordId) => teamApi.delById(recordId),
@@ -158,20 +170,67 @@ const {
   deleteSuccessMessage: '删除成功'
 })
 
+/**
+ * 弹窗状态
+ */
+const modalOpen = ref(false)
+
+// 初始化默认搜索参数
 Object.assign(searchData, defaultSearchData)
 
-const reqTableDataFunc = (params) => teamApi.queryPage(params)
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await teamApi.queryPage(params)
+}
 
+/**
+ * 搜索函数
+ */
 const searchFunc = () => {
-  btnLoading.value = true
+  loading.value = true
   reloadTable()
 }
 
-const addFunc = () => openCreate()
+/**
+ * 新增团队
+ */
+const addFunc = () => {
+  currentRecordId.value = ''
+  modalOpen.value = true
+}
 
-const editFunc = (recordId) => openEdit(recordId)
+/**
+ * 编辑团队
+ * @param {string} recordId - 团队ID
+ */
+const editFunc = (recordId) => {
+  currentRecordId.value = recordId
+  modalOpen.value = true
+}
 
-const detailFunc = (recordId) => openDetail(recordId)
+/**
+ * 查看团队详情
+ * @param {string} recordId - 团队ID
+ */
+const detailFunc = (recordId) => {
+  currentRecordId.value = recordId
+  detailOpen.value = true
+}
 
+/**
+ * 删除团队
+ * @param {string} recordId - 团队ID
+ */
 const delFunc = (recordId) => confirmDelete(recordId)
+
+/**
+ * 操作成功回调
+ */
+const handleSuccess = () => {
+  searchFunc()
+}
 </script>

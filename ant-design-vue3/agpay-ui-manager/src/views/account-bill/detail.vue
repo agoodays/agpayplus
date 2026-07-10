@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <ag-drawer
     v-model:open="localOpen"
     :title="'流水详情'"

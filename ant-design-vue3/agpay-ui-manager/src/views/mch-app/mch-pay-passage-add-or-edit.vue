@@ -1,13 +1,13 @@
 <template>
-  <a-drawer
-    :visible="visible"
+  <ag-drawer
+    v-model:open="localOpen"
     title="配置支付通道"
-    @close="onClose"
     :closable="true"
     :mask-closable="false"
     :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="40%"
+    @close="handleClose"
   >
     <a-list :data-source="[]" v-if="cardList.length === 0" />
     <div v-else>
@@ -53,37 +53,73 @@
           zIndex: 1
         }"
       >
-        <a-button icon="close" :style="{ marginRight: '8px' }" @click="onClose">取消</a-button>
-        <a-button type="primary" icon="check" @click="handleOkFunc">保存</a-button>
+        <a-button :style="{ marginRight: '8px' }" @click="onClose">
+          <template #icon><CloseOutlined /></template>
+          取消
+        </a-button>
+        <a-button type="primary" @click="handleOkFunc">
+          <template #icon><CheckOutlined /></template>
+          保存
+        </a-button>
       </div>
     </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+/**
+ * 商户支付通道配置组件
+ * 功能：配置商户应用的支付通道和费率
+ */
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
+import { AgDrawer } from '@/components'
+import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 
+/** Props 定义 */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => ({}) }
+  open: {
+    type: Boolean,
+    default: false
+  },
+  appId: {
+    type: String,
+    default: ''
+  },
+  wayCode: {
+    type: String,
+    default: ''
+  }
 })
 
-const cardList = ref([])
-const appId = ref(null)
-const wayCode = ref(null)
-const visible = ref(false)
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'success'])
 
-const show = (appIdVal, wayCodeVal) => {
-  appId.value = appIdVal
-  wayCode.value = wayCodeVal
-  visible.value = true
-  cardList.value = []
-  refCardList()
-}
+/** 本地打开状态 */
+const localOpen = ref(false)
+
+const cardList = ref([])
+
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.appId && props.wayCode) {
+      cardList.value = []
+      refCardList()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
 
 const refCardList = () => {
-  mchAppApi.getAvailablePayInterfaceList(appId.value, wayCode.value).then(resData => {
+  mchAppApi.getAvailablePayInterfaceList(props.appId, props.wayCode).then(resData => {
     if (!resData.records || resData.records.length === 0) {
       cardList.value = []
       return
@@ -128,8 +164,8 @@ const handleOkFunc = () => {
     if (!hasError) {
       reqParams.push({
         id: item.passageId,
-        appId: appId.value,
-        wayCode: wayCode.value,
+        appId: props.appId,
+        wayCode: props.wayCode,
         ifCode: item.ifCode,
         rate: item.rate,
         state: item.state ? 1 : 0
@@ -141,16 +177,15 @@ const handleOkFunc = () => {
 
   mchAppApi.queryMchPayPassagePage({ reqParams: JSON.stringify(reqParams) }).then(() => {
     message.success('保存成功')
-    visible.value = false
-    props.callbackFunc()
+    localOpen.value = false
+    emit('success')
   })
 }
 
-const onClose = () => {
-  visible.value = false
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
 }
-
-defineExpose({ show })
 </script>
 
 <style lang="less" scoped>

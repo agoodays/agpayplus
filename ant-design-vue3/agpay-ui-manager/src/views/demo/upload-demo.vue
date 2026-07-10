@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="upload-demo">
     <a-space direction="vertical" style="width: 100%" :size="24">
       <!-- 组件概览 -->

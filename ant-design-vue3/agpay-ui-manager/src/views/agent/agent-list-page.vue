@@ -103,7 +103,7 @@
     <detail v-model:open="detailOpen" :record-id="currentRecordId" />
 
     <!-- 支付配置抽屉 -->
-    <ag-pay-config ref="payConfigRef" :info-id="currentRecordId" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'mgrAgent'" />
+    <ag-pay-config v-model:open="payConfigOpen" :info-id="currentRecordId" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'mgrAgent'" />
   </div>
 </template>
 
@@ -125,8 +125,8 @@ import Detail from './detail.vue'
 /** 权限校验 */
 const { hasPermission } = usePermission()
 
-/** 支付配置组件引用 */
-const payConfigRef = ref(null)
+/** 支付配置抽屉状态 */
+const payConfigOpen = ref(false)
 
 /** 表格列配置 */
 const tableColumns = [
@@ -194,7 +194,7 @@ const detailFunc = (recordId) => openDetail(recordId)
 /** 打开支付配置 */
 const payConfigFunc = (recordId) => {
   currentRecordId.value = recordId
-  payConfigRef.value?.show(recordId)
+  payConfigOpen.value = true
 }
 
 /** 删除代理商 */

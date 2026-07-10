@@ -1,9 +1,10 @@
-<template>
+﻿<template>
   <a-modal
-    v-model:visible="isShow"
+    v-model:open="localOpen"
     :title="isAdd ? '新增账号组' : '修改账号组'"
     :confirm-loading="confirmLoading"
     @ok="handleOkFunc"
+    @cancel="handleClose"
   >
     <a-form
       ref="infoForm"
@@ -41,40 +42,69 @@
 </template>
 
 <script setup>
+/**
+ * 分账接收方分组新增/编辑弹窗组件
+ * 功能：新增或编辑分账接收方分组信息
+ */
 import { divisionGroupApi } from '@/api/business/division/division-group-api'
-import AgSelect from '@/components/ag-select'
+import { AgSelect } from '@/components'
 import { message } from 'ant-design-vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 defineOptions({ components: { AgSelect } })
 
+/** Props 定义 */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: {
+    type: Boolean,
+    default: false
+  },
+  recordId: {
+    type: [String, Number],
+    default: ''
+  }
 })
+
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'success'])
 
 const infoForm = ref(null)
 const confirmLoading = ref(false)
 const isAdd = ref(true)
-const isShow = ref(false)
+const localOpen = ref(false)
 const saveObject = ref({ autoDivisionFlag: 0 })
-const recordId = ref(null)
 
 const rules = {
   receiverGroupName: [{ required: true, message: '请输入组名称', trigger: 'blur' }]
 }
 
-const show = async (currentRecordId) => {
-  isAdd.value = !currentRecordId
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  async (val) => {
+    localOpen.value = val
+    if (val) {
+      await initForm()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+/** 初始化表单 */
+const initForm = async () => {
+  isAdd.value = !props.recordId
   saveObject.value = { autoDivisionFlag: 0 }
   confirmLoading.value = false
   infoForm.value?.resetFields?.()
 
   if (!isAdd.value) {
-    recordId.value = currentRecordId
-    const res = await divisionGroupApi.getById(currentRecordId)
+    const res = await divisionGroupApi.getById(props.recordId)
     saveObject.value = res
   }
-  isShow.value = true
 }
 
 const searchMch = (params) => divisionGroupApi.listMch(params)
@@ -101,19 +131,20 @@ const handleOkFunc = async () => {
       await divisionGroupApi.add(saveObject.value)
       message.success('添加成功')
     } else {
-      await divisionGroupApi.updateById(recordId.value, saveObject.value)
+      await divisionGroupApi.updateById(props.recordId, saveObject.value)
       message.success('修改成功')
     }
-    isShow.value = false
-    props.callbackFunc()
+    localOpen.value = false
+    emit('success')
   } finally {
     confirmLoading.value = false
   }
 }
 
-defineExpose({
-  show
-})
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
+}
 </script>
 <style lang="less">
 .agpay-tip-text:before {

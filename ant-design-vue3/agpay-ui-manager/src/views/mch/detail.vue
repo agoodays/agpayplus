@@ -1,7 +1,13 @@
-<template>
-  <a-drawer v-model:open="localOpen" title="商户详情" width="40%" @close="handleClose">
+﻿<template>
+  <ag-drawer
+    v-model:open="localOpen"
+    title="商户详情"
+    width="40%"
+    :show-footer="false"
+    @close="handleClose"
+  >
     <a-spin :spinning="loading">
-      <a-descriptions :column="2">
+      <a-descriptions :column="2" :bordered="false">
         <a-descriptions-item label="商户号">
           {{ detailData.mchNo }}
         </a-descriptions-item>
@@ -77,10 +83,11 @@
         </a-descriptions-item>
       </a-descriptions>
     </a-spin>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+import { AgDrawer } from '@/components'
 import { mchApi } from '@/api/business/mch/mch-api'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'

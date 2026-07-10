@@ -1,8 +1,8 @@
 <template>
   <a-drawer
-    :visible="visible"
+    v-model:open="localOpen"
     title="支付配置"
-    @close="onClose"
+    @close="handleClose"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ padding: '0px 0px 80px', overflowY: 'auto' }"
     width="90%"
@@ -17,32 +17,49 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+/**
+ * 支付配置抽屉组件
+ * 功能：展示支付配置面板
+ */
+import { ref, watch } from 'vue'
 import AgPayConfigPanel from './ag-pay-config-panel.vue'
 
+/** Props 定义 */
 const props = defineProps({
   permCode: { type: String, default: '' },
-  configMode: { type: String, default: '' }
+  configMode: { type: String, default: '' },
+  open: { type: Boolean, default: false },
+  infoId: { type: String, default: '' },
+  isIsvSubMch: { type: Boolean, default: false }
 })
 
-const visible = ref(false)
-const infoId = ref(null)
+/** 事件定义 */
+const emit = defineEmits(['update:open'])
+
+const localOpen = ref(false)
 const payConfig = ref(null)
 
-const show = (infoIdVal, configMchAppIsIsvSubMch) => {
-  infoId.value = infoIdVal
-  visible.value = true
-  if (payConfig.value) {
-    payConfig.value.getPayConfig(infoIdVal, configMchAppIsIsvSubMch)
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.infoId && payConfig.value) {
+      payConfig.value.getPayConfig(props.infoId, props.isIsvSubMch)
+    }
   }
-}
+)
 
-const onClose = () => {
-  visible.value = false
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
   if (payConfig.value) {
     payConfig.value.reset()
   }
 }
-
-defineExpose({ show })
 </script>

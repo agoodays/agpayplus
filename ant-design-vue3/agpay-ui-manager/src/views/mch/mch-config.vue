@@ -1,11 +1,11 @@
 <template>
-  <a-drawer
-    :visible="visible"
+  <ag-drawer
+    v-model:open="localOpen"
     :title="'商户高级配置'"
-    @close="onClose"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
+    @close="handleClose"
   >
     <a-tabs v-model:activeKey="groupKey" @change="selectTabs" :animated="false">
       <a-tab-pane key="orderConfig" tab="系统配置">
@@ -24,7 +24,10 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" icon="check-circle" @click="confirm('系统配置')" :loading="btnLoading">确认更新</a-button>
+                  <a-button type="primary" @click="confirm('系统配置')" :loading="loading">
+                  <template #icon><CheckCircleOutlined /></template>
+                  确认更新
+                </a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -80,7 +83,10 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" icon="check-circle" @click="confirm('回调参数', '更新完成后请尽快检查回调接收地址，避免验签失败造成业务损失！')" :loading="btnLoading">确认更新</a-button>
+                  <a-button type="primary" @click="confirm('回调参数', '更新完成后请尽快检查回调接收地址，避免验签失败造成业务损失！')" :loading="loading">
+                  <template #icon><CheckCircleOutlined /></template>
+                  确认更新
+                </a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -168,7 +174,10 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" icon="check-circle" @click="confirm('分账设置')" :loading="btnLoading">确认更新</a-button>
+                  <a-button type="primary" @click="confirm('分账设置')" :loading="loading">
+                  <template #icon><CheckCircleOutlined /></template>
+                  确认更新
+                </a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -194,7 +203,10 @@
             <a-row>
               <a-col :span="24">
                 <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" icon="check-circle" @click="confirm('商户的接口权限')" :loading="btnLoading">确认更新</a-button>
+                  <a-button type="primary" @click="confirm('商户的接口权限')" :loading="loading">
+                  <template #icon><CheckCircleOutlined /></template>
+                  确认更新
+                </a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -202,16 +214,36 @@
         </div>
       </a-tab-pane>
     </a-tabs>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
+/**
+ * 商户高级配置组件
+ * 功能：配置商户系统配置、回调参数、分账管理、接口权限
+ */
+import { AgDrawer } from '@/components'
+import { ref, reactive, computed, watch } from 'vue'
 import { message, Modal } from 'ant-design-vue'
-import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+import { CheckCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { mchApi } from '@/api/business/mch/mch-api'
 
 const icons = { QuestionCircleOutlined }
+
+/** Props 定义 */
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false
+  },
+  mchNo: {
+    type: String,
+    default: ''
+  }
+})
+
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'success'])
 
 const orderNotifyParamsColumns = [
   { title: '参数KEY', dataIndex: 'key' },
@@ -274,8 +306,8 @@ const mchApiEntData = [
 ]
 
 const recordId = ref(null)
-const visible = ref(false)
-const btnLoading = ref(false)
+const localOpen = ref(false)
+const loading = ref(false)
 const payOrderNotifyExtParams = ref([])
 const isShowMchApiEnt = ref(false)
 const mchApiEnts = ref([])
@@ -288,6 +320,27 @@ const divisionConfig = reactive({
     delayTime: 120
   },
   mchDivisionEntFlag: 1
+})
+
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.mchNo) {
+      recordId.value = props.mchNo
+      groupKey.value = 'orderConfig'
+      payOrderNotifyExtParams.value = []
+      isShowMchApiEnt.value = false
+      mchApiEnts.value = []
+      detail()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
 })
 
 const rowSelection = computed(() => ({
@@ -321,44 +374,34 @@ const mchApiEntRowSelection = computed(() => ({
   })
 }))
 
-const show = (mchNo) => {
-  recordId.value = mchNo
-  groupKey.value = 'orderConfig'
-  payOrderNotifyExtParams.value = []
-  isShowMchApiEnt.value = false
-  mchApiEnts.value = []
-  detail()
-  visible.value = true
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
 }
 
-const onClose = () => {
-  visible.value = false
-}
-
-const detail = () => {
+const detail = async () => {
   configData.value = []
-  mchApi.getMchConfigs(groupKey.value, recordId.value).then((res) => {
-    configData.value = res
-    if (groupKey.value === 'payOrderNotifyConfig') {
-      const extParams = res.find((item) => item.configKey === 'payOrderNotifyExtParams')
-      if (extParams) {
-        payOrderNotifyExtParams.value = JSON.parse(extParams.configVal)
-      }
+  const res = await mchApi.getMchConfigs(groupKey.value, recordId.value)
+  configData.value = res
+  if (groupKey.value === 'payOrderNotifyConfig') {
+    const extParams = res.find((item) => item.configKey === 'payOrderNotifyExtParams')
+    if (extParams) {
+      payOrderNotifyExtParams.value = JSON.parse(extParams.configVal)
     }
-    if (groupKey.value === 'divisionManage') {
-      const divConfig = res.find((item) => item.configKey === 'divisionConfig')
-      if (divConfig) {
-        Object.assign(divisionConfig, JSON.parse(divConfig.configVal))
-      }
+  }
+  if (groupKey.value === 'divisionManage') {
+    const divConfig = res.find((item) => item.configKey === 'divisionConfig')
+    if (divConfig) {
+      Object.assign(divisionConfig, JSON.parse(divConfig.configVal))
     }
-    if (groupKey.value === 'mchApiEnt') {
-      const apiEnt = res.find((item) => item.configKey === 'mchApiEntList')
-      if (apiEnt) {
-        mchApiEnts.value = JSON.parse(apiEnt.configVal)
-      }
-      isShowMchApiEnt.value = true
+  }
+  if (groupKey.value === 'mchApiEnt') {
+    const apiEnt = res.find((item) => item.configKey === 'mchApiEntList')
+    if (apiEnt) {
+      mchApiEnts.value = JSON.parse(apiEnt.configVal)
     }
-  })
+    isShowMchApiEnt.value = true
+  }
 }
 
 const selectTabs = (key) => {
@@ -374,8 +417,8 @@ const confirm = (title, content) => {
     title: `确认修改${title}吗？`,
     content: content,
     okType: 'primary',
-    onOk: () => {
-      btnLoading.value = true
+    async onOk() {
+      loading.value = true
       const jsonObject = {}
       configData.value.forEach((item) => {
         switch (item.configKey) {
@@ -393,12 +436,12 @@ const confirm = (title, content) => {
             break
         }
       })
-      mchApi.updateMchConfigs(groupKey.value, { mchNo: recordId.value, configs: jsonObject }).then(() => {
+      try {
+        await mchApi.updateMchConfigs(groupKey.value, { mchNo: recordId.value, configs: jsonObject })
         message.success('修改成功')
-        btnLoading.value = false
-      }).catch(() => {
-        btnLoading.value = false
-      })
+      } finally {
+        loading.value = false
+      }
     }
   })
 }

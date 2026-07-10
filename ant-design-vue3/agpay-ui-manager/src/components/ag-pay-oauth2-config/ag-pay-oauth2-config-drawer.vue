@@ -1,11 +1,11 @@
 <template>
   <ag-drawer
-    :visible="visible"
+    v-model:open="localOpen"
     :title="true ? 'Oauth2配置' : ''"
     :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
     :body-style="{ padding: '24px', overflowY: 'auto' }"
     width="80%"
-    @close="onClose"
+    @close="handleClose"
   >
     <div v-show="configMode === 'mgrIsv'">
       <div style="margin-bottom: 20px">
@@ -21,9 +21,10 @@
             {{ item.remark + ' [ ID: ' + item.infoId + ' ]' }}
           </a-select-option>
         </a-select>
-        <a-button v-show="diyAddMode === 'init'" type="primary" icon="plus" @click="diyAddMode = 'adding'"
-          >创建</a-button
-        >
+        <a-button v-show="diyAddMode === 'init'" type="primary" @click="diyAddMode = 'adding'">
+          <template #icon><PlusOutlined /></template>
+          创建
+        </a-button>
       </div>
       <div v-show="diyAddMode === 'adding'">
         <label>输入名称：</label>
@@ -45,10 +46,14 @@
           </template>
           <icons.QuestionCircleOutlined />
         </a-popover>
-        <a-button type="danger" icon="check" :style="{ marginLeft: '20px' }" @click="onSave">保存</a-button>
-        <a-button type="primary" icon="close" :style="{ marginLeft: '8px' }" @click="diyAddMode = 'init'"
-          >取消</a-button
-        >
+        <a-button type="danger" :style="{ marginLeft: '20px' }" @click="onSave">
+          <template #icon><CheckOutlined /></template>
+          保存
+        </a-button>
+        <a-button type="primary" :style="{ marginLeft: '8px' }" @click="diyAddMode = 'init'">
+          <template #icon><CloseOutlined /></template>
+          取消
+        </a-button>
       </div>
       <a-divider />
     </div>
@@ -64,28 +69,40 @@
         @update-if-params="handleUpdateIfParams"
       />
       <div style="display: flex; justify-content: space-around; flex-direction: row">
-        <a-button type="primary" icon="check" :loading="btnLoading" @click="onSubmit">保存</a-button>
+        <a-button type="primary" :loading="loading" @click="onSubmit">
+          <template #icon><CheckOutlined /></template>
+          保存
+        </a-button>
       </div>
     </a-card>
   </ag-drawer>
 </template>
 
 <script setup>
-import { QuestionCircleOutlined } from '@ant-design/icons-vue'
-const icons = { QuestionCircleOutlined }
-import { ref, nextTick, markRaw } from 'vue'
+/**
+ * Oauth2配置抽屉组件
+ * 功能：配置微信/支付宝Oauth2参数
+ */
+import { CheckOutlined, CloseOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
+const icons = { CheckOutlined, CloseOutlined, PlusOutlined, QuestionCircleOutlined }
+import { ref, nextTick, markRaw, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { AgDrawer } from '@/components'
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
 
+/** Props 定义 */
 const props = defineProps({
-  configMode: { type: String, default: null }
+  configMode: { type: String, default: null },
+  open: { type: Boolean, default: false },
+  infoId: { type: String, default: '' },
+  isIsvSubMch: { type: Boolean, default: false }
 })
 
-const visible = ref(false)
-const infoId = ref(null)
-const btnLoading = ref(false)
-const isIsvSubMch = ref(false)
+/** 事件定义 */
+const emit = defineEmits(['update:open'])
+
+const localOpen = ref(false)
+const loading = ref(false)
 const diyListSelectedInfoId = ref('')
 const diyList = ref([])
 const diyAddMode = ref('init')
@@ -101,11 +118,25 @@ const saveObject = ref({})
 const ifParams = ref({})
 const currentComponentRef = ref(null)
 
-const show = (infoIdValue, isIsvSubMchValue) => {
-  infoId.value = infoIdValue
-  diyListSelectedInfoId.value = infoIdValue
-  isIsvSubMch.value = isIsvSubMchValue
-  visible.value = true
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.infoId) {
+      initData()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+/** 初始化数据 */
+const initData = () => {
+  diyListSelectedInfoId.value = props.infoId
   if (props.configMode === 'mgrIsv') {
     getDiyList()
   }
@@ -114,10 +145,9 @@ const show = (infoIdValue, isIsvSubMchValue) => {
   })
 }
 
-const onClose = () => {
-  visible.value = false
-  infoId.value = null
-  isIsvSubMch.value = false
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
   diyListSelectedInfoId.value = ''
   diyList.value = []
   diyAddMode.value = 'init'
@@ -129,7 +159,7 @@ const onClose = () => {
 }
 
 const getCurrentComponent = () => {
-  const suffix = isIsvSubMch.value ? 'IsvSubMch' : ''
+  const suffix = props.isIsvSubMch ? 'IsvSubMch' : ''
   switch (currentIfCode.value) {
     case 'wxpay':
       return import(`./diy/wxpay/${suffix}Oauth2ConfigPage.vue`)
@@ -141,7 +171,7 @@ const getCurrentComponent = () => {
 }
 
 const getDiyList = async () => {
-  const res = await payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: infoId.value })
+  const res = await payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: props.infoId })
   diyList.value = res
 }
 
@@ -158,7 +188,7 @@ const getSavedConfigs = async () => {
     if (currentIfCode.value === 'alipay') {
       ifParams.value.liteParams = ifParams.value.liteParams || {}
     }
-    if (isIsvSubMch.value) {
+    if (props.isIsvSubMch) {
       ifParams.value.isUseSubmchAccount = ifParams.value.isUseSubmchAccount || 0
     }
   }
@@ -185,7 +215,7 @@ const onSave = async () => {
     const params = Object.assign(
       {},
       {
-        infoId: infoId.value,
+        infoId: props.infoId,
         configMode: props.configMode,
         remark: addDiyListName.value,
         copySourceInfoId: diyListSelectedInfoId.value
@@ -209,16 +239,14 @@ const onSubmit = async () => {
   }
   const params = currentComponentRef.value.handleStarParams()
   saveObject.value.ifParams = JSON.stringify(params)
-  btnLoading.value = true
+  loading.value = true
   try {
     await payOauth2Api.saveConfigParams(saveObject.value)
     message.success('保存成功')
   } finally {
-    btnLoading.value = false
+    loading.value = false
   }
 }
-
-defineExpose({ show })
 </script>
 
 <style scoped>

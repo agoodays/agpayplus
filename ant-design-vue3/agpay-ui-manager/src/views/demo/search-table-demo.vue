@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-card :bordered="false">
     <div style="margin-bottom: 16px">
       <ag-search
@@ -65,7 +65,7 @@
     </div>
 
     <ag-table
-      :columns="columns"
+      :columns="tableColumns"
       :on-load="reqTableDataFunc"
       :on-load-statistics="reqTableCountFunc"
       :on-download="reqDownloadDataFunc"
@@ -113,7 +113,7 @@ const searchForm = reactive({
 })
 
 // 表格列定义
-const columns = ref([
+const tableColumns = ref([
   {
     title: 'ID',
     key: 'id',

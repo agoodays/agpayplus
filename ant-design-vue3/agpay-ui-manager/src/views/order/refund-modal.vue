@@ -153,37 +153,36 @@ const initForm = () => {
 /**
  * 提交表单
  */
-const handleSubmit = () => {
-  infoForm.value.validate().then(async () => {
-    Modal.confirm({
-      title: t('refund.confirmTitle'),
-      content: t('refund.confirmContent', { amount: saveObject.refundAmount.toFixed(2) }),
-      okText: t('common.confirm'),
-      cancelText: t('common.cancel'),
-      onOk: async () => {
-        try {
-          loading.value = true
+const handleSubmit = async () => {
+  await infoForm.value.validate()
+  Modal.confirm({
+    title: t('refund.confirmTitle'),
+    content: t('refund.confirmContent', { amount: saveObject.refundAmount.toFixed(2) }),
+    okText: t('common.confirm'),
+    cancelText: t('common.cancel'),
+    async onOk() {
+      try {
+        loading.value = true
 
-          const data = {
-            payOrderId: props.payOrder.payOrderId,
-            refundAmount: Math.round(saveObject.refundAmount * 100), // 转换为分
-            refundReason: saveObject.refundReason,
-            remark: saveObject.remark
-          }
-
-          await orderApi.createRefund(data)
-          message.success(t('refund.submitSuccess'))
-
-          handleClose()
-          emit('success')
-        } catch (error) {
-          console.error('退款失败:', error)
-          message.error(error.msg || t('refund.submitFailed'))
-        } finally {
-          loading.value = false
+        const data = {
+          payOrderId: props.payOrder.payOrderId,
+          refundAmount: Math.round(saveObject.refundAmount * 100),
+          refundReason: saveObject.refundReason,
+          remark: saveObject.remark
         }
+
+        await orderApi.createRefund(data)
+        message.success(t('refund.submitSuccess'))
+
+        handleClose()
+        emit('success')
+      } catch (error) {
+        console.error('退款失败:', error)
+        message.error(error.msg || t('refund.submitFailed'))
+      } finally {
+        loading.value = false
       }
-    })
+    }
   })
 }
 

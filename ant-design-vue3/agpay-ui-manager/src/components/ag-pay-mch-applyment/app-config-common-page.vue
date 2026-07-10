@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <a-form ref="infoForm" :model="formData" layout="vertical">
     <a-row justify="space-between" type="flex">
       <a-col :span="24">
@@ -15,12 +15,13 @@
             <a-col :span="6">
               <a-button
                 type="primary"
-                icon="save"
                 size="small"
                 style="margin-left: 20px !important"
                 @click="setConfig('payBaseUrl')"
-                >配置</a-button
               >
+                <template #icon><SaveOutlined /></template>
+                配置
+              </a-button>
             </a-col>
           </a-row>
         </a-form-item>
@@ -34,12 +35,13 @@
             <a-col :span="6">
               <a-button
                 type="primary"
-                icon="save"
                 size="small"
                 style="margin-left: 20px !important"
                 @click="setConfig('bindAppId')"
-                >配置</a-button
               >
+                <template #icon><SaveOutlined /></template>
+                配置
+              </a-button>
             </a-col>
           </a-row>
         </a-form-item>
@@ -53,12 +55,13 @@
             <a-col :span="6">
               <a-button
                 type="primary"
-                icon="save"
                 size="small"
                 style="margin-left: 20px !important"
                 @click="setConfig('bindLiteAppId')"
-                >配置</a-button
               >
+                <template #icon><SaveOutlined /></template>
+                配置
+              </a-button>
             </a-col>
           </a-row>
         </a-form-item>
@@ -72,12 +75,13 @@
             <a-col :span="6">
               <a-button
                 type="primary"
-                icon="save"
                 size="small"
                 style="margin-left: 20px !important"
                 @click="setConfig('subscribeAppId')"
-                >配置</a-button
               >
+                <template #icon><SaveOutlined /></template>
+                配置
+              </a-button>
             </a-col>
           </a-row>
         </a-form-item>
@@ -85,13 +89,17 @@
     </a-row>
     <a-row justify="space-between" type="flex">
       <a-col>
-        <a-button type="primary" icon="bars" @click="queryConfig">参数查询</a-button>
+        <a-button type="primary" @click="queryConfig">
+          <template #icon><BarsOutlined /></template>
+          参数查询
+        </a-button>
       </a-col>
     </a-row>
   </a-form>
 </template>
 
 <script setup>
+import { BarsOutlined, SaveOutlined } from '@ant-design/icons-vue'
 import { reactive } from 'vue'
 
 const props = defineProps({

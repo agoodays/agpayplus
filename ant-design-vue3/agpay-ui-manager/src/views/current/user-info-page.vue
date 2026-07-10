@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="user-info-page">
     <a-card :bordered="false">
       <a-tabs v-model:active-key="activeTab">
@@ -156,7 +156,7 @@ import { Base64 } from 'js-base64'
 import { onMounted, reactive, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import AgUpload from '@/components/ag-upload'
+import { AgUpload } from '@/components'
 const router = useRouter()
 const userStore = useUserStore()
 const { t } = useI18n()

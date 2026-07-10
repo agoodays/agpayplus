@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-alert v-if="forgetErrorInfo" class="forget-error-message" :message="forgetErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">{{ t('auth.forgetTitle') }}</div>

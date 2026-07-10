@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <a-alert v-if="loginErrorInfo" class="login-error-message" :message="loginErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">{{ t('auth.loginTitle') }}</div>

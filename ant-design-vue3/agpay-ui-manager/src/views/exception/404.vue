@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="exception-page">
     <div class="exception-content">
       <div class="exception-icon">

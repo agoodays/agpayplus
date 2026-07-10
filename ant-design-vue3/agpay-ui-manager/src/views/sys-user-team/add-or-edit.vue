@@ -1,16 +1,18 @@
-<template>
-  <a-drawer
-    :mask-closable="false"
-    :visible="visible"
+﻿<template>
+  <ag-drawer
+    v-model:open="localOpen"
     :title="isAdd ? '新增团队' : '修改团队'"
     class="drawer-width"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     :width="drawerWidth"
-    @close="onClose"
+    :show-confirm="true"
+    :confirm-loading="loading"
+    @confirm="handleConfirm"
+    @close="handleClose"
   >
-    <a-form v-if="visible" ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
-      <a-row justify="space-between" type="flex">
+    <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
+      <a-row :gutter="16">
         <a-col :span="10">
           <a-form-item label="团队名称" name="teamName">
             <a-input v-model:value="saveObject.teamName" placeholder="请输入团队名称" />
@@ -22,7 +24,7 @@
           </a-form-item>
         </a-col>
         <a-col :span="10">
-          <a-form-item label="团队编号" name="statRangeType">
+          <a-form-item label="统计周期" name="statRangeType">
             <a-select v-model:value="saveObject.statRangeType" placeholder="统计周期" default-value="year">
               <a-select-option value="year">年</a-select-option>
               <a-select-option value="quarter">季度</a-select-option>
@@ -33,36 +35,33 @@
         </a-col>
       </a-row>
     </a-form>
-    <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
-        <template #icon><close-outlined /></template>
-        取消
-      </a-button>
-      <a-button type="primary" :loading="btnLoading" @click="onSubmit">
-        <template #icon><check-outlined /></template>
-        保存
-      </a-button>
-    </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+/**
+ * 用户团队新增/编辑弹窗组件
+ * 功能：支持新增和编辑团队信息
+ */
+import { AgDrawer } from '@/components'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: { type: Boolean, default: false },
+  recordId: { type: String, default: '' }
 })
 
+const emit = defineEmits(['update:open', 'success'])
+
 const infoForm = ref(null)
-const btnLoading = ref(false)
+const loading = ref(false)
+const localOpen = ref(false)
 const isAdd = ref(true)
 const saveObject = ref({})
-const recordId = ref(null)
-const visible = ref(false)
 const viewportWidth = ref(window.innerWidth)
+
 const drawerWidth = computed(() => (viewportWidth.value < 992 ? '92%' : '40%'))
 
 const onResize = () => {
@@ -91,16 +90,25 @@ const rules = {
   statRangeType: [{ required: true, validator: checkStatRangeType, trigger: 'blur' }]
 }
 
-async function show(id) {
-  isAdd.value = !id
-  saveObject.value = { statRangeType: 'year' }
-  recordId.value = id || null
-  infoForm.value?.resetFields?.()
-  visible.value = true
+watch(() => props.open, async (val) => {
+  localOpen.value = val
+  if (val) {
+    await initForm()
+  }
+})
 
-  if (!isAdd.value && recordId.value) {
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+const initForm = async () => {
+  isAdd.value = !props.recordId
+  saveObject.value = { statRangeType: 'year' }
+  infoForm.value?.resetFields?.()
+
+  if (!isAdd.value && props.recordId) {
     try {
-      const res = await teamApi.getById(recordId.value)
+      const res = await teamApi.getById(props.recordId)
       saveObject.value = res || { statRangeType: 'year' }
     } catch (_e) {
       message.error('加载团队信息失败，请重试')
@@ -108,7 +116,7 @@ async function show(id) {
   }
 }
 
-async function validateForm() {
+const validateForm = async () => {
   try {
     await infoForm.value.validate()
     return true
@@ -117,33 +125,31 @@ async function validateForm() {
   }
 }
 
-async function onSubmit() {
-  if (btnLoading.value) return
+const handleConfirm = async () => {
+  if (loading.value) return
 
   const valid = await validateForm()
   if (!valid) return
 
-  btnLoading.value = true
+  loading.value = true
   try {
     if (isAdd.value) {
       await teamApi.add(saveObject.value)
       message.success('新增成功')
     } else {
-      await teamApi.updateById(recordId.value, saveObject.value)
+      await teamApi.updateById(props.recordId, saveObject.value)
       message.success('修改成功')
     }
-    visible.value = false
-    props.callbackFunc()
+    localOpen.value = false
+    emit('success')
   } finally {
-    btnLoading.value = false
+    loading.value = false
   }
 }
 
-function onClose() {
-  visible.value = false
+const handleClose = () => {
+  localOpen.value = false
 }
-
-defineExpose({ show })
 </script>
 
 <style lang="less">

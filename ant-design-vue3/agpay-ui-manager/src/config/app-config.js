@@ -95,5 +95,5 @@ export const asyncRouteDefine = {
   MchConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') },
   MchNotifyListPage: { defaultPath: '/notify', component: () => import('@/views/notice/notice-list-page.vue') },
   PlatformProfitPage: { defaultPath: '/platformProfits', component: () => import('@/views/statistic/agent/agent-count-page.vue') },
-  SysLogPage: { defaultPath: '/log', component: () => import('@/views/exception/404.vue') }
+  SysLogPage: { defaultPath: '/log', component: () => import('@/views/sys/sys-log.vue') }
 }

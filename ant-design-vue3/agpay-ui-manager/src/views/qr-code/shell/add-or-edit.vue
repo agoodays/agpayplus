@@ -1,33 +1,32 @@
-<template>
-  <a-drawer
+﻿<template>
+  <ag-drawer
+    v-model:open="localOpen"
     :mask-closable="false"
-    :visible="visible"
     :title="isAdd ? '新增模板' : '修改模板'"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="80%"
-    class="drawer-width"
-    @close="onClose"
+    @close="handleClose"
+    :show-confirm="true"
+    :confirm-loading="loading"
+    @confirm="handleConfirm"
   >
     <a-row>
       <a-col span="14">
         <a-form
           ref="infoForm"
           :model="saveObject"
-          :label-col="{ span: 4 }"
-          :wrapper-col="{ span: 20 }"
+          layout="vertical"
           :rules="rules"
         >
-          <a-form-item label="模板别名：" name="shellAlias">
+          <a-form-item label="模板别名" name="shellAlias">
             <a-input v-model:value="saveObject.shellAlias" />
           </a-form-item>
-          <a-form-item label="选择渲染模板：" name="styleCode">
+          <a-form-item label="选择渲染模板" name="styleCode">
             <a-radio-group v-model:value="saveObject.styleCode" size="small" button-style="solid" @change="onChange">
               <a-radio-button value="shellA">模板A</a-radio-button>
               <a-radio-button value="shellB">模板B</a-radio-button>
             </a-radio-group>
           </a-form-item>
-          <a-form-item label="显示ID：" name="showIdFlag">
+          <a-form-item label="显示ID" name="showIdFlag">
             <a-radio-group
               v-model:value="saveObject.configInfo.showIdFlag"
               size="small"
@@ -38,7 +37,7 @@
               <a-radio-button :value="false">隐藏</a-radio-button>
             </a-radio-group>
           </a-form-item>
-          <a-form-item label="支付方式：" name="payType">
+          <a-form-item label="支付方式" name="payType">
             <a-row v-for="(item, index) in saveObject.configInfo.payTypeList" :key="index">
               <a-col>
                 <a-radio-group v-model:value="item.name" :options="payTypeOptions" @change="onPayTypeChange($event, index)" />
@@ -79,7 +78,7 @@
               <a-button size="small" @click="addPayTypeItem">新增</a-button>
             </a-row>
           </a-form-item>
-          <a-form-item label="背景颜色：" name="bgColor">
+          <a-form-item label="背景颜色" name="bgColor">
             <a-row>
               <a-col>
                 <a-radio-group v-model:value="saveObject.configInfo.bgColor" @change="onChange">
@@ -101,7 +100,7 @@
               </a-col>
             </a-row>
           </a-form-item>
-          <a-form-item label="主logo：" name="logoImgUrl">
+          <a-form-item label="主logo" name="logoImgUrl">
             <ag-upload
               :action="action"
               accept=".jpg, .jpeg, .png"
@@ -115,7 +114,7 @@
             </ag-upload>
             <span class="agpay-tip-text">{{ logoImgTipText }}</span>
           </a-form-item>
-          <a-form-item label="二维码上的logo：" name="qrInnerImgUrl">
+          <a-form-item label="二维码上的logo" name="qrInnerImgUrl">
             <ag-upload
               :action="action"
               accept=".jpg, .jpeg, .png"
@@ -145,26 +144,38 @@
         </div>
       </a-col>
     </a-row>
-    <div class="drawer-btn-center">
-      <a-button icon="close" :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
-        取消
-      </a-button>
-      <a-button type="primary" icon="check" :loading="btnLoading" @click="handleOkFunc"> 保存 </a-button>
-    </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 <script setup>
+import { AgDrawer, AgUpload } from '@/components'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 const icons = { LoadingOutlined, UploadOutlined }
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
-import AgUpload from '@/components/ag-upload'
 import { upload } from '@/lib/ag-axios'
 import { message } from 'ant-design-vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: {
+    type: Boolean,
+    default: false
+  },
+  recordId: {
+    type: [String, Number],
+    default: null
+  }
 })
+
+const emit = defineEmits(['update:open', 'success'])
+
+const localOpen = ref(props.open)
+
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+  }
+)
 
 const payTypeOptions = [
   { value: 'wxpay', label: '微信' },
@@ -193,38 +204,42 @@ function createDefaultSaveObject() {
 
 const infoForm = ref(null)
 const isAdd = ref(true)
-const visible = ref(false)
-const btnLoading = ref(false)
+const loading = ref(false)
 const action = upload.form
 const logoImgTipText = ref('(显示在顶部，透明图片，建议尺寸：924 X 282)')
 const qrInnerImgTipText = ref('(建议尺寸：100 X 100)')
 const saveObject = ref(createDefaultSaveObject())
-const recordId = ref(null)
 
 const rules = {
   shellAlias: [{ required: true, message: '请输入模板别名', trigger: 'blur' }],
   styleCode: [{ required: true, message: '请输入选择渲染模板', trigger: 'blur' }]
 }
 
-async function show(currentRecordId) {
-  isAdd.value = !currentRecordId
+async function loadData() {
+  isAdd.value = !props.recordId
   saveObject.value = createDefaultSaveObject()
   infoForm.value?.resetFields?.()
 
   if (!isAdd.value) {
-    recordId.value = currentRecordId
-    const res = await qrcShellApi.getById(currentRecordId)
+    const res = await qrcShellApi.getById(props.recordId)
     saveObject.value = res
-    visible.value = true
     return
   }
 
-  visible.value = true
   onChange()
 }
 
-function onClose() {
-  visible.value = false
+watch(
+  () => props.open,
+  async (val) => {
+    if (val) {
+      await loadData()
+    }
+  }
+)
+
+function handleClose() {
+  emit('update:open', false)
 }
 
 function onPayTypeChange(e, index) {
@@ -308,27 +323,26 @@ async function validateForm() {
   }
 }
 
-async function handleOkFunc() {
+async function handleConfirm() {
   const valid = await validateForm()
   if (!valid) return
 
-  const params = { ...saveObject.value, shellImgViewUrl: undefined }
-  if (isAdd.value) {
-    await qrcShellApi.add(params)
-    message.success('新增成功')
-  } else {
-    await qrcShellApi.updateById(recordId.value, params)
-    message.success('修改成功')
+  loading.value = true
+  try {
+    const params = { ...saveObject.value, shellImgViewUrl: undefined }
+    if (isAdd.value) {
+      await qrcShellApi.add(params)
+      message.success('新增成功')
+    } else {
+      await qrcShellApi.updateById(props.recordId, params)
+      message.success('修改成功')
+    }
+    emit('success')
+    emit('update:open', false)
+  } finally {
+    loading.value = false
   }
-
-  visible.value = false
-  props.callbackFunc()
 }
-
-defineExpose({
-  show,
-  onClose
-})
 </script>
 
 <style lang="less" scoped>

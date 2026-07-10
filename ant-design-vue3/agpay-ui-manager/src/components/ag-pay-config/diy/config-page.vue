@@ -60,7 +60,7 @@
             </a-col>
           </a-row>
           <a-form-item>
-            <a-button type="primary" :loading="btnLoading" @click="onSubmit"> 保存 </a-button>
+            <a-button type="primary" :loading="loading" @click="onSubmit"> 保存 </a-button>
           </a-form-item>
         </a-form>
       </div>
@@ -103,7 +103,7 @@ const props = defineProps({
 
 // State
 const showCard = ref(false)
-const btnLoading = ref(false)
+const loading = ref(false)
 const infoForm = ref(null)
 const saveObject = reactive({})
 const formItems = ref([])
@@ -123,7 +123,7 @@ const formItemLayout = {
 // Methods
 const getConfig = () => {
   if (props.ifDefine) {
-    btnLoading.value = true
+    loading.value = true
     payConfigApi.getPayConfigById(props.infoId, props.ifDefine.ifCode)
       .then((res) => {
         showCard.value = true
@@ -131,7 +131,7 @@ const getConfig = () => {
         formItems.value.forEach((item) => {
           saveObject[item.key] = item.value
         })
-        btnLoading.value = false
+        loading.value = false
       })
   }
 }
@@ -147,7 +147,7 @@ const reset = () => {
 const onSubmit = () => {
   infoForm.value.validate((errors) => {
     if (!errors) {
-      btnLoading.value = true
+      loading.value = true
       const params = {
         infoId: props.infoId,
         infoType: props.infoType,
@@ -160,7 +160,7 @@ const onSubmit = () => {
       payConfigApi.addPayConfig(params).then((res) => {
         message.success('保存成功')
         props.callbackFunc()
-        btnLoading.value = false
+        loading.value = false
       })
     }
   })

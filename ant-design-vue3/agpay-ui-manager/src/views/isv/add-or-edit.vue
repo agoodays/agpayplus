@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <ag-drawer
     v-model:open="localOpen"
     :mask-closable="false"
@@ -81,7 +81,7 @@ const emit = defineEmits(['update:open', 'success'])
 
 const infoForm = ref(null)
 const localOpen = ref(false)
-const btnLoading = ref(false)
+const loading = ref(false)
 const isAdd = ref(true)
 const saveObject = ref({})
 
@@ -116,12 +116,12 @@ async function initForm(currentRecordId) {
 }
 
 async function handleSubmit() {
-  if (btnLoading.value) return
+  if (loading.value) return
 
   try {
     await infoForm.value.validate()
 
-    btnLoading.value = true
+    loading.value = true
     if (isAdd.value) {
       await isvApi.add(saveObject.value)
       message.success('新增成功')
@@ -136,7 +136,7 @@ async function handleSubmit() {
       message.error('操作失败')
     }
   } finally {
-    btnLoading.value = false
+    loading.value = false
   }
 }
 

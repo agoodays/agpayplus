@@ -1,59 +1,55 @@
-<template>
-  <a-drawer
+﻿<template>
+  <ag-drawer
     v-model:open="localOpen"
     :title="isAdd ? '新增商户' : '修改商户'"
-    :width="720"
+    width="40%"
     :mask-closable="false"
-    :body-style="{ paddingBottom: '80px' }"
     @close="handleClose"
+    :show-confirm="true"
+    :confirm-loading="loading"
+    @confirm="handleConfirm"
   >
     <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 基本信息 -->
       <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="商户名称" name="mchName">
             <a-input v-model:value="saveObject.mchName" placeholder="请输入商户名称" />
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="登录名" name="loginUsername">
             <a-input v-model:value="saveObject.loginUsername" placeholder="请输入商户登录名" :disabled="!isAdd" />
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="商户简称" name="mchShortName">
             <a-input v-model:value="saveObject.mchShortName" placeholder="请输入商户简称" />
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="联系人姓名" name="contactName">
             <a-input v-model:value="saveObject.contactName" placeholder="请输入联系人姓名" />
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="联系人邮箱" name="contactEmail">
             <a-input v-model:value="saveObject.contactEmail" placeholder="请输入联系人邮箱" />
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="联系人手机号" name="contactTel">
             <a-input v-model:value="saveObject.contactTel" placeholder="请输入联系人手机号" />
             <div class="tip-text">(同步更改登录手机号)</div>
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item name="mchLevel">
             <template #label>
               <span>商户级别</span>
@@ -72,7 +68,7 @@
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item name="refundMode">
             <template #label>
               <span>退款方式</span>
@@ -86,10 +82,8 @@
             </a-checkbox-group>
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <a-row :gutter="16">
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item name="type">
             <template #label>
               <span>商户类型</span>
@@ -108,7 +102,7 @@
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col :span="10">
           <a-form-item label="状态" name="state">
             <a-radio-group v-model:value="saveObject.state">
               <a-radio :value="1">启用</a-radio>
@@ -116,11 +110,9 @@
             </a-radio-group>
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <!-- 特约商户专属字段 -->
-      <a-row v-if="saveObject.type === 2" :gutter="16">
-        <a-col :span="12">
+        <!-- 特约商户专属字段 -->
+        <a-col v-if="saveObject.type === 2" :span="10">
           <a-form-item label="代理商号" name="agentNo">
             <a-select
               v-model:value="saveObject.agentNo"
@@ -137,7 +129,7 @@
           </a-form-item>
         </a-col>
 
-        <a-col :span="12">
+        <a-col v-if="saveObject.type === 2" :span="10">
           <a-form-item label="服务商号" name="isvNo">
             <a-select
               v-model:value="saveObject.isvNo"
@@ -153,9 +145,7 @@
             </a-select>
           </a-form-item>
         </a-col>
-      </a-row>
 
-      <a-row :gutter="16">
         <a-col :span="24">
           <a-form-item label="备注" name="remark">
             <a-textarea v-model:value="saveObject.remark" placeholder="请输入备注" :rows="3" />
@@ -168,32 +158,28 @@
         <a-tag color="var(--error-color)">账户安全</a-tag>
       </a-divider>
 
-      <div v-if="isAdd">
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="是否发送开通提醒" name="isNotify">
-              <a-radio-group v-model:value="saveObject.isNotify">
-                <a-radio :value="0">否</a-radio>
-                <a-radio :value="1">是</a-radio>
-              </a-radio-group>
-            </a-form-item>
-          </a-col>
-        </a-row>
+      <a-row v-if="isAdd" :gutter="16">
+        <a-col :span="10">
+          <a-form-item label="是否发送开通提醒" name="isNotify">
+            <a-radio-group v-model:value="saveObject.isNotify">
+              <a-radio :value="0">否</a-radio>
+              <a-radio :value="1">是</a-radio>
+            </a-radio-group>
+          </a-form-item>
+        </a-col>
 
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="密码设置" name="passwordType">
-              <a-radio-group v-model:value="saveObject.passwordType">
-                <a-radio value="default">默认密码</a-radio>
-                <a-radio value="custom">自定义密码</a-radio>
-              </a-radio-group>
-            </a-form-item>
-          </a-col>
+        <a-col :span="10">
+          <a-form-item label="密码设置" name="passwordType">
+            <a-radio-group v-model:value="saveObject.passwordType">
+              <a-radio value="default">默认密码</a-radio>
+              <a-radio value="custom">自定义密码</a-radio>
+            </a-radio-group>
+          </a-form-item>
+        </a-col>
 
-          <a-col v-if="saveObject.passwordType === 'custom'" :span="12">
-            <a-form-item label="登录密码" name="loginPassword">
-              <a-input-password v-model:value="saveObject.loginPassword" placeholder="请输入登录密码" />
-            </a-form-item>
+        <a-col v-if="saveObject.passwordType === 'custom'" :span="10">
+          <a-form-item label="登录密码" name="loginPassword">
+            <a-input-password v-model:value="saveObject.loginPassword" placeholder="请输入登录密码" />
             <a-button
               style="color: var(--primary-color); border-color: var(--primary-color)"
               @click="handleGeneratePassword"
@@ -201,69 +187,48 @@
               <sync-outlined />
               随机生成密码
             </a-button>
-          </a-col>
-        </a-row>
-      </div>
+          </a-form-item>
+        </a-col>
+      </a-row>
 
-      <!-- 重置密码 (编辑时显示) -->
-      <div v-if="!isAdd">
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="">
-              <a-checkbox v-model:checked="resetPayPass"> 重置支付密码 </a-checkbox>
-            </a-form-item>
-          </a-col>
-        </a-row>
+      <a-row v-if="!isAdd" :gutter="16">
+        <a-col :span="10">
+          <a-form-item>
+            <a-checkbox v-model:checked="resetPayPass">重置支付密码</a-checkbox>
+          </a-form-item>
+        </a-col>
 
-        <a-row :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="">
-              <a-checkbox v-model:checked="resetPass"> 重置密码 </a-checkbox>
-            </a-form-item>
-          </a-col>
+        <a-col :span="10">
+          <a-form-item>
+            <a-checkbox v-model:checked="resetPass">重置密码</a-checkbox>
+          </a-form-item>
+        </a-col>
 
-          <a-col v-if="resetPass" :span="12">
-            <a-form-item label="">
-              <a-checkbox v-model:checked="defaultPass"> 恢复默认密码 </a-checkbox>
-            </a-form-item>
-          </a-col>
-        </a-row>
+        <a-col v-if="resetPass" :span="10">
+          <a-form-item>
+            <a-checkbox v-model:checked="defaultPass">恢复默认密码</a-checkbox>
+          </a-form-item>
+        </a-col>
 
-        <a-row v-if="resetPass && !defaultPass" :gutter="16">
-          <a-col :span="12">
-            <a-form-item label="新密码" name="newPwd">
-              <a-input-password v-model:value="saveObject.newPwd" placeholder="请输入新密码" />
-            </a-form-item>
-          </a-col>
+        <a-col v-if="resetPass && !defaultPass" :span="10">
+          <a-form-item label="新密码" name="newPwd">
+            <a-input-password v-model:value="saveObject.newPwd" placeholder="请输入新密码" />
+          </a-form-item>
+        </a-col>
 
-          <a-col :span="12">
-            <a-form-item label="确认新密码" name="confirmPwd">
-              <a-input-password v-model:value="saveObject.confirmPwd" placeholder="请再次输入新密码" />
-            </a-form-item>
-          </a-col>
-        </a-row>
-      </div>
+        <a-col v-if="resetPass && !defaultPass" :span="10">
+          <a-form-item label="确认新密码" name="confirmPwd">
+            <a-input-password v-model:value="saveObject.confirmPwd" placeholder="请再次输入新密码" />
+          </a-form-item>
+        </a-col>
+      </a-row>
     </a-form>
 
-    <!-- 底部按钮 -->
-    <template #footer>
-      <div style="text-align: center">
-        <a-space>
-          <a-button @click="handleClose">
-            <close-outlined />
-            取消
-          </a-button>
-          <a-button type="primary" :loading="loading" @click="handleSubmit">
-            <check-outlined />
-            保存
-          </a-button>
-        </a-space>
-      </div>
-    </template>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
+import { AgDrawer } from '@/components'
 import { mchApi } from '@/api/business/mch/mch-api'
 import { loginApi } from '@/api/system/login-api'
 import { CheckOutlined, CloseOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
@@ -288,7 +253,6 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open', 'success'])
 
-// State
 const infoForm = ref(null)
 const loading = ref(false)
 const isAdd = ref(true)
@@ -559,10 +523,7 @@ const handleGeneratePassword = () => {
   message.success(t('mch.randomPasswordGenerated', { password }))
 }
 
-/**
- * 提交表单
- */
-const handleSubmit = async () => {
+const handleConfirm = async () => {
   try {
     await infoForm.value.validate()
 
@@ -618,11 +579,8 @@ const handleSubmit = async () => {
   }
 }
 
-/**
- * 关闭抽屉
- */
 const handleClose = () => {
-  emit('update:open', false)
+  localOpen.value = false
 }
 </script>
 

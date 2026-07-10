@@ -1,66 +1,92 @@
 <template>
-  <a-drawer
-    :visible="visible"
-    :title="true ? '统计明细' : ''"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+  <ag-drawer
+    v-model:open="localOpen"
+    title="统计明细"
     width="80%"
-    @close="onClose"
+    :show-footer="false"
+    @close="handleClose"
   >
     <a-tabs v-model="activeKey" size="large">
       <a-tab-pane v-if="topTabData.some((tab) => tab === 'store')" :key="'store'" tab="门店统计">
-        <StoreCountPage v-if="visible" :mch-no="mchNo" :query-date-range="queryDateRange" />
+        <store-count-page :mch-no="mchNo" :query-date-range="queryDateRange" />
       </a-tab-pane>
       <a-tab-pane v-if="topTabData.some((tab) => tab === 'wayCode')" :key="'wayCode'" tab="支付方式统计">
-        <WayCodeCountPage v-if="visible" :mch-no="mchNo" :query-date-range="queryDateRange" />
+        <way-code-count-page :mch-no="mchNo" :query-date-range="queryDateRange" />
       </a-tab-pane>
       <a-tab-pane v-if="topTabData.some((tab) => tab === 'wayType')" :key="'wayType'" tab="支付类型统计">
-        <WayTypeCountPage v-if="visible" :mch-no="mchNo" :query-date-range="queryDateRange" />
+        <way-type-count-page :mch-no="mchNo" :query-date-range="queryDateRange" />
       </a-tab-pane>
     </a-tabs>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+/**
+ * 商户统计明细组件
+ * 功能：展示商户统计的门店、支付方式、支付类型明细
+ */
+import { ref, watch } from 'vue'
+import { usePermission } from '@/composables/useCommon'
 import StoreCountPage from './store-count-page.vue'
 import WayCodeCountPage from './way-code-count-page.vue'
 import WayTypeCountPage from './way-type-count-page.vue'
 
-const visible = ref(false)
+const { hasPermission } = usePermission()
+
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false
+  },
+  recordId: {
+    type: String,
+    default: ''
+  },
+  queryDateRange: {
+    type: String,
+    default: 'today'
+  }
+})
+
+const emit = defineEmits(['update:open'])
+
+const localOpen = ref(false)
 const activeKey = ref(null)
 const topTabData = ref([])
 const mchNo = ref(null)
-const queryDateRange = ref('today')
 
-const show = (currentMchNo, currentQueryDateRange) => {
-  mchNo.value = currentMchNo
-  queryDateRange.value = currentQueryDateRange
+watch(() => props.open, (val) => {
+  localOpen.value = val
+  if (val && props.recordId) {
+    loadData()
+  }
+})
+
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+const loadData = () => {
+  mchNo.value = props.recordId
   topTabData.value = []
 
-  if (window.$access('ENT_STATISTIC_MCH_STORE')) {
+  if (hasPermission('ENT_STATISTIC_MCH_STORE')) {
     topTabData.value.push('store')
   }
-  if (window.$access('ENT_STATISTIC_MCH_WAY_CODE')) {
+  if (hasPermission('ENT_STATISTIC_MCH_WAY_CODE')) {
     topTabData.value.push('wayCode')
   }
-  if (window.$access('ENT_STATISTIC_MCH_WAY_TYPE')) {
+  if (hasPermission('ENT_STATISTIC_MCH_WAY_TYPE')) {
     topTabData.value.push('wayType')
   }
 
   const [firstTopTab] = topTabData.value
   activeKey.value = firstTopTab
-  visible.value = true
 }
 
-const onClose = () => {
-  visible.value = false
+const handleClose = () => {
+  localOpen.value = false
 }
-
-defineExpose({
-  show,
-  onClose
-})
 </script>
 
 <style scoped></style>

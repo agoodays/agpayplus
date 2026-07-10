@@ -33,51 +33,89 @@
       </template>
     </ag-card>
     <!-- 新增页面组件  -->
-    <pay-if-define-add-or-edit ref="payIfDefineAddOrEdit" :callback-func="refCardList"/>
+    <add-or-edit v-model:open="modalOpen" :if-code="currentIfCode" @success="handleSuccess" />
   </div>
 </template>
 
 <script setup>
+/**
+ * 支付接口定义列表页面组件
+ * 功能：展示支付接口定义卡片列表，支持新增、编辑、删除操作
+ */
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
-const icons = { DeleteOutlined, EditOutlined }
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { reactive, ref } from 'vue'
-import PayIfDefineAddOrEdit from './add-or-edit.vue'
+import AddOrEdit from './add-or-edit.vue'
+import { message } from 'ant-design-vue'
 
+const icons = { DeleteOutlined, EditOutlined }
+
+/**
+ * 卡片组件引用
+ */
 const infoCard = ref(null)
-const payIfDefineAddOrEdit = ref(null)
 
+/**
+ * 弹窗状态
+ */
+const modalOpen = ref(false)
+const currentIfCode = ref('')
+
+/**
+ * 卡片配置
+ */
 const agpayCard = reactive({
   name: '支付接口',
   height: 300,
   span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 },
-  addAuthority: true // 暂时设置为 true，后续根据权限系统调整
+  addAuthority: true
 })
 
-// 请求支付接口定义数据
-const reqCardListFunc = () => {
-  return payConfigApi.queryIfDefineList()
+/**
+ * 请求支付接口定义数据
+ * @returns {Promise<Object>} 支付接口定义列表
+ */
+const reqCardListFunc = async () => {
+  return await payConfigApi.queryIfDefineList()
 }
 
-// 刷新card列表
+/**
+ * 刷新卡片列表
+ */
 const refCardList = () => {
   infoCard.value?.refCardList()
 }
 
+/**
+ * 新增或编辑支付接口定义
+ * @param {string} ifCode - 接口编码
+ */
 const addOrEdit = (ifCode) => {
-  payIfDefineAddOrEdit.value.show(ifCode)
+  currentIfCode.value = ifCode || ''
+  modalOpen.value = true
 }
 
-const del = (ifCode) => {
-  import('ant-design-vue').then(({ message }) => {
-    import('@/utils/info-box').then(({ infoBox }) => {
-      infoBox.confirmDanger('确认删除？', '', () => {
-        return payConfigApi.delIfDefineById(ifCode).then(res => {
-          message.success('删除成功！')
-          refCardList()
-        })
-      })
-    })
+/**
+ * 操作成功回调
+ */
+const handleSuccess = () => {
+  refCardList()
+}
+
+/**
+ * 删除支付接口定义
+ * @param {string} ifCode - 接口编码
+ */
+const del = async (ifCode) => {
+  const { infoBox } = await import('@/utils/info-box')
+  infoBox.confirmDanger('确认删除？', '', async () => {
+    try {
+      await payConfigApi.delIfDefineById(ifCode)
+      message.success('删除成功！')
+      refCardList()
+    } catch (error) {
+      console.error('删除支付接口定义失败:', error)
+    }
   })
 }
 </script>

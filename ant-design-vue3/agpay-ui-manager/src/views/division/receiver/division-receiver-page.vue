@@ -1,7 +1,8 @@
-﻿<template>
+<template>
   <div>
     <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+      <!-- 搜索区域 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -58,33 +59,30 @@
           </a-col>
         </template>
       </ag-search>
+
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
-        :init-data="true"
+        ref="tableRef"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :params="searchData"
         row-key="receiverId"
-        @btn-load-close="btnLoading = false"
       >
         <template #toolbar-left>
-          <div>
-            <a-button
-              v-if="$access('ENT_DIVISION_RECEIVER_ADD')"
-              type="primary"
-              icon="plus"
-              class="mg-b-30"
-              @click="addFunc"
-              >新增</a-button
-            >
-          </div>
+          <a-button
+            v-if="hasPermission('ENT_DIVISION_RECEIVER_ADD')"
+            type="primary"
+            @click="addFunc"
+          >
+            <template #icon><PlusOutlined /></template>
+            新增
+          </a-button>
         </template>
         <template #receiverIdSlot="{ record }">
-          <b v-if="!$access('ENT_DIVISION_RECEIVER_VIEW')">{{ record.receiverId }}</b>
-          <a v-if="$access('ENT_DIVISION_RECEIVER_VIEW')" @click="detailFunc(record.receiverId)"
-            ><b>{{ record.receiverId }}</b></a
-          >
+          <b v-if="!hasPermission('ENT_DIVISION_RECEIVER_VIEW')">{{ record.receiverId }}</b>
+          <a v-else @click="detailFunc(record.receiverId)">
+            <b>{{ record.receiverId }}</b>
+          </a>
         </template>
         <!-- 支付接口 -->
         <template #ifCodeSlot="{ record }">
@@ -120,44 +118,49 @@
             :text="record.state === 0 ? '暂停使用' : '正常可用'"
           />
         </template>
+
+        <!-- 默认分账比例列 -->
+        <template #divisionProfitSlot="{ record }">
+          {{ (record.divisionProfit * 100).toFixed(2) }}%
+        </template>
+
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_DIVISION_RECEIVER_EDIT')" type="link" @click="editFunc(record.receiverId)"
-              >编辑</a-button
-            >
+            <a-button v-if="hasPermission('ENT_DIVISION_RECEIVER_EDIT')" type="link" @click="editFunc(record.receiverId)">编辑</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
       <!-- 新增收款账户页面  -->
-      <ReceiverAdd
-        v-if="showReceiverAdd"
-        ref="receiverAdd"
-        :callback-func="searchFunc"
-        @close="showReceiverAdd = false"
-      />
+      <ReceiverAdd v-model:open="showReceiverAdd" @success="searchFunc" />
       <!-- 编辑 页面弹窗  -->
-      <ReceiverEdit
-        v-if="showReceiverEdit"
-        ref="receiverEdit"
-        :callback-func="searchFunc"
-        @close="showReceiverEdit = false"
-      />
-      <Detail v-if="showDetail" ref="recordDetail" @close="showDetail = false" />
+      <ReceiverEdit v-model:open="showReceiverEdit" :record-id="currentRecordId" @success="searchFunc" />
+      <Detail v-model:open="showDetail" :record-id="currentRecordId" />
     </a-card>
   </div>
 </template>
 <script setup>
+/**
+ * 分账收款账户列表页面组件
+ * 功能：展示分账收款账户列表，支持搜索、新增、编辑、查看详情等操作
+ */
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { defineAsyncComponent, nextTick, onMounted, reactive, ref } from 'vue'
+
+// 权限检查
+const { hasPermission } = usePermission()
 
 // 动态导入组件
 const ReceiverAdd = defineAsyncComponent(() => import('./receiver-add.vue'))
 const ReceiverEdit = defineAsyncComponent(() => import('./receiver-edit.vue'))
 const Detail = defineAsyncComponent(() => import('./detail.vue'))
 
-// 表格列配置
+/**
+ * 表格列配置
+ */
 const tableColumns = [
   { key: 'receiverId', title: '收款账户ID', width: 125, customRender: 'receiverIdSlot' },
   { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账户别名', width: 140 },
@@ -172,78 +175,110 @@ const tableColumns = [
   { key: 'channelAccNo', dataIndex: 'channelAccNo', title: '渠道账号', width: 230 },
   { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '收款关系类型', width: 140 },
   { key: 'state', dataIndex: 'state', title: '状态', width: 120, customRender: 'stateSlot', align: 'center' },
-  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', width: 160, customRender: (text, record, index) => (text * 100).toFixed(2) + '%' },
+  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', width: 160, customRender: 'divisionProfitSlot' },
   { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间', width: 200 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-// 响应式数据
-const infoTable = ref(null)
-const receiverAdd = ref(null)
-const receiverEdit = ref(null)
-const recordDetail = ref(null)
+/**
+ * 组件引用
+ */
+const tableRef = ref(null)
+
+/**
+ * 当前记录ID
+ */
+const currentRecordId = ref('')
+
+/**
+ * 搜索表单数据
+ */
 const searchData = reactive({ appId: '' })
-const btnLoading = ref(false)
+
+/**
+ * 加载状态
+ */
+const loading = ref(false)
+
+/**
+ * 弹窗显示状态
+ */
 const showReceiverAdd = ref(false)
 const showReceiverEdit = ref(false)
 const showDetail = ref(false)
+
+/**
+ * 支付接口定义列表
+ */
 const ifDefineList = ref([])
 
-// 搜索商户
+/**
+ * 搜索商户
+ * @param {Object} params - 搜索参数
+ * @returns {Promise<Object>} 商户列表
+ */
 const searchMch = (params) => {
   return divisionReceiverApi.listMch(params)
 }
 
-// 对接table接口函数
-const reqTableDataFunc = (params) => {
-  return divisionReceiverApi.queryPage(params)
+/**
+ * 请求表格数据函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise<Object>} 表格数据
+ */
+const reqTableDataFunc = async (params) => {
+  return await divisionReceiverApi.queryPage(params)
 }
 
-// 查询支付接口定义列表
-const reqIfDefineListFunc = () => {
-  divisionReceiverApi.listIfDefine({ state: 1 }).then((res) => {
+/**
+ * 查询支付接口定义列表
+ */
+const reqIfDefineListFunc = async () => {
+  try {
+    const res = await divisionReceiverApi.listIfDefine({ state: 1 })
     ifDefineList.value = res
-  })
+  } catch (error) {
+    console.error('加载支付接口定义失败:', error)
+  }
 }
 
-// 搜索函数
+/**
+ * 搜索函数
+ */
 const searchFunc = () => {
-  btnLoading.value = true
-  infoTable.value.loadData()
+  loading.value = true
+  tableRef.value?.reload()
 }
 
-// 新增函数
+/**
+ * 新增收款账户
+ */
 const addFunc = () => {
-  // 业务通道.收款账户 新增
-  // 打开新增
   showReceiverAdd.value = true
 }
 
-// 详情函数
+/**
+ * 查看收款账户详情
+ * @param {string} recordId - 收款账户ID
+ */
 const detailFunc = (recordId) => {
+  currentRecordId.value = recordId
   showDetail.value = true
-  // 延迟获取ref对象并show方法确保弹窗已经渲染
-  nextTick(() => {
-    if (recordDetail.value) {
-      recordDetail.value.show(recordId)
-    }
-  })
 }
 
-// 编辑函数
+/**
+ * 编辑收款账户
+ * @param {string} recordId - 收款账户ID
+ */
 const editFunc = (recordId) => {
-  // 业务通道.收款账户 编辑
+  currentRecordId.value = recordId
   showReceiverEdit.value = true
-  // 延迟获取ref对象并show方法确保弹窗已经渲染
-  nextTick(() => {
-    if (receiverEdit.value) {
-      receiverEdit.value.show(recordId)
-    }
-  })
 }
 
-// 组件挂载时
+/**
+ * 组件挂载时初始化
+ */
 onMounted(() => {
   reqIfDefineListFunc()
 })

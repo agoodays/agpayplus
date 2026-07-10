@@ -1,9 +1,9 @@
-<template>
-  <a-drawer
-    :open="visible"
+﻿<template>
+  <ag-drawer
+    v-model:open="localOpen"
     :title="isAdd ? '新增支付接口' : '修改支付接口'"
     :mask-closable="false"
-    @close="onClose"
+    @close="handleClose"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="40%">
@@ -222,28 +222,64 @@
     </a-form>
 
     <div class="drawer-btn-center">
-      <a-button @click="onClose" icon="close" :style="{ marginRight: '8px' }">取消</a-button>
-      <a-button type="primary" @click="onSubmit" icon="check" >保存</a-button>
+      <a-button @click="onClose" :style="{ marginRight: '8px' }">
+        <template #icon><CloseOutlined /></template>
+        取消
+      </a-button>
+      <a-button type="primary" @click="onSubmit">
+        <template #icon><CheckOutlined /></template>
+        保存
+      </a-button>
     </div>
 
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-const icons = { LoadingOutlined, UploadOutlined }
+/**
+ * 支付接口定义新增/编辑组件
+ * 功能：新增或修改支付接口定义配置
+ */
+import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+const icons = { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined }
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
 
+/** Props 定义 */
 const props = defineProps({
-  callbackFunc: { type: Function, default: () => () => ({}) }
+  open: {
+    type: Boolean,
+    default: false
+  },
+  ifCode: {
+    type: String,
+    default: ''
+  }
 })
 
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'success'])
+
 const infoForm = ref(null)
-const visible = ref(false)
+const localOpen = ref(false)
 const isAdd = ref(true)
-const ifCode = ref('')
 const action = payConfigApi.getIfBgUploadAction()
+
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val) {
+      initForm(props.ifCode)
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
 
 const saveObject = reactive({
   isMchMode: 1,
@@ -291,8 +327,8 @@ const rules = reactive({
   }, trigger: 'blur' }]
 })
 
-// 抽屉显示
-const show = (ifCodeParam) => {
+/** 初始化表单 */
+const initForm = (ifCodeParam) => {
   isAdd.value = !ifCodeParam
   // 数据清空
   Object.assign(saveObject, {
@@ -313,8 +349,7 @@ const show = (ifCodeParam) => {
     infoForm.value.resetFields()
   }
 
-  if (!isAdd.value) { // 修改信息 延迟展示弹层
-    ifCode.value = ifCodeParam
+  if (!isAdd.value) {
     // 拉取详情
     payConfigApi.getIfDefineById(ifCodeParam).then(res => {
       Object.assign(saveObject, res)
@@ -324,15 +359,14 @@ const show = (ifCodeParam) => {
       })
       checkedList.value = newItems
     })
-    visible.value = true
   } else {
     checkedList.value = [] // 多选框设置空
-    visible.value = true // 展示弹层信息
   }
 }
 
-const onClose = () => {
-  visible.value = false
+/** 处理关闭 */
+const handleClose = () => {
+  localOpen.value = false
 }
 
 // 表单提交
@@ -344,16 +378,16 @@ const onSubmit = () => {
       payConfigApi.addIfDefine(saveObject).then(res => {
         import('ant-design-vue').then(({ message }) => {
           message.success('新增成功')
-          visible.value = false
-          props.callbackFunc() // 刷新列表
+          localOpen.value = false
+          emit('success')
         })
       })
     } else {
-      payConfigApi.updateIfDefineById(ifCode.value, saveObject).then(res => {
+      payConfigApi.updateIfDefineById(props.ifCode, saveObject).then(res => {
         import('ant-design-vue').then(({ message }) => {
           message.success('修改成功')
-          visible.value = false
-          props.callbackFunc() // 刷新列表
+          localOpen.value = false
+          emit('success')
         })
       })
     }
@@ -428,7 +462,7 @@ onMounted(() => {
   payWayList()
 })
 
-defineExpose({ show })
+
 </script>
 
 <style lang="less" scoped>

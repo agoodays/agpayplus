@@ -214,7 +214,6 @@ function onSearch(values) {
 | searchData | 搜索数据（兼容旧版） | `Object` | `null` |
 | searchLoading | 查询按钮 loading 状态 | `Boolean` | `false` |
 | loading | 查询按钮 loading（兼容） | `Boolean` | `undefined` |
-| btnLoading | 查询按钮 loading（兼容） | `Boolean` | `undefined` |
 | resetMode | 重置策略 | `String` | `'undefined'` |
 | resetExclude | 重置时跳过的字段 | `Array` | `[]` |
 | collapsible | 是否支持展开/收起功能 | `Boolean` | `false` |

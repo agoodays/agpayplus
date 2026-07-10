@@ -1,13 +1,13 @@
 <template>
-  <a-drawer
+  <ag-drawer
     title="填写参数"
     width="40%"
     :closable="true"
     :mask-closable="false"
-    :visible="visible"
+    v-model:open="localOpen"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    @close="onClose"
+    @close="handleClose"
   >
     <a-form ref="infoinfoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
@@ -61,27 +61,55 @@
       </a-row>
     </a-form>
     <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" @click="onClose" icon="close">取消</a-button>
-      <a-button type="primary" @click="onSubmit" icon="check" :loading="btnLoading">保存</a-button>
+      <a-button :style="{ marginRight: '8px' }" @click="onClose">
+        <template #icon><CloseOutlined /></template>
+        取消
+      </a-button>
+      <a-button type="primary" @click="onSubmit" :loading="loading">
+        <template #icon><CheckOutlined /></template>
+        保存
+      </a-button>
     </div>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
-<script setup>import { ref, reactive } from 'vue';
-import { message } from 'ant-design-vue';
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue';
-import { AgUpload as agUpload } from '@/components/ag-upload';
-import { mchAppApi } from '@/api/business/mch-app/mch-app-api';
-import { upload } from '@/lib/ag-axios';
+<script setup>
+/**
+ * 商户支付配置添加/编辑组件
+ * 功能：配置商户支付接口参数
+ */
+import { AgDrawer, AgUpload } from '@/components'
+import { ref, reactive, watch } from 'vue'
+import { message } from 'ant-design-vue'
+import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
+import { upload } from '@/lib/ag-axios'
+
 const icons = { LoadingOutlined, UploadOutlined };
+
+/** Props 定义 */
 const props = defineProps({
- callbackFunc: { type: Function, default: () => ({}) }
+  open: {
+    type: Boolean,
+    default: false
+  },
+  appId: {
+    type: String,
+    default: ''
+  },
+  record: {
+    type: Object,
+    default: () => ({})
+  }
 });
+
+/** 事件定义 */
+const emit = defineEmits(['update:open', 'success']);
+
 const infoinfoForm = ref(null);
 const mchParaminfoForm = ref(null);
-const btnLoading = ref(false);
-const visible = ref(false);
-const appId = ref(null);
+const loading = ref(false);
+const localOpen = ref(false);
 const ifCode = ref(null);
 const mchType = ref(null);
 const action = ref(upload.cert);
@@ -98,24 +126,41 @@ const rules = {
  ifCode: [{ required: true, trigger: 'blur' }]
 };
 const ifParamsRules = ref({});
-const show = (appIdVal, record) => {
- appId.value = appIdVal;
- ifCode.value = record.ifCode;
- mchType.value = record.mchType;
- Object.keys(saveObject).forEach(key => {
- saveObject[key] = null;
- });
- Object.keys(ifParams).forEach(key => {
- delete ifParams[key];
- });
- mchParams.value = {};
- saveObject.infoId = appIdVal;
- saveObject.ifCode = record.ifCode;
- saveObject.state = record.ifConfigState === 0 ? 0 : 1;
- if (mchParaminfoForm.value) {
- mchParaminfoForm.value.resetFields();
- }
- getMchPayConfig(record);
+
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.appId && props.record.ifCode) {
+      resetForm()
+      getMchPayConfig(props.record)
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+/** 重置表单数据 */
+const resetForm = () => {
+  ifCode.value = props.record.ifCode
+  mchType.value = props.record.mchType
+  Object.keys(saveObject).forEach(key => {
+    saveObject[key] = null
+  })
+  Object.keys(ifParams).forEach(key => {
+    delete ifParams[key]
+  })
+  mchParams.value = {}
+  saveObject.infoId = props.appId
+  saveObject.ifCode = props.record.ifCode
+  saveObject.state = props.record.ifConfigState === 0 ? 0 : 1
+  if (mchParaminfoForm.value) {
+    mchParaminfoForm.value.resetFields()
+  }
 };
 const getMchPayConfig = (record) => {
  mchAppApi.getMchPayConfigUnique(saveObject.infoId, saveObject.ifCode).then(res => {
@@ -159,14 +204,14 @@ const getMchPayConfig = (record) => {
  });
  });
  mchParams.value = newItems;
- visible.value = true;
  generoterRules();
  });
 };
+
 const onSubmit = () => {
  infoinfoForm.value.validate().then(() => {
  mchParaminfoForm.value.validate().then(() => {
- btnLoading.value = true;
+ loading.value = true;
  const reqParams = {};
  reqParams.infoId = saveObject.infoId;
  reqParams.ifCode = saveObject.ifCode;
@@ -192,21 +237,23 @@ const onSubmit = () => {
  }
  mchAppApi.addMchPayConfig(reqParams).then(() => {
  message.success('保存成功');
- visible.value = false;
- btnLoading.value = false;
- props.callbackFunc();
+ localOpen.value = false;
+ loading.value = false;
+ emit('success');
  });
  }).catch(() => {
- btnLoading.value = false;
+ loading.value = false;
  });
  }).catch(() => {
- btnLoading.value = false;
+ loading.value = false;
  });
 };
+
 const uploadSuccess = (name, fileList) => {
  const [firstItem] = fileList;
  ifParams[name] = firstItem?.url;
 };
+
 const generoterRules = () => {
  const rules = {};
  Object.keys(mchParams.value).forEach(key => {
@@ -223,10 +270,11 @@ const generoterRules = () => {
  });
  ifParamsRules.value = rules;
 };
-const onClose = () => {
- visible.value = false;
+
+/** 处理关闭 */
+const handleClose = () => {
+ localOpen.value = false;
 };
-defineExpose({ show });
 </script>
 
 <style lang="less" scoped>

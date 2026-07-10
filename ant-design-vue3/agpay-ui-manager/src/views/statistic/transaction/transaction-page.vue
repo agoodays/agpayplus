@@ -1,7 +1,8 @@
 <template>
   <div>
-    <a-card>
-      <ag-search v-model="searchData" :search-loading="btnLoading" @search="searchFunc">
+    <a-card :bordered="false">
+      <!-- 搜索表单 -->
+      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -68,9 +69,9 @@
       </ag-search>
       <!-- 列表渲染 -->
       <ag-table
-        ref="infoTable"
+        ref="tableRef"
         :columns="tableColumns"
-        :loading="btnLoading"
+        :loading="loading"
         :on-load="reqTableDataFunc"
         :on-download="reqDownloadDataFunc"
         :search-data="searchData"
@@ -216,9 +217,7 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="$access('ENT_STATISTIC_MCH')" type="link" @click="detailFunc(record.groupDate)"
-              >详情</a-button
-            >
+            <a-button v-if="hasPermission('ENT_STATISTIC_MCH')" type="link" @click="detailFunc(record.groupDate)">详情</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -226,63 +225,50 @@
   </div>
 </template>
 <script setup>
+/**
+ * 交易统计页面组件
+ * 功能：展示交易统计数据，支持日报/月报/年报查询，支持导出和查看详情
+ */
 import { InfoCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
-const icons = { InfoCircleOutlined, SyncOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import { downloadExcel } from '@/lib/ag-axios'
+import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const icons = { InfoCircleOutlined, SyncOutlined }
+
+// 权限检查
+const { hasPermission } = usePermission()
 
 dayjs.locale('zh-cn')
 dayjs.extend(relativeTime)
 dayjs.extend(weekOfYear)
 dayjs.extend(quarterOfYear)
 
-import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
-
 // 表格列配置
 const tableColumns = [
   { key: 'groupDate', dataIndex: 'groupDate', title: '日期', width: 120, fixed: 'left' },
-  {
-    key: 'payAmount',
-    title: '交易金额',
-    width: 110,
-    ellipsis: true,
-    customRender: 'payAmountSlot'
-  },
-  {
-    key: 'amount',
-    title: '实际收入',
-    width: 110,
-    customRender: 'amountSlot'
-  },
+  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot' },
+  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot' },
   { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
-  {
-    key: 'refundFee',
-    title: '退款手续费',
-    width: 125,
-    customRender: 'refundFeeSlot'
-  },
-  {
-    key: 'refundCount',
-    title: '退款笔数',
-    width: 110,
-    customRender: 'refundCountSlot'
-  },
+  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot' },
+  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot' },
   { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
   { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot' },
   { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 // 响应式数据
-const infoTable = ref(null)
-const btnLoading = ref(false)
+const tableRef = ref(null)
+const loading = ref(false)
 const isShowMore = ref(false)
 const dateRangeOpen = ref(false)
 const dateFormat = ref('YYYY-MM-DD')
@@ -336,8 +322,8 @@ const setIsShowMore = (value) => {
 }
 
 const searchFunc = () => {
-  btnLoading.value = true
-  infoTable.value.reload(true)
+  loading.value = true
+  tableRef.value.reload(true)
 }
 
 // 表格接口数据请求

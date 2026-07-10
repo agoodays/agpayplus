@@ -70,16 +70,16 @@
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <InfoAddOrEdit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
 
     <!-- 支付配置抽屉 -->
-    <ag-pay-config-drawer ref="payConfigRef" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" />
+    <ag-pay-config-drawer v-model:open="payConfigOpen" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" :info-id="currentRecordId" />
 
     <!-- OAuth2配置抽屉 -->
-    <ag-pay-oauth2-config-drawer ref="payOauth2ConfigRef" :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'" :config-mode="'mgrIsv'" />
+    <ag-pay-oauth2-config-drawer v-model:open="payOauth2ConfigOpen" :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'" :config-mode="'mgrIsv'" :info-id="currentRecordId" />
 
     <!-- 支付接口配置列表 -->
-    <IsvPayIfConfigList ref="isvPayIfConfigListRef" />
+    <isv-pay-if-config-list v-model:open="isvPayIfConfigListOpen" :isv-no="currentRecordId" />
   </div>
 </template>
 
@@ -95,29 +95,24 @@ import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { ref } from 'vue'
-import InfoAddOrEdit from './add-or-edit.vue'
+import AddOrEdit from './add-or-edit.vue'
 import IsvPayIfConfigList from './isv-pay-if-config-list.vue'
 
 // 权限检查
 const { hasPermission } = usePermission()
 
-// 组件引用
-const payConfigRef = ref(null)
-const payOauth2ConfigRef = ref(null)
-const isvPayIfConfigListRef = ref(null)
+/**
+ * 抽屉状态
+ */
+const payConfigOpen = ref(false)
+const payOauth2ConfigOpen = ref(false)
+const isvPayIfConfigListOpen = ref(false)
 
 /**
  * 表格列配置
  */
 const tableColumns = [
-  {
-    key: 'isvName',
-    title: '服务商名称',
-    width: 160,
-    fixed: 'left',
-    ellipsis: true,
-    customRender: 'isvNameSlot'
-  },
+  { key: 'isvName', title: '服务商名称', width: 160, fixed: 'left', ellipsis: true, customRender: 'isvNameSlot' },
   { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
   { key: 'state', title: '服务商状态', width: 140, customRender: 'stateSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
@@ -187,7 +182,7 @@ const editFunc = (recordId) => openEdit(recordId)
  */
 const payConfigFunc = (recordId) => {
   currentRecordId.value = recordId
-  payConfigRef.value?.show(recordId)
+  payConfigOpen.value = true
 }
 
 /**
@@ -195,7 +190,8 @@ const payConfigFunc = (recordId) => {
  * @param {string} recordId - 服务商ID
  */
 const payOauth2ConfigFunc = (recordId) => {
-  payOauth2ConfigRef.value?.show(recordId)
+  currentRecordId.value = recordId
+  payOauth2ConfigOpen.value = true
 }
 
 /**
@@ -203,7 +199,8 @@ const payOauth2ConfigFunc = (recordId) => {
  * @param {string} recordId - 服务商ID
  */
 const showPayIfConfigList = (recordId) => {
-  isvPayIfConfigListRef.value?.show(recordId)
+  currentRecordId.value = recordId
+  isvPayIfConfigListOpen.value = true
 }
 
 /**

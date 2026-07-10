@@ -1,60 +1,30 @@
-<template>
-  <a-drawer
-    placement="right"
-    :closable="true"
-    :visible="open"
-    :title="open ? '日志详情' : ''"
-    @close="$emit('update:open', false)"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+﻿<template>
+  <ag-drawer
+    v-model:open="localOpen"
+    title="日志详情"
     width="40%"
+    :show-footer="false"
+    @close="handleClose"
   >
+    <a-descriptions :column="2" :bordered="false">
+      <a-descriptions-item label="用户ID">{{ detailData.userId }}</a-descriptions-item>
+      <a-descriptions-item label="用户IP">{{ detailData.userIp }}</a-descriptions-item>
+      <a-descriptions-item label="用户名"><b>{{ detailData.userName }}</b></a-descriptions-item>
+      <a-descriptions-item label="所属系统">
+        <a-tag :color="getSysTypeColor(detailData.sysType)">
+          {{ getSysTypeText(detailData.sysType) }}
+        </a-tag>
+      </a-descriptions-item>
+      <a-descriptions-item label="操作描述" :span="2">{{ detailData.methodRemark }}</a-descriptions-item>
+      <a-descriptions-item label="请求方法">{{ detailData.methodName }}</a-descriptions-item>
+      <a-descriptions-item label="请求地址" :span="2">{{ detailData.reqUrl }}</a-descriptions-item>
+    </a-descriptions>
+
+    <a-divider orientation="left">
+      <a-tag color="#FF4B33">请求参数</a-tag>
+    </a-divider>
     <a-row :gutter="16">
-      <a-col :sm="12">
-        <a-descriptions :column="1" size="small">
-          <a-descriptions-item label="用户ID">{{ detailData.userId }}</a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-      <a-col :sm="12">
-        <a-descriptions :column="1" size="small">
-          <a-descriptions-item label="用户IP">{{ detailData.userIp }}</a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-      <a-col :sm="12">
-        <a-descriptions :column="1" size="small">
-          <a-descriptions-item label="用户名"><b>{{ detailData.userName }}</b></a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-      <a-col :sm="12">
-        <a-descriptions :column="1" size="small">
-          <a-descriptions-item label="所属系统">
-            <a-tag :color="getSysTypeColor(detailData.sysType)">
-              {{ getSysTypeText(detailData.sysType) }}
-            </a-tag>
-          </a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-    </a-row>
-    <a-divider />
-    <a-row :gutter="16">
-      <a-col :sm="24">
-        <a-descriptions :column="1" size="small">
-          <a-descriptions-item label="操作描述">{{ detailData.methodRemark }}</a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-      <a-col :sm="24">
-        <a-descriptions :column="1" size="small">
-          <a-descriptions-item label="请求方法">{{ detailData.methodName }}</a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-      <a-col :sm="24">
-        <a-descriptions :column="1" size="small">
-          <a-descriptions-item label="请求地址">{{ detailData.reqUrl }}</a-descriptions-item>
-        </a-descriptions>
-      </a-col>
-    </a-row>
-    <a-row>
-      <a-col :sm="24">
+      <a-col :span="24">
         <a-form-item label="请求参数">
           <a-input
             type="textarea"
@@ -65,8 +35,12 @@
         </a-form-item>
       </a-col>
     </a-row>
-    <a-row>
-      <a-col :sm="24">
+
+    <a-divider orientation="left">
+      <a-tag color="#FF4B33">响应参数</a-tag>
+    </a-divider>
+    <a-row :gutter="16">
+      <a-col :span="24">
         <a-form-item label="响应参数">
           <a-input
             type="textarea"
@@ -77,11 +51,12 @@
         </a-form-item>
       </a-col>
     </a-row>
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
-import { reactive, watch } from 'vue'
+import { AgDrawer } from '@/components'
+import { reactive, ref, watch } from 'vue'
 import { sysApi } from '@/api/business/sys/sys-api'
 
 const props = defineProps({
@@ -95,9 +70,23 @@ const props = defineProps({
   }
 })
 
-defineEmits(['update:open'])
+const emit = defineEmits(['update:open'])
+
+const localOpen = ref(false)
 
 const detailData = reactive({})
+
+const handleClose = () => {
+  localOpen.value = false
+}
+
+watch(() => props.open, (val) => {
+  localOpen.value = val
+})
+
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
 
 const getSysTypeColor = (sysType) => {
   const colors = { MGR: 'green', AGENT: 'cyan', MCH: 'geekblue' }

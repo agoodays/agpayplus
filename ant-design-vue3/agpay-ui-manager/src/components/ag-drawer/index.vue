@@ -134,6 +134,6 @@ defineExpose({
 .drawer-footer {
   text-align: right;
   padding: 10px 16px;
-  border-top: 1px solid #f0f0f0;
+  /* border-top: 1px solid #f0f0f0; */
 }
 </style>

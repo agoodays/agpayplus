@@ -1,12 +1,12 @@
-﻿<template>
-  <a-drawer
-    :visible="visible"
+<template>
+  <ag-drawer
+    v-model:open="localOpen"
     title="支付参数列表"
     :closable="true"
     :drawer-style="{ overflow: 'hidden', backgroundColor: 'var(--layout-bg)' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="80%"
-    @close="onClose"
+    @close="handleClose"
   >
     <ag-card ref="infoCard" :req-card-list-func="reqCardListFunc" :span="agpayCard.span" :height="agpayCard.height">
       <template #cardContentSlot="{ record }">
@@ -30,24 +30,21 @@
             </div>
             <!-- 卡片底部操作栏 -->
             <div class="ag-card-ops">
-              <a v-if="$access('ENT_ISV_PAY_CONFIG_ADD')" @click="editPayIfConfigFunc(record)"
-                >填写参数 <icons.RightOutlined />
-              ></a>
+              <a v-if="hasPermission('ENT_ISV_PAY_CONFIG_ADD')" @click="editPayIfConfigFunc(record)">填写参数 <icons.RightOutlined /></a>
               <a v-else>暂无操作</a>
             </div>
           </div>
         </div>
       </template>
     </ag-card>
-    <a-drawer
+    <ag-drawer
       title="支付参数配置"
       width="40%"
       :closable="true"
-      :visible="childrenVisible"
+      v-model:open="childrenVisible"
       :drawer-style="{ overflow: 'hidden' }"
       :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
       :mask-closable="false"
-      @close="onChildrenDrawerClose"
     >
       <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
         <a-row :gutter="16">
@@ -114,27 +111,55 @@
         </a-row>
       </a-form>
       <div class="drawer-btn-center">
-        <a-button :style="{ marginRight: '8px' }" icon="close" @click="onChildrenDrawerClose"> 取消 </a-button>
-        <a-button type="primary" :loading="btnLoading" icon="check" @click="onSubmit"> 保存 </a-button>
+        <a-button :style="{ marginRight: '8px' }" @click="onChildrenDrawerClose">
+          <template #icon><CloseOutlined /></template>
+          取消
+        </a-button>
+        <a-button type="primary" :loading="loading" @click="onSubmit">
+          <template #icon><CheckOutlined /></template>
+          保存
+        </a-button>
       </div>
-    </a-drawer>
+    </ag-drawer>
     <!-- 支付参数配置页面组件  -->
     <wxpay-pay-config ref="wxpayPayConfig" :callback-func="refCardList" />
     <!-- 支付参数配置页面组件  -->
     <alipay-pay-config ref="alipayPayConfig" :callback-func="refCardList" />
-  </a-drawer>
+  </ag-drawer>
 </template>
 
 <script setup>
-import { LoadingOutlined, RightOutlined, UploadOutlined } from '@ant-design/icons-vue'
+/**
+ * ISV支付接口配置列表组件
+ * 功能：展示ISV支付接口配置卡片列表，支持填写参数配置
+ */
+import { CheckOutlined, CloseOutlined, LoadingOutlined, RightOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { AgDrawer, AgCard, AgUpload } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 const icons = { LoadingOutlined, RightOutlined, UploadOutlined }
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
-import AgCard from '@/components/ag-card'
-import AgUpload from '@/components/ag-upload'
 import { message } from 'ant-design-vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import AlipayPayConfig from './custom/alipay-pay-config.vue'
 import WxpayPayConfig from './custom/wxpay-pay-config.vue'
+
+// 权限检查
+const { hasPermission } = usePermission()
+
+/** Props 定义 */
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false
+  },
+  isvNo: {
+    type: String,
+    default: ''
+  }
+})
+
+/** 事件定义 */
+const emit = defineEmits(['update:open'])
 
 const infoCard = ref(null)
 const infoForm = ref(null)
@@ -142,10 +167,9 @@ const isvParamForm = ref(null)
 const wxpayPayConfig = ref(null)
 const alipayPayConfig = ref(null)
 
-const btnLoading = ref(false)
-const isvNo = ref(null)
+const loading = ref(false)
 const action = isvPayConfigApi.certUploadAction
-const visible = ref(false)
+const localOpen = ref(false)
 const childrenVisible = ref(false)
 const isvParams = ref([])
 const saveObject = ref({})
@@ -224,14 +248,24 @@ function generateRules() {
   ifParamsRules.value = rulesMap
 }
 
-function show(currentIsvNo) {
-  isvNo.value = currentIsvNo
-  visible.value = true
-  refCardList()
-}
+/** 监听 open 属性变化 */
+watch(
+  () => props.open,
+  (val) => {
+    localOpen.value = val
+    if (val && props.isvNo) {
+      refCardList()
+    }
+  }
+)
+
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
 
 function reqCardListFunc() {
-  return isvPayConfigApi.queryCardList(isvNo.value)
+  return isvPayConfigApi.queryCardList(props.isvNo)
 }
 
 function refCardList() {
@@ -245,7 +279,7 @@ async function editPayIfConfigFunc(record) {
 
     childrenVisible.value = true
     saveObject.value = {
-      infoId: isvNo.value,
+      infoId: props.isvNo,
       ifCode: record.ifCode,
       state: record.ifConfigState === 0 ? 0 : 1
     }
@@ -288,7 +322,7 @@ async function editPayIfConfigFunc(record) {
       wxpayPayConfig,
       alipayPayConfig
     }
-    customRefMap[customRefName]?.value?.show(isvNo.value, record)
+    customRefMap[customRefName]?.value?.show(props.isvNo, record)
   }
 }
 
@@ -309,7 +343,7 @@ async function onSubmit() {
   const valid2 = await validateForm(isvParamForm)
   if (!valid || !valid2) return
 
-  btnLoading.value = true
+  loading.value = true
   try {
     const reqParams = {
       infoId: saveObject.value.infoId,
@@ -338,7 +372,7 @@ async function onSubmit() {
     childrenVisible.value = false
     refCardList()
   } finally {
-    btnLoading.value = false
+    loading.value = false
   }
 }
 
@@ -347,18 +381,14 @@ function uploadSuccess(name, fileList) {
   ifParams.value[name] = firstItem?.url
 }
 
-function onClose() {
-  visible.value = false
+/** 处理关闭 */
+function handleClose() {
+  localOpen.value = false
 }
 
 function onChildrenDrawerClose() {
   childrenVisible.value = false
 }
-
-defineExpose({
-  show,
-  onClose
-})
 </script>
 
 <style lang="less" scoped>
