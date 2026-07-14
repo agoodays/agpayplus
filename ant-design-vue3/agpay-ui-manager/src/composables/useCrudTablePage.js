@@ -12,7 +12,6 @@ export function useCrudTablePage(options = {}) {
 
   const tableRef = ref(null)
 
-  const isShowMore = ref(false)
   const searchData = reactive({})
 
   const modalOpen = ref(false)
@@ -73,7 +72,6 @@ export function useCrudTablePage(options = {}) {
 
   return {
     tableRef,
-    isShowMore,
     searchData,
     modalOpen,
     detailOpen,

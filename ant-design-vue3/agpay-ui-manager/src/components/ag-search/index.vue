@@ -5,9 +5,9 @@
         <slot name="base" :col-span="colSpan" />
 
         <transition name="search-collapse">
-          <template v-if="!collapsed || !collapsible">
+          <div v-if="!collapsed || !collapsible" class="search-advanced-wrapper">
             <slot name="advanced" :col-span="colSpan" />
-          </template>
+          </div>
         </transition>
 
         <template v-if="!$slots.base && !$slots.advanced">
@@ -16,19 +16,22 @@
 
         <a-col :col-span="colSpan" class="search-buttons">
           <a-form-item>
-            <a-button type="primary" :loading="searchLoading" @click="onSearch">
-              <search-outlined />
-              {{ searchText }}
-            </a-button>
-            <a-button @click="onReset">
-              <redo-outlined />
-              {{ resetText }}
-            </a-button>
-            <a-button v-if="collapsible" type="link" class="collapse-link-btn" @click="toggleCollapsed">
-              {{ collapsed ? expandText : collapseText }}
-              <down-outlined v-if="collapsed" />
-              <up-outlined v-else />
-            </a-button>
+            <a-space>
+              <a-button type="primary" :loading="searchLoading" @click="onSearch">
+                <search-outlined />
+                {{ searchText }}
+              </a-button>
+              <a-button @click="onReset">
+                <redo-outlined />
+                {{ resetText }}
+              </a-button>
+              <a-button v-if="collapsible" type="link" class="collapse-link-btn" @click="toggleCollapsed">
+                {{ collapsed ? expandText : collapseText }}
+                <down-outlined v-if="collapsed" />
+                <up-outlined v-else />
+              </a-button>
+              <slot name="extra" />
+            </a-space>
           </a-form-item>
         </a-col>
       </a-row>
@@ -285,6 +288,10 @@ onMounted(() => {
 
 .search-row {
   margin-bottom: 12px;
+}
+
+.search-advanced-wrapper {
+  display: contents;
 }
 
 .search-buttons :deep(.ant-form-item) {

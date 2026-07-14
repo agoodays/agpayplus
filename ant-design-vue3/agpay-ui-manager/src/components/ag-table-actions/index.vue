@@ -11,8 +11,9 @@
       </template>
       <a-dropdown>
         <a-button type="link" size="small">
-          {{ t('components.more') }}
-          <down-outlined />
+          <!-- {{ t('components.more') }} -->
+          <!-- <down-outlined /> -->
+          <EllipsisOutlined :style="{ fontSize: '20px', verticalAlign: 'top' }"/>
         </a-button>
         <template #overlay>
           <a-menu>
@@ -28,7 +29,7 @@
 
 <script setup>
 import { computed, useSlots } from 'vue'
-import { DownOutlined } from '@ant-design/icons-vue'
+import { EllipsisOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -64,7 +65,7 @@ const moreActions = computed(() => {
 
 <style scoped>
 .ag-table-action-columns {
-  display: flex;
+  /* display: flex; */
   align-items: center;
   justify-content: flex-start;
   gap: 4px;

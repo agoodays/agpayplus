@@ -2,7 +2,7 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :collapsible="false" @search="searchFunc" @reset="resetFunc">
+      <ag-search v-model="searchData" :collapsible="false" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="resetFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -34,10 +34,11 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
+        row-key="isvNo"
+        state-key="isv_list_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
-        row-key="isvNo"
       >
         <!-- 工具栏左侧 -->
         <template #toolbar-left>
@@ -116,7 +117,7 @@ const tableColumns = [
   { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
   { key: 'state', title: '服务商状态', width: 140, customRender: 'stateSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**

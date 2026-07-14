@@ -47,6 +47,9 @@
             </div>
           </div>
           <div class="ag-layout-header-right">
+            <div class="ag-layout-header-dark-mode" :title="isDarkMode ? t('layout.switchLightMode') : t('layout.switchDarkMode')" @click="toggleDarkMode">
+              <bg-colors-outlined />
+            </div>
             <a-dropdown>
               <div class="ag-layout-header-user">
                 <a-avatar shape="square" size="small" class="ag-layout-header-user-avatar" :src="userStore.avatarUrl">
@@ -61,17 +64,9 @@
                   <a-menu-item @click="handleSetting">
                     <setting-outlined /> {{ t('layout.accountSetting') }}
                   </a-menu-item>
-                  <a-menu-item class="ag-theme-menu-item" @click="toggleDarkMode">
-                    <div class="ag-theme-menu-row">
-                      <span class="ag-theme-menu-label">
-                        <bg-colors-outlined />
-                        <span>暗黑模式</span>
-                      </span>
-                      <a-switch :checked="isDarkMode" size="small" @click.stop @change="handleDarkModeChange" />
-                    </div>
-                  </a-menu-item>
                   <a-sub-menu key="language-menu">
                     <template #title>
+                      <global-outlined />
                       {{ t('layout.language') }}
                     </template>
                     <a-menu-item @click="handleLanguageChange('zh_CN')">
@@ -116,6 +111,7 @@ import * as antIcons from '@ant-design/icons-vue'
 import {
   BgColorsOutlined,
   DownOutlined,
+  GlobalOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -629,6 +625,25 @@ const handleLogout = () => {
           display: flex;
           justify-content: flex-end;
           align-items: center;
+          gap: 8px;
+
+          .ag-layout-header-dark-mode {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 18px;
+            color: var(--text-color);
+            transition: all 0.3s;
+
+            &:hover {
+              background-color: var(--surface-subtle);
+              color: var(--primary-color);
+            }
+          }
 
           .ag-layout-header-user {
             display: flex;

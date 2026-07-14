@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div id="chart-card">
     <div class="amount">
       <div>
@@ -330,80 +330,90 @@ const init = async () => {
   getPayCountData()
 }
 
-const getPayDayCountData = () => {
-  dashboardApi.queryPayDayCount(todayOrYesterday.value)
-    .then((res) => {
-      mainChart.dayCount = res.dayCount
-      skeletonClose()
-    })
-    .catch((err) => {
-      console.error(err)
-      skeletonClose()
-    })
+/**
+ * 获取每日交易统计数据
+ */
+const getPayDayCountData = async () => {
+  try {
+    const res = await dashboardApi.queryPayDayCount(todayOrYesterday.value)
+    mainChart.dayCount = res.dayCount
+  } catch (err) {
+    console.error('获取每日交易统计数据失败:', err)
+  } finally {
+    skeletonClose()
+  }
 }
 
-const getPayTrendCountData = () => {
-  dashboardApi.queryPayTrendCount(recentDay.value)
-    .then((res) => {
-      ispayAmount.value = true
-      loadPayAmount(res)
-      skeletonClose()
-    })
-    .catch((err) => {
-      console.error(err)
-      skeletonClose()
-      ispayAmount.value = false
-    })
+/**
+ * 获取交易趋势统计数据
+ */
+const getPayTrendCountData = async () => {
+  try {
+    const res = await dashboardApi.queryPayTrendCount(recentDay.value)
+    ispayAmount.value = true
+    loadPayAmount(res)
+  } catch (err) {
+    console.error('获取交易趋势统计数据失败:', err)
+    ispayAmount.value = false
+  } finally {
+    skeletonClose()
+  }
 }
 
-const getIsvAndMchCountData = () => {
-  dashboardApi.queryIsvAndMchCount()
-    .then((res) => {
-      mainChart.totalMch = res.totalMch
-      mainChart.isvSubMchCount = res.isvSubMchCount
-      mainChart.normalMchCount = res.normalMchCount
-      mainChart.totalAgent = res.totalAgent
-      mainChart.totalIsv = res.totalIsv
-      skeletonClose()
-    })
-    .catch((err) => {
-      console.error(err)
-      skeletonClose()
-    })
+/**
+ * 获取服务商和商户数量统计
+ */
+const getIsvAndMchCountData = async () => {
+  try {
+    const res = await dashboardApi.queryIsvAndMchCount()
+    mainChart.totalMch = res.totalMch
+    mainChart.isvSubMchCount = res.isvSubMchCount
+    mainChart.normalMchCount = res.normalMchCount
+    mainChart.totalAgent = res.totalAgent
+    mainChart.totalIsv = res.totalIsv
+  } catch (err) {
+    console.error('获取服务商和商户数量统计失败:', err)
+  } finally {
+    skeletonClose()
+  }
 }
 
-const getPayTypeData = () => {
-  dashboardApi.queryPayType({ queryDateRange: searchData.payTypeQueryDateRange })
-    .then((res) => {
-      mainChart.payType = res
-      isPayType.value = true
-      const data = []
-      for (const item of res) {
-        data.push({ name: item.typeName, value: item.typeAmount })
-      }
-      loadPayType(data)
-      skeletonClose()
-    })
-    .catch((err) => {
-      console.error(err)
-      isPayType.value = false
-      skeletonClose()
-    })
+/**
+ * 获取支付方式统计数据
+ */
+const getPayTypeData = async () => {
+  try {
+    const res = await dashboardApi.queryPayType({ queryDateRange: searchData.payTypeQueryDateRange })
+    mainChart.payType = res
+    isPayType.value = true
+    const data = []
+    for (const item of res) {
+      data.push({ name: item.typeName, value: item.typeAmount })
+    }
+    loadPayType(data)
+  } catch (err) {
+    console.error('获取支付方式统计数据失败:', err)
+    isPayType.value = false
+  } finally {
+    skeletonClose()
+  }
 }
 
-const getPayCountData = () => {
-  dashboardApi.queryPayCount({ queryDateRange: searchData.payCountQueryDateRange })
-    .then((res) => {
-      mainChart.payCount = res
-      isPayCount.value = true
-      loadPayCount(res)
-      skeletonClose()
-    })
-    .catch((err) => {
-      console.error(err)
-      isPayCount.value = false
-      skeletonClose()
-    })
+/**
+ * 获取交易统计数据
+ */
+const getPayCountData = async () => {
+  try {
+    const res = await dashboardApi.queryPayCount({ queryDateRange: searchData.payCountQueryDateRange })
+    mainChart.payCount = res
+    isPayCount.value = true
+    loadPayCount(res)
+  } catch (err) {
+    console.error('获取交易统计数据失败:', err)
+    isPayCount.value = false
+  } finally {
+    skeletonClose()
+  }
 }
 
 const initPayAmount = async () => {

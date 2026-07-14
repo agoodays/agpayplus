@@ -296,7 +296,7 @@ function handleReset() {
     :pagination="pagination"
     @change="handleTableChange"
   >
-    <template #topLeftSlot>
+    <template #toolbar-left>
       <a-button type="primary" @click="handleAdd">
         <plus-outlined />
         新增

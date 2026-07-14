@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
@@ -6,6 +6,7 @@
         v-model="searchData"
         :collapsible="false"
         :default-collapsed="true"
+        :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
         @reset="resetFunc"
       >
@@ -54,14 +55,15 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
+        row-key="mchNo"
+        state-key="mch_list_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
-        row-key="mchNo"
       >
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_MCH_INFO_ADD')" type="primary" @click="addFunc">
-            <plus-outlined /> 新建商户
+            <plus-outlined /> 新增
           </a-button>
         </template>
 
@@ -92,6 +94,9 @@
 
     <!-- 详情抽屉 -->
     <detail v-model:open="detailOpen" :record-id="currentRecordId" />
+
+    <!-- 高级配置抽屉 -->
+    <mch-config v-model:open="mchConfigOpen" :record-id="mchConfigRecordId" @success="reloadTable" />
   </div>
 </template>
 
@@ -107,14 +112,20 @@ import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
+import MchConfig from './mch-config.vue'
 
 // 路由实例
 const router = useRouter()
 
 // 权限检查
 const { hasPermission } = usePermission()
+
+// 高级配置抽屉状态
+const mchConfigOpen = ref(false)
+const mchConfigRecordId = ref(null)
 
 /**
  * 表格列配置
@@ -128,7 +139,7 @@ const tableColumns = [
   { key: 'state', title: '状态', width: 80, customRender: 'stateSlot' },
   { key: 'type', title: '商户类型', width: 100, customRender: 'typeSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
-  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
@@ -208,14 +219,12 @@ const appConfigFunc = (record) => {
 }
 
 /**
- * 跳转高级配置页面
+ * 打开高级配置抽屉
  * @param {Object} record - 商户记录
  */
 const advancedConfigFunc = (record) => {
-  router.push({
-    path: '/mchConfig',
-    query: { mchNo: record.mchNo }
-  })
+  mchConfigRecordId.value = record.mchNo
+  mchConfigOpen.value = true
 }
 
 /**

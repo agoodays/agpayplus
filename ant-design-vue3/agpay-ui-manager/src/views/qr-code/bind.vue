@@ -18,12 +18,12 @@
       <a-row :gutter="16">
         <a-col :span="10">
           <a-form-item label="商户号" name="mchNo">
-            <ag-select
-              v-model:value="saveObject.mchNo"
-              :api="searchMch"
-              value-field="mchNo"
-              label-field="mchName"
+            <ag-select-infinite
+              v-model="saveObject.mchNo"
               placeholder="商户号（搜索商户名称）"
+              search-field="mchName"
+              :fetch-data="searchMch"
+              :field-names="{ label: 'mchName', value: 'mchNo' }"
               @change="mchNoChange"
             />
           </a-form-item>
@@ -57,7 +57,7 @@
  * 二维码绑定组件
  * 功能：将二维码绑定到商户、应用和门店
  */
-import { AgDrawer, AgSelect } from '@/components'
+import { AgDrawer, AgSelectInfinite } from '@/components'
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'

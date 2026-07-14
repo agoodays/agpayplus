@@ -1,8 +1,8 @@
 ﻿<template>
   <ag-drawer
     v-model:open="localOpen"
-    :title="isAdd ? '新增团队' : '修改团队'"
     class="drawer-width"
+    :title="isAdd ? '新增团队' : '修改团队'"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     :width="drawerWidth"

@@ -124,6 +124,8 @@ npm run format        # 格式化代码
 | [快速开始](./QUICK_START.md) | 新手入门指南 ⭐ |
 | [组件总览](./COMPONENTS_OVERVIEW.md) | 所有组件介绍 |
 | [自定义组件使用指南](./CUSTOM_COMPONENTS_USAGE_GUIDE.md) | 自定义组件统一使用规范 |
+| [前端迁移升级执行计划](./FRONTEND_MIGRATION_UPGRADE_PLAN.md) | Vue2 -> Vue3 迁移路线与执行门禁 |
+| [迁移批次清单（Batch 01）](./FRONTEND_MIGRATION_BATCH_01.md) | 第一批文件级迁移任务与验收清单 |
 | [项目状态](./PROJECT_STATUS.md) | 项目进度和统计 |
 | [文档索引](./DOCUMENTATION_INDEX.md) | 完整文档列表 |
 

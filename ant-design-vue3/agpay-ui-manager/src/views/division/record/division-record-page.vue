@@ -2,23 +2,23 @@
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc" @reset="resetFunc">
+      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="resetFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-date-range-picker :value="searchData.queryDateRange" @change="searchData.queryDateRange = $event" />
+              <ag-date-range-picker v-model="searchData.queryDateRange" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-            <ag-select
-              v-model="searchData.mchNo"
-              :api="searchMch"
-              value-field="mchNo"
-              label-field="mchName"
-              placeholder="商户号(支持按商户名称搜索)"
-            />
-          </a-form-item>
+              <ag-select-infinite
+                v-model="searchData.mchNo"
+                placeholder="商户号(支持按商户名称搜索)"
+                search-field="mchName"
+                :fetch-data="searchMch"
+                :field-names="{ label: 'mchName', value: 'mchNo' }"
+              />
+            </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -47,23 +47,27 @@
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <a-select v-model:value="searchData.state" placeholder="分账状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">待分账</a-select-option>
-                <a-select-option value="1">分账成功</a-select-option>
-                <a-select-option value="2">分账失败</a-select-option>
-                <a-select-option value="3">已退款</a-select-option>
-              </a-select>
+              <ag-select
+                v-model="searchData.state"
+                placeholder="分账状态"
+                allow-clear
+                :options="[
+                  { value: '0', label: '待分账' },
+                  { value: '1', label: '分账成功' },
+                  { value: '2', label: '分账失败' },
+                  { value: '3', label: '已退款' }
+                ]"
+              />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <a-select v-model:value="searchData.ifCode" placeholder="支付接口">
+              <a-select v-model="searchData.ifCode" placeholder="支付接口">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
-                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
-                    ><img class="icon" :src="item.icon" alt=""
-                  /></span>
+                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }">
+                    <img class="icon" :src="item.icon" alt="" />
+                  </span>
                   {{ item.ifName }}[{{ item.ifCode }}]
                 </a-select-option>
               </a-select>
@@ -71,14 +75,15 @@
           </a-col>
         </template>
       </ag-search>
-      
+
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="recordId"
+        state-key="division_record_table_columns"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
-        :params="searchData"
-        row-key="recordId"
+        :search-data="searchData"
       >
         <template #amountSlot="{ record }"><b>¥{{ record.calDivisionAmount / 100 }}</b></template>
 
@@ -155,12 +160,15 @@
  * 功能：展示分账记录列表，支持搜索、查看详情、重发分账等操作
  */
 import { divisionRecordApi } from '@/api/business/division/division-record-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { onMounted, reactive, ref } from 'vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { onMounted, ref } from 'vue'
+import { message } from 'ant-design-vue'
+import { infoBox } from '@/utils/info-box'
 import Detail from './detail.vue'
 
-// 权限检查
+/** 权限检查 */
 const { hasPermission } = usePermission()
 
 /**
@@ -184,31 +192,21 @@ const tableColumns = [
 ]
 
 /**
- * 组件引用
+ * 使用 CRUD 表格页面组合式函数
  */
-const tableRef = ref(null)
+const {
+  tableRef,
+  searchData,
+  detailOpen,
+  currentRecordId,
+  reloadTable,
+  openDetail
+} = useCrudTablePage()
 
-/**
- * 详情弹窗状态
- */
-const detailOpen = ref(false)
-const currentRecordId = ref('')
+// 初始化搜索数据
+searchData.queryDateRange = 'today'
 
-/**
- * 加载状态
- */
-const loading = ref(false)
-
-/**
- * 搜索表单数据
- */
-const searchData = reactive({
-  queryDateRange: 'today'
-})
-
-/**
- * 支付接口定义列表
- */
+/** 支付接口定义列表 */
 const ifDefineList = ref([])
 
 /**
@@ -216,9 +214,7 @@ const ifDefineList = ref([])
  * @param {Object} params - 搜索参数
  * @returns {Promise<Object>} 商户列表
  */
-const searchMch = (params) => {
-  return divisionRecordApi.listMch(params)
-}
+const searchMch = (params) => divisionRecordApi.listMch(params)
 
 /**
  * 请求表格数据函数
@@ -241,54 +237,41 @@ const reqIfDefineListFunc = async () => {
   }
 }
 
-/**
- * 搜索函数
- */
-const searchFunc = () => {
-  loading.value = true
-  tableRef.value?.reload()
-}
+/** 搜索函数 */
+const searchFunc = () => reloadTable()
 
-/**
- * 重置搜索条件
- */
+/** 重置搜索条件 */
 const resetFunc = () => {
   Object.keys(searchData).forEach((key) => {
     searchData[key] = ''
   })
   searchData.queryDateRange = 'today'
-  searchFunc()
+  reloadTable()
 }
 
 /**
  * 查看分账记录详情
  * @param {string} recordId - 分账记录ID
  */
-const detailFunc = (recordId) => {
-  currentRecordId.value = recordId
-  detailOpen.value = true
-}
+const detailFunc = (recordId) => openDetail(recordId)
 
 /**
  * 重新分账
  * @param {string} recordId - 分账记录ID
  */
 const redivFunc = async (recordId) => {
-  const { infoBox } = await import('@/utils/info-box')
   infoBox.confirmPrimary('确定重新分账?', '重新分账将重新触发分账操作,可能会导致重复分账', async () => {
     try {
       await divisionRecordApi.resendDivision(recordId)
-      tableRef.value?.reload()
-      window.$message.warning('等待接口返回状态')
+      reloadTable()
+      message.warning('等待接口返回状态')
     } catch (error) {
       console.error('重新分账失败:', error)
     }
   })
 }
 
-/**
- * 组件挂载时初始化
- */
+/** 组件挂载时初始化 */
 onMounted(() => {
   reqIfDefineListFunc()
 })

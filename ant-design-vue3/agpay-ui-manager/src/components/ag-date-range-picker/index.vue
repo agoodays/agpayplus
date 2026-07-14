@@ -4,9 +4,10 @@
     <a-select
       v-if="actualShowQuickSelect && currentMode !== 'custom'"
       v-model:value="selectedOption"
+      allow-clear
+      style="width: 100%"
       :size="size"
       :disabled="disabled"
-      style="width: 100%"
       @change="handleOptionChange"
       @focus="onFocus"
       @blur="onBlur"
@@ -272,7 +273,7 @@ const props = defineProps({
   options: {
     type: Array,
     default: () => [
-      { label: '全部时间', value: '' },
+      // { label: '全部时间', value: '' },
       { label: '今天', value: 'today' },
       { label: '昨天', value: 'yesterday' },
       { label: '近7天', value: 'near7' },

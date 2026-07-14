@@ -1,34 +1,36 @@
-﻿<template>
+<template>
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-select
+              <ag-select-infinite
                 v-model="searchData.mchNo"
-                :api="searchMch"
-                value-field="mchNo"
-                label-field="mchName"
+                label="商户号"
                 placeholder="商户号(支持按商户名称搜索)"
+                allow-clear
+                search-field="mchName"
+                :fetch-data="searchMch"
+                :field-names="{ label: 'mchName', value: 'mchNo' }"
               />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input v-model="searchData.receiverGroupId" placeholder="分组ID" />
+              <ag-input v-model="searchData.receiverGroupId" label="分组ID" placeholder="分组ID" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input v-model="searchData.receiverGroupName" placeholder="分组名称" />
+              <ag-input v-model="searchData.receiverGroupName" label="分组名称" placeholder="分组名称" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.autoDivisionFlag"
+                v-model="searchData.autoDivisionFlag"
                 label="是否自动分账"
                 placeholder="请选择是否自动分账"
                 allow-clear
@@ -45,15 +47,15 @@
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="receiverGroupId"
+        state-key="division_receiver_group_table_columns"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
-        :params="searchData"
-        row-key="receiverGroupId"
+        :search-data="searchData"
       >
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_DIVISION_RECEIVER_GROUP_ADD')" type="primary" @click="addFunc">
-            <template #icon><PlusOutlined /></template>
-            新增
+            <plus-outlined /> 新增
           </a-button>
         </template>
         <!-- 自动分账列 -->
@@ -79,15 +81,14 @@
  * 分账接收方分组列表页面组件
  * 功能：展示分账接收方分组列表，支持搜索、新增、编辑、删除操作
  */
-import { PlusOutlined } from '@ant-design/icons-vue'
 import { divisionGroupApi } from '@/api/business/division/division-group-api'
-import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { AgInput, AgSearch, AgSelectInfinite, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { ref } from 'vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import AddOrEdit from './add-or-edit.vue'
 
-// 权限检查
+/** 权限检查 */
 const { hasPermission } = usePermission()
 
 /**
@@ -101,29 +102,28 @@ const tableColumns = [
   { key: 'autoDivisionFlag', dataIndex: 'autoDivisionFlag', title: '自动分账', width: 120, customRender: 'autoDivisionFlagSlot' },
   { key: 'createdBy', dataIndex: 'createdBy', title: '创建人', width: 120 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
- * 加载状态
+ * 使用 CRUD 表格页面组合式函数
  */
-const loading = ref(false)
-
-/**
- * 使用CRUD表格页面组合式函数
- */
-const { tableRef, searchData, reloadTable, confirmDelete } = useCrudTablePage({
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  currentRecordId,
+  reloadTable,
+  openCreate,
+  openEdit,
+  closeModal,
+  confirmDelete
+} = useCrudTablePage({
   deleteAction: (recordId) => divisionGroupApi.delById(recordId),
   deleteConfirmTitle: '确定删除吗',
   deleteConfirmContent: '',
   deleteSuccessMessage: '删除成功'
 })
-
-/**
- * 弹窗状态
- */
-const modalOpen = ref(false)
-const currentRecordId = ref('')
 
 /**
  * 搜索商户
@@ -141,30 +141,17 @@ const reqTableDataFunc = async (params) => {
   return await divisionGroupApi.queryPage(params)
 }
 
-/**
- * 搜索函数
- */
-const searchFunc = () => {
-  loading.value = true
-  reloadTable()
-}
+/** 搜索函数 */
+const searchFunc = () => reloadTable()
 
-/**
- * 新增分组
- */
-const addFunc = () => {
-  currentRecordId.value = ''
-  modalOpen.value = true
-}
+/** 新增分组 */
+const addFunc = () => openCreate()
 
 /**
  * 编辑分组
  * @param {string} recordId - 分组ID
  */
-const editFunc = (recordId) => {
-  currentRecordId.value = recordId
-  modalOpen.value = true
-}
+const editFunc = (recordId) => openEdit(recordId)
 
 /**
  * 删除分组
@@ -172,10 +159,9 @@ const editFunc = (recordId) => {
  */
 const delFunc = (recordId) => confirmDelete(recordId)
 
-/**
- * 操作成功回调
- */
+/** 操作成功回调 */
 const handleSuccess = () => {
-  searchFunc()
+  closeModal()
+  reloadTable()
 }
 </script>

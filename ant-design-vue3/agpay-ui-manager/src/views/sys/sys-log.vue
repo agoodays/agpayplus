@@ -5,10 +5,8 @@
       <ag-search
         v-model="searchData"
         :collapsible="true"
-        :default-collapsed="!isShowMore"
         :search-loading="loading"
         @search="searchFunc"
-        @collapse-change="setIsShowMore"
       >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
@@ -24,7 +22,6 @@
                 placeholder="请选择所属系统"
                 allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: 'MGR', label: '运营平台' },
                   { value: 'AGENT', label: '代理商系统' },
                   { value: 'MCH', label: '商户系统' }
@@ -40,7 +37,6 @@
                 placeholder="请选择日志类型"
                 allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: '0', label: '登录日志' },
                   { value: '1', label: '操作日志' }
                 ]"
@@ -73,11 +69,12 @@
       </ag-search>
       <ag-table
         ref="tableRef"
+        row-key="sysLogId"
+        state-key="sys_log_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
         :row-selection="rowSelection"
-        row-key="sysLogId"
         @load-complete="loading = false"
       >
         <template #toolbar-left>
@@ -149,11 +146,6 @@ const detailOpen = ref(false)
 const currentLogId = ref('')
 
 /**
- * 搜索区域展开状态
- */
-const isShowMore = ref(false)
-
-/**
  * 加载状态
  */
 const loading = ref(false)
@@ -194,14 +186,6 @@ const rowSelection = computed(() => ({
     })
   }
 }))
-
-/**
- * 设置搜索区域展开状态
- * @param {boolean} val - 是否展开
- */
-const setIsShowMore = (val) => {
-  isShowMore.value = val
-}
 
 /**
  * 请求表格数据函数

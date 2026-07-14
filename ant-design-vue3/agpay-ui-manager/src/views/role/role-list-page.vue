@@ -7,12 +7,11 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.sysType"
+                v-model="searchData.sysType"
                 label="所属系统"
                 placeholder="请选择所属系统"
                 allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: 'MGR', label: '运营平台' },
                   { value: 'AGENT', label: '代理商' },
                   { value: 'MCH', label: '商户' }
@@ -37,49 +36,33 @@
           </a-col>
         </template>
       </ag-search>
-      
+
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="roleId"
+        state-key="role_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
-        :params="searchData"
-        row-key="roleName"
+        :search-data="searchData"
       >
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_UR_ROLE_ADD')" type="primary" @click="addFunc">
-            <template #icon><PlusOutlined /></template>
-            新增
+            <plus-outlined /> 新增
           </a-button>
         </template>
+
         <template #roleIdSlot="{ record }"><b>{{ record.roleId }}</b></template>
-        <!-- 自定义列 -->
+
+        <!-- 所属系统列 -->
         <template #sysTypeSlot="{ record }">
-          <a-tag
-            :key="record.sysType"
-            :color="
-              record.sysType === 'MGR'
-                ? 'green'
-                : record.sysType === 'AGENT'
-                  ? 'cyan'
-                  : record.sysType === 'MCH'
-                    ? 'geekblue'
-                    : 'loser'
-            "
-          >
-            {{
-              record.sysType === 'MGR'
-                ? '运营平台'
-                : record.sysType === 'AGENT'
-                  ? '代理商系统'
-                  : record.sysType === 'MCH'
-                    ? '商户系统'
-                    : '其他'
-            }}
+          <a-tag :color="getSysTypeColor(record.sysType)">
+            {{ getSysTypeText(record.sysType) }}
           </a-tag>
         </template>
+
+        <!-- 操作列 -->
         <template #opSlot="{ record }">
-          <!-- 操作按钮 -->
           <ag-table-actions>
             <a-button v-if="hasPermission('ENT_UR_ROLE_EDIT')" type="link" @click="editFunc(record.roleId, record.sysType)">编辑</a-button>
             <a-button v-if="hasPermission('ENT_UR_ROLE_DEL')" type="link" style="color: red" @click="delFunc(record.roleId)">删除</a-button>
@@ -87,7 +70,8 @@
         </template>
       </ag-table>
     </a-card>
-    <!-- 新增 / 编辑 页面弹窗  -->
+
+    <!-- 新增/编辑弹窗 -->
     <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" :sys-type="currentSysType" @success="handleSuccess" />
   </div>
 </template>
@@ -96,16 +80,47 @@
  * 角色列表页面组件
  * 功能：展示角色列表，支持搜索、新增、编辑、删除操作
  */
-import { PlusOutlined } from '@ant-design/icons-vue'
 import { roleApi } from '@/api/business/role/role-api'
-import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
-import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 
-// 权限检查
+/** 权限检查 */
 const { hasPermission } = usePermission()
+
+/** 当前系统类型（用于编辑） */
+const currentSysType = ref('')
+
+/**
+ * 获取系统类型颜色
+ * @param {string} sysType - 系统类型
+ * @returns {string} 颜色值
+ */
+const getSysTypeColor = (sysType) => {
+  const colorMap = {
+    MGR: 'green',
+    AGENT: 'cyan',
+    MCH: 'geekblue'
+  }
+  return colorMap[sysType] || 'default'
+}
+
+/**
+ * 获取系统类型文本
+ * @param {string} sysType - 系统类型
+ * @returns {string} 文本值
+ */
+const getSysTypeText = (sysType) => {
+  const textMap = {
+    MGR: '运营平台',
+    AGENT: '代理商系统',
+    MCH: '商户系统'
+  }
+  return textMap[sysType] || '其他'
+}
 
 /**
  * 表格列配置
@@ -115,40 +130,31 @@ const tableColumns = [
   { key: 'roleName', dataIndex: 'roleName', title: '角色名称', width: 160, sorter: true },
   { key: 'sysType', title: '所属系统', width: 120, customRender: 'sysTypeSlot' },
   { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
- * 默认查询参数对象模板
+ * 使用 CRUD 表格页面组合式函数
  */
-const defaultSearchData = {
-  sysType: 'MGR'
-}
-
-/**
- * 加载状态
- */
-const loading = ref(false)
-
-/**
- * 使用CRUD表格页面组合式函数
- */
-const { tableRef, searchData, reloadTable, confirmDelete } = useCrudTablePage({
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  currentRecordId,
+  reloadTable,
+  openCreate,
+  openEdit,
+  closeModal,
+  confirmDelete
+} = useCrudTablePage({
   deleteAction: (recordId) => roleApi.delById(recordId),
   deleteConfirmTitle: '确定删除吗',
   deleteConfirmContent: '',
   deleteSuccessMessage: '删除成功'
 })
 
-/**
- * 弹窗状态
- */
-const modalOpen = ref(false)
-const currentRecordId = ref('')
-const currentSysType = ref('')
-
 // 初始化默认搜索参数
-Object.assign(searchData, defaultSearchData)
+searchData.sysType = 'MGR'
 
 /**
  * 请求表格数据函数
@@ -159,21 +165,13 @@ const reqTableDataFunc = async (params) => {
   return await roleApi.queryPage(params)
 }
 
-/**
- * 搜索函数
- */
-const searchFunc = () => {
-  loading.value = true
-  reloadTable()
-}
+/** 搜索函数 */
+const searchFunc = () => reloadTable()
 
-/**
- * 新增角色
- */
+/** 新增角色 */
 const addFunc = () => {
-  currentRecordId.value = ''
   currentSysType.value = ''
-  modalOpen.value = true
+  openCreate()
 }
 
 /**
@@ -182,9 +180,8 @@ const addFunc = () => {
  * @param {string} sysType - 所属系统
  */
 const editFunc = (recordId, sysType) => {
-  currentRecordId.value = recordId
   currentSysType.value = sysType
-  modalOpen.value = true
+  openEdit(recordId)
 }
 
 /**
@@ -193,10 +190,9 @@ const editFunc = (recordId, sysType) => {
  */
 const delFunc = (recordId) => confirmDelete(recordId)
 
-/**
- * 操作成功回调
- */
+/** 操作成功回调 */
 const handleSuccess = () => {
-  searchFunc()
+  closeModal()
+  reloadTable()
 }
 </script>

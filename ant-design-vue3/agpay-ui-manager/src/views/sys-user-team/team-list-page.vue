@@ -12,7 +12,6 @@
                 placeholder="请选择所属系统"
                 allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: 'MGR', label: '运营平台' },
                   { value: 'AGENT', label: '代理商' }
                 ]"
@@ -44,15 +43,15 @@
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="teamId"
+        state-key="team_list_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
-        :params="searchData"
-        row-key="teamId"
+        :search-data="searchData"
       >
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_UR_TEAM_ADD')" type="primary" @click="addFunc">
-            <template #icon><PlusOutlined /></template>
-            新增
+            <plus-outlined /> 新增
           </a-button>
         </template>
         <template #statRangeTypeSlot="{ record }">
@@ -145,7 +144,7 @@ const tableColumns = [
   { key: 'sysType', title: '所属系统', width: 120, customRender: 'sysTypeSlot' },
   { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**

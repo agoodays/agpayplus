@@ -1,17 +1,20 @@
-﻿<template>
+<template>
   <ag-drawer
+    width="50%"
     v-model:open="localOpen"
-    :title="isAdd ? '新增支付接口' : '修改支付接口'"
     :mask-closable="false"
+    :title="isAdd ? '新增支付接口' : '修改支付接口'"
+    :show-confirm="true"
+    :confirm-loading="loading"
     @close="handleClose"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    width="40%">
+    @confirm="handleConfirm"
+  >
     <a-form
       ref="infoForm"
       :model="saveObject"
       layout="vertical"
-      :rules="rules">
+      :rules="rules"
+    >
       <a-row :gutter="16">
         <a-col :span="24">
           <p class="ag-drawer-title">基本配置</p>
@@ -29,135 +32,95 @@
         <a-col :span="12">
           <a-form-item label="是否支持普通商户模式" name="isMchMode">
             <a-radio-group v-model:value="saveObject.isMchMode">
-              <a-radio :value="1">
-                支持
-              </a-radio>
-              <a-radio :value="0">
-                不支持
-              </a-radio>
+              <a-radio :value="1">支持</a-radio>
+              <a-radio :value="0">不支持</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否支持服务商子商户模式" name="isIsvMode">
             <a-radio-group v-model:value="saveObject.isIsvMode">
-              <a-radio :value="1">
-                支持
-              </a-radio>
-              <a-radio :value="0">
-                不支持
-              </a-radio>
+              <a-radio :value="1">支持</a-radio>
+              <a-radio :value="0">不支持</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="24">
           <a-form-item label="支付参数配置页面类型" name="configPageType">
             <a-radio-group v-model:value="saveObject.configPageType">
-              <a-radio :value="1">
-                根据接口配置定义描述渲染页面
-              </a-radio>
-              <a-radio :value="2">
-                自定义页面
-              </a-radio>
+              <a-radio :value="1">根据接口配置定义描述渲染页面</a-radio>
+              <a-radio :value="2">自定义页面</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否支持进件" name="isSupportApplyment">
             <a-radio-group v-model:value="saveObject.isSupportApplyment">
-              <a-radio :value="1">
-                支持
-              </a-radio>
-              <a-radio :value="0">
-                不支持
-              </a-radio>
+              <a-radio :value="1">支持</a-radio>
+              <a-radio :value="0">不支持</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否开启进件" name="isOpenApplyment">
             <a-radio-group v-model:value="saveObject.isOpenApplyment" :disabled="!saveObject.isSupportApplyment">
-              <a-radio :value="1">
-                开启
-              </a-radio>
-              <a-radio :value="0">
-                关闭
-              </a-radio>
+              <a-radio :value="1">开启</a-radio>
+              <a-radio :value="0">关闭</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否支持对账" name="isSupportCheckBill">
             <a-radio-group v-model:value="saveObject.isSupportCheckBill">
-              <a-radio :value="1">
-                支持
-              </a-radio>
-              <a-radio :value="0">
-                不支持
-              </a-radio>
+              <a-radio :value="1">支持</a-radio>
+              <a-radio :value="0">不支持</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否开启对账" name="isOpenCheckBill">
             <a-radio-group v-model:value="saveObject.isOpenCheckBill" :disabled="!saveObject.isSupportCheckBill">
-              <a-radio :value="1">
-                开启
-              </a-radio>
-              <a-radio :value="0">
-                关闭
-              </a-radio>
+              <a-radio :value="1">开启</a-radio>
+              <a-radio :value="0">关闭</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否支持提现" name="isSupportCashout">
             <a-radio-group v-model:value="saveObject.isSupportCashout">
-              <a-radio :value="1">
-                支持
-              </a-radio>
-              <a-radio :value="0">
-                不支持
-              </a-radio>
+              <a-radio :value="1">支持</a-radio>
+              <a-radio :value="0">不支持</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="是否开启提现" name="isOpenCashout">
             <a-radio-group v-model:value="saveObject.isOpenCashout" :disabled="!saveObject.isSupportCashout">
-              <a-radio :value="1">
-                开启
-              </a-radio>
-              <a-radio :value="0">
-                关闭
-              </a-radio>
+              <a-radio :value="1">开启</a-radio>
+              <a-radio :value="0">关闭</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="24" v-if="saveObject.isIsvMode == 1 && saveObject.configPageType === 1">
           <a-form-item label="服务商接口配置定义描述" name="isvParams">
-            <a-input v-model:value="saveObject.isvParams" placeholder="请输入" type="textarea" />
+            <a-textarea v-model:value="saveObject.isvParams" placeholder="请输入" :rows="4" />
           </a-form-item>
         </a-col>
         <a-col :span="24" v-if="saveObject.isIsvMode == 1 && saveObject.configPageType === 1">
           <a-form-item label="特约商户接口配置定义描述" name="isvsubMchParams">
-            <a-input v-model:value="saveObject.isvsubMchParams" placeholder="请输入" type="textarea" />
+            <a-textarea v-model:value="saveObject.isvsubMchParams" placeholder="请输入" :rows="4" />
           </a-form-item>
         </a-col>
         <a-col :span="24" v-if="saveObject.isMchMode == 1 && saveObject.configPageType === 1">
           <a-form-item label="普通商户接口配置定义描述" name="normalMchParams">
-            <a-input v-model:value="saveObject.normalMchParams" placeholder="请输入" type="textarea" />
+            <a-textarea v-model:value="saveObject.normalMchParams" placeholder="请输入" :rows="4" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
           <a-form-item label="状态" name="state">
             <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="1">
-                启用
-              </a-radio>
-              <a-radio :value="0">
-                停用
-              </a-radio>
+              <a-radio :value="1">启用</a-radio>
+              <a-radio :value="0">停用</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
@@ -169,7 +132,7 @@
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
-          <a-divider orientation="left"/>
+          <a-divider orientation="left" />
         </a-col>
         <a-col :span="24">
           <p class="ag-drawer-title">支付方式</p>
@@ -179,19 +142,21 @@
         <a-col :span="24">
           <a-form-item label="支持的支付方式" name="checkedList">
             <a-checkbox-group v-model:value="checkedList">
-              <a-row v-for="(group, index) in groupedWays" :key="index">
-                <h3>{{ group.name }}</h3>
-                <a-col :span="6" v-for="(way, i) in group.ways" :key="i">
-                  <a-checkbox :value="way.wayCode">{{ way.wayName }}</a-checkbox>
-                </a-col>
-              </a-row>
+              <div v-for="(group, index) in groupedWays" :key="index" class="pay-way-group">
+                <div class="pay-way-group-title">{{ group.name }}</div>
+                <a-row :gutter="8">
+                  <a-col v-for="(way, i) in group.ways" :key="i">
+                    <a-checkbox :value="way.wayCode">{{ way.wayName }}</a-checkbox>
+                  </a-col>
+                </a-row>
+              </div>
             </a-checkbox-group>
           </a-form-item>
         </a-col>
       </a-row>
       <a-row justify="space-between" type="flex">
         <a-col :span="24">
-          <a-divider orientation="left"/>
+          <a-divider orientation="left" />
         </a-col>
         <a-col :span="24">
           <p class="ag-drawer-title">页面展示</p>
@@ -207,7 +172,7 @@
               :urls="[saveObject.icon]"
               @upload-success="uploadSuccess"
             >
-              <template #uploadSlot="{loading}">
+              <template #uploadSlot="{ loading }">
                 <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
               </template>
             </ag-upload>
@@ -215,23 +180,11 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="卡片背景色" name="bgColor">
-            <a-input style="height: 66px; margin-top: 8px;" v-model:value="saveObject.bgColor" placeholder="请输入" />
+            <color-picker v-model="saveObject.bgColor" style="height: 66px; margin-top: 8px;" />
           </a-form-item>
         </a-col>
       </a-row>
     </a-form>
-
-    <div class="drawer-btn-center">
-      <a-button @click="onClose" :style="{ marginRight: '8px' }">
-        <template #icon><CloseOutlined /></template>
-        取消
-      </a-button>
-      <a-button type="primary" @click="onSubmit">
-        <template #icon><CheckOutlined /></template>
-        保存
-      </a-button>
-    </div>
-
   </ag-drawer>
 </template>
 
@@ -240,12 +193,17 @@
  * 支付接口定义新增/编辑组件
  * 功能：新增或修改支付接口定义配置
  */
+import { AgDrawer, AgUpload } from '@/components'
 import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-const icons = { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined }
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { onMounted, reactive, ref, watch } from 'vue'
+import { message } from 'ant-design-vue'
 
-/** Props 定义 */
+const icons = { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined }
+
+/**
+ * Props 定义
+ */
 const props = defineProps({
   open: {
     type: Boolean,
@@ -257,21 +215,45 @@ const props = defineProps({
   }
 })
 
-/** 事件定义 */
+/**
+ * 组件事件定义
+ */
 const emit = defineEmits(['update:open', 'success'])
 
+/**
+ * 表单引用
+ */
 const infoForm = ref(null)
+
+/**
+ * 本地抽屉打开状态，避免直接修改 props
+ */
 const localOpen = ref(false)
+
+/**
+ * 是否为新增模式
+ */
 const isAdd = ref(true)
+
+/**
+ * 按钮加载状态
+ */
+const loading = ref(false)
+
+/**
+ * 上传地址
+ */
 const action = payConfigApi.getIfBgUploadAction()
 
-/** 监听 open 属性变化 */
+/**
+ * 监听抽屉打开状态变化
+ */
 watch(
   () => props.open,
-  (val) => {
+  async (val) => {
     localOpen.value = val
     if (val) {
-      initForm(props.ifCode)
+      await loadData()
     }
   }
 )
@@ -281,56 +263,68 @@ watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
-const saveObject = reactive({
-  isMchMode: 1,
-  isIsvMode: 1,
-  state: 1,
-  configPageType: 1,
-  isSupportApplyment: 0,
-  isOpenApplyment: 0,
-  isSupportCheckBill: 0,
-  isOpenCheckBill: 0,
-  isSupportCashout: 0,
-  isOpenCashout: 0,
-  bgColor: '#1a53ff'
-})
+const saveObject = reactive({})
 
 const groupedWays = ref([])
+
+/**
+ * 选中的支付方式列表
+ */
 const checkedList = ref([])
 
+/**
+ * 表单验证规则
+ */
 const rules = reactive({
   ifCode: [{ required: true, message: '请输入接口代码', trigger: 'blur' }],
   ifName: [{ required: true, message: '请输入接口名称', trigger: 'blur' }],
-  normalMchParams: [{ validator: (rule, value, callback) => {
-    if (saveObject.isMchMode === 1 && saveObject.configPageType === 1 && !value) {
-      callback(new Error('请输入普通商户接口配置定义描述'))
-    }
-    callback()
-  }, trigger: 'blur' }],
-  isvParams: [{ validator: (rule, value, callback) => {
-    if (saveObject.isIsvMode === 1 && saveObject.configPageType === 1 && !value) {
-      callback(new Error('请输入服务商接口配置定义描述'))
-    }
-    callback()
-  }, trigger: 'blur' }],
-  isvsubMchParams: [{ validator: (rule, value, callback) => {
-    if (saveObject.isIsvMode === 1 && saveObject.configPageType === 1 && !value) {
-      callback(new Error('请输入特约商户接口配置定义描述'))
-    }
-    callback()
-  }, trigger: 'blur' }],
-  checkedList: [{ required: true, validator: (rule, value, callback) => {
-    if (checkedList.value.length <= 0) {
-      callback(new Error('请选择支付方式'))
-    }
-    callback()
-  }, trigger: 'blur' }]
+  normalMchParams: [{
+    validator: (rule, value, callback) => {
+      if (saveObject.isMchMode === 1 && saveObject.configPageType === 1 && !value) {
+        callback(new Error('请输入普通商户接口配置定义描述'))
+      }
+      callback()
+    },
+    trigger: 'blur'
+  }],
+  isvParams: [{
+    validator: (rule, value, callback) => {
+      if (saveObject.isIsvMode === 1 && saveObject.configPageType === 1 && !value) {
+        callback(new Error('请输入服务商接口配置定义描述'))
+      }
+      callback()
+    },
+    trigger: 'blur'
+  }],
+  isvsubMchParams: [{
+    validator: (rule, value, callback) => {
+      if (saveObject.isIsvMode === 1 && saveObject.configPageType === 1 && !value) {
+        callback(new Error('请输入特约商户接口配置定义描述'))
+      }
+      callback()
+    },
+    trigger: 'blur'
+  }],
+  checkedList: [{
+    required: true,
+    validator: (rule, value, callback) => {
+      if (checkedList.value.length <= 0) {
+        callback(new Error('请选择支付方式'))
+      }
+      callback()
+    },
+    trigger: 'blur'
+  }]
 })
 
-/** 初始化表单 */
-const initForm = (ifCodeParam) => {
-  isAdd.value = !ifCodeParam
-  // 数据清空
+/**
+ * 加载表单数据
+ * 新增时初始化默认数据，编辑时从接口获取数据
+ */
+async function loadData() {
+  isAdd.value = !props.ifCode
+
+  /** 初始化表单默认值 */
   Object.assign(saveObject, {
     isMchMode: 1,
     isIsvMode: 1,
@@ -345,22 +339,21 @@ const initForm = (ifCodeParam) => {
     bgColor: '#1a53ff'
   })
 
+  /** 重置表单 */
   if (infoForm.value) {
     infoForm.value.resetFields()
   }
 
   if (!isAdd.value) {
-    // 拉取详情
-    payConfigApi.getIfDefineById(ifCodeParam).then(res => {
-      Object.assign(saveObject, res)
-      const newItems = [] // 多选框赋值
-      res.wayCodes.forEach(item => {
-        newItems.push(item.wayCode)
-      })
-      checkedList.value = newItems
+    const res = await payConfigApi.getIfDefineById(props.ifCode)
+    Object.assign(saveObject, res)
+    const newItems = []
+    res.wayCodes.forEach(item => {
+      newItems.push(item.wayCode)
     })
+    checkedList.value = newItems
   } else {
-    checkedList.value = [] // 多选框设置空
+    checkedList.value = []
   }
 }
 
@@ -369,33 +362,35 @@ const handleClose = () => {
   localOpen.value = false
 }
 
-// 表单提交
-const onSubmit = () => {
-  infoForm.value.validate().then(() => {
+/**
+ * 表单提交
+ */
+const handleConfirm = async () => {
+  try {
+    await infoForm.value.validate()
     saveObject.wayCodeStrs = checkedList.value.join(',')
-    // 请求接口
+
     if (isAdd.value) {
-      payConfigApi.addIfDefine(saveObject).then(res => {
-        import('ant-design-vue').then(({ message }) => {
-          message.success('新增成功')
-          localOpen.value = false
-          emit('success')
-        })
-      })
+      await payConfigApi.addIfDefine(saveObject)
+      message.success('新增成功')
     } else {
-      payConfigApi.updateIfDefineById(props.ifCode, saveObject).then(res => {
-        import('ant-design-vue').then(({ message }) => {
-          message.success('修改成功')
-          localOpen.value = false
-          emit('success')
-        })
-      })
+      await payConfigApi.updateIfDefineById(props.ifCode, saveObject)
+      message.success('修改成功')
     }
-  }).catch(error => {
-    console.error('验证失败:', error)
-  })
+
+    localOpen.value = false
+    emit('success')
+  } catch (error) {
+    console.error('操作失败:', error)
+  }
 }
 
+/**
+ * 按指定键分组列表
+ * @param {Array} list - 列表数据
+ * @param {string} key - 分组键
+ * @returns {Object} 分组结果
+ */
 const groupBy = (list, key) => {
   return list.reduce((acc, item) => {
     (acc[item[key]] = acc[item[key]] || []).push(item)
@@ -403,6 +398,11 @@ const groupBy = (list, key) => {
   }, {})
 }
 
+/**
+ * 获取分组名称
+ * @param {string} wayType - 支付方式类型
+ * @returns {string} 分组名称
+ */
 const getGroupName = (wayType) => {
   switch (wayType) {
     case 'WECHAT':
@@ -420,61 +420,104 @@ const getGroupName = (wayType) => {
   }
 }
 
-// 支付方式列表
-const payWayList = () => {
-  payConfigApi.queryPayWayList({ pageSize: -1 }).then(res => {
-    const ways = res.records
+/**
+ * 加载支付方式列表
+ */
+const payWayList = async () => {
+  const res = await payConfigApi.queryPayWayList({ pageSize: -1 })
+  const ways = res.records
 
-    const groupedWaysData = groupBy(ways, 'wayType')
+  const groupedWaysData = groupBy(ways, 'wayType')
 
-    // 指定顺序排序
-    const order = ['WECHAT', 'ALIPAY', 'YSFPAY', 'UNIONPAY', 'DCEPPAY', 'OTHER']
-    const sortedGroupedWays = Object.fromEntries(
-        Object.entries(groupedWaysData)
-            .sort(([keyA], [keyB]) => {
-              const indexA = order.indexOf(keyA)
-              const indexB = order.indexOf(keyB)
-              return indexA - indexB
-            })
-    )
+  const order = ['WECHAT', 'ALIPAY', 'YSFPAY', 'UNIONPAY', 'DCEPPAY', 'OTHER']
+  const sortedGroupedWays = Object.fromEntries(
+    Object.entries(groupedWaysData)
+      .sort(([keyA], [keyB]) => {
+        const indexA = order.indexOf(keyA)
+        const indexB = order.indexOf(keyB)
+        return indexA - indexB
+      })
+  )
 
-    groupedWays.value = []
-    for (const wayType in sortedGroupedWays) {
-      const group = {
-        name: getGroupName(wayType),
-        ways: []
-      }
-      for (const way of sortedGroupedWays[wayType]) {
-        group.ways.push({ wayCode: way.wayCode, wayName: way.wayName })
-      }
-      groupedWays.value.push(group)
+  groupedWays.value = []
+  for (const wayType in sortedGroupedWays) {
+    const group = {
+      name: getGroupName(wayType),
+      ways: []
     }
-  })
+    for (const way of sortedGroupedWays[wayType]) {
+      group.ways.push({ wayCode: way.wayCode, wayName: way.wayName })
+    }
+    groupedWays.value.push(group)
+  }
 }
 
-// 上传文件成功回调方法，参数fileList为已经上传的文件列表，name是自定义参数
+/**
+ * 上传文件成功回调方法
+ * @param {string} name - 字段名
+ * @param {Array} fileList - 文件列表
+ */
 const uploadSuccess = (name, fileList) => {
   const [firstItem] = fileList
   saveObject[name] = firstItem?.url
 }
 
+/**
+ * 组件挂载时加载支付方式列表
+ */
 onMounted(() => {
   payWayList()
 })
-
-
 </script>
 
 <style lang="less" scoped>
-  .ag-drawer-title {
-    font-size: 16px;
-    font-weight: 600;
-    width: 100%;
-    margin-bottom: 15px;
+.ag-drawer-title {
+  font-size: 16px;
+  font-weight: 600;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.ag-upload-btn {
+  height: 66px;
+}
+
+.m-colorPicker {
+  height: 66px;
+  width: 100%;
+  margin-top: 8px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+
+  :deep(.colorBtn) {
+    height: 48px;
+    width: calc(100% - 16px);
+    margin: 8px;
+    border-radius: 4px;
   }
 
-  .ag-upload-btn {
-    height: 66px;
-    margin-top: 8px;
+  :deep(.box.open) {
+    z-index: 3;
   }
+
+  :deep(.bd h3:nth-of-type(3)) {
+    cursor: pointer;
+  }
+}
+
+.pay-way-group {
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.pay-way-group-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
 </style>

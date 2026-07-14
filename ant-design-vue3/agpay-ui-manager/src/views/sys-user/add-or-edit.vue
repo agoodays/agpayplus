@@ -1,6 +1,6 @@
-﻿<template>
+<template>
   <ag-drawer
-    :open="localOpen"
+    v-model:open="localOpen"
     :title="isAdd ? '新增操作员' : '修改操作员'"
     width="40%"
     :mask-closable="false"
@@ -8,15 +8,14 @@
     :confirm-loading="confirmLoading"
     @confirm="handleConfirm"
     @close="handleClose"
-    @update:open="handleUpdateOpen"
   >
     <a-form
       ref="infoForm"
       :model="saveObject"
       layout="vertical"
       :rules="rules"
-      style="padding-bottom:50px">
-
+      style="padding-bottom:50px"
+    >
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-item label="用户登录名" name="loginUsername">
@@ -70,9 +69,9 @@
           </a-form-item>
         </a-col>
 
-        <a-col :span="10" v-if="saveObject.userType===3">
+        <a-col :span="10" v-if="saveObject.userType === 3">
           <a-form-item label="选择团队" name="teamId">
-            <a-select v-model:value="saveObject.teamId" placeholder="请选择用户类型">
+            <a-select v-model:value="saveObject.teamId" placeholder="请选择团队">
               <a-select-option v-for="d in teamList" :value="d.teamId" :key="d.teamId">
                 {{ d.teamName }}
               </a-select-option>
@@ -80,7 +79,7 @@
           </a-form-item>
         </a-col>
 
-        <a-col :span="10" v-if="saveObject.userType===3">
+        <a-col :span="10" v-if="saveObject.userType === 3">
           <a-form-item label="是否队长" name="isTeamLeader">
             <a-radio-group v-model:value="saveObject.isTeamLeader">
               <a-radio :value="1">是</a-radio>
@@ -91,9 +90,7 @@
       </a-row>
 
       <a-divider orientation="left">
-        <a-tag color="#FF4B33">
-          账户安全
-        </a-tag>
+        <a-tag color="#FF4B33">账户安全</a-tag>
       </a-divider>
 
       <div>
@@ -101,12 +98,8 @@
           <a-col :span="10">
             <a-form-item label="是否发送开通提醒" name="isNotify">
               <a-radio-group v-model:value="saveObject.isNotify">
-                <a-radio :value="0">
-                  否
-                </a-radio>
-                <a-radio :value="1">
-                  是
-                </a-radio>
+                <a-radio :value="0">否</a-radio>
+                <a-radio :value="1">是</a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
@@ -115,18 +108,14 @@
           <a-col :span="10">
             <a-form-item label="密码设置" name="passwordType">
               <a-radio-group v-model:value="saveObject.passwordType">
-                <a-radio value="default">
-                  默认密码
-                </a-radio>
-                <a-radio value="custom">
-                  自定义密码
-                </a-radio>
+                <a-radio value="default">默认密码</a-radio>
+                <a-radio value="custom">自定义密码</a-radio>
               </a-radio-group>
             </a-form-item>
           </a-col>
           <a-col :span="10" v-if="saveObject.passwordType === 'custom'">
             <a-form-item label="登录密码" name="loginPassword">
-              <a-input placeholder="请输入登录密码" v-model:value="saveObject.loginPassword"/>
+              <a-input placeholder="请输入登录密码" v-model:value="saveObject.loginPassword" />
             </a-form-item>
             <a-button :style="{ marginRight: '8px', color: '#4278ff', borderColor: '#4278ff' }" @click="genRandomPassword">
               <template #icon><FileSyncOutlined /></template>
@@ -144,7 +133,7 @@
             </a-form-item>
           </a-col>
           <a-col :span="10">
-            <a-form-item label="" v-if="sysPassword.resetPass">
+            <a-form-item label="" v-if="resetIsShow">
               恢复默认密码：<a-checkbox v-model:checked="sysPassword.defaultPass" @click="isResetPass"></a-checkbox>
             </a-form-item>
           </a-col>
@@ -175,7 +164,6 @@
       </div>
 
     </a-form>
-
   </ag-drawer>
 </template>
 
@@ -191,9 +179,7 @@ import { Base64 } from '@/lib/encrypt'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
 
-/**
- * 组件属性定义
- */
+/** 组件属性定义 */
 const props = defineProps({
   open: { type: Boolean, default: false },
   recordId: { type: String, default: '' },
@@ -201,66 +187,44 @@ const props = defineProps({
   belongInfoId: { type: String, default: '' }
 })
 
-/**
- * 组件事件定义
- */
+/** 组件事件定义 */
 const emit = defineEmits(['update:open', 'success'])
 
-/**
- * 表单引用
- */
+/** 表单引用 */
 const infoForm = ref(null)
 
-/**
- * 是否为新增操作
- */
+/** 是否为新增操作 */
 const isAdd = ref(true)
 
-/**
- * 本地打开状态
- */
+/** 本地打开状态 */
 const localOpen = ref(false)
 
-/**
- * 确认按钮加载状态
- */
+/** 确认按钮加载状态 */
 const confirmLoading = ref(false)
 
-/**
- * 是否显示重置密码选项
- */
+/** 是否显示重置密码选项 */
 const resetIsShow = ref(false)
 
-/**
- * 新密码输入框值
- */
+/** 新密码输入框值 */
 const newPwd = ref('')
 
-/**
- * 团队列表
- */
+/** 团队列表 */
 const teamList = ref([])
 
-/**
- * 用户类型选项列表
- */
+/** 用户类型选项列表 */
 const userTypeOptions = ref([
   { userTypeName: '超级管理员', userType: 1 },
   { userTypeName: '普通操作员', userType: 2 }
 ])
 
-/**
- * 密码相关状态
- */
+/** 密码相关状态 */
 const sysPassword = reactive({
   resetPass: false,
   defaultPass: true,
   confirmPwd: ''
 })
 
-/**
- * 保存表单数据对象
- */
+/** 保存表单数据对象 */
 const saveObject = reactive({
   state: 1,
   sex: 1,
@@ -271,17 +235,13 @@ const saveObject = reactive({
   loginPassword: ''
 })
 
-/**
- * 密码规则配置
- */
+/** 密码规则配置 */
 const passwordRules = reactive({
   regexpRules: '',
   errTips: ''
 })
 
-/**
- * 表单验证规则
- */
+/** 表单验证规则 */
 const rules = reactive({
   realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }],
   userType: [{ required: true, validator: (rule, value, callback) => {
@@ -441,7 +401,6 @@ const resetPassEmpty = () => {
 
 /**
  * 加载用户详情数据
- * @param {string} recordIdParam - 用户ID
  * @returns {void}
  */
 const loadDetail = async () => {
@@ -496,9 +455,7 @@ const loadDetail = async () => {
   }
 }
 
-/**
- * 监听 open 属性变化，加载数据
- */
+/** 监听 open 属性变化，加载数据 */
 watch(() => props.open, (newVal) => {
   localOpen.value = newVal
   if (newVal) {
@@ -506,21 +463,15 @@ watch(() => props.open, (newVal) => {
   }
 }, { immediate: true })
 
-/**
- * 处理open更新事件
- */
-const handleUpdateOpen = (val) => {
-  localOpen.value = val
+/** 监听本地 open 变化，同步 emit */
+watch(localOpen, (val) => {
   emit('update:open', val)
-}
+})
 
-/**
- * 组件挂载时加载密码规则
- */
-onMounted(() => {
-  sysUserApi.queryPwdRulesRegexp().then((res) => {
-    passwordRules.regexpRules = res.regexpRules
-    passwordRules.errTips = res.errTips
-  })
+/** 组件挂载时加载密码规则 */
+onMounted(async () => {
+  const res = await sysUserApi.queryPwdRulesRegexp()
+  passwordRules.regexpRules = res.regexpRules
+  passwordRules.errTips = res.errTips
 })
 </script>

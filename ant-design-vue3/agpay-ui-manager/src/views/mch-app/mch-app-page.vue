@@ -6,21 +6,21 @@
         v-model="searchData"
         :collapsible="false"
         :default-collapsed="false"
+        :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
         @reset="onReset"
       >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-select
+              <ag-select-infinite
                 v-model="searchData.mchNo"
                 label="商户号"
                 placeholder="请选择商户"
                 allow-clear
-                :options="mchOptions"
-                :show-search="true"
-                :filter-option="false"
-                @search="handleSearchMch"
+                search-field="mchName"
+                :fetch-data="searchMch"
+                :field-names="{ label: 'mchName', value: 'mchNo' }"
               />
             </a-form-item>
           </a-col>
@@ -30,7 +30,7 @@
                 v-model="searchData.appId"
                 label="应用AppId"
                 placeholder="请输入应用AppId"
-                :allow-clear="true"
+                allow-clear
               />
             </a-form-item>
           </a-col>
@@ -40,7 +40,7 @@
                 v-model="searchData.appName"
                 label="应用名称"
                 placeholder="请输入应用名称"
-                :allow-clear="true"
+                allow-clear
               />
             </a-form-item>
           </a-col>
@@ -52,9 +52,8 @@
                 placeholder="请选择状态"
                 allow-clear
                 :options="[
-                  { value: '', label: '全部' },
-                  { value: '1', label: '启用' },
-                  { value: '0', label: '禁用' }
+                  { value: '0', label: '禁用' },
+                  { value: '1', label: '启用' }
                 ]"
               />
             </a-form-item>
@@ -65,16 +64,15 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
+        state-key="mch_app_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
-        state-key="mch_app_table_columns"
       >
         <!-- 操作按钮 -->
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_MCH_APP_ADD')" type="primary" @click="handleAdd">
-            <template #icon><PlusOutlined /></template>
-            新建
+            <plus-outlined /> 新增
           </a-button>
         </template>
         
@@ -91,7 +89,7 @@
           />
         </template>
         <template #opSlot="{ record }">
-          <ag-table-actions :max-show-num="4">
+          <ag-table-actions>
             <a-button v-if="hasPermission('ENT_MCH_APP_EDIT')" type="link" size="small" @click="handleEdit(record)">
               修改
             </a-button>
@@ -141,7 +139,7 @@
  * 功能：展示商户应用列表，支持搜索、新增、编辑、删除、配置等操作
  */
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
-import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
@@ -158,11 +156,6 @@ const { t } = useI18n()
  * 权限检查
  */
 const { hasPermission } = usePermission()
-
-/**
- * 商户列表
- */
-const mchList = ref([])
 
 /**
  * 当前商户号
@@ -199,27 +192,19 @@ Object.assign(searchData, {
   state: ''
 })
 
-/**
- * 商户选项（用于下拉选择）
- */
-const mchOptions = computed(() => {
-  return mchList.value.map(item => ({
-    value: item.mchNo,
-    label: item.mchName
-  }))
-})
+
 
 /**
  * 表格列定义
  */
 const tableColumns = [
-  { key: 'appId', dataIndex: 'appId', title: '应用AppId', width: 320, fixed: 'left', customRender: 'appIdSlot' },
+  { key: 'appId', dataIndex: 'appId', title: '应用AppId', width: 230, fixed: 'left', customRender: 'appIdSlot' },
   { key: 'appName', dataIndex: 'appName', title: '应用名称', width: 200 },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
   { key: 'state', dataIndex: 'state', title: '状态', width: 80, customRender: 'stateSlot' },
   { key: 'defaultFlag', dataIndex: 'defaultFlag', title: '默认应用', width: 100, customRender: 'defaultFlagSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
-  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
@@ -258,24 +243,14 @@ const reqTableDataFunc = async (params) => {
 }
 
 /**
- * 搜索商户
+ * 搜索商户（用于 ag-select-infinite 组件）
+ * @param {Object} params - 搜索参数
+ * @param {Number} params.pageNumber - 页码
+ * @param {Number} params.pageSize - 每页大小
+ * @param {String} params.mchName - 商户名称（通过 search-field 指定）
+ * @returns {Promise<Object>} 商户列表
  */
-const handleSearchMch = async (keyword) => {
-  if (!keyword) {
-    mchList.value = []
-    return
-  }
-
-  try {
-    const res = await mchAppApi.queryMchPage({
-      mchName: keyword,
-      pageSize: 20
-    })
-    mchList.value = res.records || []
-  } catch (error) {
-    console.error('搜索商户失败:', error)
-  }
-}
+const searchMch = (params) => mchAppApi.queryMchPage(params)
 
 /**
  * 搜索函数
@@ -296,7 +271,7 @@ const onReset = () => {
 }
 
 /**
- * 新建应用
+ * 新增应用
  */
 const handleAdd = () => {
   currentMchNo.value = searchData.mchNo || ''

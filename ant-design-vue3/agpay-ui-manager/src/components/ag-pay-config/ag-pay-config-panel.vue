@@ -115,11 +115,11 @@
             <!-- 列表渲染 -->
             <ag-table
               ref="infoTableRef"
+              row-key="wayCode"
               :on-load="reqTableDataFunc"
               :columns="tableColumns"
-              :params="searchData"
+              :search-data="searchData"
               :row-selection="rowSelection"
-              row-key="wayCode"
             >
               <template #stateSlot="{ record }">
                 <a-badge
@@ -133,10 +133,10 @@
             <!-- 列表渲染 -->
             <ag-table
               ref="passageInfoTableRef"
+              row-key="ifCode"
               :on-load="reqPassageTableDataFunc"
               :columns="passageTableColumns"
-              :params="passageSearchData"
-              row-key="ifCode"
+              :search-data="passageSearchData"
             >
               <template #ifNameSlot="{ record }">
                 <div class="if-name">

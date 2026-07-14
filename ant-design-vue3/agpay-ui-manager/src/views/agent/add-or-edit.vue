@@ -50,12 +50,13 @@
         </a-col>
         <a-col :span="10">
           <a-form-item label="上级代理商号" name="pid">
-            <ag-select
+            <ag-select-infinite
               v-model="saveObject.pid"
-              :api="searchAgent"
-              value-field="agentNo"
-              label-field="agentName"
+              allow-clear
               placeholder="代理商号（搜索代理商名称）"
+              search-field="agentName"
+              :fetch-data="searchAgent"
+              :field-names="{ label: 'agentName', value: 'agentNo' }"
               :disabled="!isAdd"
               @change="pidChange"
             />
@@ -63,12 +64,13 @@
         </a-col>
         <a-col :span="10">
           <a-form-item label="服务商号" name="isvNo">
-            <ag-select
+            <ag-select-infinite
               v-model="saveObject.isvNo"
-              :api="searchIsv"
-              value-field="isvNo"
-              label-field="isvName"
+              allow-clear
               placeholder="服务商号（搜索服务商名称）"
+              search-field="isvName"
+              :fetch-data="searchIsv"
+              :field-names="{ label: 'isvName', value: 'isvNo' }"
               :disabled="!isAdd || saveObject.pid?.length > 0"
             />
           </a-form-item>
@@ -401,7 +403,7 @@
 import { agentApi } from '@/api/business/agent/agent-api'
 import { isvApi } from '@/api/business/isv/isv-api'
 import { basicApi } from '@/api/system/basic-api'
-import { AgDrawer, AgSelect, AgUpload } from '@/components'
+import { AgDrawer, AgSelectInfinite, AgUpload } from '@/components'
 import { upload } from '@/lib/ag-axios'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
@@ -802,7 +804,7 @@ watch(
 /** 上级代理商变更处理 */
 function pidChange(val, selected) {
   if (selected) {
-    saveObject.value.isvNo = selected?.isvNo
+    saveObject.value.isvNo = selected?.isvNo || ''
   }
 }
 
@@ -849,28 +851,6 @@ loadPwdRules()
 </script>
 
 <style lang="less">
-.agpay-tip-text:before {
-  content: '';
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-bottom-color: var(--warning-color);
-  position: absolute;
-  top: -20px;
-  left: 30px;
-}
-.agpay-tip-text {
-  font-size: 12px !important;
-  border-radius: 5px;
-  background: var(--warning-color);
-  color: var(--text-on-primary) !important;
-  padding: 5px 10px;
-  display: inline-block;
-  max-width: 100%;
-  position: relative;
-  margin-top: 15px;
-  line-height: 1.5715;
-}
 .cashout-fee {
   display: flex;
   margin-bottom: 8px;

@@ -29,10 +29,11 @@
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/store/modules/system/user'
-import { upload } from '@/lib/ag-axios'
+import { upload, uploadFile } from '@/lib/ag-axios'
 import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
 import { UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { viewerApi } from '@/utils/viewer-api'
 
 const { t } = useI18n()
 
@@ -127,36 +128,24 @@ function handleChange(info) {
   }
 }
 
-function customRequest({ file, onSuccess, onError }) {
+/**
+ * 自定义上传请求处理
+ * @param {Object} options - 上传选项
+ * @param {File} options.file - 文件对象
+ * @param {Function} options.onSuccess - 成功回调
+ * @param {Function} options.onError - 失败回调
+ */
+async function customRequest({ file, onSuccess, onError }) {
   loading.value = true
-  upload
-    .getFormParams(props.action, file.name, file.size)
-    .then((res) => {
-      const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
-      const formParams = isLocalFile
-        ? res.formParams
-        : {
-            OSSAccessKeyId: res.formParams.ossAccessKeyId,
-            key: res.formParams.key,
-            Signature: res.formParams.signature,
-            policy: res.formParams.policy,
-            success_action_status: res.formParams.successActionStatus
-          }
-      const data = Object.assign(formParams, { file: file })
-      const formActionUrl = isLocalFile ? props.action : res.formActionUrl
-      upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
-        loading.value = false
-        const ossFileUrl = isLocalFile ? response : res.ossFileUrl
-        fileList.value = getDefaultFileList([ossFileUrl])
-        onSuccess({ code: 0, msg: 'SUCCESS', data: ossFileUrl })
-      }).catch((error) => {
-        loading.value = false
-        onError(error)
-      })
-    })
-    .catch(() => {
-      loading.value = false
-    })
+  try {
+    const ossFileUrl = await uploadFile(props.action, file)
+    loading.value = false
+    fileList.value = getDefaultFileList([ossFileUrl])
+    onSuccess({ code: 0, msg: 'SUCCESS', data: ossFileUrl })
+  } catch (error) {
+    loading.value = false
+    onError(error)
+  }
 }
 
 function isAssetTypeAnImage(fileName, fileType) {
@@ -176,8 +165,11 @@ function isAssetTypeAnImage(fileName, fileType) {
 
 function handlePreview(info) {
   if (isAssetTypeAnImage(info.url, info.type)) {
-    import('viewerjs').then(({ default: Viewer }) => {
-      new Viewer(info)
+    viewerApi({
+      images: [info.url],
+      options: {
+        initialViewIndex: 0
+      }
     })
   }
 }

@@ -1,10 +1,11 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
       <ag-search
         v-model="searchData"
         :collapsible="false"
+        :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
         @reset="onReset"
       >
@@ -15,6 +16,7 @@
                 v-model:value="searchData.sysType"
                 label="系统类型"
                 placeholder="选择系统菜单"
+                allow-clear
                 :options="[
                   { value: 'MGR', label: '显示菜单-运营平台' },
                   { value: 'AGENT', label: '显示菜单-代理商系统' },
@@ -40,13 +42,13 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
+        state-key="ent_table_columns"
         :columns="tableColumns"
         :show-auto-refresh="true"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
         :pagination="false"
         :scroll-x="1450"
-        state-key="ent_table_columns"
       >
         <!-- 状态列自定义渲染 -->
         <template #stateSlot="{ record }">
@@ -59,7 +61,7 @@
 
         <!-- 操作列 -->
         <template #opSlot="{ record }">
-          <ag-table-actions :max-show-num="3">
+          <ag-table-actions>
             <a-button
               v-if="hasPermission('ENT_UR_ROLE_ENT_EDIT')"
               type="link"

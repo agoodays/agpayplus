@@ -26,62 +26,89 @@
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="ifCode"
+        state-key="channel_count_table_columns"
         :on-load="reqTableDataFunc"
         :on-download="reqDownloadDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
         :initial-statistics="countInitData"
-        row-key="ifCode"
         :show-download="true"
         :enable-statistics="true"
       >
-        <template #statistics="{ data }">
-          <div class="data-statistics" style="background: rgb(250, 250, 250)">
+        <template #statistics="{ data: statistics }">
+          <div class="data-statistics">
             <div class="statistics-list">
-              <div class="item">
-                <div class="title">总交易金额</div>
-                <div class="amount" style="color: rgb(26, 102, 255)">
-                  <span class="amount-num">{{ data.payAmount.toFixed(2) }}</span>
+              <div class="item item-primary">
+                <div class="icon-wrapper">
+                  <WalletOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">
+                    总交易金额
+                    <a-tooltip title="支付成功的交易总金额，包含已退款和未退款的交易">
+                      <InfoCircleOutlined class="info-icon" />
+                    </a-tooltip>
+                  </div>
+                  <div class="amount">
+                    <span class="amount-num">{{ ((statistics?.payAmount || 0) / 100).toFixed(2) }}</span>
+                    <span class="amount-unit">元</span>
+                  </div>
                 </div>
               </div>
-              <div class="item">
-                <div class="line"></div>
-                <div class="title"></div>
-              </div>
-              <div class="item">
-                <div class="title">总交易笔数</div>
-                <div class="amount">
-                  <span class="amount-num">{{ data.payCount }}</span>
+              <div class="item item-transaction">
+                <div class="icon-wrapper">
+                  <TransactionOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">交易笔数</div>
+                  <div class="amount">
+                    <span class="amount-num">{{ (statistics?.payCount || 0) }}</span>
+                    <span class="amount-unit">笔</span>
+                  </div>
                 </div>
               </div>
-              <div class="item">
-                <div class="line"></div>
-                <div class="title"></div>
-              </div>
-              <div class="item">
-                <div class="title">退款金额</div>
-                <div class="amount">
-                  <span class="amount-num">{{ data.refundAmount.toFixed(2) }}</span>
+              <div class="item item-warning">
+                <div class="icon-wrapper">
+                  <DollarOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">手续费金额</div>
+                  <div class="amount">
+                    <span class="amount-num">{{ ((statistics?.fee || 0) / 100).toFixed(2) }}</span>
+                    <span class="amount-unit">元</span>
+                  </div>
                 </div>
               </div>
-              <div class="item">
-                <div class="line"></div>
-                <div class="title"></div>
-              </div>
-              <div class="item">
-                <div class="title">退款笔数</div>
-                <div class="amount">
-                  <span class="amount-num">{{ data.refundCount }}</span>
+              <div class="item item-error">
+                <div class="icon-wrapper">
+                  <UndoOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">退款订单</div>
+                  <div class="amount">
+                    <span class="amount-num">{{ ((statistics?.refundAmount || 0) / 100).toFixed(2) }}</span>
+                    <span class="amount-unit">元</span>
+                  </div>
+                  <div class="detail">
+                    <span>{{ (statistics?.refundCount || 0) }}笔</span>
+                  </div>
                 </div>
               </div>
-              <div class="item">
-                <div class="line"></div>
-                <div class="title"></div>
-              </div>
-              <div class="item">
-                <div class="title">支付成功率</div>
-                <div class="amount" style="color: rgb(250, 173, 20)">
-                  <span class="amount-num">{{ (data.round * 100).toFixed(2) }}%</span>
+              <div class="item item-success-rate">
+                <div class="icon-wrapper">
+                  <TrophyOutlined />
+                </div>
+                <div class="content">
+                  <div class="title">
+                    支付成功率
+                    <a-tooltip title="交易成功总笔数占总订单数的百分比">
+                      <InfoCircleOutlined class="info-icon" />
+                    </a-tooltip>
+                  </div>
+                  <div class="amount">
+                    <span class="amount-num">{{ ((statistics?.round || 0) * 100).toFixed(2) }}%</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -174,12 +201,19 @@
   </div>
 </template>
 <script setup>
-import { InfoCircleOutlined } from '@ant-design/icons-vue'
+import {
+  DollarOutlined,
+  InfoCircleOutlined,
+  TransactionOutlined,
+  TrophyOutlined,
+  UndoOutlined,
+  WalletOutlined
+} from '@ant-design/icons-vue'
 const icons = { InfoCircleOutlined }
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
 import { reactive, ref } from 'vue'
-import { downloadExcel } from '@/lib/ag-axios'
+import { downloadFile } from '@/lib/ag-axios'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -219,8 +253,8 @@ const countInitData = {
 
 const reqTableDataFunc = (params) => statisticApi.queryOrderStatistic(params)
 
-const reqDownloadDataFunc = (params) => {
-  downloadExcel(statisticApi.exportExcel(params), '通道交易统计.xlsx')
+const reqDownloadDataFunc = async (params) => {
+  await downloadFile(statisticApi.exportExcel(params), '通道交易统计.xlsx')
 }
 
 const searchFunc = () => {
@@ -229,70 +263,12 @@ const searchFunc = () => {
 }
 </script>
 <style lang="less" scoped>
-.order-list {
-  -webkit-text-size-adjust: none;
-  font-size: 12px;
-  display: flex;
-  flex-direction: column;
-
-  p {
-    white-space: nowrap;
-    span {
-      display: inline-block;
-      font-weight: 800;
-      height: 16px;
-      line-height: 16px;
-      width: 35px;
-      border-radius: 5px;
-      text-align: center;
-      margin-right: 2px;
-    }
-  }
-}
-
-.modal-title,
-.modal-describe {
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-.modal-title {
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.close {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  border-top: 1px solid #efefef;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 0;
-}
-
-.icon-style {
-  border-radius: 5px;
-  padding-left: 2px;
-  padding-right: 2px;
-}
-
-.icon {
-  width: 15px;
-  height: 14px;
-  margin-bottom: 3px;
-}
-
 .data-statistics {
-  margin: 0 30px 10px;
-  padding: 28px 0 32px;
-  border-radius: 3px;
-  border: 1px solid #ebebeb;
+  padding: 24px 0;
+  border-radius: 8px;
   transform: translateY(-10px);
+  background: var(--layout-surface);
+  border: 1px solid var(--border-color);
 }
 
 .statistics-list {
@@ -301,38 +277,148 @@ const searchFunc = () => {
   justify-content: space-around;
 }
 
-.statistics-list .item .title {
-  color: gray;
-  margin-bottom: 10px;
-}
+.statistics-list .item {
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
 
-.statistics-list .item .amount {
-  margin-bottom: 10px;
-  max-width: 150px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+  .icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
 
-.statistics-list .item .amount .amount-num {
-  padding-right: 3px;
-  font-weight: 600;
-  font-size: 20px;
-}
+  .content {
+    display: flex;
+    flex-direction: column;
 
-.statistics-list .item .symbol {
-  padding-right: 3px;
-}
+    .title {
+      color: var(--text-color-weak);
+      font-size: 13px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
 
-.statistics-list .item .detail-text {
-  color: rgb(26, 102, 255);
-  padding-left: 5px;
-  cursor: pointer;
+      .info-icon {
+        font-size: 12px;
+        margin-left: 4px;
+        cursor: help;
+      }
+    }
+
+    .amount {
+      display: flex;
+      align-items: baseline;
+
+      .amount-num {
+        font-weight: 600;
+        font-size: 22px;
+        margin-right: 4px;
+      }
+
+      .amount-unit {
+        font-size: 12px;
+        color: var(--text-color-muted);
+      }
+    }
+
+    .detail {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-color-muted);
+
+      .detail-text {
+        color: var(--primary-color);
+        padding-left: 8px;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  &.item-primary {
+    .icon-wrapper {
+      background: rgba(26, 102, 255, 0.1);
+      color: rgb(26, 102, 255);
+    }
+    .amount .amount-num {
+      color: rgb(26, 102, 255);
+    }
+  }
+
+  &.item-transaction {
+    .icon-wrapper {
+      background: rgba(26, 189, 159, 0.1);
+      color: rgb(26, 189, 159);
+    }
+    .amount .amount-num {
+      color: var(--text-color);
+    }
+  }
+
+  &.item-warning {
+    .icon-wrapper {
+      background: rgba(250, 173, 20, 0.1);
+      color: rgb(250, 173, 20);
+    }
+    .amount .amount-num {
+      color: rgb(250, 173, 20);
+    }
+  }
+
+  &.item-error {
+    .icon-wrapper {
+      background: rgba(255, 77, 79, 0.1);
+      color: rgb(255, 77, 79);
+    }
+    .amount .amount-num {
+      color: rgb(255, 77, 79);
+    }
+  }
+
+  &.item-success-rate {
+    .icon-wrapper {
+      background: rgba(250, 173, 20, 0.1);
+      color: rgb(250, 173, 20);
+    }
+    .amount .amount-num {
+      color: rgb(250, 173, 20);
+    }
+  }
 }
 
 .statistics-list .line {
   width: 1px;
-  height: 100%;
-  border-right: 1px solid #efefef;
+  height: 40px;
+  border-right: 1px solid var(--border-color);
+  margin: auto 0;
+}
+
+:root[data-theme='dark'] {
+  :deep(.data-statistics) {
+    background: var(--layout-surface);
+    border-color: var(--border-color);
+  }
+
+  :deep(.statistics-list .item .title) {
+    color: var(--text-color-weak);
+  }
+
+  :deep(.statistics-list .item .detail-text) {
+    color: var(--primary-color);
+  }
+
+  :deep(.statistics-list .line) {
+    border-color: var(--border-color);
+  }
 }
 </style>

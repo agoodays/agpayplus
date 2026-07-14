@@ -1,11 +1,13 @@
 import { message } from 'ant-design-vue'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 export function useTableData({ props, state, emit, t }) {
   const internalData = ref([])
   const localLoading = ref(false)
   const latestLoadRequestId = ref(0)
   const latestStatisticsRequestId = ref(0)
+
+  const isLoading = ref(false)
 
   function safeCallHook(hook, payload) {
     if (typeof hook !== 'function') return undefined
@@ -53,6 +55,10 @@ export function useTableData({ props, state, emit, t }) {
   const isPaginationControlled = computed(() => typeof props.pagination === 'object' && props.pagination !== null)
 
   const computedLoading = computed(() => props.loading || localLoading.value)
+
+  watch(computedLoading, (val) => {
+    isLoading.value = val
+  }, { immediate: true })
 
   const tableData = computed(() => ({
     records: props.data && props.data.length ? props.data : internalData.value,
@@ -336,6 +342,7 @@ export function useTableData({ props, state, emit, t }) {
   return {
     isPaginationControlled,
     computedLoading,
+    isLoading,
     tableData,
     paginationConfig,
     reload,

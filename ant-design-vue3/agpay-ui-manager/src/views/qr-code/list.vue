@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
@@ -6,30 +6,34 @@
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-date-range-picker v-model:value="searchData.queryDateRange" />
+              <ag-date-range-picker 
+                v-model:value="searchData.queryDateRange"
+                label="创建时间"
+                placeholder="请选择创建时间"
+                allow-clear />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-select
+              <ag-select-infinite
                 v-model="searchData.agentNo"
-                :api="searchAgent"
-                value-field="agentNo"
-                label-field="agentName"
                 label="代理商号"
                 placeholder="请输入代理商号"
+                search-field="agentName"
+                :fetch-data="searchAgent"
+                :field-names="{ label: 'agentName', value: 'agentNo' }"
               />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-select
+              <ag-select-infinite
                 v-model="searchData.mchNo"
-                :api="searchMch"
-                value-field="mchNo"
-                label-field="mchName"
                 label="商户号"
                 placeholder="请输入商户号"
+                search-field="mchName"
+                :fetch-data="searchMch"
+                :field-names="{ label: 'mchName', value: 'mchNo' }"
               />
             </a-form-item>
           </a-col>
@@ -49,15 +53,15 @@
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="qrcId"
+        state-key="qr_code_table_columns"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
-        :params="searchData"
-        row-key="qrcId"
+        :search-data="searchData"
       >
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_DEVICE_QRC_ADD')" type="primary" @click="addFunc">
-            <template #icon><PlusOutlined /></template>
-            生成二维码
+            <plus-outlined /> 新增
           </a-button>
         </template>
         <template #qrcIdSlot="{ record }">
@@ -120,13 +124,14 @@
  */
 import { ExclamationCircleOutlined, PlusOutlined, QrcodeOutlined } from '@ant-design/icons-vue'
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgSelectInfinite, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
 import Bind from './bind.vue'
 import { message } from 'ant-design-vue'
+import { viewerApi } from '@/utils/viewer-api'
 
 const icons = { ExclamationCircleOutlined, QrcodeOutlined }
 
@@ -145,7 +150,7 @@ const tableColumns = [
   { key: 'state', title: '状态', width: 80, customRender: 'stateSlot' },
   { key: 'fixedPayAmount', title: '固定金额', width: 120, customRender: 'fixedPayAmountSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
@@ -207,7 +212,6 @@ const reloadTable = () => {
  * @param {boolean} isToFirst - 是否跳转到第一页
  */
 const searchFunc = (isToFirst = false) => {
-  loading.value = true
   tableRef.value?.reload(isToFirst)
 }
 
@@ -218,7 +222,7 @@ const searchFunc = (isToFirst = false) => {
 const onPreview = async (recordId) => {
   try {
     const res = await qrcApi.viewQrc(recordId)
-    window.$viewerApi({
+    viewerApi({
       images: [res],
       options: {
         initialViewIndex: 0

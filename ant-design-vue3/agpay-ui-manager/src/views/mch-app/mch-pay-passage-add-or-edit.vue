@@ -118,31 +118,36 @@ watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
-const refCardList = () => {
-  mchAppApi.getAvailablePayInterfaceList(props.appId, props.wayCode).then(resData => {
-    if (!resData.records || resData.records.length === 0) {
-      cardList.value = []
-      return
-    }
-    const newItems = []
-    resData.records.forEach(item => {
-      newItems.push({
-        passageId: item.passageId ? item.passageId : '',
-        ifCode: item.ifCode,
-        ifName: item.ifName,
-        icon: item.icon,
-        bgColor: item.bgColor,
-        rate: item.rate,
-        state: item.state === 1,
-        error: '',
-        help: ''
-      })
+/**
+ * 加载支付通道卡片列表
+ */
+const refCardList = async () => {
+  const resData = await mchAppApi.getAvailablePayInterfaceList(props.appId, props.wayCode)
+  if (!resData.records || resData.records.length === 0) {
+    cardList.value = []
+    return
+  }
+  const newItems = []
+  resData.records.forEach(item => {
+    newItems.push({
+      passageId: item.passageId ? item.passageId : '',
+      ifCode: item.ifCode,
+      ifName: item.ifName,
+      icon: item.icon,
+      bgColor: item.bgColor,
+      rate: item.rate,
+      state: item.state === 1,
+      error: '',
+      help: ''
     })
-    cardList.value = newItems
   })
+  cardList.value = newItems
 }
 
-const handleOkFunc = () => {
+/**
+ * 保存支付通道配置
+ */
+const handleOkFunc = async () => {
   const reqParams = []
   let hasError = false
 
@@ -175,11 +180,14 @@ const handleOkFunc = () => {
 
   if (hasError) return
 
-  mchAppApi.queryMchPayPassagePage({ reqParams: JSON.stringify(reqParams) }).then(() => {
+  try {
+    await mchAppApi.queryMchPayPassagePage({ reqParams: JSON.stringify(reqParams) })
     message.success('保存成功')
     localOpen.value = false
     emit('success')
-  })
+  } catch (error) {
+    console.error('保存失败:', error)
+  }
 }
 
 /** 处理关闭 */

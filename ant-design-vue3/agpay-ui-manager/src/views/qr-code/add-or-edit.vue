@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ag-drawer
     v-model:open="localOpen"
     :mask-closable="false"
@@ -16,7 +16,7 @@
       :rules="rules"
     >
       <a-row :gutter="16">
-        <a-col v-if="isAdd" :span="10">
+        <a-col v-if="isAdd" :span="14">
           <a-form-item label="批次号" name="batchId">
             <a-input-number v-model:value="saveObject.batchId" style="width: 70%; margin-right: 20px" />
             <a-button type="primary" size="small" @click="onToday">今天</a-button>
@@ -95,6 +95,7 @@
               <a-radio :value="'h5'">固定H5页面</a-radio>
               <a-radio :value="'lite'">固定小程序页面</a-radio>
             </a-radio-group>
+            <br/>
             <p class="agpay-tip-text">选择[默认/H5/小程序]任意一种后不可修改，请谨慎选择。</p>
           </a-form-item>
         </a-col>
@@ -115,6 +116,7 @@
               <a-radio :value="'ALI_JSAPI'">ALI_JSAPI</a-radio>
               <a-radio :value="'ALI_WAP'">ALI_WAP</a-radio>
             </a-radio-group>
+            <br/>
             <p class="agpay-tip-text">仅H5呈现时生效</p>
           </a-form-item>
         </a-col>
@@ -132,6 +134,7 @@ import { QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
+import { viewerApi } from '@/utils/viewer-api'
 
 const icons = { QuestionCircleOutlined }
 
@@ -318,7 +321,7 @@ const handleConfirm = async () => {
  * @param {string} url - 图片URL
  */
 const onPreview = (url) => {
-  window.$viewerApi({
+  viewerApi({
     images: [url],
     options: {
       initialViewIndex: 0
@@ -338,28 +341,5 @@ const onPreview = (url) => {
   width: 18.37px;
   height: 26px;
   margin-bottom: 3px;
-}
-
-.agpay-tip-text:before {
-  content: '';
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-bottom-color: var(--warning-color);
-  position: absolute;
-  top: -20px;
-  left: 30px;
-}
-.agpay-tip-text {
-  font-size: 12px !important;
-  border-radius: 5px;
-  background: var(--warning-color);
-  color: var(--text-on-primary) !important;
-  padding: 5px 10px;
-  display: inline-block;
-  max-width: 100%;
-  position: relative;
-  margin-top: 15px;
-  line-height: 1.5715;
 }
 </style>

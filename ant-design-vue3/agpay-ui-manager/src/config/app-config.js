@@ -66,7 +66,6 @@ export const asyncRouteDefine = {
   SysUserTeamPage: { defaultPath: '/teams', component: () => import('@/views/sys-user-team/team-list-page.vue') },
   RolePage: { defaultPath: '/roles', component: () => import('@/views/role/role-list-page.vue') },
   EntPage: { defaultPath: '/ents', component: () => import('@/views/ent/ent-page.vue') },
-  PayWayPage: { defaultPath: '/payways', component: () => import('@/views/pay-config/pay-config-page.vue') },
   QrCodePage: { defaultPath: '/qrc', component: () => import('@/views/qr-code/list.vue') },
   QrCodeShellPage: { defaultPath: '/shell', component: () => import('@/views/qr-code/shell/list.vue') },
   IsvListPage: { defaultPath: '/isv', component: () => import('@/views/isv/isv-list-page.vue') }, // 服务商列表
@@ -75,9 +74,10 @@ export const asyncRouteDefine = {
   MchListPage: { defaultPath: '/mch', component: () => import('@/views/mch/mch-list-page.vue') }, // 商户列表
   MchAppPage: { defaultPath: '/apps', component: () => import('@/views/mch-app/mch-app-page.vue') }, // 商户应用列表
   MchStorePage: { defaultPath: '/store', component: () => import('@/views/mch-store/mch-store-page.vue') }, // 商户门店列表
-  PayOrderListPage: { defaultPath: '/payOrder', component: () => import('@/views/order/pay-order-page.vue') }, // 支付订单列表
-  RefundOrderListPage: { defaultPath: '/refundOrder', component: () => import('@/views/order/refund-order-page.vue') }, // 退款订单列表
-  TransferOrderListPage: { defaultPath: '/transferOrder', component: () => import('@/views/order/transfer-order-page.vue') }, // 转账订单
+  MchNotifyListPage: { defaultPath: '/notify', component: () => import('@/views/order/notify/mch-notify-page.vue') }, // 商户通知列表
+  PayOrderListPage: { defaultPath: '/payOrder', component: () => import('@/views/order/pay/pay-order-page.vue') }, // 支付订单列表
+  RefundOrderListPage: { defaultPath: '/refundOrder', component: () => import('@/views/order/refund/refund-order-page.vue') }, // 退款订单列表
+  TransferOrderListPage: { defaultPath: '/transferOrder', component: () => import('@/views/order/transfer/transfer-order-page.vue') }, // 转账订单
   TransactionPage: { defaultPath: '/statistic/transaction', component: () => import('@/views/statistic/transaction/transaction-page.vue') }, // 交易报表
   MchCountPage: { defaultPath: '/statistic/mch', component: () => import('@/views/statistic/mch/mch-count-page.vue') }, // 商户统计
   AgentCountPage: { defaultPath: '/statistic/agent', component: () => import('@/views/statistic/agent/agent-count-page.vue') }, // 代理商统计
@@ -88,12 +88,11 @@ export const asyncRouteDefine = {
   DivisionRecordPage: { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/division-record-page.vue') }, // 分账记录
   SysConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') }, // 系统配置
   NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/notice/notice-list-page.vue') }, // 公告管理
-
-  // 兼容后端遗留 componentName（Vue2 -> Vue3 迁移期间）
-  IfDefinePage: { defaultPath: '/ifdefines', component: () => import('@/views/pay-config/pay-config-page.vue') },
+  IfDefinePage: { defaultPath: '/ifdefines', component: () => import('@/views/pay-config/pay-if-define/list.vue') },
+  PayWayPage: { defaultPath: '/payways', component: () => import('@/views/pay-config/pay-way/list.vue') },
   SysUserPage: { defaultPath: '/users', component: () => import('@/views/sys-user/sys-user-page.vue') },
   MchConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') },
-  MchNotifyListPage: { defaultPath: '/notify', component: () => import('@/views/notice/notice-list-page.vue') },
+  NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/notice/notice-list-page.vue') },
   PlatformProfitPage: { defaultPath: '/platformProfits', component: () => import('@/views/statistic/agent/agent-count-page.vue') },
   SysLogPage: { defaultPath: '/log', component: () => import('@/views/sys/sys-log.vue') }
 }

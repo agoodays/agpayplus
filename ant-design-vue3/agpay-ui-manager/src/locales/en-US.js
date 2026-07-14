@@ -63,7 +63,9 @@ export default {
     logout: 'Logout',
     confirmLogoutTitle: 'Confirm Logout',
     confirmLogoutContent: 'Hi {name}, are you sure you want to log out?',
-    footerCopyright: 'Copyright ©2023-{year} AgPay | Agooday'
+    footerCopyright: 'Copyright ©2023-{year} AgPay | Agooday',
+    switchDarkMode: 'Switch to dark mode',
+    switchLightMode: 'Switch to light mode'
   },
   userLayout: {
     footerCopyright: 'Copyright ©2023-{year} Agooday. All rights reserved.',
@@ -79,6 +81,7 @@ export default {
     delete: 'Delete',
     confirmDelete: 'Confirm deletion?',
     scrollLoadMore: 'Scroll to load more',
+    noMoreData: 'No more data available',
     searching: 'Searching...'
   },
   common: {

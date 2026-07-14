@@ -1,13 +1,13 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
-      <ag-search v-if="hasPermission('ENT_UR_USER_SEARCH')" v-model="searchData" :search-loading="loading" @search="searchFunc">
+      <ag-search v-if="hasPermission('ENT_UR_USER_SEARCH')" v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.sysType"
+                v-model="searchData.sysType"
                 label="所属系统"
                 placeholder="请选择所属系统"
                 allow-clear
@@ -37,7 +37,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.userType"
+                v-model="searchData.userType"
                 label="用户类型"
                 placeholder="请选择用户类型"
                 allow-clear
@@ -51,16 +51,16 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
+        row-key="sysUserId"
+        state-key="sys_user_table_columns"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
-        row-key="sysUserId"
       >
         <!-- 工具栏左侧 -->
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_UR_USER_ADD')" type="primary" @click="addFunc">
-            <template #icon><PlusOutlined /></template>
-            新建
+            <plus-outlined /> 新增
           </a-button>
         </template>
 
@@ -168,21 +168,19 @@
  * 系统用户列表页面组件
  * 功能：展示系统用户列表、搜索、新增、编辑、删除、状态切换、分配角色等操作
  */
-
 import { CopyOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
 import { AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { reactive, ref } from 'vue'
-import { message, Modal } from 'ant-design-vue'
+import { ref } from 'vue'
+import { message } from 'ant-design-vue'
+import { infoBox } from '@/utils/info-box'
 import AddOrEdit from './add-or-edit.vue'
 import InviteCode from './invite-code.vue'
 import RoleDist from './role-dist.vue'
 
-/**
- * 权限检查
- */
+/** 权限检查 */
 const { hasPermission } = usePermission()
 
 /**
@@ -197,38 +195,22 @@ const userTypeList = [
 ]
 
 /**
- * 默认查询条件
- */
-const defaultSearchData = {
-  userType: '',
-  sysType: 'MGR'
-}
-
-/**
  * 用户类型选项
  */
-const userTypeOptions = userTypeList
+const userTypeOptions = userTypeList.map(item => ({
+  label: item.userTypeName,
+  value: item.userType
+}))
 
-/**
- * 加载状态
- */
-const loading = ref(false)
-
-/**
- * 当前所属信息ID（用于编辑）
- */
+/** 当前所属信息ID（用于编辑） */
 const currentBelongInfoId = ref('')
 
-/**
- * 邀请码弹窗状态
- */
+/** 邀请码弹窗状态 */
 const inviteCodeOpen = ref(false)
 const currentInviteCode = ref('')
 const currentSysType = ref('')
 
-/**
- * 角色分配弹窗状态
- */
+/** 角色分配弹窗状态 */
 const roleDistOpen = ref(false)
 const currentRoleDistId = ref('')
 const currentRoleDistSysType = ref('')
@@ -254,10 +236,9 @@ const {
   deleteSuccessMessage: '删除成功！'
 })
 
-/**
- * 初始化搜索数据
- */
-Object.assign(searchData, defaultSearchData)
+// 初始化搜索数据
+searchData.userType = ''
+searchData.sysType = 'MGR'
 
 /**
  * 表格列配置
@@ -312,14 +293,19 @@ const getSysTypeText = (sysType) => {
  * 复制邀请码到剪贴板
  * @param {string} text - 邀请码
  */
-const copyFunc = (text) => {
-  const el = document.createElement('input')
-  el.setAttribute('value', text)
-  document.body.appendChild(el)
-  el.select()
-  document.execCommand('copy')
-  document.body.removeChild(el)
-  message.success('邀请码已复制')
+const copyFunc = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    message.success('邀请码已复制')
+  } catch (err) {
+    const el = document.createElement('input')
+    el.setAttribute('value', text)
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+    message.success('邀请码已复制')
+  }
 }
 
 /**
@@ -382,15 +368,10 @@ const editFunc = (recordId, sysType, belongInfoId) => {
  * @param {string} recordId - 用户ID
  */
 const relieveFunc = async (recordId) => {
-  Modal.confirm({
-    title: '确认解除吗？',
-    content: '',
-    okType: 'danger',
-    async onOk() {
-      await sysUserApi.relieveLoginLimit(recordId)
-      message.success('解除成功！')
-      reloadTable()
-    }
+  infoBox.confirmPrimary('确认解除吗？', '', async () => {
+    await sysUserApi.relieveLoginLimit(recordId)
+    message.success('解除成功！')
+    reloadTable()
   })
 }
 
@@ -424,24 +405,9 @@ const updateState = async (recordId, state) => {
   const title = state === 1 ? '确认[启用]该用户？' : '确认[停用]该用户？'
   const content = state === 1 ? '启用后用户可进行登陆等一系列操作' : '停用后该用户将立即退出系统并不可再次登陆'
 
-  return new Promise((resolve, reject) => {
-    Modal.confirm({
-      title,
-      content,
-      okType: 'danger',
-      async onOk() {
-        try {
-          await sysUserApi.updateStateById(recordId, { state })
-          reloadTable()
-          resolve()
-        } catch (err) {
-          reject(err)
-        }
-      },
-      onCancel() {
-        reject(new Error())
-      }
-    })
+  infoBox.confirmPrimary(title, content, async () => {
+    await sysUserApi.updateStateById(recordId, { state })
+    reloadTable()
   })
 }
 

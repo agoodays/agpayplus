@@ -1,11 +1,11 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
       <ag-search
         v-model="searchData"
         :collapsible="true"
-        :default-collapsed="false"
+        :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
         @reset="onReset"
       >
@@ -16,8 +16,10 @@
               <ag-date-range-picker
                 v-model:value="searchData.dateRange"
                 label="创建时间"
-                :show-time="{ format: 'HH:mm:ss' }"
+                placeholder="请选择创建时间"
+                allow-clear
                 format="YYYY-MM-DD HH:mm:ss"
+                :show-time="{ format: 'HH:mm:ss' }"
               />
             </a-form-item>
           </a-col>
@@ -47,7 +49,6 @@
                 placeholder="请选择状态"
                 allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: '0', label: '订单生成' },
                   { value: '1', label: '支付中' },
                   { value: '2', label: '支付成功' },
@@ -71,7 +72,6 @@
                 placeholder="请选择状态"
                 allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: '0', label: '未发送' },
                   { value: '1', label: '已发送' }
                 ]"
@@ -101,6 +101,8 @@
 
       <ag-table
         ref="tableRef"
+        row-key="payOrderId"
+        state-key="pay_order_table_columns"
         :columns="tableColumns"
         :show-auto-refresh="true"
         :on-load="loadData"
@@ -109,7 +111,6 @@
         :on-download="handleExport"
         :show-download="true"
         :enable-statistics="true"
-        state-key="pay_order_table_columns"
       >
         <!-- 统计信息 -->
         <template #statistics="{ data: statistics }">
@@ -339,9 +340,8 @@
 
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" @click="handleDetail(record)">详情</a-button>
+            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" @click="handleDetail(record)">详情{{ record.state }}{{ record.refundState }}</a-button>
             <a-button
-              v-if="hasPermission('ENT_PAY_ORDER_REFUND') && record.state === 2 && record.refundState !== 2"
               type="link"
               style="color: red"
               @click="handleRefund(record)"
@@ -487,7 +487,6 @@ const loadStatistics = async (params) => {
  * 搜索回调函数
  */
 const searchFunc = () => {
-  message.success('开始搜索')
   refresh()
 }
 
@@ -630,7 +629,7 @@ const tableColumns = [
   { key: 'notifyState', dataIndex: 'notifyState', title: '回调状态', width: 100, customRender: 'notifyStateSlot' },
   { key: 'divisionState', dataIndex: 'divisionState', title: '分账状态', width: 100, customRender: 'divisionStateSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-  { key: 'op', title: '操作', width: 120, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 </script>
 

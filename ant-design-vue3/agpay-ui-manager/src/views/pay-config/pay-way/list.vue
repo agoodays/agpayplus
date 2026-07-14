@@ -17,7 +17,22 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model="searchData.state"
+                v-model="searchData.productType"
+                label="产品类型"
+                placeholder="请选择产品类型"
+                allow-clear
+                :options="[
+                  { value: 'PAY', label: '支付产品' },
+                  { value: 'TRANSFER', label: '转账产品' },
+                  { value: 'DIVISION', label: '分账产品' }
+                ]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select
+                v-model="searchData.wayType"
                 label="支付类型"
                 placeholder="请选择支付类型"
                 allow-clear
@@ -27,6 +42,8 @@
                   { value: 'YSFPAY', label: '云闪付' },
                   { value: 'UNIONPAY', label: '银联' },
                   { value: 'DCEPPAY', label: '数字人民币' },
+                  { value: 'TRANSFER', label: '转账' },
+                  { value: 'DIVISION', label: '分账' },
                   { value: 'OTHER', label: '其他' }
                 ]"
               />
@@ -38,37 +55,36 @@
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="wayCode"
+        state-key="pay_way_table_columns"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
-        row-key="wayCode"
       >
         <template #toolbar-left>
           <a-button v-if="true" type="primary" @click="addFunc">
-            <template #icon><PlusOutlined /></template>
-            新建
+            <plus-outlined /> 新增
           </a-button>
         </template>
-        <template #wayCodeSlot="{record}"><b>{{ record.wayCode }}</b></template> <!-- 自定义插槽 -->
-        <template #wayTypeSlot="{record}">
+        <template #wayCodeSlot="{ record }"><b>{{ record.wayCode }}</b></template> <!-- 自定义插槽 -->
+        <template #productTypeSlot="{ record }">
           <a-tag
-            :key="record.wayType"
-            :color="record.wayType === 'WECHAT' ? 'rgb(4, 190, 2)' :
-              record.wayType === 'ALIPAY' ? 'rgb(23, 121, 255)' :
-              record.wayType === 'YSFPAY' ? '#f5222d' :
-              record.wayType === 'UNIONPAY' ? '#00508e' :
-              record.wayType === 'DCEPPAY' ? '#d12c2c' : '#fa8c16'">
-            {{ record.wayType === 'WECHAT' ? '微信' :
-              record.wayType === 'ALIPAY' ? '支付宝' :
-              record.wayType === 'YSFPAY' ? '云闪付' :
-              record.wayType === 'UNIONPAY' ? '银联' :
-              record.wayType === 'DCEPPAY' ? '数字人民币' : '其他' }}
+            :key="record.productType"
+            :color="getProductTypeColor(record.productType)">
+            {{ getProductTypeText(record.productType) }}
           </a-tag>
         </template>
-        <template #opSlot="{record}">  <!-- 操作列插槽 -->
+        <template #wayTypeSlot="{ record }">
+          <a-tag
+            :key="record.wayType"
+            :color="getWayTypeColor(record.wayType)">
+            {{ getWayTypeText(record.wayType) }}
+          </a-tag>
+        </template>
+        <template #opSlot="{ record }">  <!-- 操作列插槽 -->
           <ag-table-actions>
-            <a-button type="link" v-if="true" @click="editFunc(record.wayCode)">修改</a-button>
-            <a-button type="link" style="color: red" v-if="true" @click="delFunc(record.wayCode)">删除</a-button>
+            <a-button type="link" v-if="hasPermission('ENT_PC_WAY_EDIT')" @click="editFunc(record.wayCode)">修改</a-button>
+            <a-button type="link" v-if="hasPermission('ENT_PC_WAY_DEL')" @click="delFunc(record.wayCode)">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -76,8 +92,8 @@
     <!-- 新增页面组件  -->
     <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleSuccess" />
   </div>
-
 </template>
+
 <script setup>
 /**
  * 支付方式列表页面组件
@@ -85,10 +101,14 @@
  */
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
-import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { reactive, ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import { message } from 'ant-design-vue'
+import { usePermission } from '@/composables/useCommon'
+
+// 权限检查
+const { hasPermission } = usePermission()
 
 /**
  * 表格列配置
@@ -96,17 +116,18 @@ import { message } from 'ant-design-vue'
 const tableColumns = [
   { key: 'wayCode', fixed: 'left', title: '支付方式代码', width: 180, customRender: 'wayCodeSlot' },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称', width: 180 },
+  { key: 'productType', title: '产品类型', width: 120, align: 'center', customRender: 'productTypeSlot' },
   { key: 'wayType', title: '支付类型', width: 120, align: 'center', customRender: 'wayTypeSlot' },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
- * 组件引用
+ * 表格组件引用
  */
 const tableRef = ref(null)
 
 /**
- * 弹窗状态
+ * 新增编辑组件引用
  */
 const modalOpen = ref(false)
 const currentRecordId = ref('')
@@ -134,7 +155,6 @@ const reqTableDataFunc = async (params) => {
  * 搜索函数
  */
 const searchFunc = () => {
-  loading.value = true
   tableRef.value?.reload()
 }
 
@@ -177,5 +197,70 @@ const delFunc = async (wayCode) => {
       console.error('删除支付方式失败:', error)
     }
   })
+}
+
+
+/**
+ * 获取产品类型颜色
+ * @param {string} productType - 产品类型
+ * @returns {string} 颜色值
+ */
+const getProductTypeColor = (productType) => {
+  const colorMap = {
+    PAY: 'rgb(4, 190, 2)',
+    TRANSFER: '#0099ff',
+    DIVISION: '#ff9900'
+  }
+  return colorMap[productType] || '#fa8c16'
+}
+
+/**
+ * 获取产品类型文本
+ * @param {string} productType - 产品类型
+ * @returns {string} 类型文本
+ */
+const getProductTypeText = (productType) => {
+  const textMap = {
+    PAY: '支付产品',
+    TRANSFER: '转账',
+    DIVISION: '分账'
+  }
+  return textMap[productType] || '其他'
+}
+
+/**
+ * 获取支付类型颜色
+ * @param {string} wayType - 支付类型
+ * @returns {string} 颜色值
+ */
+const getWayTypeColor = (wayType) => {
+  const colorMap = {
+    WECHAT: 'rgb(4, 190, 2)',
+    ALIPAY: 'rgb(23, 121, 255)',
+    YSFPAY: '#f5222d',
+    UNIONPAY: '#00508e',
+    DCEPPAY: '#d12c2c',
+    DIVISION: '#ff9900',
+    TRANSFER: '#0099ff'
+  }
+  return colorMap[wayType] || '#fa8c16'
+}
+
+/**
+ * 获取支付类型文本
+ * @param {string} wayType - 支付类型
+ * @returns {string} 类型文本
+ */
+const getWayTypeText = (wayType) => {
+  const textMap = {
+    WECHAT: '微信',
+    ALIPAY: '支付宝',
+    YSFPAY: '云闪付',
+    UNIONPAY: '银联',
+    DCEPPAY: '数字人民币',
+    TRANSFER: '转账',
+    DIVISION: '分账'
+  }
+  return textMap[wayType] || '其他'
 }
 </script>

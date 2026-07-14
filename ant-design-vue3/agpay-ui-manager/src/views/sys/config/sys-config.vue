@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div style="background: #fff; border-radius: 10px">
     <a-tabs :animated="false" @change="selectTabs">
       <a-tab-pane key="applicationConfig" tab="域名管理">
@@ -578,11 +578,13 @@
 </template>
 <script setup>
 import { CheckCircleOutlined, FireOutlined } from '@ant-design/icons-vue'
-const icons = { CheckCircleOutlined, FireOutlined }
 import { sysConfigApi } from '@/api/business/sys/sys-config-api'
 import { AgEditor } from '@/components'
 import { message } from 'ant-design-vue'
 import { onMounted, reactive, ref } from 'vue'
+import { infoBox } from '@/utils/info-box'
+
+const icons = { CheckCircleOutlined, FireOutlined }
 
 const loading = ref(false)
 const configData = ref([])
@@ -732,8 +734,14 @@ const passwordRegexpChange = () => {
   }
 }
 
+/**
+ * 确认更新配置
+ * @param {Event} _e - 事件对象
+ * @param {string} title - 配置名称
+ * @param {string} content - 提示内容
+ */
 const confirm = (_e, title, content) => {
-  window.$infoBox.confirmPrimary(`确认修改${title}吗？`, content, async () => {
+  infoBox.confirmPrimary(`确认修改${title}吗？`, content, async () => {
     loading.value = true
     try {
       const jsonObject = {}
@@ -796,26 +804,4 @@ onMounted(() => {
 })
 </script>
 <style lang="less">
-.agpay-tip-text:before {
-  content: '';
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-bottom-color: #ffeed8;
-  position: absolute;
-  top: -20px;
-  left: 30px;
-}
-.agpay-tip-text {
-  font-size: 12px !important;
-  border-radius: 5px;
-  background: #ffeed8;
-  color: #c57000 !important;
-  padding: 5px 10px;
-  display: inline-block;
-  max-width: 100%;
-  position: relative;
-  margin-top: 15px;
-  line-height: 1.5715;
-}
 </style>

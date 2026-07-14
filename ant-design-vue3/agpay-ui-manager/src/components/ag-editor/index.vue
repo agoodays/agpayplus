@@ -38,7 +38,7 @@ const [Editor, Toolbar, editorLoaded] = (() => {
 
   return [computed(() => EditorComponent), computed(() => ToolbarComponent), loaded]
 })()
-import { upload } from '@/lib/ag-axios'
+import { upload, uploadFile } from '@/lib/ag-axios'
 import { appDefaultConfig } from '@/config/app-config'
 import { useUserStore } from '@/store/modules/system/user'
 
@@ -101,50 +101,19 @@ const mergedEditorConfig = computed(() => {
         server: upload.form,
         headers: getHeaders(),
         fieldName: 'file',
-        customUpload: (file, insertFn) => {
-          upload.getFormParams(upload.form, file.name, file.size).then((res) => {
-            const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
-            const formParams = isLocalFile
-              ? res.formParams
-              : {
-                  OSSAccessKeyId: res.formParams.ossAccessKeyId,
-                  key: res.formParams.key,
-                  Signature: res.formParams.signature,
-                  policy: res.formParams.policy,
-                  success_action_status: res.formParams.successActionStatus
-                }
-            const data = Object.assign(formParams, { file: file })
-            const formActionUrl = isLocalFile ? upload.form : res.formActionUrl
-            upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
-              const ossFileUrl = isLocalFile ? response : res.ossFileUrl
-              insertFn(ossFileUrl, file.name, ossFileUrl)
-            })
-          })
+        customUpload: async (file, insertFn) => {
+          const ossFileUrl = await uploadFile(upload.form, file)
+          insertFn(ossFileUrl, file.name, ossFileUrl)
         }
       },
+      // 自定义插入视频
       uploadVideo: {
         server: upload.form,
         headers: getHeaders(),
         fieldName: 'file',
-        customUpload: (file, insertFn) => {
-          upload.getFormParams(upload.form, file.name, file.size).then((res) => {
-            const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
-            const formParams = isLocalFile
-              ? res.formParams
-              : {
-                  OSSAccessKeyId: res.formParams.ossAccessKeyId,
-                  key: res.formParams.key,
-                  Signature: res.formParams.signature,
-                  policy: res.formParams.policy,
-                  success_action_status: res.formParams.successActionStatus
-                }
-            const data = Object.assign(formParams, { file: file })
-            const formActionUrl = isLocalFile ? upload.form : res.formActionUrl
-            upload.singleFile(formActionUrl, isLocalFile, data).then((response) => {
-              const ossFileUrl = isLocalFile ? response : res.ossFileUrl
-              insertFn(ossFileUrl, ossFileUrl)
-            })
-          })
+        customUpload: async (file, insertFn) => {
+          const ossFileUrl = await uploadFile(upload.form, file)
+          insertFn(ossFileUrl, ossFileUrl)
         }
       }
     }

@@ -1,4 +1,4 @@
-import { req, upload } from '@/lib/ag-axios'
+import { req, upload, uploadFile } from '@/lib/ag-axios'
 
 export const currentApi = {
   modifyUserInfo(data) {
@@ -7,8 +7,12 @@ export const currentApi = {
   modifyPwd(data) {
     return req.post('/api/current/modifyPwd', data)
   },
-  uploadAvatar(formData) {
-    // 头像上传是本地上传，isLocalFile = true
-    return upload.singleFile(upload.avatar, true, formData)
+  /**
+   * 上传头像
+   * @param {File} file - 文件对象
+   * @returns {Promise<string>} 上传后的文件 URL
+   */
+  async uploadAvatar(file) {
+    return await uploadFile(upload.avatar, file)
   }
 }

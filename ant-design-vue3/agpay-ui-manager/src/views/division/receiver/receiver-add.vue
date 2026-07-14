@@ -23,12 +23,12 @@
         <a-col :span="6" style="padding-left: 20px; padding-right: 20px">
           <a-form-item label="商户号">
             <div style="display: flex">
-              <ag-select
+              <ag-select-infinite
                 v-model="mchNo"
-                :api="searchMch"
-                value-field="mchNo"
-                label-field="mchName"
                 placeholder="商户号（搜索商户名称）"
+                search-field="mchName"
+                :fetch-data="searchMch"
+                :field-names="{ label: 'mchName', value: 'mchNo' }"
                 @change="changeMchNo"
               />
             </div>
@@ -60,8 +60,7 @@
                 style="margin-bottom: 0px; margin-left: 20px"
                 @click="addGroupFunc"
               >
-                <template #icon><PlusOutlined /></template>
-                新建
+                <plus-outlined /> 新增
               </a-button>
             </div>
           </a-form-item>
@@ -97,11 +96,12 @@
         </a-button>
       </template>
       <ag-table
+        row-key="rowKey"
+        state-key="division_receiver_acc_table_columns"
         :columns="accTableColumns"
         :data="receiverTableData.filter((item) => item.ifCode == 'wxpay')"
         :pagination="false"
         :show-toolbar="false"
-        row-key="rowKey"
         :scroll-x="1400"
       >
         <template #reqBindStateSlot="{ record }">
@@ -181,11 +181,11 @@
         </a-button>
       </template>
       <ag-table
+        row-key="rowKey"
         :columns="accTableColumns"
         :data="receiverTableData.filter((item) => item.ifCode == 'alipay')"
         :pagination="false"
         :show-toolbar="false"
-        row-key="rowKey"
         :scroll-x="1400"
       >
         <template #reqBindStateSlot="{ record }">
@@ -265,7 +265,7 @@
  * 功能：批量绑定微信/支付宝分账接收者账号
  */
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
-import { AgDrawer, AgSelect, AgTable } from '@/components'
+import { AgDrawer, AgSelectInfinite, AgTable } from '@/components'
 import { ChannelUserModal } from '@/components/channel-user'
 import { genRowKey } from '@/utils/util'
 import { ref, watch } from 'vue'
@@ -281,6 +281,7 @@ import {
   RocketOutlined,
   WechatOutlined
 } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
 import InfoAddOrEdit from '../group/add-or-edit.vue'
 
 const { hasPermission } = usePermission()
@@ -389,33 +390,42 @@ const changeMchNo = (value) => {
   getReceiverGroup(value)
 }
 
-const getMchApp = (currentMchNo) => {
-  divisionReceiverApi.listMchApp({ pageSize: -1, mchNo: currentMchNo }).then((res) => {
-    mchAppList.value = res.records || []
-    if (mchAppList.value.length > 0) {
-      appId.value = `${mchAppList.value[0].appId}`
-      changeAppId(appId.value)
-    }
-  })
+/**
+ * 获取商户应用列表
+ * @param {string} currentMchNo - 商户号
+ */
+const getMchApp = async (currentMchNo) => {
+  const res = await divisionReceiverApi.listMchApp({ pageSize: -1, mchNo: currentMchNo })
+  mchAppList.value = res.records || []
+  if (mchAppList.value.length > 0) {
+    appId.value = `${mchAppList.value[0].appId}`
+    await changeAppId(appId.value)
+  }
 }
 
-const getReceiverGroup = (currentMchNo) => {
-  divisionReceiverApi.listReceiverGroup({ pageSize: -1, mchNo: currentMchNo }).then((res) => {
-    allReceiverGroup.value = res.records || []
-    if (allReceiverGroup.value.length > 0) {
-      selectedReceiverGroupId.value = allReceiverGroup.value[0].receiverGroupId
-    }
-  })
+/**
+ * 获取接收者分组列表
+ * @param {string} currentMchNo - 商户号
+ */
+const getReceiverGroup = async (currentMchNo) => {
+  const res = await divisionReceiverApi.listReceiverGroup({ pageSize: -1, mchNo: currentMchNo })
+  allReceiverGroup.value = res.records || []
+  if (allReceiverGroup.value.length > 0) {
+    selectedReceiverGroupId.value = allReceiverGroup.value[0].receiverGroupId
+  }
 }
 
 const addGroupFunc = () => {
   infoAddOrEdit.value?.show()
 }
 
-const changeAppId = (value) => {
-  divisionReceiverApi.listIfCodeByAppId(value).then((res) => {
-    appSupportIfCodes.value = res || []
-  })
+/**
+ * 获取应用支持的接口列表
+ * @param {string} value - 应用ID
+ */
+const changeAppId = async (value) => {
+  const res = await divisionReceiverApi.listIfCodeByAppId(value)
+  appSupportIfCodes.value = res || []
 }
 
 /** 处理关闭 */
@@ -448,57 +458,62 @@ const changeChannelUserIdFunc = ({ channelUserId, extObject }) => {
   extObject.accNo = channelUserId
 }
 
+/**
+ * 添加分账接收者行
+ * @param {string} currentIfCode - 接口代码
+ */
 const addReceiverRow = (currentIfCode) => {
   if (!selectedReceiverGroupId.value) {
-    return window.$message.error('请选选择要加入的分组')
+    return message.error('请选择要加入的分组')
   }
   receiverTableData.value.push(
     Object.assign({}, defaultReceiverTemplate, { rowKey: genRowKey(), ifCode: currentIfCode, appId: appId.value })
   )
 }
 
-const reqBatchBindReceiver = (i) => {
+/**
+ * 批量绑定分账接收者
+ */
+const reqBatchBindReceiver = async () => {
   if (receiverTableData.value.length <= 0) {
-    return window.$message.error('请先添加账号')
+    return message.error('请先添加账号')
   }
 
-  if (i >= receiverTableData.value.length) {
-    return window.$message.success('已完成所有账号的绑定操作')
-  }
+  for (let i = 0; i < receiverTableData.value.length; i++) {
+    const currentReceiver = receiverTableData.value[i]
+    currentReceiver.receiverGroupId = selectedReceiverGroupId.value
 
-  const currentReceiver = receiverTableData.value[i]
-  currentReceiver.receiverGroupId = selectedReceiverGroupId.value
+    if (currentReceiver.reqBindState === 1) {
+      continue
+    }
 
-  if (currentReceiver.reqBindState === 1) {
-    return reqBatchBindReceiver(i + 1)
-  }
+    if (!currentReceiver.accNo) {
+      return message.error(`第${i + 1}条： 接收方账号不能为空`)
+    }
 
-  if (!currentReceiver.accNo) {
-    return window.$message.error(`第${i + 1}条： 接收方账号不能为空`)
-  }
+    if (currentReceiver.relationType === 'CUSTOM' && !currentReceiver.relationTypeName) {
+      return message.error(`第${i + 1}条： 自定义类型时接收方账号名称不能为空`)
+    }
 
-  if (currentReceiver.relationType === 'CUSTOM' && !currentReceiver.relationTypeName) {
-    return window.$message.error(`第${i + 1}条： 自定义类型时接收方账号名称不能为空`)
-  }
+    if (!currentReceiver.divisionProfit || currentReceiver.divisionProfit <= 0 || currentReceiver.divisionProfit > 100) {
+      return message.error(`第${i + 1}条： 默认分账比例请设置在[0.01% ~ 100% ] 之间`)
+    }
 
-  if (!currentReceiver.divisionProfit || currentReceiver.divisionProfit <= 0 || currentReceiver.divisionProfit > 100) {
-    return window.$message.error(`第${i + 1}条： 默认分账比例请设置在[0.01% ~ 100% ] 之间`)
-  }
-
-  divisionReceiverApi
-    .add(currentReceiver)
-    .then((apiRes) => {
+    try {
+      const apiRes = await divisionReceiverApi.add(currentReceiver)
       if (apiRes.bindState === 1) {
         currentReceiver.reqBindState = 1
-        reqBatchBindReceiver(i + 1)
       } else {
         currentReceiver.reqBindState = 2
-        window.$infoBox.modalError(`第${i + 1}条： 绑定异常`, `错误码：${apiRes.errCode}\n错误信息：${apiRes.errMsg}`)
+        message.error(`第${i + 1}条： 绑定异常，错误码：${apiRes.errCode}，错误信息：${apiRes.errMsg}`)
       }
-    })
-    .catch(() => {
+    } catch (error) {
       currentReceiver.reqBindState = 2
-    })
+      console.error('绑定失败:', error)
+    }
+  }
+
+  message.success('已完成所有账号的绑定操作')
 }
 
 

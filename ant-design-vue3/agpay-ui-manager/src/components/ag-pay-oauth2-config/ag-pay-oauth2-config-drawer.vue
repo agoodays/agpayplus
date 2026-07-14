@@ -1,5 +1,5 @@
 <template>
-  <ag-drawer
+  <a-drawer
     v-model:open="localOpen"
     :title="true ? 'Oauth2配置' : ''"
     :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
@@ -75,7 +75,7 @@
         </a-button>
       </div>
     </a-card>
-  </ag-drawer>
+  </a-drawer>
 </template>
 
 <script setup>
@@ -87,7 +87,6 @@ import { CheckOutlined, CloseOutlined, PlusOutlined, QuestionCircleOutlined } fr
 const icons = { CheckOutlined, CloseOutlined, PlusOutlined, QuestionCircleOutlined }
 import { ref, nextTick, markRaw, watch } from 'vue'
 import { message } from 'ant-design-vue'
-import { AgDrawer } from '@/components'
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
 
 /** Props 定义 */
@@ -211,7 +210,7 @@ const onSave = async () => {
     message.error('请输入名称')
     return
   }
-  window.$infoBox.confirmPrimary('确认新增该服务商的配置条目？', '新建后不支持修改/删除，请谨慎操作', async () => {
+  window.$infoBox.confirmPrimary('确认新增该服务商的配置条目？', '新增后不支持修改/删除，请谨慎操作', async () => {
     const params = Object.assign(
       {},
       {

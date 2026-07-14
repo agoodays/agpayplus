@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <a-modal
     v-model:open="localOpen"
     :title="isAdd ? '新增账号组' : '修改账号组'"
@@ -14,12 +14,12 @@
       :rules="rules"
     >
       <a-form-item label="商户号" name="mchNo">
-        <ag-select
-          v-model:value="saveObject.mchNo"
-          :api="searchMch"
-          value-field="mchNo"
-          label-field="mchName"
+        <ag-select-infinite
+          v-model="saveObject.mchNo"
           placeholder="商户号（搜索商户名称）"
+          search-field="mchName"
+          :fetch-data="searchMch"
+          :field-names="{ label: 'mchName', value: 'mchNo' }"
           :disabled="!isAdd"
         />
       </a-form-item>
@@ -47,11 +47,11 @@
  * 功能：新增或编辑分账接收方分组信息
  */
 import { divisionGroupApi } from '@/api/business/division/division-group-api'
-import { AgSelect } from '@/components'
+import { AgSelectInfinite } from '@/components'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
 
-defineOptions({ components: { AgSelect } })
+defineOptions({ components: { AgSelectInfinite } })
 
 /** Props 定义 */
 const props = defineProps({
@@ -147,26 +147,4 @@ const handleClose = () => {
 }
 </script>
 <style lang="less">
-.agpay-tip-text:before {
-  content: '';
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-bottom-color: #ffeed8;
-  position: absolute;
-  top: -20px;
-  left: 30px;
-}
-.agpay-tip-text {
-  font-size: 12px !important;
-  border-radius: 5px;
-  background: #ffeed8;
-  color: #c57000 !important;
-  padding: 5px 10px;
-  display: inline-block;
-  max-width: 100%;
-  position: relative;
-  margin-top: 15px;
-  line-height: 1.5715;
-}
 </style>

@@ -18,8 +18,8 @@
                 v-model:value="searchData.infoType"
                 label="角色类型"
                 placeholder="请选择角色类型"
+                allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: 'PLATFORM', label: '运营平台' },
                   { value: 'AGENT', label: '代理商' }
                 ]"
@@ -32,8 +32,8 @@
                 v-model:value="searchData.infoType"
                 label="角色类型"
                 placeholder="请选择角色类型"
+                allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: 'PLATFORM', label: '运营平台' },
                   { value: 'AGENT', label: '代理商' }
                 ]"
@@ -46,8 +46,8 @@
                 v-model:value="searchData.bizType"
                 label="业务类型"
                 placeholder="请选择业务类型"
+                allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: '1', label: '平台佣金收入' },
                   { value: '2', label: '提现支出' },
                   { value: '3', label: '佣金支出' },
@@ -62,8 +62,8 @@
                 v-model:value="searchData.accountType"
                 label="账户类型"
                 placeholder="请选择账户类型"
+                allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: '1', label: '钱包账户' },
                   { value: '2', label: '用途账户' }
                 ]"
@@ -91,10 +91,11 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
+        row-key="id"
+        state-key="account_bill_table_columns"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
-        row-key="id"
       >
         <!-- 业务类型列 -->
         <template #bizTypeSlot="{ record }">
@@ -191,7 +192,7 @@ const tableColumns = [
   { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: 'afterBalanceSlot' },
   { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联业务订单号', width: 200 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**

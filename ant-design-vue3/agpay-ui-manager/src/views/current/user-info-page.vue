@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="user-info-page">
     <a-card :bordered="false">
       <a-tabs v-model:active-key="activeTab">
@@ -153,10 +153,11 @@ import { useUserStore } from '@/store/modules/system/user'
 import { CheckCircleOutlined, SafetyCertificateOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
-import { onMounted, reactive, ref, computed } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { AgUpload } from '@/components'
+import { infoBox } from '@/utils/info-box'
 const router = useRouter()
 const userStore = useUserStore()
 const { t } = useI18n()
@@ -264,11 +265,14 @@ const fetchPasswordRules = async () => {
   }
 }
 
+/**
+ * 更新基本信息
+ */
 const handleUpdateBasic = async () => {
   try {
     await basicFormRef.value.validate()
 
-    window.$infoBox.confirmPrimary(t('current.confirmUpdateInfoTitle'), '', async () => {
+    infoBox.confirmPrimary(t('current.confirmUpdateInfoTitle'), '', async () => {
       basicLoading.value = true
       try {
         await currentApi.modifyUserInfo(basicForm)
@@ -286,11 +290,14 @@ const handleUpdateBasic = async () => {
   }
 }
 
+/**
+ * 更新密码
+ */
 const handleUpdatePassword = async () => {
   try {
     await passwordFormRef.value.validate()
 
-    window.$infoBox.confirmPrimary(t('current.confirmUpdatePasswordTitle'), t('current.updatePasswordNeedRelogin'), async () => {
+    infoBox.confirmPrimary(t('current.confirmUpdatePasswordTitle'), t('current.updatePasswordNeedRelogin'), async () => {
       passwordLoading.value = true
       try {
         await currentApi.modifyPwd({

@@ -23,23 +23,25 @@
         :disabled="item.disabled"
       >
         <slot name="option" :option="item">
-          {{ item[fieldNames.label] }}
+          {{ item[fieldNames.label] }}[{{ item[fieldNames.value] }}]
         </slot>
       </a-select-option>
 
-      <!-- 加载更多提示 -->
-      <template v-if="hasMore" #dropdownRender="{ menuNode }">
+      <!-- 下拉底部状态提示：加载中/加载更多/没有更多数据 -->
+      <template #dropdownRender="{ menuNode }">
         <div>
           <component :is="menuNode" />
-          <a-divider style="margin: 4px 0" />
-          <div style="padding: 8px; text-align: center; color: #999">
+          <a-divider v-if="options.length > 0 && (hasMore || loadingMore)" style="margin: 4px 0" />
+          <div v-if="options.length > 0 && (hasMore || loadingMore || !hasMore)" style="padding: 8px; text-align: center; color: #999">
             <a-spin v-if="loadingMore" size="small" />
-            <span v-else>{{ resolvedLoadMoreText }}</span>
+            <span v-else-if="hasMore">{{ resolvedLoadMoreText }}</span>
+            <span v-else>{{ resolvedNoMoreText }}</span>
           </div>
         </div>
       </template>
     </a-select>
 
+    <!-- 浮动标签 -->
     <label v-if="label" class="ag-float-label" :class="labelClass">
       {{ label }}
       <span v-if="required" class="ag-required-star">*</span>
@@ -48,62 +50,120 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+/**
+ * 无限滚动选择器组件
+ * 基于 Ant Design Vue 的 a-select 组件封装，支持远程搜索、分页加载、自动填充
+ * 
+ * 主要特性：
+ * 1. 远程数据加载，支持分页和搜索
+ * 2. 滚动到底部自动加载更多数据
+ * 3. 数据量不足时自动填充至下拉框填满
+ * 4. 搜索时重置数据，重新从第一页加载
+ * 5. 支持浮动标签（float label）
+ * 6. 兼容 modelValue 和 value 两种绑定方式
+ */
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useFloatLabel } from '@/composables/useFloatLabel'
 
 const { t } = useI18n()
 
+/**
+ * 组件属性定义
+ */
 const props = defineProps({
+  /**
+   * 选中值（v-model 绑定）
+   */
   modelValue: {
     type: [String, Number, Array],
     default: undefined
   },
+  /**
+   * 选中值（兼容旧版绑定方式）
+   */
   value: {
     type: [String, Number, Array],
     default: undefined
   },
+  /**
+   * 标签文本
+   */
   label: {
     type: String,
     default: ''
   },
+  /**
+   * 占位符
+   */
   placeholder: {
     type: String,
     default: ''
   },
+  /**
+   * 是否禁用
+   */
   disabled: {
     type: Boolean,
     default: false
   },
+  /**
+   * 选择模式：'multiple' | 'tags' | undefined
+   */
   mode: {
     type: String,
     default: undefined
   },
+  /**
+   * 是否允许清空
+   */
   allowClear: {
     type: Boolean,
     default: false
   },
+  /**
+   * 是否显示搜索框
+   */
   showSearch: {
     type: Boolean,
     default: true
   },
+  /**
+   * 是否必填（显示红色星号）
+   */
   required: {
     type: Boolean,
     default: false
   },
+  /**
+   * 尺寸：'small' | 'middle' | 'large'
+   */
   size: {
     type: String,
     default: 'middle'
   },
-  // 分页相关
+  /**
+   * 数据加载函数（必填）
+   * @param {Object} params - 请求参数
+   * @param {Number} params.pageNumber - 页码
+   * @param {Number} params.pageSize - 每页大小
+   * @param {String} params.keyword - 搜索关键词
+   * @returns {Promise<Object>} 返回数据格式：{ records: [], total: 0, hasNext: false } 或 { data: [], total: 0 }
+   */
   fetchData: {
     type: Function,
     required: true
   },
+  /**
+   * 每页加载数量
+   */
   pageSize: {
     type: Number,
-    default: 20
+    default: 10
   },
+  /**
+   * 自定义字段名称映射
+   */
   fieldNames: {
     type: Object,
     default: () => ({
@@ -111,49 +171,87 @@ const props = defineProps({
       value: 'value'
     })
   },
-  // 搜索防抖时间
+  /**
+   * 搜索防抖时间（毫秒）
+   */
   searchDebounce: {
     type: Number,
     default: 300
   },
-  // 自定义文本
+  /**
+   * 搜索字段名（传递给 fetchData 的查询参数字段）
+   * 默认使用 keyword，可根据实际业务场景自定义，如 mchName、agentNo、userId 等
+   */
+  searchField: {
+    type: String,
+    default: 'keyword'
+  },
+  /**
+   * 自定义"加载更多"文本
+   */
   loadMoreText: {
     type: String,
     default: ''
   },
+  /**
+   * 自定义"没有更多数据"文本
+   */
   noMoreText: {
     type: String,
     default: ''
   },
+  /**
+   * 自定义"搜索中"文本
+   */
   searchingText: {
     type: String,
     default: ''
   },
-  // 浮动标签配置
+  /**
+   * 浮动标签配置选项
+   */
   floatOptions: {
     type: Object,
     default: () => ({})
+  },
+  /**
+   * 是否自动加载数据
+   */
+  autoLoad: {
+    type: Boolean,
+    default: true
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'search'])
+/**
+ * 组件事件定义
+ */
+const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'search', 'load'])
 
-const selectRef = ref()
-const selectValue = ref(props.modelValue ?? props.value)
+/**
+ * 组件内部状态
+ */
+const selectRef = ref()                           // 选择器引用
+const selectValue = ref(props.modelValue ?? props.value)  // 当前选中值
 
-// 数据状态
-const options = ref([])
-const currentPage = ref(1)
-const totalPages = ref(1)
-const loading = ref(false)
-const loadingMore = ref(false)
-const searchKeyword = ref('')
-let searchTimer = null
+// 数据相关状态
+const options = ref([])                          // 选项列表
+const currentPage = ref(1)                       // 当前页码
+const totalPages = ref(1)                        // 总页数
+const loading = ref(false)                       // 首次加载中
+const loadingMore = ref(false)                   // 加载更多中
+const searchKeyword = ref('')                    // 当前搜索关键词
+const isLoaded = ref(false)                      // 是否已加载过数据
+let searchTimer = null                          // 搜索防抖定时器
 
-// 是否有更多数据
+/**
+ * 是否还有更多数据
+ */
 const hasMore = computed(() => currentPage.value < totalPages.value)
 
-// 自定义值检查函数
+/**
+ * 值检查函数（用于浮动标签判断）
+ */
 function hasValueCheck(value) {
   if (Array.isArray(value)) {
     return value.length > 0
@@ -161,7 +259,9 @@ function hasValueCheck(value) {
   return value !== undefined && value !== null && value !== ''
 }
 
-// 使用浮动标签 composable
+/**
+ * 使用浮动标签 composable
+ */
 const { isFocused, labelClass, floatPlaceholder, handleFocus, handleBlur, clear } = useFloatLabel(
   props,
   emit,
@@ -174,7 +274,10 @@ const { isFocused, labelClass, floatPlaceholder, handleFocus, handleBlur, clear 
   }
 )
 
-// 动态事件处理器 - 只有当 showSearch 为 true 时才包含搜索事件
+/**
+ * 动态事件处理器
+ * 根据 showSearch 决定是否添加搜索事件
+ */
 const eventHandlers = computed(() => {
   const handlers = {
     focus: handleFocus,
@@ -183,7 +286,6 @@ const eventHandlers = computed(() => {
     'dropdown-visible-change': handleDropdownVisibleChange
   }
 
-  // 只有启用搜索时才添加搜索事件
   if (props.showSearch) {
     handlers.search = handleSearch
   }
@@ -191,10 +293,16 @@ const eventHandlers = computed(() => {
   return handlers
 })
 
+/**
+ * 解析后的文本（优先使用自定义文本，否则使用国际化）
+ */
 const resolvedLoadMoreText = computed(() => props.loadMoreText || t('components.scrollLoadMore'))
+const resolvedNoMoreText = computed(() => props.noMoreText || t('components.noMoreData'))
 const resolvedSearchingText = computed(() => props.searchingText || t('components.searching'))
 
-// 未找到内容提示
+/**
+ * 未找到内容提示（加载中时显示"搜索中"）
+ */
 const notFoundContent = computed(() => {
   if (loading.value) {
     return resolvedSearchingText.value
@@ -202,10 +310,15 @@ const notFoundContent = computed(() => {
   return undefined
 })
 
-// 加载数据
+/**
+ * 加载数据
+ * @param {Number} page - 页码，默认为 1
+ * @param {String} keyword - 搜索关键词，默认为空
+ */
 async function loadData(page = 1, keyword = '') {
   const isFirstPage = page === 1
 
+  // 设置加载状态
   if (isFirstPage) {
     loading.value = true
   } else {
@@ -213,61 +326,98 @@ async function loadData(page = 1, keyword = '') {
   }
 
   try {
-    const result = await props.fetchData({
-      page,
-      pageSize: props.pageSize,
-      keyword
-    })
+    // 调用外部数据加载函数，使用自定义搜索字段名
+    const searchParams = {
+      pageNumber: page,
+      pageSize: props.pageSize
+    }
+    searchParams[props.searchField] = keyword
+    const result = await props.fetchData(searchParams)
 
-    // 处理返回数据
-    const { data = [], total = 0, totalPage } = result
+    // 解析返回数据，兼容多种格式
+    const { records = [], total = 0, data = [], hasNext } = result
+    const listData = records.length > 0 ? records : data
 
-    // 计算总页数
-    if (totalPage !== undefined) {
-      totalPages.value = totalPage
+    // 计算总页数，优先使用 hasNext 字段
+    if (hasNext !== undefined) {
+      totalPages.value = hasNext ? page + 1 : page
     } else if (total !== undefined) {
       totalPages.value = Math.ceil(total / props.pageSize)
     } else {
-      totalPages.value = data.length < props.pageSize ? page : page + 1
+      // 如果没有总条数，根据当前页数据量判断是否还有更多
+      totalPages.value = listData.length < props.pageSize ? page : page + 1
     }
 
-    // 更新选项
+    // 更新选项列表
     if (isFirstPage) {
-      options.value = data
+      options.value = listData
     } else {
-      options.value = [...options.value, ...data]
+      options.value = [...options.value, ...listData]
     }
 
+    // 更新状态
     currentPage.value = page
+    isLoaded.value = true
+
+    // 触发加载完成事件
+    emit('load', { page, keyword, data: listData })
   } catch (error) {
     console.error('加载数据失败:', error)
   } finally {
+    // 清除加载状态
     loading.value = false
     loadingMore.value = false
   }
 }
 
-// 处理滚动到底部
+/**
+ * 自动填充下拉框
+ * 当首次加载数据量较小时（少于一次可见量），额外加载一次数据
+ * 防止 pageSize 较小时无法触发滚动加载的问题
+ */
+async function fillDropdown() {
+  await nextTick()
+
+  const visibleItemCount = 8                     // 下拉框可见区域大约能显示的条数
+  if (hasMore.value && options.value.length < visibleItemCount) {
+    loadingMore.value = true
+    try {
+      await loadData(currentPage.value + 1, searchKeyword.value)
+    } finally {
+      loadingMore.value = false
+    }
+  }
+}
+
+/**
+ * 处理下拉框滚动事件
+ * 当滚动到底部附近（50px）时触发加载更多
+ */
 function handlePopupScroll(e) {
   const { target } = e
   const scrollHeight = target.scrollHeight
   const scrollTop = target.scrollTop
   const clientHeight = target.clientHeight
 
-  // 距离底部 50px 时触发加载
-  if (scrollHeight - scrollTop - clientHeight < 50 && hasMore.value && !loadingMore.value) {
+  // 距离底部 50px 时触发加载更多
+  if (scrollHeight - scrollTop - clientHeight < 50 && hasMore.value && !loadingMore.value && !loading.value) {
     loadMore()
   }
 }
 
-// 加载更多
+/**
+ * 加载更多数据
+ */
 function loadMore() {
-  if (hasMore.value && !loadingMore.value) {
+  if (hasMore.value && !loadingMore.value && !loading.value) {
     loadData(currentPage.value + 1, searchKeyword.value)
   }
 }
 
-// 处理搜索
+/**
+ * 处理搜索输入
+ * 使用防抖机制，避免频繁请求
+ */
 function handleSearch(value) {
   searchKeyword.value = value
 
@@ -276,39 +426,94 @@ function handleSearch(value) {
     clearTimeout(searchTimer)
   }
 
-  // 防抖处理
-  searchTimer = setTimeout(() => {
-    // 搜索时重置页码
+  // 防抖处理：延迟 searchDebounce 毫秒后执行搜索
+  searchTimer = setTimeout(async () => {
+    // 重置分页状态
     currentPage.value = 1
-    loadData(1, value)
+    totalPages.value = 1
+    isLoaded.value = false
+
+    // 重新加载第一页数据
+    await loadData(1, value)
+
+    // 触发搜索事件
     emit('search', value)
+
+    // 自动填充下拉框
+    fillDropdown()
   }, props.searchDebounce)
 }
 
-// 处理下拉框显示/隐藏
-function handleDropdownVisibleChange(open) {
-  if (open && options.value.length === 0) {
-    loadData(1, searchKeyword.value)
+/**
+ * 处理下拉框显示/隐藏
+ * 下拉框打开时，如果未加载过数据且允许自动加载，则加载第一页数据
+ */
+async function handleDropdownVisibleChange(open) {
+  if (open && props.autoLoad && !isLoaded.value && options.value.length === 0) {
+    await loadData(1, searchKeyword.value)
+    fillDropdown()
   }
 }
 
+/**
+ * 处理选择值变化
+ * @param {*} value - 选中的值
+ * @param {Object} option - Ant Design Vue 的 option 对象
+ */
 function handleChange(value, option) {
-  emit('change', value, option)
+  const selectedRecord = options.value.find(item => item[props.fieldNames.value] === value)
+  emit('change', value, selectedRecord || option)
 }
 
-// 监听外部值变化（同时兼容 modelValue / value）
+/**
+ * 根据 value 查询并添加对应的记录到选项列表
+ * @param {*} value - 当前选中的值
+ */
+async function loadRecordByValue(value) {
+  if (!value) return
+  
+  const exists = options.value.some(item => item[props.fieldNames.value] === value)
+  if (exists) return
+
+  try {
+    const searchParams = {
+      pageNumber: 1,
+      pageSize: 1
+    }
+    searchParams[props.fieldNames.value] = value
+    const result = await props.fetchData(searchParams)
+    const { records = [], data = [] } = result
+    const listData = records.length > 0 ? records : data
+    
+    if (listData.length > 0) {
+      const record = listData[0]
+      if (!options.value.some(item => item[props.fieldNames.value] === record[props.fieldNames.value])) {
+        options.value.unshift(record)
+      }
+    }
+  } catch (error) {
+    console.error('[AgSelectInfinite] Failed to load record by value:', error)
+  }
+}
+
+/**
+ * 监听外部值变化（兼容 modelValue 和 value）
+ */
 watch(
   () => [props.modelValue, props.value],
-  ([newModelValue, newValue]) => {
+  async ([newModelValue, newValue]) => {
     const resolved = newModelValue ?? newValue
     if (resolved !== selectValue.value) {
       selectValue.value = resolved
     }
+    await loadRecordByValue(resolved)
   },
   { deep: true, immediate: true }
 )
 
-// 监听内部值变化
+/**
+ * 监听内部值变化，触发更新事件
+ */
 watch(
   selectValue,
   (newVal) => {
@@ -318,34 +523,74 @@ watch(
   { deep: true }
 )
 
-// 重新加载数据（外部调用）
+/**
+ * 重新加载数据（外部调用方法）
+ * 清空搜索关键词，从第一页重新加载
+ */
 function reload() {
   searchKeyword.value = ''
   currentPage.value = 1
+  totalPages.value = 1
+  isLoaded.value = false
   loadData(1, '')
 }
 
-// 暴露方法
+/**
+ * 聚焦（外部调用方法）
+ */
 function focus() {
   selectRef.value?.focus()
 }
 
+/**
+ * 失焦（外部调用方法）
+ */
 function blur() {
   selectRef.value?.blur()
 }
 
+/**
+ * 重置组件状态（外部调用方法）
+ * 清空所有选项、分页状态和搜索关键词
+ */
+function reset() {
+  options.value = []
+  currentPage.value = 1
+  totalPages.value = 1
+  isLoaded.value = false
+  searchKeyword.value = ''
+}
+
+/**
+ * 暴露给外部的方法
+ */
 defineExpose({
   focus,
   blur,
   reload,
   loadMore,
-  clear
+  clear,
+  reset
 })
 
-// 组件挂载时加载首页数据
-onMounted(() => {
-  if (options.value.length === 0) {
-    loadData(1, '')
+/**
+ * 组件挂载时的处理
+ * 如果允许自动加载且选项为空，则加载第一页数据
+ */
+onMounted(async () => {
+  if (props.autoLoad && options.value.length === 0) {
+    await loadData(1, '')
+    fillDropdown()
+  }
+})
+
+/**
+ * 组件卸载时的处理
+ * 清除搜索防抖定时器，防止内存泄漏
+ */
+onUnmounted(() => {
+  if (searchTimer) {
+    clearTimeout(searchTimer)
   }
 })
 </script>

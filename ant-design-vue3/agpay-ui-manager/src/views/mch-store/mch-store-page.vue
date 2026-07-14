@@ -6,21 +6,21 @@
         v-model="searchData"
         :collapsible="true"
         :default-collapsed="false"
+        :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
         @reset="onReset"
       >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-select
+              <ag-select-infinite
                 v-model="searchData.mchNo"
                 label="商户号"
                 placeholder="请选择商户"
                 allow-clear
-                :options="mchOptions"
-                :show-search="true"
-                :filter-option="false"
-                @search="handleSearchMch"
+                search-field="mchName"
+                :fetch-data="searchMch"
+                :field-names="{ label: 'mchName', value: 'mchNo' }"
               />
             </a-form-item>
           </a-col>
@@ -30,7 +30,7 @@
                 v-model="searchData.storeId"
                 label="门店编号"
                 placeholder="请输入门店编号"
-                :allow-clear="true"
+                allow-clear
               />
             </a-form-item>
           </a-col>
@@ -40,7 +40,7 @@
                 v-model="searchData.storeName"
                 label="门店名称"
                 placeholder="请输入门店名称"
-                :allow-clear="true"
+                allow-clear
               />
             </a-form-item>
           </a-col>
@@ -50,16 +50,16 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
+        row-key="storeId"
+        state-key="mch_store_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
-        state-key="mch_store_table_columns"
       >
         <!-- 操作按钮 -->
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_MCH_STORE_ADD')" type="primary" @click="handleAdd">
-            <plus-outlined />
-            新建
+            <plus-outlined /> 新增
           </a-button>
         </template>
 
@@ -78,7 +78,7 @@
           />
         </template>
         <template #opSlot="{ record }">
-          <ag-table-actions :max-show-num="3">
+          <ag-table-actions>
             <a-button v-if="hasPermission('ENT_MCH_STORE_EDIT')" type="link" size="small" @click="handleEdit(record)">
               修改
             </a-button>
@@ -125,7 +125,7 @@
  * 功能：展示商户门店列表，支持搜索、新增、编辑、删除、应用分配等操作
  */
 import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
-import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { message, Modal } from 'ant-design-vue'
@@ -144,7 +144,6 @@ const { hasPermission } = usePermission()
 
 // State
 const tableRef = ref(null)
-const mchList = ref([])
 const currentRecordId = ref('')
 const currentBindAppId = ref('')
 const currentMchNo = ref('')
@@ -156,14 +155,6 @@ const searchData = reactive({
   storeName: ''
 })
 
-// 商户选项（用于下拉选择）
-const mchOptions = computed(() => {
-  return mchList.value.map(item => ({
-    value: item.mchNo,
-    label: item.mchName
-  }))
-})
-
 // 表格列定义
 const tableColumns = [
   { key: 'storeName', dataIndex: 'storeName', title: '门店名称', width: 200, fixed: 'left', ellipsis: true, customRender: 'storeNameSlot' },
@@ -172,7 +163,7 @@ const tableColumns = [
   { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140, ellipsis: true },
   { key: 'defaultFlag', dataIndex: 'defaultFlag', title: '默认门店', width: 100, customRender: 'defaultFlagSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
-  { key: 'op', title: '操作', width: 200, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
@@ -207,30 +198,19 @@ const reqTableDataFunc = async (params) => {
 }
 
 /**
- * 搜索商户
+ * 搜索商户（用于 ag-select-infinite 组件）
+ * @param {Object} params - 搜索参数
+ * @param {Number} params.pageNumber - 页码
+ * @param {Number} params.pageSize - 每页大小
+ * @param {String} params.mchName - 商户名称（通过 search-field 指定）
+ * @returns {Promise<Object>} 商户列表
  */
-const handleSearchMch = async (keyword) => {
-  if (!keyword) {
-    mchList.value = []
-    return
-  }
-
-  try {
-    const res = await mchStoreApi.queryMchPage({
-      mchName: keyword,
-      pageSize: 20
-    })
-    mchList.value = res.records || []
-  } catch (error) {
-    console.error('搜索商户失败:', error)
-  }
-}
+const searchMch = (params) => mchStoreApi.queryMchPage(params)
 
 /**
  * 搜索
  */
 function searchFunc() {
-  message.success('开始搜索')
   tableRef.value.reload()
 }
 
@@ -245,7 +225,7 @@ function onReset() {
 }
 
 /**
- * 新建门店
+ * 新增门店
  */
 const handleAdd = () => {
   currentRecordId.value = ''

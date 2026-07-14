@@ -14,6 +14,8 @@ import App from './App.vue'
 import Initializer from './bootstrap'
 import './theme/index.less'
 import { infoBox } from './utils/info-box'
+import vcolorpicker from 'vcolorpicker'
+import 'vcolorpicker/style.css'
 
 // ==================== 全局配置 ====================
 
@@ -117,6 +119,7 @@ async function initializeApp() {
   // 使用插件
   app.use(i18n)
   app.use(Antd)
+  app.use(vcolorpicker)
 
   // 初始化多语言（i18n + dayjs）
   const appConfigStore = useAppConfigStore(store)

@@ -167,7 +167,7 @@
 </template>
 
 <script setup>
-import { AgEditor } from '@/components'
+import AgEditor from '@/components/ag-editor/index.vue'
 import { message } from 'ant-design-vue'
 import { reactive, ref } from 'vue'
 

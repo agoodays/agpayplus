@@ -645,7 +645,7 @@ export const reqLoad = {
 }
 
 /**
- * 文件上传配置与方法
+ * 文件上传 URL 常量配置
  * 
  * 预定义上传路径：
  * - avatar: 头像上传
@@ -653,60 +653,91 @@ export const reqLoad = {
  * - cert: 证书上传
  * - form: 表单文件上传
  */
-export const upload = {
+export const uploadUrl = {
   avatar: '/api/ossFiles/avatar',
   ifBG: '/api/ossFiles/ifBG',
   cert: '/api/ossFiles/cert',
-  form: '/api/ossFiles/form',
+  form: '/api/ossFiles/form'
+}
 
-  /**
-   * 获取上传表单参数（通过后端接口获取 OSS 上传所需的签名等参数）
-   * @param {string} url - 本地接口地址（如 /api/ossFiles/form）
-   * @param {string} fileName - 文件名
-   * @param {number} fileSize - 文件大小
-   * @param {boolean} useCache - 是否启用缓存
-   * @returns {Promise} 表单参数（包含 formActionUrl、formParams、ossFileUrl 等）
-   */
-  getFormParams: (url, fileName, fileSize, useCache = false) => {
-    return request({ url: url, method: 'GET', params: { fileName, fileSize } }, true, true, false, useCache)
-  },
+/**
+ * 获取上传表单参数（通过后端接口获取 OSS 上传所需的签名等参数）
+ * @param {string} url - 本地接口地址（如 /api/ossFiles/form）
+ * @param {string} fileName - 文件名
+ * @param {number} fileSize - 文件大小
+ * @param {boolean} useCache - 是否启用缓存
+ * @returns {Promise} 表单参数（包含 formActionUrl、formParams、ossFileUrl 等）
+ */
+export const getUploadFormParams = async (url, fileName, fileSize, useCache = false) => {
+  return await request({ url, method: 'GET', params: { fileName, fileSize } }, true, true, false, useCache)
+}
 
-  /**
-   * 上传单个文件
-   * 
-   * 上传逻辑说明：
-   * - isLocalFile = true：本地上传，url 为相对路径，使用默认 VITE_APP_API_BASE_URL
-   * - isLocalFile = false：OSS 上传，url 为 OSS 地址（如阿里云），需要清空 baseURL 避免拼接
-   * 
-   * @param {string} url - 上传地址（本地相对路径或 OSS 完整地址）
-   * @param {boolean} isLocalFile - 是否本地文件上传（true=本地，false=OSS）
-   * @param {Object} data - 表单数据（包含 file 对象及 OSS 签名参数）
-   * @returns {Promise} 上传结果（本地返回 URL，OSS 返回空需使用 ossFileUrl）
-   */
-  singleFile: (url, isLocalFile, data) => {
-    const formData = new FormData()
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        formData.append(key, data[key])
-      }
+/**
+ * 上传单个文件
+ * 
+ * 上传逻辑说明：
+ * - isLocalFile = true：本地上传，url 为相对路径，使用默认 VITE_APP_API_BASE_URL
+ * - isLocalFile = false：OSS 上传，url 为 OSS 地址（如阿里云），需要清空 baseURL 避免拼接
+ * 
+ * @param {string} url - 上传地址（本地相对路径或 OSS 完整地址）
+ * @param {boolean} isLocalFile - 是否本地文件上传（true=本地，false=OSS）
+ * @param {Object} data - 表单数据（包含 file 对象及 OSS 签名参数）
+ * @returns {Promise} 上传结果（本地返回 URL，OSS 返回空需使用 ossFileUrl）
+ */
+export const uploadSingleFile = async (url, isLocalFile, data) => {
+  const formData = new FormData()
+  for (const key in data) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      formData.append(key, data[key])
     }
-    // 本地上传使用默认 baseURL，OSS 上传清空 baseURL 直接请求完整地址
-    const actionUrl = isLocalFile ? { url: url } : { baseURL: '', url: url }
-    const options = Object.assign(actionUrl, { method: 'POST', data: formData })
-    return request(options)
-    
-    //  * - isLocalFile = true：本地上传，使用自定义 request 方法（经过拦截器，带 token）
-    //  * - isLocalFile = false：OSS 上传，直接使用 axios 原生方法（避免单例 baseURL 污染）
-    // if (isLocalFile) {
-    //   // 本地上传：使用自定义 request 方法（经过拦截器，带 token）
-    //   return request({ url: url, method: 'POST', data: formData })
-    // } else {
-    //   // OSS 上传：直接使用 axios 原生方法
-    //   // 原因：单例模式的 agAxios 已固定 baseURL，无法动态切换到 OSS 地址
-    //   // 使用原生 axios 避免经过自定义拦截器，直接请求 OSS 完整地址
-    //   return axios({ url: url, method: 'POST', data: formData })
-    // }
   }
+  const actionUrl = isLocalFile ? { url } : { baseURL: '', url }
+  const options = Object.assign(actionUrl, { method: 'POST', data: formData })
+  return await request(options)
+}
+
+/**
+ * 统一文件上传方法（封装完整上传流程）
+ * 
+ * 上传流程：
+ * 1. 调用 getUploadFormParams 获取上传参数（本地或 OSS 签名）
+ * 2. 判断是否本地上传（isLocalFile）
+ * 3. 构建表单参数（OSS 需要特殊处理签名参数）
+ * 4. 调用 uploadSingleFile 执行上传
+ * 5. 返回最终的文件 URL
+ * 
+ * @param {string} uploadUrl - 上传接口地址（如 uploadUrl.form）
+ * @param {File} file - 文件对象
+ * @returns {Promise<string>} 上传成功后的文件 URL
+ */
+export const uploadFile = async (uploadUrl, file) => {
+  const res = await getUploadFormParams(uploadUrl, file.name, file.size)
+  const isLocalFile = res.formActionUrl === 'LOCAL_SINGLE_FILE_URL'
+  
+  const formParams = isLocalFile
+    ? res.formParams
+    : {
+        OSSAccessKeyId: res.formParams.ossAccessKeyId,
+        key: res.formParams.key,
+        Signature: res.formParams.signature,
+        policy: res.formParams.policy,
+        success_action_status: res.formParams.successActionStatus
+      }
+  
+  const data = Object.assign(formParams, { file })
+  const formActionUrl = isLocalFile ? uploadUrl : res.formActionUrl
+  
+  const response = await uploadSingleFile(formActionUrl, isLocalFile, data)
+  return isLocalFile ? response : res.ossFileUrl
+}
+
+/**
+ * 兼容旧版上传对象（保留向后兼容）
+ */
+export const upload = {
+  ...uploadUrl,
+  getFormParams: getUploadFormParams,
+  singleFile: uploadSingleFile
 }
 
 // ================================= 加密 =================================
@@ -725,95 +756,6 @@ export const upload = {
 // ================================= 下载 =================================
 
 /**
- * POST 下载文件
- * @param {string} url - 下载 URL
- * @param {Object} data - 请求体数据
- */
-export const postDownload = function (url, data) {
-  request({ method: 'post', url, data, responseType: 'blob' })
-    .then((data) => {
-      handleDownloadData(data)
-    })
-    .catch((error) => {
-      handleDownloadError(error)
-    })
-}
-
-/**
- * GET 下载文件
- * @param {string} url - 下载 URL
- * @param {Object} params - 查询参数
- */
-export const getDownload = function (url, params) {
-  request({ method: 'get', url, params, responseType: 'blob' })
-    .then((data) => {
-      handleDownloadData(data)
-    })
-    .catch((error) => {
-      handleDownloadError(error)
-    })
-}
-
-/**
- * 通用 Excel 下载工具函数
- * 
- * 使用方式：
- * ```js
- * import { downloadExcel } from '@/lib/ag-axios'
- * 
- * const reqDownloadDataFunc = (params) => {
- *   downloadExcel(statisticApi.exportExcel(params), '代理商统计.xlsx')
- * }
- * ```
- * 
- * @param {Promise} apiPromise - API 请求 Promise（应返回 Blob 数据）
- * @param {string} fileName - 下载文件名称（含扩展名）
- */
-export const downloadExcel = (apiPromise, fileName) => {
-  apiPromise
-    .then((res) => {
-      const blob = new Blob([res])
-      if ('download' in document.createElement('a')) {
-        const elink = document.createElement('a')
-        elink.download = fileName
-        elink.style.display = 'none'
-        elink.href = URL.createObjectURL(blob)
-        document.body.appendChild(elink)
-        elink.click()
-        URL.revokeObjectURL(elink.href)
-        document.body.removeChild(elink)
-      } else {
-        navigator.msSaveBlob(blob, fileName)
-      }
-    })
-    .catch((error) => {
-      console.error(error)
-    })
-}
-
-/**
- * 清除所有响应缓存
- */
-export const clearCache = () => {
-  agAxios.clearCache()
-}
-
-/**
- * 取消指定 URL 的请求
- * @param {string} url - 请求 URL
- */
-export const cancelRequest = (url) => {
-  agAxios.cancelRequest(url)
-}
-
-/**
- * 取消所有正在进行的请求
- */
-export const cancelAllRequests = () => {
-  agAxios.cancelAllRequests()
-}
-
-/**
  * 处理下载错误
  * 
  * 错误处理策略：
@@ -826,9 +768,8 @@ export const cancelAllRequests = () => {
  * 
  * @param {Error|Blob} error - 错误对象或 Blob（后端返回的错误信息）
  */
-function handleDownloadError(error) {
+async function handleDownloadError(error) {
   if (error instanceof Blob) {
-    // 后端返回的错误信息以 Blob 形式传递（通常是 JSON 格式）
     const fileReader = new FileReader()
     fileReader.readAsText(error)
     fileReader.onload = () => {
@@ -838,7 +779,6 @@ function handleDownloadError(error) {
       message.error(jsonMsg.msg)
     }
   } else {
-    // 网络错误、请求取消等普通错误
     message.destroy()
     message.error(translate('common.networkError'), error)
   }
@@ -862,38 +802,131 @@ function handleDownloadData(response) {
     return
   }
 
-  // 1. 获取 Content-Type：优先小写，其次大写
   let contentType = _.isUndefined(response.headers?.['content-type'])
     ? response.headers?.['Content-Type']
     : response.headers?.['content-type']
 
-  // 2. 若无 Content-Type 且为 Blob，使用 Blob 自身的 type 或默认值
   if (!contentType && response instanceof Blob) {
     contentType = response.type || 'application/octet-stream'
   }
 
-  // 3. 创建 Blob URL：response.data 为响应数据，直接 response 为 Blob
   let url = window.URL.createObjectURL(new Blob([response.data || response], { type: contentType }))
   
-  // 4. 创建临时下载链接
   let link = document.createElement('a')
   link.style.display = 'none'
   link.href = url
 
-  // 5. 解析文件名：支持 Content-Disposition header 的两种写法（fileName 和 filename）
   let str = _.isUndefined(response.headers?.['content-disposition'])
     ? response.headers?.['Content-Disposition']?.split(';')[1]
     : response.headers?.['content-disposition']?.split(';')[1]
   
-  // 优先尝试 fileName，其次 filename，默认 'download'
   let filename = str ? (str.split('fileName=')[1] || str.split('filename=')[1]) : 'download'
   link.setAttribute('download', decodeURIComponent(filename))
 
-  // 6. 触发下载
   document.body.appendChild(link)
   link.click()
 
-  // 7. 清理临时资源
   document.body.removeChild(link)
   window.URL.revokeObjectURL(url)
+}
+
+/**
+ * POST 下载文件（async/await 风格）
+ * @param {string} url - 下载 URL
+ * @param {Object} data - 请求体数据
+ * @returns {Promise} 下载结果
+ */
+export const postDownload = async (url, data) => {
+  try {
+    const res = await request({ method: 'post', url, data, responseType: 'blob' })
+    handleDownloadData(res)
+    return res
+  } catch (error) {
+    await handleDownloadError(error)
+    throw error
+  }
+}
+
+/**
+ * GET 下载文件（async/await 风格）
+ * @param {string} url - 下载 URL
+ * @param {Object} params - 查询参数
+ * @returns {Promise} 下载结果
+ */
+export const getDownload = async (url, params) => {
+  try {
+    const res = await request({ method: 'get', url, params, responseType: 'blob' })
+    handleDownloadData(res)
+    return res
+  } catch (error) {
+    await handleDownloadError(error)
+    throw error
+  }
+}
+
+/**
+ * 通用文件下载工具函数（async/await 风格）
+ * 
+ * 使用方式：
+ * ```js
+ * import { downloadFile } from '@/lib/ag-axios'
+ * 
+ * const reqDownloadDataFunc = async (params) => {
+ *   await downloadFile(statisticApi.exportExcel(params), '代理商统计.xlsx')
+ * }
+ * ```
+ * 
+ * @param {Promise} apiPromise - API 请求 Promise（应返回 Blob 数据）
+ * @param {string} fileName - 下载文件名称（含扩展名）
+ * @returns {Promise} 下载结果
+ */
+export const downloadFile = async (apiPromise, fileName) => {
+  try {
+    const res = await apiPromise
+    const blob = new Blob([res])
+    if ('download' in document.createElement('a')) {
+      const elink = document.createElement('a')
+      elink.download = fileName
+      elink.style.display = 'none'
+      elink.href = URL.createObjectURL(blob)
+      document.body.appendChild(elink)
+      elink.click()
+      URL.revokeObjectURL(elink.href)
+      document.body.removeChild(elink)
+    } else {
+      navigator.msSaveBlob(blob, fileName)
+    }
+    return res
+  } catch (error) {
+    await handleDownloadError(error)
+    throw error
+  }
+}
+
+/**
+ * Excel 下载工具函数（downloadFile 的别名，保持向后兼容）
+ * @deprecated 使用 downloadFile 替代
+ */
+export const downloadExcel = downloadFile
+
+/**
+ * 清除所有响应缓存
+ */
+export const clearCache = () => {
+  agAxios.clearCache()
+}
+
+/**
+ * 取消指定 URL 的请求
+ * @param {string} url - 请求 URL
+ */
+export const cancelRequest = (url) => {
+  agAxios.cancelRequest(url)
+}
+
+/**
+ * 取消所有正在进行的请求
+ */
+export const cancelAllRequests = () => {
+  agAxios.cancelAllRequests()
 }

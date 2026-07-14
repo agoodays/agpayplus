@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="ag-table">
     <!-- 工具栏 -->
     <ag-table-toolbar
@@ -182,6 +182,7 @@ const dragKey = ref(null)
 
 const {
   computedLoading,
+  isLoading,
   tableData,
   paginationConfig,
   reload,
@@ -404,6 +405,7 @@ defineExpose({
   resetColumnSettings,
   startAutoRefresh,
   stopAutoRefresh,
+  isLoading,
   getSelectedRowKeys: () => state.selectedRowKeys,
   getSelectedRows: () => state.selectedRows,
   clearSelection: handleClearSelection,

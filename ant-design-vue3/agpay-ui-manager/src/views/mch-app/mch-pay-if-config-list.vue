@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ag-drawer
     v-model:open="localOpen"
     :closable="true"
@@ -67,10 +67,11 @@
         <div class="split-line"/>
         <ag-table
           ref="tableRef"
+          row-key="wayCode"
+          state-key="mch_pay_if_config_list_table_columns"
           :on-load="reqTableDataFunc"
           :columns="tableColumns"
           :search-data="searchData2"
-          row-key="wayCode"
         >
           <template #stateSlot="{ record }">
             <a-badge :status="record.passageState === 0 ? 'error' : 'processing'" :text="record.passageState === 0 ? '禁用' : '启用'" />
@@ -135,11 +136,10 @@ const tableColumns = [
   { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式代码' },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称' },
   { key: 'passageState', title: '状态', customRender: 'stateSlot' },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 const currentStep = ref(0)
-const loading = ref(false)
 const localOpen = ref(false)
 const cardListData = ref([])
 const searchData2 = reactive({})
@@ -167,30 +167,45 @@ watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
+/**
+ * 切换步骤
+ * @param {number} current - 当前步骤
+ */
 const stepChange = (current) => {
   currentStep.value = current
 }
 
-const reqCardListFunc = () => {
-  return mchAppApi.queryPage({ appId: props.appId })
+/**
+ * 加载卡片列表数据
+ */
+const refCardList = async () => {
+  const res = await mchAppApi.queryPage({ appId: props.appId, pageSize: -1 })
+  cardListData.value = res.records || res
 }
 
-const refCardList = () => {
-  mchAppApi.queryPage({ appId: props.appId, pageSize: -1 }).then(res => {
-    cardListData.value = res.records || res
-  })
+/**
+ * 表格数据加载函数
+ * @param {Object} params - 查询参数
+ * @returns {Promise} 查询结果
+ */
+const reqTableDataFunc = async (params) => {
+  return await mchAppApi.queryMchPayPassagePage(Object.assign(params, { appId: props.appId }))
 }
 
-const reqTableDataFunc = (params) => {
-  return mchAppApi.queryMchPayPassagePage(Object.assign(params, { appId: props.appId }))
-}
-
+/**
+ * 搜索触发
+ * @param {boolean} isToFirst - 是否跳转到第一页
+ */
 const searchFunc = (isToFirst = false) => {
   if (tableRef.value) {
     tableRef.value.refTable(isToFirst)
   }
 }
 
+/**
+ * 编辑支付接口配置
+ * @param {Object} record - 记录数据
+ */
 const editPayIfConfigFunc = (record) => {
   if (!record) return
   if (record.subMchIsvConfig === 0) {
@@ -211,17 +226,20 @@ const editPayIfConfigFunc = (record) => {
   }
 }
 
-const editPayPassageFunc = (record) => {
-  mchAppApi.getAvailablePayInterfaceList(props.appId, record.wayCode).then(resData => {
-    if (!resData.records || resData.records.length === 0) {
-      Modal.error({
-        title: '提示',
-        content: '暂无可用支付接口配置'
-      })
-    } else {
-      message.info('支付通道配置功能开发中')
-    }
-  })
+/**
+ * 编辑支付通道配置
+ * @param {Object} record - 记录数据
+ */
+const editPayPassageFunc = async (record) => {
+  const resData = await mchAppApi.getAvailablePayInterfaceList(props.appId, record.wayCode)
+  if (!resData.records || resData.records.length === 0) {
+    Modal.error({
+      title: '提示',
+      content: '暂无可用支付接口配置'
+    })
+  } else {
+    message.info('支付通道配置功能开发中')
+  }
 }
 
 /** 处理关闭 */
@@ -229,6 +247,10 @@ const handleClose = () => {
   localOpen.value = false
 }
 
+/**
+ * 跳转到支付宝授权页面
+ * @param {Object} record - 记录数据
+ */
 const toAlipayAuthPageFunc = (record) => {
   if (!record) return
   if (record.subMchIsvConfig === 0) {

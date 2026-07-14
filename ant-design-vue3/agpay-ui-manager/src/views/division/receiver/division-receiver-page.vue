@@ -2,16 +2,16 @@
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-select
+              <ag-select-infinite
                 v-model="searchData.mchNo"
-                :api="searchMch"
-                value-field="mchNo"
-                label-field="mchName"
                 placeholder="商户号(支持按商户名称搜索)"
+                search-field="mchName"
+                :fetch-data="searchMch"
+                :field-names="{ label: 'mchName', value: 'mchNo' }"
               />
             </a-form-item>
           </a-col>
@@ -37,21 +37,25 @@
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <a-select v-model:value="searchData.state" placeholder="账户状态(系统默认)" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">正常可用</a-select-option>
-                <a-select-option value="0">暂停使用</a-select-option>
-              </a-select>
+              <ag-select
+                v-model="searchData.state"
+                placeholder="账户状态(系统默认)"
+                allow-clear
+                :options="[
+                  { value: '0', label: '暂停使用' },
+                  { value: '1', label: '正常可用' }
+                ]"
+              />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <a-select v-model:value="searchData.ifCode" placeholder="支付接口">
+              <a-select v-model="searchData.ifCode" placeholder="支付接口">
                 <a-select-option value="">全部</a-select-option>
                 <a-select-option v-for="item in ifDefineList" :key="item.ifCode">
-                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }"
-                    ><img class="icon" :src="item.icon" alt=""
-                  /></span>
+                  <span class="icon-style" :style="{ backgroundColor: item.bgColor }">
+                    <img class="icon" :src="item.icon" alt="" />
+                  </span>
                   {{ item.ifName }}[{{ item.ifCode }}]
                 </a-select-option>
               </a-select>
@@ -63,10 +67,11 @@
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="receiverId"
+        state-key="division_receiver_table_columns"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
-        :params="searchData"
-        row-key="receiverId"
+        :search-data="searchData"
       >
         <template #toolbar-left>
           <a-button
@@ -74,8 +79,7 @@
             type="primary"
             @click="addFunc"
           >
-            <template #icon><PlusOutlined /></template>
-            新增
+            <plus-outlined /> 新增
           </a-button>
         </template>
         <template #receiverIdSlot="{ record }">
@@ -146,17 +150,16 @@
  */
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
-import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { defineAsyncComponent, nextTick, onMounted, reactive, ref } from 'vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { onMounted, ref } from 'vue'
+import ReceiverAdd from './receiver-add.vue'
+import ReceiverEdit from './receiver-edit.vue'
+import Detail from './detail.vue'
 
-// 权限检查
+/** 权限检查 */
 const { hasPermission } = usePermission()
-
-// 动态导入组件
-const ReceiverAdd = defineAsyncComponent(() => import('./receiver-add.vue'))
-const ReceiverEdit = defineAsyncComponent(() => import('./receiver-edit.vue'))
-const Detail = defineAsyncComponent(() => import('./detail.vue'))
 
 /**
  * 表格列配置
@@ -178,39 +181,28 @@ const tableColumns = [
   { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '默认分账比例', width: 160, customRender: 'divisionProfitSlot' },
   { key: 'bindSuccessTime', dataIndex: 'bindSuccessTime', title: '绑定成功时间', width: 200 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**
- * 组件引用
+ * 使用 CRUD 表格页面组合式函数
  */
-const tableRef = ref(null)
+const {
+  tableRef,
+  searchData,
+  currentRecordId,
+  reloadTable
+} = useCrudTablePage()
 
-/**
- * 当前记录ID
- */
-const currentRecordId = ref('')
+// 初始化搜索数据
+searchData.appId = ''
 
-/**
- * 搜索表单数据
- */
-const searchData = reactive({ appId: '' })
-
-/**
- * 加载状态
- */
-const loading = ref(false)
-
-/**
- * 弹窗显示状态
- */
+/** 弹窗显示状态 */
 const showReceiverAdd = ref(false)
 const showReceiverEdit = ref(false)
 const showDetail = ref(false)
 
-/**
- * 支付接口定义列表
- */
+/** 支付接口定义列表 */
 const ifDefineList = ref([])
 
 /**
@@ -218,9 +210,7 @@ const ifDefineList = ref([])
  * @param {Object} params - 搜索参数
  * @returns {Promise<Object>} 商户列表
  */
-const searchMch = (params) => {
-  return divisionReceiverApi.listMch(params)
-}
+const searchMch = (params) => divisionReceiverApi.listMch(params)
 
 /**
  * 请求表格数据函数
@@ -243,17 +233,10 @@ const reqIfDefineListFunc = async () => {
   }
 }
 
-/**
- * 搜索函数
- */
-const searchFunc = () => {
-  loading.value = true
-  tableRef.value?.reload()
-}
+/** 搜索函数 */
+const searchFunc = () => reloadTable()
 
-/**
- * 新增收款账户
- */
+/** 新增收款账户 */
 const addFunc = () => {
   showReceiverAdd.value = true
 }
@@ -276,9 +259,7 @@ const editFunc = (recordId) => {
   showReceiverEdit.value = true
 }
 
-/**
- * 组件挂载时初始化
- */
+/** 组件挂载时初始化 */
 onMounted(() => {
   reqIfDefineListFunc()
 })

@@ -1,14 +1,12 @@
-﻿<template>
+<template>
   <ag-drawer
-    :mask-closable="false"
-    :open="localOpen"
+    v-model:open="localOpen"
     :title="'设置权限匹配规则'"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
     class="drawer-width"
     @close="onClose"
-    @update:open="handleUpdateOpen"
   >
     <a-row>
       <a-col span="24">
@@ -24,7 +22,6 @@
       </a-col>
       <a-col span="10">
         <p v-if="hasEnt">请选择权限：</p>
-        <!-- 树状结构 -->
         <a-tree v-model="checkedKeys" :tree-data="treeData" :replace-fields="replaceFields" :checkable="true" />
       </a-col>
       <a-col span="14">
@@ -58,7 +55,7 @@
       </a-col>
     </a-row>
     <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" style="margin-right: 8px" @click="onClose">
+      <a-button :style="{ marginRight: '8px' }" @click="onClose">
         <template #icon><CloseOutlined /></template>
         取消
       </a-button>
@@ -162,18 +159,17 @@ watch(() => props.open, (newVal) => {
 })
 
 /**
+ * 监听本地open变化，同步emit
+ */
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+/**
  * 关闭弹窗
  */
 const onClose = () => {
   emit('update:open', false)
-}
-
-/**
- * 处理open更新事件
- */
-const handleUpdateOpen = (val) => {
-  localOpen.value = val
-  emit('update:open', val)
 }
 
 /**
@@ -299,8 +295,6 @@ const getAllPid = (entId, array) => {
     getAllPid(allEntList.value[entId].pid, array)
   }
 }
-
-defineExpose({ show })
 </script>
 
 <style scoped>

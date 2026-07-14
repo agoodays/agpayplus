@@ -1,39 +1,45 @@
 <template>
   <div>
-    <ag-card
-      ref="infoCard"
-      :req-card-list-func="reqCardListFunc"
-      :span="agpayCard.span"
-      :height="agpayCard.height"
-      :name="agpayCard.name"
-      :add-authority="agpayCard.addAuthority"
-      @add-ag-card="addOrEdit"
-    >
-      <template #cardContentSlot="{record}">
-        <div :style="{'height': agpayCard.height + 'px'}" class="ag-card-content">
-          <!-- 卡片自定义样式 -->
-          <div class="ag-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
-            <img v-if="record.icon" :src="record.icon" :style="{height: agpayCard.height/5 + 'px'}">
-          </div>
-          <div class="ag-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
-            <div class="title">
-              {{ record.ifName }}
+    <a-card :bordered="false">
+      <ag-card
+        ref="cardRef"
+        :req-card-list-func="reqCardListFunc"
+        :span="agpayCard.span"
+        :height="agpayCard.height"
+        :name="agpayCard.name"
+        :add-authority="agpayCard.addAuthority"
+        @add="handleAdd"
+      >
+        <template #cardContentSlot="{ record }">
+          <div :style="{'height': agpayCard.height + 'px'}" class="ag-card-content">
+            <!-- 卡片自定义样式 -->
+            <div class="ag-card-content-header" :style="{backgroundColor: record.bgColor, height: agpayCard.height/2 + 'px'}">
+              <img v-if="record.icon" :src="record.icon" :style="{height: agpayCard.height/5 + 'px'}">
+            </div>
+            <div class="ag-card-content-body" :style="{height: (agpayCard.height/2 - 50) + 'px'}">
+              <div class="title">
+                {{ record.ifName }}
+              </div>
+            </div>
+            <!-- 卡片底部操作栏 -->
+            <div class="ag-card-ops">
+              <a-tooltip placement="top" title="编辑">
+                <a-button type="text" v-if="hasPermission('ENT_PC_IF_DEFINE_EDIT')"  @click="handleEdit(record.ifCode)">
+                  <edit-outlined />
+                </a-button>
+              </a-tooltip>
+              <a-tooltip placement="top" title="删除">
+                <a-button type="text" danger @click="del(record.ifCode)">
+                  <delete-outlined />
+                </a-button>
+              </a-tooltip>
             </div>
           </div>
-          <!-- 卡片底部操作栏 -->
-          <div class="ag-card-ops">
-            <a-tooltip placement="top" title="编辑">
-              <icons.EditOutlined />
-            </a-tooltip>
-            <a-tooltip placement="top" title="删除">
-              <icons.DeleteOutlined />
-            </a-tooltip>
-          </div>
-        </div>
-      </template>
-    </ag-card>
+        </template>
+      </ag-card>
+    </a-card>
     <!-- 新增页面组件  -->
-    <add-or-edit v-model:open="modalOpen" :if-code="currentIfCode" @success="handleSuccess" />
+    <add-or-edit v-model:open="addOrEditOpen" :if-code="currentIfCode" @success="handleSuccess" />
   </div>
 </template>
 
@@ -45,20 +51,23 @@
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { reactive, ref } from 'vue'
-import AddOrEdit from './add-or-edit.vue'
 import { message } from 'ant-design-vue'
+import { AgCard } from '@/components'
+import { usePermission } from '@/composables/useCommon'
+import AddOrEdit from './add-or-edit.vue'
 
-const icons = { DeleteOutlined, EditOutlined }
+// 权限检查
+const { hasPermission } = usePermission()
 
 /**
  * 卡片组件引用
  */
-const infoCard = ref(null)
+const cardRef = ref(null)
 
 /**
- * 弹窗状态
+ * 新增编辑组件引用
  */
-const modalOpen = ref(false)
+const addOrEditOpen = ref(false)
 const currentIfCode = ref('')
 
 /**
@@ -66,9 +75,9 @@ const currentIfCode = ref('')
  */
 const agpayCard = reactive({
   name: '支付接口',
-  height: 300,
+  height: 360,
   span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 },
-  addAuthority: true
+  addAuthority: hasPermission('ENT_PC_IF_DEFINE_ADD')
 })
 
 /**
@@ -83,16 +92,25 @@ const reqCardListFunc = async () => {
  * 刷新卡片列表
  */
 const refCardList = () => {
-  infoCard.value?.refCardList()
+  cardRef.value?.refreshCardList()
 }
 
 /**
- * 新增或编辑支付接口定义
- * @param {string} ifCode - 接口编码
+ * 新增支付接口定义
  */
-const addOrEdit = (ifCode) => {
-  currentIfCode.value = ifCode || ''
-  modalOpen.value = true
+function handleAdd() {
+  currentIfCode.value = null
+  addOrEditOpen.value = true
+}
+
+
+/**
+ * 编辑支付接口定义
+ * @param {string|number} ifCode 接口编码
+ */
+function handleEdit(ifCode) {
+  currentIfCode.value = ifCode
+  addOrEditOpen.value = true
 }
 
 /**
@@ -121,43 +139,63 @@ const del = async (ifCode) => {
 </script>
 
 <style lang="less" scoped>
-  .ag-card-content {
-    width: 100%;
-    position: relative;
-    background-color: #f5f5f5;
-    border-radius: 6px;
-    overflow:hidden;
+.ag-card-content {
+  width: 100%;
+  position: relative;
+  background-color: var(--base-bg-color);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.3s;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   }
-  .ag-card-ops {
-    width: 100%;
-    height: 50px;
-    background-color: #f5f5f5;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    border-top: 1px solid #e8e8e8;
-    position: absolute;
-    bottom: 0;
-  }
-  .ag-card-content-header {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
-  .ag-card-content-body {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-  }
-  .title {
+}
+
+.ag-card-ops {
+  width: 100%;
+  height: 50px;
+  background-color: var(--surface-subtle);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  border-top: 1px solid var(--border-color);
+  position: absolute;
+  bottom: 0;
+
+  :deep(.ant-btn) {
+    padding: 4px 8px;
     font-size: 16px;
-    font-family: PingFang SC, PingFang SC-Bold;
-    font-weight: 700;
-    color: #1a1a1a;
-    letter-spacing: 1px;
+
+    &:hover {
+      color: var(--primary-color);
+    }
   }
+}
+
+.ag-card-content-header {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.ag-card-content-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-color);
+  letter-spacing: 1px;
+}
 </style>

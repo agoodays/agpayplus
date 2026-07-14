@@ -1,33 +1,29 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    :title="'商户高级配置'"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+    title="商户高级配置"
+    :mask-closable="false"
     width="60%"
     @close="handleClose"
   >
-    <a-tabs v-model:activeKey="groupKey" @change="selectTabs" :animated="false">
+    <a-tabs v-model:active-key="groupKey" @change="selectTabs" :animated="false">
       <a-tab-pane key="orderConfig" tab="系统配置">
-        <div class="account-settings-info-view" v-if="groupKey === 'orderConfig'">
-          <a-form layout="horizontal">
+        <div v-if="groupKey === 'orderConfig'">
+          <a-form :model="configData" layout="horizontal">
             <a-row>
               <a-col :span="8" :offset="1" :key="config" v-for="(item, config) in configData">
                 <a-form-item :label="item.configName">
                   <a-radio-group v-model:value="item.configVal">
-                    <a-radio :value="'1'">启用</a-radio>
-                    <a-radio :value="'0'">禁用</a-radio>
+                    <a-radio value="1">启用</a-radio>
+                    <a-radio value="0">禁用</a-radio>
                   </a-radio-group>
                 </a-form-item>
               </a-col>
             </a-row>
             <a-row>
               <a-col :span="19">
-                <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" @click="confirm('系统配置')" :loading="loading">
-                  <template #icon><CheckCircleOutlined /></template>
-                  确认更新
-                </a-button>
+                <a-form-item style="display: flex; justify-content: center">
+                  <a-button type="primary" @click="confirm('系统配置')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -35,14 +31,14 @@
         </div>
       </a-tab-pane>
       <a-tab-pane key="payOrderNotifyConfig" tab="回调和查单参数">
-        <div class="account-settings-info-view" v-if="groupKey === 'payOrderNotifyConfig'">
-          <a-form layout="vertical">
+        <div v-if="groupKey === 'payOrderNotifyConfig'">
+          <a-form :model="configData" layout="vertical">
             <a-row>
               <a-col :span="22" :offset="1" :key="config" v-for="(item, config) in configData">
                 <div v-if="item.configKey !== 'payOrderNotifyExtParams'">
                   <a-form-item :label="item.configName" v-if="item.type === 'text' || item.type === 'textarea'">
                     <a-input :type="item.type === 'text' ? 'text' : 'textarea'" v-model:value="item.configVal" autocomplete="off" />
-                    <div class="agpay-tip-text" v-if="item.configKey === 'mchRefundNotifyUrl'">
+                    <div v-if="item.configKey === 'mchRefundNotifyUrl'" class="agpay-tip-text">
                       <span>智能POS收款、退款等场景下，需要配置商户回调地址，接口下单以下单传参为准</span>
                     </div>
                   </a-form-item>
@@ -59,13 +55,13 @@
                         <template #title>
                           <span>回调方式</span>
                         </template>
-                        <span><component :is="icons.QuestionCircleOutlined" /></span>
+                        <span><InfoCircleOutlined /></span>
                       </a-popover>
                     </template>
                     <a-radio-group v-model:value="item.configVal">
-                      <a-radio :value="'POST_JSON'">POST(JSON 形式)</a-radio>
-                      <a-radio :value="'POST_BODY'">POST(Body 形式)</a-radio>
-                      <a-radio :value="'POST_QUERYSTRING'">POST(QueryString 形式)</a-radio>
+                      <a-radio value="POST_JSON">POST(JSON 形式)</a-radio>
+                      <a-radio value="POST_BODY">POST(Body 形式)</a-radio>
+                      <a-radio value="POST_QUERYSTRING">POST(QueryString 形式)</a-radio>
                     </a-radio-group>
                   </a-form-item>
                 </div>
@@ -76,17 +72,15 @@
                     :row-selection="rowSelection"
                     :columns="orderNotifyParamsColumns"
                     :data-source="orderNotifyParamsData"
-                    :pagination="false" />
+                    :pagination="false"
+                  />
                 </div>
               </a-col>
             </a-row>
             <a-row>
               <a-col :span="19">
-                <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" @click="confirm('回调参数', '更新完成后请尽快检查回调接收地址，避免验签失败造成业务损失！')" :loading="loading">
-                  <template #icon><CheckCircleOutlined /></template>
-                  确认更新
-                </a-button>
+                <a-form-item style="display: flex; justify-content: center">
+                  <a-button type="primary" @click="confirm('回调参数', '更新完成后请尽快检查回调接收地址，避免验签失败造成业务损失！')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -94,11 +88,11 @@
         </div>
       </a-tab-pane>
       <a-tab-pane key="divisionManage" tab="分账管理">
-        <div class="account-settings-info-view" v-if="groupKey === 'divisionManage'">
-          <a-form layout="horizontal">
+        <div v-if="groupKey === 'divisionManage'">
+          <a-form :model="divisionConfig" layout="horizontal">
             <a-row>
               <a-col :span="22" :offset="1">
-                <a-form-item style="margin-bottom: 0;">
+                <a-form-item style="margin-bottom: 0">
                   <template #label>
                     <span title="全局自动分账" style="margin-right: 4px">全局自动分账</span>
                     <a-popover placement="top">
@@ -109,7 +103,7 @@
                       <template #title>
                         <span>全局自动分账</span>
                       </template>
-                      <span><component :is="icons.QuestionCircleOutlined" /></span>
+                      <span><InfoCircleOutlined /></span>
                     </a-popover>
                   </template>
                   <a-radio-group v-model:value="divisionConfig.overrideAutoFlag">
@@ -117,35 +111,26 @@
                     <a-radio :value="0">关闭</a-radio>
                   </a-radio-group>
                 </a-form-item>
-                <a-form-item v-if="divisionConfig.overrideAutoFlag" class="division" title="金额限制">
+                <a-form-item v-if="divisionConfig.overrideAutoFlag === 1" class="division" label="金额限制">
                   <a-divider orientation="left">全局自动分账规则</a-divider>
-                  <div class="ant-col ant-form-item-label division-rule-label">
-                    <label class="division-rule-label-head">金额限制:</label>
-                    <label>当订单金额大于等于</label>
-                  </div>
-                  <a-input-number :min="0" :formatter="(value) => `${value} 元`" v-model:value="divisionConfig.autoDivisionRules.amountLimit" />
-                  <div class="ant-col ant-form-item-label division-rule-label">
-                    <label class="division-rule-label-tail">时自动分账</label>
+                  <div style="display: flex; align-items: center;">
+                    <span style="margin-right: 8px">当订单金额大于等于</span>
+                    <a-input-number :min="0" :formatter="value => `${value} 元`" v-model:value="divisionConfig.autoDivisionRules.amountLimit" />
+                    <span style="margin-left: 8px">时自动分账</span>
                   </div>
                 </a-form-item>
-                <a-form-item v-if="divisionConfig.overrideAutoFlag" class="division" title="自动分账时间">
-                  <div class="ant-col ant-form-item-label division-rule-label">
-                    <label class="division-rule-label-head">自动分账时间:</label>
-                    <label>订单支付成功</label>
-                  </div>
-                  <a-select
-                    v-model:value="divisionConfig.autoDivisionRules.delayTime"
-                    style="width: 90px"
-                  >
-                    <a-select-option :value="2 * 60">2分钟</a-select-option>
-                    <a-select-option :value="5 * 60">5分钟</a-select-option>
-                    <a-select-option :value="10 * 60">10分钟</a-select-option>
-                    <a-select-option :value="30 * 60">30分钟</a-select-option>
-                    <a-select-option :value="1 * 60 * 60">1小时</a-select-option>
-                    <a-select-option :value="2 * 60 * 60">2小时</a-select-option>
-                  </a-select>
-                  <div class="ant-col ant-form-item-label division-rule-label">
-                    <label class="division-rule-label-tail">后</label>
+                <a-form-item v-if="divisionConfig.overrideAutoFlag === 1" class="division" label="自动分账时间">
+                  <div style="display: flex; align-items: center;">
+                    <span style="margin-right: 8px">订单支付成功</span>
+                    <a-select v-model:value="divisionConfig.autoDivisionRules.delayTime" style="width: 90px">
+                      <a-select-option :value="2 * 60">2分钟</a-select-option>
+                      <a-select-option :value="5 * 60">5分钟</a-select-option>
+                      <a-select-option :value="10 * 60">10分钟</a-select-option>
+                      <a-select-option :value="30 * 60">30分钟</a-select-option>
+                      <a-select-option :value="1 * 60 * 60">1小时</a-select-option>
+                      <a-select-option :value="2 * 60 * 60">2小时</a-select-option>
+                    </a-select>
+                    <span style="margin-left: 8px">后</span>
                   </div>
                 </a-form-item>
               </a-col>
@@ -161,7 +146,7 @@
                       <template #title>
                         <span>商户管理功能限制</span>
                       </template>
-                      <span><component :is="icons.QuestionCircleOutlined" /></span>
+                      <span><InfoCircleOutlined /></span>
                     </a-popover>
                   </template>
                   <a-radio-group v-model:value="divisionConfig.mchDivisionEntFlag">
@@ -173,11 +158,8 @@
             </a-row>
             <a-row>
               <a-col :span="19">
-                <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" @click="confirm('分账设置')" :loading="loading">
-                  <template #icon><CheckCircleOutlined /></template>
-                  确认更新
-                </a-button>
+                <a-form-item style="display: flex; justify-content: center">
+                  <a-button type="primary" @click="confirm('分账设置')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -185,7 +167,7 @@
         </div>
       </a-tab-pane>
       <a-tab-pane key="mchApiEnt" tab="接口权限">
-        <div class="account-settings-info-view" v-if="groupKey === 'mchApiEnt'">
+        <div v-if="groupKey === 'mchApiEnt'">
           <a-form layout="horizontal">
             <a-row>
               <a-col :span="24">
@@ -196,17 +178,15 @@
                     :row-selection="mchApiEntRowSelection"
                     :columns="mchApiEntColumns"
                     :data-source="mchApiEntData"
-                    :pagination="false" />
+                    :pagination="false"
+                  />
                 </div>
               </a-col>
             </a-row>
             <a-row>
               <a-col :span="24">
-                <a-form-item style="display:flex;justify-content:center">
-                  <a-button type="primary" @click="confirm('商户的接口权限')" :loading="loading">
-                  <template #icon><CheckCircleOutlined /></template>
-                  确认更新
-                </a-button>
+                <a-form-item style="display: flex; justify-content: center">
+                  <a-button type="primary" @click="confirm('商户的接口权限')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -218,32 +198,30 @@
 </template>
 
 <script setup>
-/**
- * 商户高级配置组件
- * 功能：配置商户系统配置、回调参数、分账管理、接口权限
- */
 import { AgDrawer } from '@/components'
-import { ref, reactive, computed, watch } from 'vue'
-import { message, Modal } from 'ant-design-vue'
-import { CheckCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { mchApi } from '@/api/business/mch/mch-api'
+import { InfoCircleOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { ref, computed, watch } from 'vue'
 
-const icons = { QuestionCircleOutlined }
-
-/** Props 定义 */
 const props = defineProps({
   open: {
     type: Boolean,
     default: false
   },
-  mchNo: {
+  recordId: {
     type: String,
-    default: ''
+    default: null
   }
 })
 
-/** 事件定义 */
 const emit = defineEmits(['update:open', 'success'])
+
+const localOpen = ref(false)
+const btnLoading = ref(false)
+const groupKey = ref('orderConfig')
+const configData = ref([])
+const isShowMchApiEnt = ref(false)
 
 const orderNotifyParamsColumns = [
   { title: '参数KEY', dataIndex: 'key' },
@@ -284,6 +262,8 @@ const orderNotifyParamsData = [
   { key: 'expiredTime', name: '订单失效时间' }
 ]
 
+const payOrderNotifyExtParams = ref([])
+
 const mchApiEntColumns = [
   { title: '名称', dataIndex: 'name' },
   { title: 'KEY', dataIndex: 'key' },
@@ -305,15 +285,9 @@ const mchApiEntData = [
   { name: '对分账用户的渠道余额发起提现', key: 'API_DIVISION_CHANNEL_CASHOUT', path: '/api/division/receiver/channelBalanceCashout' }
 ]
 
-const recordId = ref(null)
-const localOpen = ref(false)
-const loading = ref(false)
-const payOrderNotifyExtParams = ref([])
-const isShowMchApiEnt = ref(false)
 const mchApiEnts = ref([])
-const groupKey = ref(null)
-const configData = ref([])
-const divisionConfig = reactive({
+
+const divisionConfig = ref({
   overrideAutoFlag: 0,
   autoDivisionRules: {
     amountLimit: 0,
@@ -322,37 +296,16 @@ const divisionConfig = reactive({
   mchDivisionEntFlag: 1
 })
 
-/** 监听 open 属性变化 */
-watch(
-  () => props.open,
-  (val) => {
-    localOpen.value = val
-    if (val && props.mchNo) {
-      recordId.value = props.mchNo
-      groupKey.value = 'orderConfig'
-      payOrderNotifyExtParams.value = []
-      isShowMchApiEnt.value = false
-      mchApiEnts.value = []
-      detail()
-    }
-  }
-)
-
-/** 监听本地 open 变化，同步 emit */
-watch(localOpen, (val) => {
-  emit('update:open', val)
-})
-
 const rowSelection = computed(() => ({
   onChange: (selectedRowKeys, selectedRows) => {
     payOrderNotifyExtParams.value = []
-    selectedRows.forEach((record) => {
+    selectedRows.forEach(record => {
       if (!record.disabled) {
         payOrderNotifyExtParams.value.push(record.key)
       }
     })
   },
-  getCheckboxProps: (record) => ({
+  getCheckboxProps: record => ({
     props: {
       disabled: record.disabled,
       defaultChecked: record.disabled || payOrderNotifyExtParams.value.includes(record.key)
@@ -363,119 +316,93 @@ const rowSelection = computed(() => ({
 const mchApiEntRowSelection = computed(() => ({
   onChange: (selectedRowKeys, selectedRows) => {
     mchApiEnts.value = []
-    selectedRows.forEach((record) => {
+    selectedRows.forEach(record => {
       mchApiEnts.value.push(record.key)
     })
   },
-  getCheckboxProps: (record) => ({
+  getCheckboxProps: record => ({
     props: {
       defaultChecked: mchApiEnts.value.includes(record.key)
     }
   })
 }))
 
-/** 处理关闭 */
-const handleClose = () => {
-  localOpen.value = false
-}
-
 const detail = async () => {
   configData.value = []
-  const res = await mchApi.getMchConfigs(groupKey.value, recordId.value)
+  const res = await mchApi.getMchConfigs(groupKey.value, { mchNo: props.recordId })
   configData.value = res
   if (groupKey.value === 'payOrderNotifyConfig') {
-    const extParams = res.find((item) => item.configKey === 'payOrderNotifyExtParams')
-    if (extParams) {
-      payOrderNotifyExtParams.value = JSON.parse(extParams.configVal)
+    const extParamsItem = res.find(item => item.configKey === 'payOrderNotifyExtParams')
+    if (extParamsItem) {
+      payOrderNotifyExtParams.value = JSON.parse(extParamsItem.configVal)
     }
   }
   if (groupKey.value === 'divisionManage') {
-    const divConfig = res.find((item) => item.configKey === 'divisionConfig')
-    if (divConfig) {
-      Object.assign(divisionConfig, JSON.parse(divConfig.configVal))
+    const divisionItem = res.find(item => item.configKey === 'divisionConfig')
+    if (divisionItem) {
+      divisionConfig.value = JSON.parse(divisionItem.configVal)
     }
   }
   if (groupKey.value === 'mchApiEnt') {
-    const apiEnt = res.find((item) => item.configKey === 'mchApiEntList')
-    if (apiEnt) {
-      mchApiEnts.value = JSON.parse(apiEnt.configVal)
+    const apiEntItem = res.find(item => item.configKey === 'mchApiEntList')
+    if (apiEntItem) {
+      mchApiEnts.value = JSON.parse(apiEntItem.configVal)
     }
     isShowMchApiEnt.value = true
   }
 }
 
-const selectTabs = (key) => {
-  if (key) {
-    groupKey.value = key
-    isShowMchApiEnt.value = false
-    detail()
+const selectTabs = async (key) => {
+  groupKey.value = key
+  isShowMchApiEnt.value = false
+  await detail()
+}
+
+const confirm = async (title, content) => {
+  const jsonObject = {}
+  for (const i in configData.value) {
+    const item = configData.value[i]
+    switch (item.configKey) {
+      case 'payOrderNotifyExtParams':
+        jsonObject[item.configKey] = JSON.stringify(payOrderNotifyExtParams.value)
+        break
+      case 'divisionConfig':
+        jsonObject[item.configKey] = JSON.stringify(divisionConfig.value)
+        break
+      case 'mchApiEntList':
+        jsonObject[item.configKey] = JSON.stringify(mchApiEnts.value)
+        break
+      default:
+        jsonObject[item.configKey] = item.configVal
+        break
+    }
+  }
+  btnLoading.value = true
+  try {
+    await mchApi.updateMchConfigs(groupKey.value, jsonObject)
+    message.success('更新成功')
+    emit('success')
+    handleClose()
+  } catch (error) {
+    console.error('更新失败:', error)
+  } finally {
+    btnLoading.value = false
   }
 }
 
-const confirm = (title, content) => {
-  Modal.confirm({
-    title: `确认修改${title}吗？`,
-    content: content,
-    okType: 'primary',
-    async onOk() {
-      loading.value = true
-      const jsonObject = {}
-      configData.value.forEach((item) => {
-        switch (item.configKey) {
-          case 'payOrderNotifyExtParams':
-            jsonObject[item.configKey] = JSON.stringify(payOrderNotifyExtParams.value)
-            break
-          case 'divisionManage':
-            jsonObject[item.configKey] = JSON.stringify(divisionConfig)
-            break
-          case 'mchApiEntList':
-            jsonObject[item.configKey] = JSON.stringify(mchApiEnts.value)
-            break
-          default:
-            jsonObject[item.configKey] = item.configVal
-            break
-        }
-      })
-      try {
-        await mchApi.updateMchConfigs(groupKey.value, { mchNo: recordId.value, configs: jsonObject })
-        message.success('修改成功')
-      } finally {
-        loading.value = false
-      }
-    }
-  })
+const handleClose = () => {
+  localOpen.value = false
+  emit('update:open', false)
 }
 
-defineExpose({ show })
+watch(() => props.open, (newVal) => {
+  if (newVal) {
+    localOpen.value = true
+    groupKey.value = 'orderConfig'
+    payOrderNotifyExtParams.value = []
+    isShowMchApiEnt.value = false
+    mchApiEnts.value = []
+    detail()
+  }
+})
 </script>
-
-<style lang="less" scoped>
-.agpay-tip-text:before {
-  content: "";
-  width: 0;
-  height: 0;
-  border: 10px solid transparent;
-  border-bottom-color: #ffeed8;
-  position: absolute;
-  top: -20px;
-  left: 30px;
-}
-.agpay-tip-text {
-  font-size: 12px !important;
-  border-radius: 5px;
-  background: #ffeed8;
-  color: #c57000 !important;
-  padding: 5px 10px;
-  display: inline-block;
-  max-width: 100%;
-  position: relative;
-  margin-top: 15px;
-  line-height: 1.5715;
-}
-.division-rule-label > label::after {
-  content: '';
-}
-.division-rule-label-tail {
-  margin-left: 10px;
-}
-</style>

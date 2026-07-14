@@ -63,7 +63,9 @@ export default {
     logout: '退出登录',
     confirmLogoutTitle: '确认退出',
     confirmLogoutContent: '你好 {name}，确认退出登录吗？',
-    footerCopyright: 'Copyright ©2023-{year} AgPay | 吉日科技'
+    footerCopyright: 'Copyright ©2023-{year} AgPay | 吉日科技',
+    switchDarkMode: '切换暗黑模式',
+    switchLightMode: '切换明亮模式'
   },
   userLayout: {
     footerCopyright: 'Copyright ©2023-{year} 吉日科技 版权所有',
@@ -79,6 +81,7 @@ export default {
     delete: '删除',
     confirmDelete: '确认删除？',
     scrollLoadMore: '滚动加载更多',
+    noMoreData: '没有更多数据了',
     searching: '搜索中...'
   },
   common: {

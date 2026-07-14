@@ -1,10 +1,11 @@
-﻿<template>
+<template>
   <a-card :bordered="false">
     <div style="margin-bottom: 16px">
       <ag-search
         v-model:model-value="searchForm"
         :collapsible="true"
         :default-collapsed="true"
+        :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
         @reset="onReset"
       >
@@ -28,7 +29,6 @@
                 placeholder="支付状态"
                 allow-clear
                 :options="[
-                  { value: '', label: '全部' },
                   { value: '0', label: '订单生成' },
                   { value: '1', label: '支付中' },
                   { value: '2', label: '支付成功' },
@@ -65,6 +65,7 @@
     </div>
 
     <ag-table
+      ref="tableRef"
       :columns="tableColumns"
       :on-load="reqTableDataFunc"
       :on-load-statistics="reqTableCountFunc"
@@ -111,6 +112,9 @@ const searchForm = reactive({
   state: '',
   amountRange: [undefined, undefined]
 })
+
+// 表格引用
+const tableRef = ref(null)
 
 // 表格列定义
 const tableColumns = ref([

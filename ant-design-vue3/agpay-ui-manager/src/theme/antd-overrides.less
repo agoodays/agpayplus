@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Ant Design Vue 样式覆盖
  * 
  * 使用运行时 CSS 变量覆盖 Ant Design 组件样式
@@ -37,7 +37,7 @@
   .ant-modal-content,
   .ant-drawer-content,
   .ant-card,
-  .ant-table,
+  // .ant-table,
   .ant-form,
   .ant-message-notice-content,
   .ant-notification-notice-content,
@@ -58,7 +58,7 @@
   .ant-menu-submenu-title,
   .ant-select-item,
   .ant-picker-cell,
-  .ant-table-cell,
+  // .ant-table-cell,
   .ant-form-item-label > label,
   .ant-modal-title,
   .ant-drawer-title,
@@ -75,7 +75,7 @@
   .ant-menu-item:hover,
   .ant-select-item-option-active,
   .ant-picker-cell:hover,
-  .ant-table-tbody > tr:hover > td,
+  // .ant-table-tbody > tr:hover > td,
   .ant-message-notice-content:hover,
   .ant-notification-notice-content:hover,
   .ant-popover-inner:hover {
@@ -116,11 +116,11 @@
   .ant-input-number-group-addon,
   .ant-picker-panel-container,
   .ant-picker-header,
-  .ant-table-container,
-  .ant-table-thead > tr > th,
-  .ant-table-tbody > tr > td,
-  .ant-table-placeholder,
-  .ant-table-expanded-row-fixed,
+  // .ant-table-container,
+  // .ant-table-thead > tr > th,
+  // .ant-table-tbody > tr > td,
+  // .ant-table-placeholder,
+  // .ant-table-expanded-row-fixed,
   .ant-pagination-item,
   .ant-pagination-prev .ant-pagination-item-link,
   .ant-pagination-next .ant-pagination-item-link,
@@ -147,14 +147,14 @@
   .ant-statistic,
   .ant-statistic-content,
   .ant-statistic-title {
-    background: var(--layout-surface) !important;
+    // background: var(--layout-surface) !important;
     color: var(--text-color) !important;
     border-color: var(--border-color) !important;
   }
 
-  .ant-table-thead > tr > th,
-  .ant-table-tbody > tr > td,
-  .ant-table-cell,
+  // .ant-table-thead > tr > th,
+  // .ant-table-tbody > tr > td,
+  // .ant-table-cell,
   .ant-pagination-item a,
   .ant-tabs-tab-btn,
   .ant-tabs-tab .anticon,
@@ -200,9 +200,9 @@
     background-size: 400% 100% !important;
   }
 
-  .ant-table-thead > tr > th,
-  .ant-table-tbody > tr > td,
-  .ant-table-container,
+  // .ant-table-thead > tr > th,
+  // .ant-table-tbody > tr > td,
+  // .ant-table-container,
   .ant-pagination-item,
   .ant-pagination-prev .ant-pagination-item-link,
   .ant-pagination-next .ant-pagination-item-link,
@@ -220,12 +220,12 @@
     border-color: var(--border-color) !important;
   }
 
-  .ant-table-thead > tr > th {
-    background: var(--surface-variant) !important;
-  }
+  // .ant-table-thead > tr > th {
+  //   background: var(--surface-variant) !important;
+  // }
 
-  .ant-table-tbody > tr.ant-table-row:hover > td,
-  .ant-table-tbody > tr:hover > td,
+  // .ant-table-tbody > tr.ant-table-row:hover > td,
+  // .ant-table-tbody > tr:hover > td,
   .ant-list-item:hover,
   .ant-pagination-item:hover,
   .ant-tabs-tab:hover {
@@ -284,6 +284,16 @@
   background: var(--primary-color-weak) !important;
 }
 
+.ant-select-dropdown {
+  overflow: hidden !important;
+}
+
+.ant-select-dropdown-menu,
+.ant-select-dropdown-list {
+  max-height: 300px !important;
+  overflow: auto !important;
+}
+
 // ==================== 标签、徽章 ====================
 
 .ant-tag,
@@ -300,9 +310,9 @@
 
 // ==================== 表格 ====================
 
-.ant-table-tbody > tr:hover > td {
-  background: var(--primary-color-weak) !important;
-}
+// .ant-table-tbody > tr:hover > td {
+//   background: var(--primary-color-weak) !important;
+// }
 
 // ==================== 表单 ====================
 

@@ -1,14 +1,14 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
       <ag-search
         v-model="searchData"
         :collapsible="true"
-        :default-collapsed="!isShowMore"
+        :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
-        @collapse-change="handleCollapseChange"
       >
+        <!-- 基础搜索条件 -->
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -35,12 +35,16 @@
               <ag-input v-model="searchData.loginUsername" label="代理商登录名" placeholder="请输入代理商登录名" />
             </a-form-item>
           </a-col>
-          <a-col v-if="isShowMore" v-bind="colSpan">
+        </template>
+
+        <!-- 高级搜索条件 -->
+        <template #advanced="{ colSpan }">
+          <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-input v-model="searchData.contactTel" label="手机号" placeholder="请输入手机号" />
             </a-form-item>
           </a-col>
-          <a-col v-if="isShowMore" v-bind="colSpan">
+          <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
                 v-model="searchData.state"
@@ -60,10 +64,11 @@
       <!-- 表格区域 -->
       <ag-table
         ref="tableRef"
+        row-key="agentNo"
+        state-key="agent_list_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
-        row-key="agentNo"
       >
         <!-- 工具栏 -->
         <template #toolbar-left>
@@ -141,13 +146,12 @@ const tableColumns = [
   { key: 'unAmount', dataIndex: 'unAmount', title: '待结算金额', width: 110 },
   { key: 'state', title: '状态', width: 100, customRender: 'stateSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /** 使用 CRUD 表格页面组合式函数 */
 const {
   tableRef,
-  isShowMore,
   searchData,
   modalOpen,
   detailOpen,
@@ -176,11 +180,6 @@ const reqTableDataFunc = async (params) => {
 
 /** 搜索触发 */
 const searchFunc = () => reloadTable()
-
-/** 处理折叠展开变化 */
-const handleCollapseChange = (collapsed) => {
-  isShowMore.value = !collapsed
-}
 
 /** 新增代理商 */
 const addFunc = () => openCreate()

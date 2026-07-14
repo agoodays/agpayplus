@@ -24,15 +24,15 @@
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
+        row-key="articleId"
+        state-key="notice_list_table_columns"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
-        :params="searchData"
-        row-key="articleId"
+        :search-data="searchData"
       >
         <template #toolbar-left>
           <a-button v-if="hasPermission('ENT_NOTICE_ADD')" type="primary" @click="addFunc">
-            <template #icon><PlusOutlined /></template>
-            新增
+            <plus-outlined /> 新增
           </a-button>
         </template>
         <template #opSlot="{ record }">
@@ -77,7 +77,7 @@ const tableColumns = [
   { key: 'subtitle', dataIndex: 'subtitle', title: '副标题', width: 200 },
   { key: 'publisher', dataIndex: 'publisher', title: '发布人', width: 120 },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**

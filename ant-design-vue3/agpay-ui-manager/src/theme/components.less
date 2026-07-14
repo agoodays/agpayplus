@@ -841,6 +841,31 @@
   min-width: 190px !important;
 }
 
+// ==================== 提示文本样式 ====================
+
+.agpay-tip-text:before {
+  content: '';
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-bottom-color: var(--warning-color);
+  position: absolute;
+  top: -20px;
+  left: 30px;
+}
+.agpay-tip-text {
+  font-size: 12px;
+  border-radius: 5px;
+  background: var(--warning-color);
+  color: var(--text-on-primary) !important;
+  padding: 5px 10px;
+  display: inline-block;
+  max-width: 100%;
+  position: relative;
+  margin-top: 15px;
+  line-height: 1.5715;
+}
+
 // ==================== 色弱模式 ====================
 
 .colorWeak {

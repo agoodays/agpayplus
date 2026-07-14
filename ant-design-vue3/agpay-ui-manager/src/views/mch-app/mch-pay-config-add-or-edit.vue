@@ -162,118 +162,132 @@ const resetForm = () => {
     mchParaminfoForm.value.resetFields()
   }
 };
-const getMchPayConfig = (record) => {
- mchAppApi.getMchPayConfigUnique(saveObject.infoId, saveObject.ifCode).then(res => {
- if (res && res.ifParams) {
- Object.assign(saveObject, res);
- const parsedParams = JSON.parse(res.ifParams);
- Object.assign(ifParams, parsedParams);
- }
- const newItems = [];
- let radioItems = [];
- const mchParamsStr = mchType.value === 1 ? record.normalMchParams : record.isvsubMchParams;
- JSON.parse(mchParamsStr).forEach(item => {
- radioItems = [];
- if (item.type === 'radio') {
- const valueItems = item.values.split(',');
- const titleItems = item.titles.split(',');
- for (let i = 0; i < valueItems.length; i++) {
- let radioVal = valueItems[i];
- if (!isNaN(radioVal)) {
- radioVal = Number(radioVal);
- }
- radioItems.push({
- value: radioVal,
- title: titleItems[i]
- });
- }
- }
- if (item.star === '1') {
- ifParams[item.name + '_ph'] = ifParams[item.name] ? ifParams[item.name] : '请输入';
- if (ifParams[item.name]) {
- ifParams[item.name] = '';
- }
- }
- newItems.push({
- name: item.name,
- desc: item.desc,
- type: item.type,
- verify: item.verify,
- values: radioItems,
- star: item.star
- });
- });
- mchParams.value = newItems;
- generoterRules();
- });
-};
+/**
+ * 获取商户支付配置
+ * @param {Object} record - 记录对象
+ */
+const getMchPayConfig = async (record) => {
+  try {
+    const res = await mchAppApi.getMchPayConfigUnique(saveObject.infoId, saveObject.ifCode)
+    if (res && res.ifParams) {
+      Object.assign(saveObject, res)
+      const parsedParams = JSON.parse(res.ifParams)
+      Object.assign(ifParams, parsedParams)
+    }
+    const newItems = []
+    let radioItems = []
+    const mchParamsStr = mchType.value === 1 ? record.normalMchParams : record.isvsubMchParams
+    JSON.parse(mchParamsStr).forEach(item => {
+      radioItems = []
+      if (item.type === 'radio') {
+        const valueItems = item.values.split(',')
+        const titleItems = item.titles.split(',')
+        for (let i = 0; i < valueItems.length; i++) {
+          let radioVal = valueItems[i]
+          if (!isNaN(radioVal)) {
+            radioVal = Number(radioVal)
+          }
+          radioItems.push({
+            value: radioVal,
+            title: titleItems[i]
+          })
+        }
+      }
+      if (item.star === '1') {
+        ifParams[item.name + '_ph'] = ifParams[item.name] ? ifParams[item.name] : '请输入'
+        if (ifParams[item.name]) {
+          ifParams[item.name] = ''
+        }
+      }
+      newItems.push({
+        name: item.name,
+        desc: item.desc,
+        type: item.type,
+        verify: item.verify,
+        values: radioItems,
+        star: item.star
+      })
+    })
+    mchParams.value = newItems
+    generoterRules()
+  } catch (error) {
+    console.error('获取商户支付配置失败:', error)
+  }
+}
 
-const onSubmit = () => {
- infoinfoForm.value.validate().then(() => {
- mchParaminfoForm.value.validate().then(() => {
- loading.value = true;
- const reqParams = {};
- reqParams.infoId = saveObject.infoId;
- reqParams.ifCode = saveObject.ifCode;
- reqParams.state = saveObject.state;
- reqParams.remark = saveObject.remark;
- if (Object.keys(ifParams).length === 0) {
- message.error('参数不能为空！');
- return;
- }
- Object.keys(mchParams.value).forEach(key => {
- const item = mchParams.value[key];
- if (item.star === '1' && ifParams[item.name] === '') {
- ifParams[item.name] = undefined;
- }
- if (ifParams[item.name + '_ph'] !== undefined) {
- delete ifParams[item.name + '_ph'];
- }
- });
- reqParams.ifParams = JSON.stringify(ifParams);
- if (Object.keys(reqParams).length === 0) {
- message.error('参数不能为空！');
- return;
- }
- mchAppApi.addMchPayConfig(reqParams).then(() => {
- message.success('保存成功');
- localOpen.value = false;
- loading.value = false;
- emit('success');
- });
- }).catch(() => {
- loading.value = false;
- });
- }).catch(() => {
- loading.value = false;
- });
-};
+/**
+ * 提交表单
+ */
+const onSubmit = async () => {
+  try {
+    await infoinfoForm.value.validate()
+    await mchParaminfoForm.value.validate()
+    
+    loading.value = true
+    const reqParams = {}
+    reqParams.infoId = saveObject.infoId
+    reqParams.ifCode = saveObject.ifCode
+    reqParams.state = saveObject.state
+    reqParams.remark = saveObject.remark
+    
+    if (Object.keys(ifParams).length === 0) {
+      message.error('参数不能为空！')
+      return
+    }
+    
+    Object.keys(mchParams.value).forEach(key => {
+      const item = mchParams.value[key]
+      if (item.star === '1' && ifParams[item.name] === '') {
+        ifParams[item.name] = undefined
+      }
+      if (ifParams[item.name + '_ph'] !== undefined) {
+        delete ifParams[item.name + '_ph']
+      }
+    })
+    
+    reqParams.ifParams = JSON.stringify(ifParams)
+    
+    if (Object.keys(reqParams).length === 0) {
+      message.error('参数不能为空！')
+      return
+    }
+    
+    await mchAppApi.addMchPayConfig(reqParams)
+    message.success('保存成功')
+    localOpen.value = false
+    emit('success')
+  } catch (error) {
+    console.error('提交失败:', error)
+  } finally {
+    loading.value = false
+  }
+}
 
 const uploadSuccess = (name, fileList) => {
- const [firstItem] = fileList;
- ifParams[name] = firstItem?.url;
+  const [firstItem] = fileList;
+  ifParams[name] = firstItem?.url;
 };
 
 const generoterRules = () => {
- const rules = {};
- Object.keys(mchParams.value).forEach(key => {
- const item = mchParams.value[key];
- const newItems = [];
- if (item.verify === 'required' && item.star !== '1') {
- newItems.push({
- required: true,
- message: '请输入' + item.desc,
- trigger: 'blur'
- });
- rules[item.name] = newItems;
- }
- });
- ifParamsRules.value = rules;
+  const rules = {};
+  Object.keys(mchParams.value).forEach(key => {
+    const item = mchParams.value[key];
+    const newItems = [];
+    if (item.verify === 'required' && item.star !== '1') {
+      newItems.push({
+        required: true,
+        message: '请输入' + item.desc,
+        trigger: 'blur'
+      });
+      rules[item.name] = newItems;
+    }
+  });
+  ifParamsRules.value = rules;
 };
 
 /** 处理关闭 */
 const handleClose = () => {
- localOpen.value = false;
+  localOpen.value = false;
 };
 </script>
 
