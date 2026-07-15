@@ -6,7 +6,10 @@
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-date-range-picker v-model:value="searchData.queryDateRange" />
+              <ag-date-range-picker
+                v-model:value="searchData.queryDateRange"
+                label="创建时间"
+                placeholder="请选择创建时间" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -46,7 +49,7 @@
       </ag-table>
     </a-card>
     <!-- 新增/编辑页面弹窗  -->
-    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="reloadTable" />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
     <!-- 详情页面弹窗  -->
     <detail v-model:open="detailOpen" :record-id="currentRecordId" />
   </div>
@@ -97,13 +100,15 @@ const loading = ref(false)
  */
 const {
   tableRef,
-  infoAddOrEdit,
-  infoDetail,
   searchData,
+  modalOpen,
+  detailOpen,
+  currentRecordId,
   reloadTable,
   openCreate,
   openEdit,
   openDetail,
+  closeModal,
   confirmDelete
 } = useCrudTablePage({
   deleteAction: (recordId) => noticeApi.delById(recordId),
@@ -153,4 +158,12 @@ const detailFunc = (recordId) => openDetail(recordId)
  * @param {string} recordId - 公告ID
  */
 const delFunc = (recordId) => confirmDelete(recordId)
+
+/**
+ * 处理新增/编辑成功
+ */
+const handleModalSuccess = () => {
+  closeModal()
+  reloadTable()
+}
 </script>

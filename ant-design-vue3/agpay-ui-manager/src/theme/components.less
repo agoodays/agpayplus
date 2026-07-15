@@ -866,6 +866,57 @@
   line-height: 1.5715;
 }
 
+// ==================== 上传按钮样式 ====================
+
+.ag-upload-btn {
+  height: 66px;
+}
+
+// ==================== 颜色选择器样式 ====================
+
+.m-colorPicker {
+  // --vcp-swatch-size: 48px !important;
+  // --vcp-panel-width: 190px;
+  --vcp-panel-bg: var(--base-bg-color);
+  --vcp-panel-border: 1px solid var(--border-color);
+  --vcp-panel-radius: var(--border-radius);
+  --vcp-panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --vcp-panel-padding: 10px;
+  --vcp-text-color: var(--text-color);
+  --vcp-focus-color: var(--primary-color);
+  --vcp-transition: 0.3s ease;
+  --vcp-z-index: 10000;
+  height: 66px !important;
+  width: 100% !important;
+  margin-top: 8px !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--border-radius) !important;
+  text-align: left;
+  outline: none;
+  font-size: 14px;
+  display: inline-block;
+  position: relative;
+}
+
+.m-colorPicker .colorBtn {
+  width: calc(100% - 16px) !important;
+  height: 48px !important;
+  margin: 8px !important;
+  border-radius: var(--border-radius) !important;
+  cursor: pointer;
+}
+
+.m-colorPicker .box.open {
+  z-index: 10000 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.m-colorPicker .box h3.moreColors {
+  cursor: pointer;
+}
+
 // ==================== 色弱模式 ====================
 
 .colorWeak {

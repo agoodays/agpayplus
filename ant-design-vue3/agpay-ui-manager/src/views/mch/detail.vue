@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ag-drawer
     v-model:open="localOpen"
     title="商户详情"
@@ -25,8 +25,8 @@
         </a-descriptions-item>
 
         <a-descriptions-item label="商户类型">
-          <a-tag :color="detailData.type === 1 ? 'green' : 'orange'">
-            {{ detailData.type === 1 ? '普通商户' : '特约商户' }}
+          <a-tag :color="detailData.type === MCH_TYPE_ENUM.NORMAL.value ? MCH_TYPE_ENUM.NORMAL.color : MCH_TYPE_ENUM.SPECIAL.color">
+            {{ detailData.type === MCH_TYPE_ENUM.NORMAL.value ? MCH_TYPE_ENUM.NORMAL.desc : MCH_TYPE_ENUM.SPECIAL.desc }}
           </a-tag>
         </a-descriptions-item>
 
@@ -34,19 +34,19 @@
           {{ detailData.mchLevel }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === 2" label="服务商号">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value" label="服务商号">
           {{ detailData.isvNo }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === 2" label="服务商名称">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value" label="服务商名称">
           {{ detailData.isvName }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === 2" label="代理商号">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value" label="代理商号">
           {{ detailData.agentNo }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === 2" label="代理商名称">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value" label="代理商名称">
           {{ detailData.agentName }}
         </a-descriptions-item>
 
@@ -63,14 +63,14 @@
         </a-descriptions-item>
 
         <a-descriptions-item label="退款方式">
-          <a-tag v-if="detailData.refundMode?.includes('plat')" color="blue"> 平台退款 </a-tag>
-          <a-tag v-if="detailData.refundMode?.includes('api')" color="green"> 接口退款 </a-tag>
+          <a-tag v-if="detailData.refundMode?.includes(REFUND_MODE_ENUM.PLAT.value)" color="blue"> {{ REFUND_MODE_ENUM.PLAT.desc }} </a-tag>
+          <a-tag v-if="detailData.refundMode?.includes(REFUND_MODE_ENUM.API.value)" color="green"> {{ REFUND_MODE_ENUM.API.desc }} </a-tag>
         </a-descriptions-item>
 
         <a-descriptions-item label="状态">
           <a-badge
-            :status="detailData.state === 0 ? 'error' : 'processing'"
-            :text="detailData.state === 0 ? '禁用' : '启用'"
+            :status="detailData.state === STATE_ENUM.DISABLED.value ? 'error' : 'processing'"
+            :text="detailData.state === STATE_ENUM.DISABLED.value ? STATE_ENUM.DISABLED.desc : STATE_ENUM.ENABLED.desc"
           />
         </a-descriptions-item>
 
@@ -87,10 +87,15 @@
 </template>
 
 <script setup>
+/**
+ * 商户详情抽屉组件
+ * 功能：展示商户的详细信息
+ */
 import { AgDrawer } from '@/components'
 import { mchApi } from '@/api/business/mch/mch-api'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
+import { STATE_ENUM, MCH_TYPE_ENUM, REFUND_MODE_ENUM } from '@/constants/common-const'
 
 // Props & Emits
 const props = defineProps({

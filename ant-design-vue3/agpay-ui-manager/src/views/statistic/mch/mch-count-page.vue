@@ -6,7 +6,10 @@
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-date-range-picker v-model:value="searchData.queryDateRange" />
+              <ag-date-range-picker
+                v-model:value="searchData.queryDateRange"
+                label="创建时间"
+                placeholder="请选择创建时间" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -239,7 +242,7 @@ import {
   WalletOutlined
 } from '@ant-design/icons-vue'
 import { statisticApi } from '@/api/business/statistic/statistic-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'

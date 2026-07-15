@@ -135,15 +135,14 @@
 import { ref, reactive } from 'vue'
 import { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput, AgSelect } from '@/components'
 import { orderApi } from '@/api/business/order/order-api'
-import { useUserStore } from '@/store/modules/system/user'
+import { usePermission } from '@/composables/useCommon'
 import { message } from 'ant-design-vue'
 import DetailDrawer from './detail-drawer.vue'
 
 /**
  * 用户权限检查函数
  */
-const userStore = useUserStore()
-const hasPermission = (permission) => userStore.hasPerm(permission)
+const { hasPermission } = usePermission()
 
 /**
  * 表格引用
@@ -174,10 +173,10 @@ const searchData = reactive({
 const tableColumns = [
   { key: 'orderId', dataIndex: 'orderId', title: '订单ID', width: 210, fixed: 'left' },
   { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号', width: 200 },
-  { key: 'state', title: '通知状态', width: 130, scopedSlots: { customRender: 'stateSlot' } },
-  { key: 'orderType', title: '订单类型', width: 130, scopedSlots: { customRender: 'orderTypeSlot' } },
+  { key: 'state', title: '通知状态', width: 130, customRender: 'stateSlot' },
+  { key: 'orderType', title: '订单类型', width: 130, customRender: 'orderTypeSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
-  { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**

@@ -426,8 +426,4 @@ function handleClose() {
   localOpen.value = false
 }
 </script>
-<style lang="less" scoped>
-.ag-upload-btn {
-  // height: 66px;
-}
-</style>
+<style lang="less" scoped></style>

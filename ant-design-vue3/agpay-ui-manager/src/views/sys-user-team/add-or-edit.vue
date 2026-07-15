@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ag-drawer
     v-model:open="localOpen"
     class="drawer-width"
@@ -15,22 +15,21 @@
       <a-row :gutter="16">
         <a-col :span="10">
           <a-form-item label="团队名称" name="teamName">
-            <a-input v-model:value="saveObject.teamName" placeholder="请输入团队名称" />
+            <ag-input v-model="saveObject.teamName" placeholder="请输入团队名称" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="团队编号" name="teamNo">
-            <a-input v-model:value="saveObject.teamNo" placeholder="请输入团队编号" />
+            <ag-input v-model="saveObject.teamNo" placeholder="请输入团队编号" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="统计周期" name="statRangeType">
-            <a-select v-model:value="saveObject.statRangeType" placeholder="统计周期" default-value="year">
-              <a-select-option value="year">年</a-select-option>
-              <a-select-option value="quarter">季度</a-select-option>
-              <a-select-option value="month">月</a-select-option>
-              <a-select-option value="week">周</a-select-option>
-            </a-select>
+            <ag-select
+              v-model="saveObject.statRangeType"
+              placeholder="请选择统计周期"
+              :options="STAT_RANGE_TYPE_OPTIONS"
+            />
           </a-form-item>
         </a-col>
       </a-row>
@@ -43,10 +42,11 @@
  * 用户团队新增/编辑弹窗组件
  * 功能：支持新增和编辑团队信息
  */
-import { AgDrawer } from '@/components'
+import { AgDrawer, AgInput, AgSelect } from '@/components'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
 import { message } from 'ant-design-vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { STAT_RANGE_TYPE_ENUM, STAT_RANGE_TYPE_OPTIONS } from '@/constants/common-const'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -76,18 +76,10 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
 })
 
-const checkStatRangeType = (_rule, value, callback) => {
-  if (isAdd.value && !value) {
-    callback(new Error('请选择统计周期'))
-    return
-  }
-  callback()
-}
-
 const rules = {
   teamName: [{ required: true, message: '请输入团队名称', trigger: 'blur' }],
   teamNo: [{ required: true, message: '请输入团队编号', trigger: 'blur' }],
-  statRangeType: [{ required: true, validator: checkStatRangeType, trigger: 'blur' }]
+  statRangeType: [{ required: true, message: '请选择统计周期', trigger: 'change' }]
 }
 
 watch(() => props.open, async (val) => {
@@ -103,13 +95,13 @@ watch(localOpen, (val) => {
 
 const initForm = async () => {
   isAdd.value = !props.recordId
-  saveObject.value = { statRangeType: 'year' }
+  saveObject.value = { statRangeType: STAT_RANGE_TYPE_ENUM.YEAR.value }
   infoForm.value?.resetFields?.()
 
   if (!isAdd.value && props.recordId) {
     try {
       const res = await teamApi.getById(props.recordId)
-      saveObject.value = res || { statRangeType: 'year' }
+      saveObject.value = res || { statRangeType: STAT_RANGE_TYPE_ENUM.YEAR.value }
     } catch (_e) {
       message.error('加载团队信息失败，请重试')
     }

@@ -3,12 +3,12 @@
     <!-- 快捷选择下拉框（仅 picker='date' 时可用） -->
     <a-select
       v-if="actualShowQuickSelect && currentMode !== 'custom'"
-      v-model:value="selectedOption"
+      :value="selectedOption"
       allow-clear
       style="width: 100%"
       :size="size"
       :disabled="disabled"
-      @change="handleOptionChange"
+      @change="handleOptionSelectChange"
       @focus="onFocus"
       @blur="onBlur"
     >
@@ -30,14 +30,14 @@
 
       <a-range-picker
         ref="rangePickerRef"
-        v-model:value="dateRange"
+        :value="dateRange"
         :format="displayFormat"
         :show-time="showTimeConfig"
         :size="size"
         :picker="picker"
         :disabled="disabled"
         style="width: 100%"
-        @change="handleDateChange"
+        @change="handleDateInputChange"
         @focus="onFocus"
         @blur="onBlur"
         @mouseenter="popoverVisible = true"
@@ -71,6 +71,7 @@ import weekOfYear from 'dayjs/plugin/weekOfYear'
 import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import { SyncOutlined, LeftCircleOutlined } from '@ant-design/icons-vue'
 import { useFloatLabel } from '@/composables/useFloatLabel'
+import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
 
 // 启用 dayjs 插件
 dayjs.extend(weekOfYear)
@@ -429,6 +430,12 @@ const lastNonCustomOption = ref('')
 /** 日期选择器引用 */
 const rangePickerRef = ref(null)
 
+/**
+ * 表单上下文（自动检测是否在 a-form-item 内部）
+ * 如果组件在 a-form-item 内，则自动获得表单验证能力
+ */
+const formItemContext = useInjectFormItemContext()
+
 // 自定义值检查函数
 function hasValueCheck(value) {
   return (
@@ -622,6 +629,10 @@ const dateRangeTip = computed(() => {
  */
 const getDateRangeByOption = (option) => {
   const now = dayjs()
+
+  if (!option) {
+    return []
+  }
 
   // ==================== 动态格式 - 天数 ====================
   // 支持动态的 'nearN' 格式：最近N天
@@ -1015,25 +1026,53 @@ const triggerInputClick = async () => {
 }
 
 /**
+ * 处理内部 a-select 的变化事件
+ * @param {String} value - 选中的选项值
+ */
+const handleOptionSelectChange = (value) => {
+  selectedOption.value = value
+  handleOptionChange(value)
+}
+
+/**
+ * 处理内部 a-range-picker 的变化事件
+ * @param {Array<Dayjs> | null} dates - 选择的日期范围
+ */
+const handleDateInputChange = (dates) => {
+  handleDateChange(dates)
+}
+
+/**
  * 快捷选项变化处理
  * @param {String} value - 选项值
  */
 const handleOptionChange = (value) => {
+  if (!value) {
+    dateRange.value = []
+    lastNonCustomOption.value = ''
+    const outputValue = formatValue('', [])
+    emit('update:value', outputValue)
+    emit('change', outputValue)
+    if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
+      formItemContext.onFieldChange()
+    }
+    return
+  }
+
   if (value === 'custom') {
-    // 切换到自定义模式
     currentMode.value = 'custom'
     dateRange.value = []
-
-    // 触发输入框点击，打开日期选择面板
     triggerInputClick()
   } else {
-    // 快捷选项
     lastNonCustomOption.value = value
     dateRange.value = getDateRangeByOption(value)
 
     const outputValue = formatValue(value, dateRange.value)
     emit('update:value', outputValue)
     emit('change', outputValue)
+    if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
+      formItemContext.onFieldChange()
+    }
   }
 }
 
@@ -1057,11 +1096,21 @@ const handleDateChange = (dates) => {
     const outputValue = formatValue(actualShowQuickSelect.value ? 'custom' : '', [adjustedStart, adjustedEnd])
     emit('update:value', outputValue)
     emit('change', outputValue)
+    // 如果组件在 a-form-item 内，自动触发表单验证状态更新
+    // 确保 formItemContext 和 onFieldChange 方法存在
+    if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
+      formItemContext.onFieldChange()
+    }
   } else {
     dateRange.value = []
     const emptyValue = autoValueType.value === 'array' ? [] : ''
     emit('update:value', emptyValue)
     emit('change', emptyValue)
+    // 如果组件在 a-form-item 内，自动触发表单验证状态更新
+    // 确保 formItemContext 和 onFieldChange 方法存在
+    if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
+      formItemContext.onFieldChange()
+    }
   }
 }
 

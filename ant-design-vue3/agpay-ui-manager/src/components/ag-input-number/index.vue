@@ -2,7 +2,7 @@
   <div class="ag-float-container" :class="{ 'is-focused': isFocused }">
     <a-input-number
       ref="inputRef"
-      v-model:value="inputValue"
+      :value="inputValue"
       :placeholder="floatPlaceholder"
       :disabled="disabled"
       :min="min"
@@ -14,7 +14,7 @@
       style="width: 100%"
       @focus="handleFocus"
       @blur="handleBlur"
-      @change="handleChange"
+      @change="handleInputChange"
       @press-enter="handlePressEnter"
     />
 
@@ -123,6 +123,7 @@ const {
   floatPlaceholder,
   handleFocus,
   handleBlur,
+  handleChange,
   handlePressEnter,
   focus,
   blur,
@@ -133,9 +134,9 @@ const {
   ...props.floatOptions
 })
 
-// 处理change事件
-function handleChange(value) {
-  emit('change', value)
+function handleInputChange(value) {
+  inputValue.value = value
+  handleChange(value)
 }
 
 defineExpose({

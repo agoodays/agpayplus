@@ -62,13 +62,13 @@
       <!-- 通知地址区域 -->
       <a-descriptions :column="1" :bordered="false">
         <a-descriptions-item label="通知地址">
-          <a-input type="textarea" :disabled="true" style="height: 100px; color: black" :value="detailData.notifyUrl" />
+          <a-textarea :disabled="true" :rows="2" :value="detailData.notifyUrl" />
         </a-descriptions-item>
         <a-descriptions-item label="请求Body">
-          <a-input type="textarea" :disabled="true" style="height: 100px; color: black" :value="detailData.reqBody" />
+          <a-textarea :disabled="true" :rows="9" :value="detailData.reqBody" />
         </a-descriptions-item>
         <a-descriptions-item label="响应结果">
-          <a-input type="textarea" :disabled="true" style="height: 100px; color: black" :value="detailData.resResult" />
+          <a-textarea :disabled="true" :rows="3" :value="detailData.resResult" />
         </a-descriptions-item>
       </a-descriptions>
     </a-spin>
@@ -92,8 +92,8 @@ const props = defineProps({
     default: false
   },
   notifyId: {
-    type: String,
-    default: ''
+    type: [Number, String],
+    default: 0
   }
 })
 

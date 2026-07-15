@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ag-drawer
     v-model:open="localOpen"
     title="代理商详情"
@@ -20,13 +20,13 @@
         <a-descriptions-item label="联系人手机号">{{ detailData.contactTel }}</a-descriptions-item>
         <a-descriptions-item label="联系人邮箱">{{ detailData.contactEmail }}</a-descriptions-item>
         <a-descriptions-item label="是否允许发展下级">
-          <a-tag :color="detailData.addAgentFlag === 1 ? 'green' : 'volcano'">
-            {{ detailData.addAgentFlag === 0 ? '否' : detailData.addAgentFlag === 1 ? '是' : '未知' }}
+          <a-tag :color="detailData.addAgentFlag === FLAG_ENUM.YES.value ? FLAG_ENUM.YES.color : FLAG_ENUM.NO.color">
+            {{ detailData.addAgentFlag === FLAG_ENUM.YES.value ? FLAG_ENUM.YES.desc : FLAG_ENUM.NO.desc }}
           </a-tag>
         </a-descriptions-item>
         <a-descriptions-item label="状态">
-          <a-tag :color="detailData.state === 1 ? 'green' : 'volcano'">
-            {{ detailData.state === 0 ? '禁用' : detailData.state === 1 ? '启用' : '未知' }}
+          <a-tag :color="detailData.state === STATE_ENUM.ENABLED.value ? STATE_ENUM.ENABLED.color : STATE_ENUM.DISABLED.color">
+            {{ detailData.state === STATE_ENUM.ENABLED.value ? STATE_ENUM.ENABLED.desc : STATE_ENUM.DISABLED.desc }}
           </a-tag>
         </a-descriptions-item>
         <a-descriptions-item label="钱包余额">
@@ -52,16 +52,16 @@
         <a-tag color="#FF4B33">账户信息</a-tag>
       </a-divider>
       <a-descriptions :column="2" :bordered="false">
-        <a-descriptions-item label="代理商类型">{{ detailData.agentType === 1 ? '个人' : '企业' }}</a-descriptions-item>
+        <a-descriptions-item label="代理商类型">{{ detailData.agentType === AGENT_TYPE_ENUM.INDIVIDUAL.value ? AGENT_TYPE_ENUM.INDIVIDUAL.desc : AGENT_TYPE_ENUM.ENTERPRISE.desc }}</a-descriptions-item>
         <a-descriptions-item label="收款账户类型">{{ detailData.settAccountTypeName }}</a-descriptions-item>
-        <a-descriptions-item v-if="detailData.settAccountType === 'BANK_PUBLIC'" label="对公账户名称">
+        <a-descriptions-item v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value" label="对公账户名称">
           {{ detailData.settAccountName }}
         </a-descriptions-item>
         <a-descriptions-item :label="detailData.settAccountNoLabel">{{ detailData.settAccountNo }}</a-descriptions-item>
-        <a-descriptions-item v-if="detailData.settAccountType === 'BANK_PUBLIC'" label="开户银行名称">
+        <a-descriptions-item v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value" label="开户银行名称">
           {{ detailData.settAccountBank }}
         </a-descriptions-item>
-        <a-descriptions-item v-if="detailData.settAccountType === 'BANK_PUBLIC'" label="开户行支行名称">
+        <a-descriptions-item v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value" label="开户行支行名称">
           {{ detailData.settAccountSubBank }}
         </a-descriptions-item>
       </a-descriptions>
@@ -145,6 +145,7 @@ import { agentApi } from '@/api/business/agent/agent-api'
 import { AgDrawer, AgUpload } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
+import { STATE_ENUM, FLAG_ENUM, AGENT_TYPE_ENUM, SETT_ACCOUNT_TYPE_ENUM } from '@/constants/common-const'
 
 /** Props 定义 */
 const props = defineProps({

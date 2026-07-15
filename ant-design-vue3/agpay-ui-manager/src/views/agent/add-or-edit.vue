@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ag-drawer
     v-model:open="localOpen"
     :mask-closable="false"
@@ -19,32 +19,32 @@
       <a-row :gutter="16">
         <a-col :span="10">
           <a-form-item label="代理商名称" name="agentName">
-            <a-input v-model:value="saveObject.agentName" placeholder="请输入代理商名称" />
+            <ag-input v-model="saveObject.agentName" placeholder="请输入代理商名称" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="登录名" name="loginUsername">
-            <a-input v-model:value="saveObject.loginUsername" placeholder="请输入代理商登录名" :disabled="!isAdd" />
+            <ag-input v-model="saveObject.loginUsername" placeholder="请输入代理商登录名" :disabled="!isAdd" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="代理商简称" name="agentShortName">
-            <a-input v-model:value="saveObject.agentShortName" placeholder="请输入代理商简称" />
+            <ag-input v-model="saveObject.agentShortName" placeholder="请输入代理商简称" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="联系人姓名" name="contactName">
-            <a-input v-model:value="saveObject.contactName" placeholder="请输入联系人姓名" />
+            <ag-input v-model="saveObject.contactName" placeholder="请输入联系人姓名" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="联系人邮箱" name="contactEmail">
-            <a-input v-model:value="saveObject.contactEmail" placeholder="请输入联系人邮箱" />
+            <ag-input v-model="saveObject.contactEmail" placeholder="请输入联系人邮箱" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="联系人手机号" name="contactTel">
-            <a-input v-model:value="saveObject.contactTel" placeholder="请输入联系人手机号" />
+            <ag-input v-model="saveObject.contactTel" placeholder="请输入联系人手机号" />
             <p class="agpay-tip-text">(同步更改登录手机号)</p>
           </a-form-item>
         </a-col>
@@ -58,7 +58,7 @@
               :fetch-data="searchAgent"
               :field-names="{ label: 'agentName', value: 'agentNo' }"
               :disabled="!isAdd"
-              @change="pidChange"
+              @select-change="pidChange"
             />
           </a-form-item>
         </a-col>
@@ -93,7 +93,7 @@
         </a-col>
         <a-col :span="24">
           <a-form-item label="备注" name="remark">
-            <a-textarea v-model:value="saveObject.remark" placeholder="请输入备注" />
+            <ag-textarea v-model="saveObject.remark" placeholder="请输入备注" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -197,35 +197,32 @@
         </a-col>
         <a-col :span="10">
           <a-form-item label="收款账户类型" name="settAccountType">
-            <a-select
-              v-model:value="saveObject.settAccountType"
+            <ag-select
+              v-model="saveObject.settAccountType"
               placeholder="请选择收款账户类型"
+              :options="settAccountTypeOptions"
               @change="settAccountTypeChange"
-            >
-              <a-select-option v-for="d in settAccountTypeList" :key="d.settAccountType" :value="d.settAccountType">
-                {{ d.settAccountTypeName }}
-              </a-select-option>
-            </a-select>
+            />
           </a-form-item>
         </a-col>
         <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
           <a-form-item label="对公账户名称" name="settAccountName">
-            <a-input v-model:value="saveObject.settAccountName" />
+            <ag-input v-model="saveObject.settAccountName" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item :label="settAccountNoLabel" name="settAccountNo">
-            <a-input v-model:value="saveObject.settAccountNo" />
+            <ag-input v-model="saveObject.settAccountNo" />
           </a-form-item>
         </a-col>
         <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
           <a-form-item label="开户银行名称" name="settAccountBank">
-            <a-input v-model:value="saveObject.settAccountBank" />
+            <ag-input v-model="saveObject.settAccountBank" />
           </a-form-item>
         </a-col>
         <a-col v-if="saveObject.settAccountType === 'BANK_PUBLIC'" :span="10">
           <a-form-item label="开户行支行名称" name="settAccountSubBank">
-            <a-input v-model:value="saveObject.settAccountSubBank" />
+            <ag-input v-model="saveObject.settAccountSubBank" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -403,12 +400,20 @@
 import { agentApi } from '@/api/business/agent/agent-api'
 import { isvApi } from '@/api/business/isv/isv-api'
 import { basicApi } from '@/api/system/basic-api'
-import { AgDrawer, AgSelectInfinite, AgUpload } from '@/components'
+import { AgDrawer, AgSelectInfinite, AgUpload, AgInput, AgTextarea } from '@/components'
 import { upload } from '@/lib/ag-axios'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
 import { computed, reactive, ref, watch } from 'vue'
+import {
+  STATE_ENUM,
+  FLAG_ENUM,
+  AGENT_TYPE_ENUM,
+  SETT_ACCOUNT_TYPE_ENUM,
+  SETT_ACCOUNT_TYPE_OPTIONS,
+  CASH_OUT_FEE_TYPE_ENUM
+} from '@/constants/common-const'
 
 /** 图标集合 */
 const icons = { LoadingOutlined, UploadOutlined }
@@ -455,19 +460,15 @@ const action = upload.form
 
 /** 代理商类型列表 */
 const agentTypeList = [
-  { agentType: 1, agentTypeName: '个人' },
-  { agentType: 2, agentTypeName: '企业' }
+  { agentType: AGENT_TYPE_ENUM.INDIVIDUAL.value, agentTypeName: AGENT_TYPE_ENUM.INDIVIDUAL.desc },
+  { agentType: AGENT_TYPE_ENUM.ENTERPRISE.value, agentTypeName: AGENT_TYPE_ENUM.ENTERPRISE.desc }
 ]
 
 /** 基础收款账户类型列表 */
-const baseSettAccountTypeList = [
-  { settAccountType: 'WX_CASH', settAccountTypeName: '个人微信' },
-  { settAccountType: 'ALIPAY_CASH', settAccountTypeName: '个人支付宝' },
-  { settAccountType: 'BANK_PRIVATE', settAccountTypeName: '对私账户' }
-]
+const baseSettAccountTypeList = SETT_ACCOUNT_TYPE_OPTIONS.filter(item => item.value !== 'BANK_PUBLIC')
 
 /** 收款账户类型列表（响应式，根据代理商类型动态调整） */
-const settAccountTypeList = ref([...baseSettAccountTypeList])
+const settAccountTypeOptions = ref([...baseSettAccountTypeList])
 
 /** 系统密码重置状态 */
 const sysPassword = reactive({
@@ -531,7 +532,7 @@ const rules = computed(() => ({
         }
         return Promise.resolve()
       },
-      trigger: 'blur'
+      trigger: 'change'
     }
   ],
   contactEmail: [
@@ -589,12 +590,12 @@ const rules = computed(() => ({
 /** 获取默认保存对象 */
 function getDefaultSaveObject() {
   return {
-    state: 1,
-    addAgentFlag: 1,
-    agentType: 1,
-    settAccountType: 'WX_CASH',
+    state: STATE_ENUM.ENABLED.value,
+    addAgentFlag: FLAG_ENUM.YES.value,
+    agentType: AGENT_TYPE_ENUM.INDIVIDUAL.value,
+    settAccountType: SETT_ACCOUNT_TYPE_ENUM.WX_CASH.value,
     cashoutFeeRuleType: 1,
-    isNotify: 0,
+    isNotify: FLAG_ENUM.NO.value,
     passwordType: 'default',
     loginPassword: '',
     newPwd: '',
@@ -617,34 +618,19 @@ function resetPassEmpty() {
 
 /** 根据代理商类型规范化收款账户类型列表 */
 function normalizeSettAccountTypeList(agentType) {
-  const hasPublic = settAccountTypeList.value.some((item) => item.settAccountType === 'BANK_PUBLIC')
-  if (agentType === 2 && !hasPublic) {
-    settAccountTypeList.value = [...settAccountTypeList.value, { settAccountType: 'BANK_PUBLIC', settAccountTypeName: '对公账户' }]
+  const bankPublicOption = SETT_ACCOUNT_TYPE_OPTIONS.find(item => item.value === 'BANK_PUBLIC')
+  const hasPublic = settAccountTypeOptions.value.some((item) => item.value === 'BANK_PUBLIC')
+  if (agentType === AGENT_TYPE_ENUM.ENTERPRISE.value && !hasPublic && bankPublicOption) {
+    settAccountTypeOptions.value = [...settAccountTypeOptions.value, bankPublicOption]
   }
-  if (agentType !== 2 && hasPublic) {
-    settAccountTypeList.value = settAccountTypeList.value.filter((item) => item.settAccountType !== 'BANK_PUBLIC')
+  if (agentType !== AGENT_TYPE_ENUM.ENTERPRISE.value && hasPublic) {
+    settAccountTypeOptions.value = settAccountTypeOptions.value.filter((item) => item.value !== 'BANK_PUBLIC')
   }
 }
 
 /** 设置收款账号标签 */
 function setSettAccountNoLabel(value) {
-  switch (value) {
-    case 'WX_CASH':
-      settAccountNoLabel.value = '个人微信号'
-      break
-    case 'ALIPAY_CASH':
-      settAccountNoLabel.value = '支付宝账号'
-      break
-    case 'BANK_PRIVATE':
-      settAccountNoLabel.value = '收款银行卡号'
-      break
-    case 'BANK_PUBLIC':
-      settAccountNoLabel.value = '对公账号'
-      break
-    default:
-      settAccountNoLabel.value = '个人微信号'
-      break
-  }
+  settAccountNoLabel.value = SETT_ACCOUNT_TYPE_ENUM[value]?.noLabel || SETT_ACCOUNT_TYPE_ENUM.WX_CASH.noLabel
 }
 
 /** 初始化表单 */
@@ -810,7 +796,7 @@ function pidChange(val, selected) {
 
 /** 代理商类型变更处理 */
 function agentTypeChange() {
-  if (saveObject.value.agentType === 2) {
+  if (saveObject.value.agentType === AGENT_TYPE_ENUM.ENTERPRISE.value) {
     imgLabel.value = '法人'
   } else {
     imgLabel.value = '联系人'
@@ -818,9 +804,9 @@ function agentTypeChange() {
 
   normalizeSettAccountTypeList(saveObject.value.agentType)
 
-  if (saveObject.value.agentType === 1 && saveObject.value.settAccountType === 'BANK_PUBLIC') {
-    saveObject.value.settAccountType = 'WX_CASH'
-    setSettAccountNoLabel('WX_CASH')
+  if (saveObject.value.agentType === AGENT_TYPE_ENUM.INDIVIDUAL.value && saveObject.value.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value) {
+    saveObject.value.settAccountType = SETT_ACCOUNT_TYPE_ENUM.WX_CASH.value
+    setSettAccountNoLabel(SETT_ACCOUNT_TYPE_ENUM.WX_CASH.value)
   }
 }
 
@@ -873,8 +859,5 @@ loadPwdRules()
 .ant-form-item-label.cashout-fee-label {
   padding-top: 5px;
   text-align: center;
-}
-.ag-upload-btn {
-  height: 66px;
 }
 </style>

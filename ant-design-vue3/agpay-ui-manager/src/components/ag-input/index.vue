@@ -2,7 +2,7 @@
   <div class="ag-float-container" :class="{ 'is-focused': isFocused }">
     <a-input
       ref="inputRef"
-      v-model:value="inputValue"
+      :value="inputValue"
       :placeholder="floatPlaceholder"
       :disabled="disabled"
       :maxlength="maxlength"
@@ -13,8 +13,9 @@
       :size="size"
       @focus="handleFocus"
       @blur="handleBlur"
-      @change="handleChange"
+      @change="handleInputChange"
       @press-enter="handlePressEnter"
+      :auto-complete="'off'"
     >
       <template v-if="$slots.prefix" #prefix>
         <slot name="prefix"></slot>
@@ -22,7 +23,7 @@
       <template v-if="$slots.suffix" #suffix>
         <slot name="suffix"></slot>
       </template>
-    </a-input>
+      </a-input>
 
     <label class="ag-float-label" :class="labelClass">
       {{ label }}
@@ -107,6 +108,11 @@ const {
   blurDelay: 100,
   ...props.floatOptions
 })
+
+function handleInputChange(e) {
+  inputValue.value = e.target.value
+  handleChange(e)
+}
 
 defineExpose({
   focus,

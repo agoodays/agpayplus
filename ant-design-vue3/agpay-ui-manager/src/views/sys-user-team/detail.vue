@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ag-drawer
     v-model:open="localOpen"
     title="团队详情"
@@ -9,8 +9,8 @@
     <a-descriptions :column="2" :bordered="false">
       <a-descriptions-item label="团队编号">{{ detailData.teamNo }}</a-descriptions-item>
       <a-descriptions-item label="团队名称">{{ detailData.teamName }}</a-descriptions-item>
-      <a-descriptions-item label="统计周期">{{ getStatRangeTypeName(detailData.statRangeType) }}</a-descriptions-item>
-      <a-descriptions-item label="所属系统">{{ getSysTypeName(detailData.sysType) }}</a-descriptions-item>
+      <a-descriptions-item label="统计周期">{{ statRangeTypeMap[detailData.statRangeType] || '' }}</a-descriptions-item>
+      <a-descriptions-item label="所属系统">{{ sysTypeMap[detailData.sysType] || '未知' }}</a-descriptions-item>
       <a-descriptions-item label="所属代理商/商户">{{ detailData.belongInfoId }}</a-descriptions-item>
       <a-descriptions-item label="创建时间">{{ detailData.createdAt }}</a-descriptions-item>
     </a-descriptions>
@@ -25,6 +25,7 @@
 import { AgDrawer } from '@/components'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
 import { reactive, ref, watch } from 'vue'
+import { STAT_RANGE_TYPE_ENUM, SYS_TYPE_ENUM } from '@/constants/common-const'
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -36,24 +37,8 @@ const emit = defineEmits(['update:open'])
 const localOpen = ref(false)
 const detailData = reactive({})
 
-const getStatRangeTypeName = (type) => {
-  const map = {
-    year: '年',
-    quarter: '季度',
-    month: '月',
-    week: '周'
-  }
-  return map[type] || ''
-}
-
-const getSysTypeName = (type) => {
-  const map = {
-    MGR: '运营平台',
-    AGENT: '代理商系统',
-    MCH: '商户系统'
-  }
-  return map[type] || '未知'
-}
+const statRangeTypeMap = Object.fromEntries(Object.values(STAT_RANGE_TYPE_ENUM).map(item => [item.value, item.desc]))
+const sysTypeMap = Object.fromEntries(Object.values(SYS_TYPE_ENUM).map(item => [item.value, item.desc]))
 
 watch(() => props.open, async (val) => {
   localOpen.value = val

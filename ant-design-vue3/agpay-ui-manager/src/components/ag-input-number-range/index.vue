@@ -3,7 +3,7 @@
     <div class="range-inputs">
       <a-input-number
         ref="minInputRef"
-        v-model:value="minValue"
+        :value="minValue"
         :placeholder="floatPlaceholder ? placeholder[0] : ''"
         :disabled="disabled"
         :min="min"
@@ -14,14 +14,14 @@
         class="min-input"
         @focus="handleFocus"
         @blur="handleBlur"
-        @change="handleMinChange"
+        @change="handleMinInputChange"
       />
 
       <span class="range-separator">~</span>
 
       <a-input-number
         ref="maxInputRef"
-        v-model:value="maxValue"
+        :value="maxValue"
         :placeholder="floatPlaceholder ? placeholder[1] : ''"
         :disabled="disabled"
         :min="minValue !== undefined && minValue !== null ? minValue : min"
@@ -32,7 +32,7 @@
         class="max-input"
         @focus="handleFocus"
         @blur="handleBlur"
-        @change="handleMaxChange"
+        @change="handleMaxInputChange"
       />
     </div>
 
@@ -128,7 +128,13 @@ function hasValueCheck(value) {
 }
 
 // 使用浮动标签 composable
-const { isFocused, labelClass, floatPlaceholder, handleFocus, handleBlur } = useFloatLabel(
+const { 
+  isFocused,
+  labelClass,
+  floatPlaceholder,
+  handleFocus,
+  handleBlur
+} = useFloatLabel(
   {
     ...props,
     modelValue: [minValue.value, maxValue.value]
@@ -161,6 +167,16 @@ watch([minValue, maxValue], ([newMin, newMax]) => {
   emit('update:modelValue', result)
   emit('change', result)
 })
+
+function handleMinInputChange(value) {
+  minValue.value = value
+  handleMinChange(value)
+}
+
+function handleMaxInputChange(value) {
+  maxValue.value = value
+  handleMaxChange(value)
+}
 
 function handleMinChange(value) {
   // 如果最小值大于最大值，自动调整最大值

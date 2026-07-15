@@ -131,6 +131,72 @@
   --ant-primary-2: var(--primary-color-hover);
 }
 
+/* ==================== WangEditor 主题适配 ==================== */
+
+/* 亮色模式：映射到全局主变量 */
+:root {
+  --w-e-textarea-bg-color: var(--base-bg-color);
+  --w-e-textarea-color: var(--text-color);
+  --w-e-textarea-border-color: var(--border-color);
+  --w-e-textarea-slight-border-color: var(--border-color);
+  --w-e-textarea-slight-color: var(--text-color-weak);
+  --w-e-textarea-slight-bg-color: var(--surface-light);
+  --w-e-textarea-selected-border-color: var(--primary-color);
+  --w-e-textarea-handler-bg-color: var(--primary-color);
+
+  --w-e-toolbar-color: var(--text-color);
+  --w-e-toolbar-bg-color: var(--layout-surface);
+  --w-e-toolbar-active-color: var(--primary-color);
+  --w-e-toolbar-active-bg-color: var(--surface-light);
+  --w-e-toolbar-disabled-color: var(--text-color-muted);
+  --w-e-toolbar-border-color: var(--border-color);
+
+  --w-e-modal-button-bg-color: var(--base-bg-color);
+  --w-e-modal-button-border-color: var(--border-color);
+}
+
+/* 暗黑模式：映射到全局暗黑变量 */
+:root[data-theme='dark'] {
+  --w-e-textarea-bg-color: var(--dark-base-bg-color);
+  --w-e-textarea-color: var(--dark-text-color);
+  --w-e-textarea-border-color: var(--dark-border-color);
+  --w-e-textarea-slight-border-color: var(--dark-border-color);
+  --w-e-textarea-slight-color: var(--dark-text-color-weak);
+  --w-e-textarea-slight-bg-color: var(--dark-surface-light);
+  --w-e-textarea-selected-border-color: var(--primary-color);
+  --w-e-textarea-handler-bg-color: var(--primary-color);
+
+  --w-e-toolbar-color: var(--dark-text-color);
+  --w-e-toolbar-bg-color: var(--dark-layout-surface);
+  --w-e-toolbar-active-color: var(--primary-color);
+  --w-e-toolbar-active-bg-color: var(--dark-surface-light);
+  --w-e-toolbar-disabled-color: var(--dark-text-color-muted);
+  --w-e-toolbar-border-color: var(--dark-border-color);
+
+  --w-e-modal-button-bg-color: var(--dark-layout-surface);
+  --w-e-modal-button-border-color: var(--dark-border-color);
+}
+
+/* ==================== 颜色选择器 (.m-colorPicker) 主题适配 ==================== */
+
+/* 亮色模式：映射到全局主变量 */
+.m-colorPicker {
+  --vcp-panel-bg: var(--base-bg-color);
+  --vcp-panel-border: 1px solid var(--border-color);
+  --vcp-panel-shadow: 0 8px 24px var(--shadow-color);
+  --vcp-text-color: var(--text-color);
+  --vcp-focus-color: var(--primary-color);
+}
+
+/* 暗黑模式：映射到全局暗黑变量 */
+:root[data-theme='dark'] .m-colorPicker {
+  --vcp-panel-bg: var(--dark-layout-surface);
+  --vcp-panel-border: 1px solid var(--dark-border-color);
+  --vcp-panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); /* 暗黑模式下阴影加深 */
+  --vcp-text-color: var(--dark-text-color);
+  --vcp-focus-color: var(--primary-color);
+}
+
 // ==================== 基础样式 ====================
 
 * {

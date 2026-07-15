@@ -6,7 +6,10 @@
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-date-range-picker v-model="searchData.queryDateRange" />
+              <ag-date-range-picker
+                v-model:value="searchData.queryDateRange"
+                label="创建时间"
+                placeholder="请选择创建时间" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">

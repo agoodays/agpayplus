@@ -181,7 +181,9 @@
           <b>支付方式</b>
           <div class="chart-padding">
             <ag-date-range-picker
-              v-model:value="searchData.payTypeQueryDateRange"
+              v-model="searchData.payTypeQueryDateRange"
+              label="创建时间"
+              placeholder="请选择创建时间"
               :options="[
                 { label: '今天', value: 'today' },
                 { label: '昨天', value: 'yesterday' },
@@ -205,7 +207,9 @@
           <b>交易统计</b>
           <div class="chart-padding">
             <ag-date-range-picker
-              v-model:value="searchData.payCountQueryDateRange"
+              v-model="searchData.payCountQueryDateRange"
+              label="创建时间"
+              placeholder="请选择创建时间"
               :options="[
                 { label: '近7天', value: 'near7' },
                 { label: '近30天', value: 'near30' },

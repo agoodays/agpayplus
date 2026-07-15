@@ -8,7 +8,8 @@
             <a-form-item label="">
               <ag-date-range-picker
                 v-model:value="searchData.queryDateRange"
-                label="日期范围"
+                label="创建时间"
+                placeholder="请选择创建时间" />
               />
             </a-form-item>
           </a-col>

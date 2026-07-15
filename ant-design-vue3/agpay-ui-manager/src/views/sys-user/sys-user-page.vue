@@ -95,14 +95,16 @@
         </template>
 
         <!-- 邀请码列 -->
-        <template #inviteCodeSlot="{ record }" v-if="record.inviteCode">
+        <template #inviteCodeSlot="{ record }">
           <b>{{ record.inviteCode }}</b>
-          <a-button type="link" @click="copyFunc(record.inviteCode)">
-            <template #icon><CopyOutlined /></template>
-          </a-button>
-          <a-button type="link" @click="openInviteCode(record.inviteCode, record.sysType)">
-            <template #icon><InfoCircleOutlined /></template>
-          </a-button>
+          <span v-if="record.inviteCode">
+            <a-button type="link" @click="copyFunc(record.inviteCode)">
+              <template #icon><CopyOutlined /></template>
+            </a-button>
+            <a-button type="link" @click="openInviteCode(record.inviteCode, record.sysType)">
+              <template #icon><InfoCircleOutlined /></template>
+            </a-button>
+          </span>
         </template>
 
         <!-- 状态列 -->
@@ -118,18 +120,18 @@
         <template #opSlot="{ record }">
           <ag-table-actions>
             <a-button
-              v-if="hasPermission('ENT_UR_USER_UPD_ROLE') && record.userType === 2"
-              type="link"
-              @click="openRoleDist(record.sysUserId, record.sysType, record.belongInfoId)"
-            >
-              变更角色
-            </a-button>
-            <a-button
               v-if="hasPermission('ENT_UR_USER_EDIT')"
               type="link"
               @click="editFunc(record.sysUserId, record.sysType, record.belongInfoId)"
             >
               修改
+            </a-button>
+            <a-button
+              v-if="hasPermission('ENT_UR_USER_UPD_ROLE') && record.userType === 2"
+              type="link"
+              @click="openRoleDist(record.sysUserId, record.sysType, record.belongInfoId)"
+            >
+              变更角色
             </a-button>
             <a-button
               v-if="hasPermission('ENT_UR_USER_LOGIN_LIMIT_DELETE')"
@@ -258,7 +260,7 @@ const tableColumns = [
   { key: 'state', title: '状态', width: 100, customRender: 'stateSlot', align: 'center' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
   { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
-  { key: 'op', title: '操作', width: 180, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
 /**

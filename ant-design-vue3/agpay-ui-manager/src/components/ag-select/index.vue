@@ -2,7 +2,7 @@
   <div class="ag-float-container" :class="{ 'is-focused': isFocused, 'is-open': isOpen }">
     <a-select
       ref="selectRef"
-      v-model:value="selectValue"
+      :value="selectValue"
       :placeholder="floatPlaceholder"
       :disabled="disabled"
       :mode="mode"
@@ -15,11 +15,12 @@
       :max-tag-placeholder="maxTagPlaceholder"
       style="width: 100%"
       v-on="eventHandlers"
+      @change="handleSelectChange"
     >
       <template v-if="$slots.default" #default>
         <slot></slot>
       </template>
-    </a-select>
+      </a-select>
 
     <label class="ag-float-label" :class="labelClass">
       {{ label }}
@@ -109,7 +110,15 @@ function hasValueCheck(value) {
   return value !== undefined && value !== null && value !== ''
 }
 
-const { isFocused, labelClass, floatPlaceholder, handleFocus, handleBlur, clear } = useFloatLabel(
+const {
+  isFocused,
+  labelClass,
+  floatPlaceholder,
+  handleFocus,
+  handleBlur,
+  handleChange,
+  clear
+} = useFloatLabel(
   props,
   emit,
   selectRef,
@@ -125,7 +134,6 @@ const eventHandlers = computed(() => {
   const handlers = {
     focus: handleFocus,
     blur: handleBlur,
-    change: handleChange,
     'dropdown-visible-change': handleDropdownVisibleChange
   }
 
@@ -154,8 +162,9 @@ watch(
   { deep: true }
 )
 
-function handleChange(value, option) {
-  emit('change', value, option)
+function handleSelectChange(value, option) {
+  selectValue.value = value
+  handleChange(value, option)
 }
 
 function handleSearch(value) {

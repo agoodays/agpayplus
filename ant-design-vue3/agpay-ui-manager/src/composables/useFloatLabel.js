@@ -1,10 +1,17 @@
-import { ref, computed, watch, shallowRef } from 'vue'
+import { ref, computed, watch, shallowRef, nextTick } from 'vue'
+import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
 
 export function useFloatLabel(props, emit, inputRef, hasValueCheck, options = {}) {
   const { animationDuration = 200, blurDelay = 100 } = options
 
   const isFocused = ref(false)
   const inputValue = shallowRef(props.modelValue ?? '')
+  
+  /**
+   * 表单上下文（自动检测是否在 a-form-item 内部）
+   * 如果组件在 a-form-item 内，则自动获得表单验证能力
+   */
+  const formItemContext = useInjectFormItemContext()
 
   const hasValue = computed(() => {
     if (hasValueCheck) {
@@ -68,6 +75,14 @@ export function useFloatLabel(props, emit, inputRef, hasValueCheck, options = {}
 
   function handleChange(e) {
     emit('change', e)
+    // 如果组件在 a-form-item 内，自动触发表单验证状态更新
+    // 确保 formItemContext 和 onFieldChange 方法存在
+    // 使用 nextTick 确保表单的值已经更新（Vue 的响应式更新是异步的）
+    nextTick(() => {
+      if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
+        formItemContext.onFieldChange()
+      }
+    })
   }
 
   function handlePressEnter(e) {

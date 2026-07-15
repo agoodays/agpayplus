@@ -478,33 +478,6 @@ onMounted(() => {
   margin-bottom: 15px;
 }
 
-.ag-upload-btn {
-  height: 66px;
-}
-
-.m-colorPicker {
-  height: 66px;
-  width: 100%;
-  margin-top: 8px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-
-  :deep(.colorBtn) {
-    height: 48px;
-    width: calc(100% - 16px);
-    margin: 8px;
-    border-radius: 4px;
-  }
-
-  :deep(.box.open) {
-    z-index: 3;
-  }
-
-  :deep(.bd h3:nth-of-type(3)) {
-    cursor: pointer;
-  }
-}
-
 .pay-way-group {
   margin-bottom: 16px;
 

@@ -19,6 +19,9 @@ export const orderApi = {
   queryRefundOrderPage(params) {
     return req.list(API_URL_REFUND_ORDER, params)
   },
+  queryRefundOrderCount(params) {
+    return req.count(API_URL_REFUND_ORDER, params)
+  },
   getRefundOrderById(refundOrderId) {
     return req.getById(API_URL_REFUND_ORDER, refundOrderId)
   },

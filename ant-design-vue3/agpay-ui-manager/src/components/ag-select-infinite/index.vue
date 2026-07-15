@@ -2,7 +2,7 @@
   <div class="ag-float-container" :class="{ 'is-focused': isFocused }">
     <a-select
       ref="selectRef"
-      v-model:value="selectValue"
+      :value="selectValue"
       :placeholder="floatPlaceholder"
       :disabled="disabled"
       :mode="mode"
@@ -15,6 +15,7 @@
       style="width: 100%"
       v-on="eventHandlers"
       @popup-scroll="handlePopupScroll"
+      @change="handleSelectChange"
     >
       <a-select-option
         v-for="item in options"
@@ -23,7 +24,7 @@
         :disabled="item.disabled"
       >
         <slot name="option" :option="item">
-          {{ item[fieldNames.label] }}[{{ item[fieldNames.value] }}]
+          {{ item[fieldNames.label] }}
         </slot>
       </a-select-option>
 
@@ -76,13 +77,6 @@ const props = defineProps({
    * 选中值（v-model 绑定）
    */
   modelValue: {
-    type: [String, Number, Array],
-    default: undefined
-  },
-  /**
-   * 选中值（兼容旧版绑定方式）
-   */
-  value: {
     type: [String, Number, Array],
     default: undefined
   },
@@ -226,13 +220,13 @@ const props = defineProps({
 /**
  * 组件事件定义
  */
-const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'search', 'load'])
+const emit = defineEmits(['update:modelValue', 'change', 'select-change', 'focus', 'blur', 'search', 'load'])
 
 /**
  * 组件内部状态
  */
 const selectRef = ref()                           // 选择器引用
-const selectValue = ref(props.modelValue ?? props.value)  // 当前选中值
+const selectValue = ref(props.modelValue)  // 当前选中值
 
 // 数据相关状态
 const options = ref([])                          // 选项列表
@@ -262,7 +256,15 @@ function hasValueCheck(value) {
 /**
  * 使用浮动标签 composable
  */
-const { isFocused, labelClass, floatPlaceholder, handleFocus, handleBlur, clear } = useFloatLabel(
+const {
+  isFocused,
+  labelClass,
+  floatPlaceholder,
+  handleFocus,
+  handleBlur,
+  handleChange,
+  clear
+} = useFloatLabel(
   props,
   emit,
   selectRef,
@@ -282,7 +284,6 @@ const eventHandlers = computed(() => {
   const handlers = {
     focus: handleFocus,
     blur: handleBlur,
-    change: handleChange,
     'dropdown-visible-change': handleDropdownVisibleChange
   }
 
@@ -456,13 +457,16 @@ async function handleDropdownVisibleChange(open) {
 }
 
 /**
- * 处理选择值变化
+ * 处理内部 a-select 的变化事件
  * @param {*} value - 选中的值
  * @param {Object} option - Ant Design Vue 的 option 对象
  */
-function handleChange(value, option) {
+function handleSelectChange(value, option) {
+  selectValue.value = value
   const selectedRecord = options.value.find(item => item[props.fieldNames.value] === value)
-  emit('change', value, selectedRecord || option)
+  handleChange(value, selectedRecord || option)
+  // const selectedRecord = options.value.find(item => item[props.fieldNames.value] === value)
+  emit('select-change', value, selectedRecord || option); // 自定义事件供外部监听
 }
 
 /**
@@ -497,16 +501,15 @@ async function loadRecordByValue(value) {
 }
 
 /**
- * 监听外部值变化（兼容 modelValue 和 value）
+ * 监听外部值变化
  */
 watch(
-  () => [props.modelValue, props.value],
-  async ([newModelValue, newValue]) => {
-    const resolved = newModelValue ?? newValue
-    if (resolved !== selectValue.value) {
-      selectValue.value = resolved
+  () => props.modelValue,
+  async (newModelValue) => {
+    if (newModelValue !== selectValue.value) {
+      selectValue.value = newModelValue
     }
-    await loadRecordByValue(resolved)
+    await loadRecordByValue(newModelValue)
   },
   { deep: true, immediate: true }
 )
@@ -518,7 +521,6 @@ watch(
   selectValue,
   (newVal) => {
     emit('update:modelValue', newVal)
-    emit('update:value', newVal)
   },
   { deep: true }
 )

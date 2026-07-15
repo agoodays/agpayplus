@@ -134,6 +134,9 @@
           <div class="data-statistics">
             <div class="statistics-list">
               <div class="item item-primary">
+                <div class="icon-wrapper">
+                  <UndoOutlined />
+                </div>
                 <div class="content">
                   <div class="title">退款金额</div>
                   <div class="amount">
@@ -142,24 +145,27 @@
                   </div>
                 </div>
               </div>
-              <div class="item">
-                <div class="line"></div>
-              </div>
               <div class="item item-transaction">
+                <div class="icon-wrapper">
+                  <TransactionOutlined />
+                </div>
                 <div class="content">
-                  <div class="title">退款笔数</div>
+                  <div class="title">退款订单</div>
                   <div class="amount">
-                    <span class="amount-num">{{ statistics?.refundCount || 0 }}</span>
-                    <span class="amount-unit">笔</span>
+                    <span class="amount-num">{{ (statistics?.refundAmount || 0).toFixed(2) }}</span>
+                    <span class="amount-unit">元</span>
+                  </div>
+                  <div class="detail">
+                    <span>{{ statistics?.refundCount || 0 }}笔</span>
                   </div>
                 </div>
               </div>
-              <div class="item">
-                <div class="line"></div>
-              </div>
               <div class="item item-warning">
+                <div class="icon-wrapper">
+                  <DollarOutlined />
+                </div>
                 <div class="content">
-                  <div class="title">手续费金额</div>
+                  <div class="title">手续费退还</div>
                   <div class="amount">
                     <span class="amount-num">{{ (statistics?.refundFeeAmount || 0).toFixed(2) }}</span>
                     <span class="amount-unit">元</span>
@@ -290,7 +296,7 @@ import { basicApi } from '@/api/system/basic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
 import { onMounted, reactive, ref, computed } from 'vue'
-import { CopyOutlined } from '@ant-design/icons-vue'
+import { CopyOutlined, DollarOutlined, TransactionOutlined, UndoOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import RefundDetailDrawer from './refund-detail-drawer.vue'
 
@@ -584,16 +590,12 @@ const copyOrderNo = (text) => {
 </script>
 
 <style lang="less" scoped>
-/**
- * 统计信息样式
- */
 .data-statistics {
-  margin: 0 30px 10px;
-  padding: 28px 0 32px;
-  border-radius: 3px;
-  border: 1px solid #ebebeb;
+  padding: 24px 0;
+  border-radius: 8px;
   transform: translateY(-10px);
-  background: rgb(250, 250, 250);
+  background: var(--layout-surface);
+  border: 1px solid var(--border-color);
 }
 
 .statistics-list {
@@ -605,59 +607,117 @@ const copyOrderNo = (text) => {
 .statistics-list .item {
   display: flex;
   align-items: center;
+  padding: 0 20px;
+
+  .icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 16px;
+    flex-shrink: 0;
+  }
 
   .content {
     display: flex;
     flex-direction: column;
 
     .title {
-      color: gray;
-      margin-bottom: 10px;
+      color: var(--text-color-weak);
       font-size: 13px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+
+      .info-icon {
+        font-size: 12px;
+        margin-left: 4px;
+        cursor: help;
+      }
     }
 
     .amount {
       display: flex;
       align-items: baseline;
-      margin-bottom: 10px;
 
       .amount-num {
-        padding-right: 3px;
         font-weight: 600;
-        font-size: 20px;
+        font-size: 22px;
+        margin-right: 4px;
       }
 
       .amount-unit {
         font-size: 12px;
-        color: #999;
+        color: var(--text-color-muted);
+      }
+    }
+
+    .detail {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--text-color-muted);
+
+      .detail-text {
+        color: var(--primary-color);
+        padding-left: 8px;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
       }
     }
   }
 
   &.item-primary {
-    .amount-num {
+    .icon-wrapper {
+      background: rgba(26, 102, 255, 0.1);
+      color: rgb(26, 102, 255);
+    }
+    .amount .amount-num {
       color: rgb(26, 102, 255);
     }
   }
 
   &.item-transaction {
-    .amount-num {
+    .icon-wrapper {
+      background: rgba(26, 189, 159, 0.1);
+      color: rgb(26, 189, 159);
+    }
+    .amount .amount-num {
       color: var(--text-color);
     }
   }
 
   &.item-warning {
-    .amount-num {
+    .icon-wrapper {
+      background: rgba(250, 173, 20, 0.1);
+      color: rgb(250, 173, 20);
+    }
+    .amount .amount-num {
       color: rgb(250, 173, 20);
     }
   }
 
-  .line {
-    width: 1px;
-    height: 100%;
-    border-right: 1px solid #efefef;
-    margin: 0 20px;
+  &.item-error {
+    .icon-wrapper {
+      background: rgba(255, 77, 79, 0.1);
+      color: rgb(255, 77, 79);
+    }
+    .amount .amount-num {
+      color: rgb(255, 77, 79);
+    }
   }
+}
+
+.statistics-list .line {
+  width: 1px;
+  height: 40px;
+  border-right: 1px solid var(--border-color);
+  margin: auto 0;
 }
 
 /**

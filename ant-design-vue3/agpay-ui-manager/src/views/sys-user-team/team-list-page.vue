@@ -1,20 +1,16 @@
 <template>
   <div>
     <a-card :bordered="false">
-      <!-- 搜索表单 -->
       <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.sysType"
+                v-model="searchData.sysType"
                 label="所属系统"
                 placeholder="请选择所属系统"
                 allow-clear
-                :options="[
-                  { value: 'MGR', label: '运营平台' },
-                  { value: 'AGENT', label: '代理商' }
-                ]"
+                :options="SYS_TYPE_OPTIONS"
               />
             </a-form-item>
           </a-col>
@@ -40,7 +36,6 @@
           </a-col>
         </template>
       </ag-search>
-      <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
         row-key="teamId"
@@ -54,48 +49,15 @@
             <plus-outlined /> 新增
           </a-button>
         </template>
-        <template #statRangeTypeSlot="{ record }">
-          <!-- 自定义渲染 -->
-          <span>
-            {{
-              record.statRangeType === 'year'
-                ? '年'
-                : record.statRangeType === 'quarter'
-                  ? '季度'
-                  : record.statRangeType === 'month'
-                    ? '月'
-                    : record.statRangeType === 'week'
-                      ? '周'
-                      : ''
-            }}
-          </span>
+        <template #statRangeTypeSlot="{ text }">
+          {{ getStatRangeTypeName(text) }}
         </template>
-        <template #sysTypeSlot="{ record }">
-          <a-tag
-            :key="record.sysType"
-            :color="
-              record.sysType === 'MGR'
-                ? 'green'
-                : record.sysType === 'AGENT'
-                  ? 'cyan'
-                  : record.sysType === 'MCH'
-                    ? 'geekblue'
-                    : 'loser'
-            "
-          >
-            {{
-              record.sysType === 'MGR'
-                ? '运营平台'
-                : record.sysType === 'AGENT'
-                  ? '代理商系统'
-                  : record.sysType === 'MCH'
-                    ? '商户系统'
-                    : '未知'
-            }}
+        <template #sysTypeSlot="{ text }">
+          <a-tag :color="getSysTypeTag(text).color">
+            {{ getSysTypeTag(text).text }}
           </a-tag>
         </template>
         <template #opSlot="{ record }">
-          <!-- 操作按钮 -->
           <ag-table-actions>
             <a-button v-if="hasPermission('ENT_UR_TEAM_EDIT')" type="link" @click="editFunc(record.teamId)">编辑</a-button>
             <a-button v-if="hasPermission('ENT_UR_TEAM_DEL')" type="link" style="color: red" @click="delFunc(record.teamId)">删除</a-button>
@@ -103,9 +65,7 @@
         </template>
       </ag-table>
     </a-card>
-    <!-- 新增/编辑弹窗  -->
     <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleSuccess" />
-    <!-- 详情弹窗  -->
     <detail v-model:open="detailOpen" :record-id="currentRecordId" />
   </div>
 </template>
@@ -116,12 +76,13 @@
  */
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
-import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
 import { ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
+import { STAT_RANGE_TYPE_ENUM, SYS_TYPE_ENUM, SYS_TYPE_OPTIONS } from '@/constants/common-const'
 
 // 权限检查
 const { hasPermission } = usePermission()
@@ -131,6 +92,24 @@ const { hasPermission } = usePermission()
  */
 const defaultSearchData = {
   sysType: 'MGR'
+}
+
+const statRangeTypeMap = Object.fromEntries(Object.values(STAT_RANGE_TYPE_ENUM).map(item => [item.value, item.desc]))
+const sysTypeMap = Object.fromEntries(Object.values(SYS_TYPE_ENUM).map(item => [item.value, item.desc]))
+
+const sysTypeColorMap = {
+  MGR: 'green',
+  AGENT: 'cyan',
+  MCH: 'geekblue'
+}
+
+const getStatRangeTypeName = (text) => statRangeTypeMap[text] || ''
+
+const getSysTypeTag = (text) => {
+  return {
+    text: sysTypeMap[text] || '未知',
+    color: sysTypeColorMap[text] || 'default'
+  }
 }
 
 /**

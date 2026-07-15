@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <ag-drawer
     v-model:open="localOpen"
     :title="isAdd ? '新增商户' : '修改商户'"
@@ -14,37 +14,37 @@
       <a-row :gutter="16">
         <a-col :span="10">
           <a-form-item label="商户名称" name="mchName">
-            <a-input v-model:value="saveObject.mchName" placeholder="请输入商户名称" />
+            <ag-input v-model="saveObject.mchName" placeholder="请输入商户名称" />
           </a-form-item>
         </a-col>
 
         <a-col :span="10">
           <a-form-item label="登录名" name="loginUsername">
-            <a-input v-model:value="saveObject.loginUsername" placeholder="请输入商户登录名" :disabled="!isAdd" />
+            <ag-input v-model="saveObject.loginUsername" placeholder="请输入商户登录名" :disabled="!isAdd" />
           </a-form-item>
         </a-col>
 
         <a-col :span="10">
           <a-form-item label="商户简称" name="mchShortName">
-            <a-input v-model:value="saveObject.mchShortName" placeholder="请输入商户简称" />
+            <ag-input v-model="saveObject.mchShortName" placeholder="请输入商户简称" />
           </a-form-item>
         </a-col>
 
         <a-col :span="10">
           <a-form-item label="联系人姓名" name="contactName">
-            <a-input v-model:value="saveObject.contactName" placeholder="请输入联系人姓名" />
+            <ag-input v-model="saveObject.contactName" placeholder="请输入联系人姓名" />
           </a-form-item>
         </a-col>
 
         <a-col :span="10">
           <a-form-item label="联系人邮箱" name="contactEmail">
-            <a-input v-model:value="saveObject.contactEmail" placeholder="请输入联系人邮箱" />
+            <ag-input v-model="saveObject.contactEmail" placeholder="请输入联系人邮箱" />
           </a-form-item>
         </a-col>
 
         <a-col :span="10">
           <a-form-item label="联系人手机号" name="contactTel">
-            <a-input v-model:value="saveObject.contactTel" placeholder="请输入联系人手机号" />
+            <ag-input v-model="saveObject.contactTel" placeholder="请输入联系人手机号" />
             <div class="tip-text">(同步更改登录手机号)</div>
           </a-form-item>
         </a-col>
@@ -55,15 +55,15 @@
               <span>商户级别</span>
               <a-tooltip>
                 <template #title>
-                  <div>M0商户：简单模式（页面简洁，仅基础收款功能）</div>
-                  <div>M1商户：高级模式（支持api调用，支持配置应用及分账、转账功能）</div>
+                  <div>{{ MCH_LEVEL_ENUM.M0.desc }}商户：{{ MCH_LEVEL_ENUM.M0.tips }}</div>
+                  <div>{{ MCH_LEVEL_ENUM.M1.desc }}商户：{{ MCH_LEVEL_ENUM.M1.tips }}</div>
                 </template>
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
             <a-radio-group v-model:value="saveObject.mchLevel">
-              <a-radio value="M0">M0</a-radio>
-              <a-radio value="M1">M1</a-radio>
+              <a-radio :value="MCH_LEVEL_ENUM.M0.value">{{ MCH_LEVEL_ENUM.M0.desc }}</a-radio>
+              <a-radio :value="MCH_LEVEL_ENUM.M1.value">{{ MCH_LEVEL_ENUM.M1.desc }}</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
@@ -77,8 +77,8 @@
               </a-tooltip>
             </template>
             <a-checkbox-group v-model:value="saveObject.refundMode">
-              <a-checkbox value="plat">平台退款</a-checkbox>
-              <a-checkbox value="api">接口退款</a-checkbox>
+              <a-checkbox :value="REFUND_MODE_ENUM.PLAT.value">{{ REFUND_MODE_ENUM.PLAT.desc }}</a-checkbox>
+              <a-checkbox :value="REFUND_MODE_ENUM.API.value">{{ REFUND_MODE_ENUM.API.desc }}</a-checkbox>
             </a-checkbox-group>
           </a-form-item>
         </a-col>
@@ -89,15 +89,15 @@
               <span>商户类型</span>
               <a-tooltip>
                 <template #title>
-                  <div>普通商户：商户自行申请入驻，单独调接口</div>
-                  <div>特约商户：由服务商协助完成入驻，走服务商接口</div>
+                  <div>{{ MCH_TYPE_ENUM.NORMAL.desc }}：商户自行申请入驻，单独调接口</div>
+                  <div>{{ MCH_TYPE_ENUM.SPECIAL.desc }}：由服务商协助完成入驻，走服务商接口</div>
                 </template>
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
             <a-radio-group v-model:value="saveObject.type" :disabled="!isAdd">
-              <a-radio :value="1">普通商户</a-radio>
-              <a-radio :value="2">特约商户</a-radio>
+              <a-radio :value="MCH_TYPE_ENUM.NORMAL.value">{{ MCH_TYPE_ENUM.NORMAL.desc }}</a-radio>
+              <a-radio :value="MCH_TYPE_ENUM.SPECIAL.value">{{ MCH_TYPE_ENUM.SPECIAL.desc }}</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
@@ -105,14 +105,14 @@
         <a-col :span="10">
           <a-form-item label="状态" name="state">
             <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="1">启用</a-radio>
-              <a-radio :value="0">禁用</a-radio>
+              <a-radio :value="STATE_ENUM.ENABLED.value">{{ STATE_ENUM.ENABLED.desc }}</a-radio>
+              <a-radio :value="STATE_ENUM.DISABLED.value">{{ STATE_ENUM.DISABLED.desc }}</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
 
         <!-- 特约商户专属字段 -->
-        <a-col v-if="saveObject.type === 2" :span="10">
+        <a-col v-if="saveObject.type === MCH_TYPE_ENUM.SPECIAL.value" :span="10">
           <a-form-item label="代理商号" name="agentNo">
             <a-select
               v-model:value="saveObject.agentNo"
@@ -129,7 +129,7 @@
           </a-form-item>
         </a-col>
 
-        <a-col v-if="saveObject.type === 2" :span="10">
+        <a-col v-if="saveObject.type === MCH_TYPE_ENUM.SPECIAL.value" :span="10">
           <a-form-item label="服务商号" name="isvNo">
             <a-select
               v-model:value="saveObject.isvNo"
@@ -148,7 +148,7 @@
 
         <a-col :span="24">
           <a-form-item label="备注" name="remark">
-            <a-textarea v-model:value="saveObject.remark" placeholder="请输入备注" :rows="3" />
+            <ag-textarea v-model="saveObject.remark" placeholder="请输入备注" :rows="3" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -162,8 +162,8 @@
         <a-col :span="10">
           <a-form-item label="是否发送开通提醒" name="isNotify">
             <a-radio-group v-model:value="saveObject.isNotify">
-              <a-radio :value="0">否</a-radio>
-              <a-radio :value="1">是</a-radio>
+              <a-radio :value="FLAG_ENUM.NO.value">{{ FLAG_ENUM.NO.desc }}</a-radio>
+              <a-radio :value="FLAG_ENUM.YES.value">{{ FLAG_ENUM.YES.desc }}</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
@@ -228,7 +228,11 @@
 </template>
 
 <script setup>
-import { AgDrawer } from '@/components'
+/**
+ * 商户新增/编辑抽屉组件
+ * 功能：商户信息的新增和编辑，包含基本信息、账户安全
+ */
+import { AgDrawer, AgInput, AgTextarea, AgSelectInfinite } from '@/components'
 import { mchApi } from '@/api/business/mch/mch-api'
 import { loginApi } from '@/api/system/login-api'
 import { CheckOutlined, CloseOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
@@ -236,6 +240,7 @@ import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
 import { nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { STATE_ENUM, FLAG_ENUM, MCH_TYPE_ENUM, MCH_LEVEL_ENUM, REFUND_MODE_ENUM } from '@/constants/common-const'
 
 const { t } = useI18n()
 
@@ -281,14 +286,14 @@ const saveObject = reactive({
   contactName: '',
   contactEmail: '',
   contactTel: '',
-  mchLevel: 'M0',
-  refundMode: ['api'],
-  type: 1,
-  state: 1,
+  mchLevel: MCH_LEVEL_ENUM.M0.value,
+  refundMode: [REFUND_MODE_ENUM.API.value],
+  type: MCH_TYPE_ENUM.NORMAL.value,
+  state: STATE_ENUM.ENABLED.value,
   agentNo: '',
   isvNo: '',
   remark: '',
-  isNotify: 0,
+  isNotify: FLAG_ENUM.NO.value,
   passwordType: 'default',
   loginPassword: '',
   newPwd: '',
@@ -318,7 +323,7 @@ const rules = {
   isvNo: [
     {
       validator: (rule, value) => {
-        if (saveObject.type === 2 && !value) {
+        if (saveObject.type === MCH_TYPE_ENUM.SPECIAL.value && !value) {
           return Promise.reject('请选择服务商')
         }
         return Promise.resolve()

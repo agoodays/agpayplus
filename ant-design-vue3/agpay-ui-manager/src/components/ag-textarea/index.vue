@@ -2,7 +2,7 @@
   <div class="ag-float-container" :class="{ 'is-focused': isFocused }">
     <a-textarea
       ref="textareaRef"
-      v-model:value="inputValue"
+      :value="inputValue"
       :placeholder="floatPlaceholder"
       :disabled="disabled"
       :maxlength="maxlength"
@@ -12,8 +12,8 @@
       :allow-clear="allowClear"
       @focus="handleFocus"
       @blur="handleBlur"
-      @change="handleChange"
-      @press-enter="handlePressEnter"
+      @change="handleInputChange"
+        @press-enter="handlePressEnter"
     />
 
     <label class="ag-float-label" :class="labelClass">
@@ -100,6 +100,11 @@ const {
   blurDelay: 100,
   ...props.floatOptions
 })
+
+function handleInputChange(e) {
+  inputValue.value = e.target.value
+  handleChange(e)
+}
 
 defineExpose({
   focus,

@@ -22,6 +22,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
+import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
 
 const props = defineProps({
   // 状态值：0=停用/禁用，1=启用/激活，其他=未知
@@ -77,6 +78,12 @@ const emit = defineEmits(['update:state', 'change'])
 const localChecked = ref(props.state === 1)
 const loading = ref(false)
 
+/**
+ * 表单上下文（自动检测是否在 a-form-item 内部）
+ * 如果组件在 a-form-item 内，则自动获得表单验证能力
+ */
+const formItemContext = useInjectFormItemContext()
+
 // 监听外部状态变化
 watch(
   () => props.state,
@@ -96,6 +103,11 @@ async function handleChange(checked) {
     // 成功后更新状态
     emit('update:state', checked ? 1 : 0)
     emit('change', checked ? 1 : 0)
+    // 如果组件在 a-form-item 内，自动触发表单验证状态更新
+    // 确保 formItemContext 和 onFieldChange 方法存在
+    if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
+      formItemContext.onFieldChange()
+    }
   } catch (error) {
     // 失败时恢复原状态
     localChecked.value = !checked

@@ -34,6 +34,7 @@ import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
 import { UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { viewerApi } from '@/utils/viewer-api'
+import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
 
 const { t } = useI18n()
 
@@ -54,6 +55,12 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['change', 'success', 'error', 'uploadSuccess'])
+
+/**
+ * 表单上下文（自动检测是否在 a-form-item 内部）
+ * 如果组件在 a-form-item 内，则自动获得表单验证能力
+ */
+const formItemContext = useInjectFormItemContext()
 
 const fileList = ref([])
 const loading = ref(false)
@@ -119,9 +126,19 @@ function handleChange(info) {
     fileList.value = getFileItems(info.fileList)
     emit('uploadSuccess', props.bindName, fileList.value)
     emit('success', info.file.response)
+    // 如果组件在 a-form-item 内，上传成功后自动触发表单验证状态更新
+    // 确保 formItemContext 和 onFieldChange 方法存在
+    if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
+      formItemContext.onFieldChange()
+    }
   } else if (info.file.status === 'removed') {
     fileList.value = getFileItems(info.fileList)
     emit('uploadSuccess', props.bindName, fileList.value)
+    // 如果组件在 a-form-item 内，删除文件后自动触发表单验证状态更新
+    // 确保 formItemContext 和 onFieldChange 方法存在
+    if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
+      formItemContext.onFieldChange()
+    }
   } else if (info.file.status === 'error') {
     message.error('上传失败')
     emit('error', info.file.error)
