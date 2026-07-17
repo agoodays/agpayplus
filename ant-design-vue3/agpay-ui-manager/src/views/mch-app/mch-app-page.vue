@@ -8,7 +8,7 @@
         :default-collapsed="false"
         :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
-        @reset="onReset"
+        @reset="searchFunc"
       >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
@@ -256,17 +256,6 @@ const searchMch = (params) => mchAppApi.queryMchPage(params)
  * 搜索函数
  */
 const searchFunc = () => {
-  reloadTable()
-}
-
-/**
- * 重置搜索条件
- */
-const onReset = () => {
-  searchData.mchNo = ''
-  searchData.appId = ''
-  searchData.appName = ''
-  searchData.state = ''
   reloadTable()
 }
 

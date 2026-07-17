@@ -50,13 +50,13 @@ export const useUserStore = defineStore('userStore', {
   },
 
   actions: {
-    // ✅ 简化：使用 $reset() 重置状态，persist 会自动清除 localStorage
-    logout() {
-      return new Promise((resolve) => {
-        // 重置所有状态到初始值
-        this.$reset()
-        resolve()
-      })
+    /**
+     * 退出登录
+     * 重置所有状态到初始值（pinia-plugin-persistedstate 会自动清除 localStorage）
+     * @returns {Promise<void>}
+     */
+    async logout() {
+      this.$reset()
     },
 
     // ✅ 简化：直接修改状态，persist 会自动保存

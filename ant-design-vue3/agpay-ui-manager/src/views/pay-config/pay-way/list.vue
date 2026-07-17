@@ -1,8 +1,8 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -102,12 +102,11 @@
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { reactive, ref } from 'vue'
-import AddOrEdit from './add-or-edit.vue'
-import { message } from 'ant-design-vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
+import AddOrEdit from './add-or-edit.vue'
 
-// 权限检查
+/** 权限检查 */
 const { hasPermission } = usePermission()
 
 /**
@@ -122,25 +121,23 @@ const tableColumns = [
 ]
 
 /**
- * 表格组件引用
+ * 使用 CRUD 表格页面组合式函数
  */
-const tableRef = ref(null)
-
-/**
- * 新增编辑组件引用
- */
-const modalOpen = ref(false)
-const currentRecordId = ref('')
-
-/**
- * 加载状态
- */
-const loading = ref(false)
-
-/**
- * 搜索表单数据
- */
-const searchData = reactive({})
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  currentRecordId,
+  reloadTable,
+  openCreate,
+  openEdit,
+  closeModal,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: (wayCode) => payConfigApi.delPayWayById(wayCode),
+  deleteConfirmTitle: '确认删除？',
+  deleteSuccessMessage: '删除成功！'
+})
 
 /**
  * 请求表格数据函数
@@ -154,49 +151,31 @@ const reqTableDataFunc = async (params) => {
 /**
  * 搜索函数
  */
-const searchFunc = () => {
-  tableRef.value?.reload()
-}
+const searchFunc = () => reloadTable()
 
 /**
  * 新增支付方式
  */
-const addFunc = () => {
-  currentRecordId.value = ''
-  modalOpen.value = true
-}
+const addFunc = () => openCreate()
 
 /**
  * 编辑支付方式
  * @param {string} wayCode - 支付方式代码
  */
-const editFunc = (wayCode) => {
-  currentRecordId.value = wayCode
-  modalOpen.value = true
-}
-
-/**
- * 操作成功回调
- */
-const handleSuccess = () => {
-  searchFunc()
-}
+const editFunc = (wayCode) => openEdit(wayCode)
 
 /**
  * 删除支付方式
  * @param {string} wayCode - 支付方式代码
  */
-const delFunc = async (wayCode) => {
-  const { infoBox } = await import('@/utils/info-box')
-  infoBox.confirmDanger('确认删除？', '', async () => {
-    try {
-      await payConfigApi.delPayWayById(wayCode)
-      message.success('删除成功！')
-      tableRef.value?.reload()
-    } catch (error) {
-      console.error('删除支付方式失败:', error)
-    }
-  })
+const delFunc = (wayCode) => confirmDelete(wayCode)
+
+/**
+ * 操作成功回调
+ */
+const handleSuccess = () => {
+  closeModal()
+  reloadTable()
 }
 
 

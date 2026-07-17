@@ -69,7 +69,11 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+/**
+ * 支付配置 - 通用配置页面组件
+ * 功能：根据支付接口定义动态渲染配置表单，支持文本、文本域、下拉选择、开关、上传等类型
+ */
+import { ref, reactive, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgUpload } from '@/components'
@@ -101,14 +105,18 @@ const props = defineProps({
   }
 })
 
-// State
+/** 是否显示卡片 */
 const showCard = ref(false)
+/** 加载状态 */
 const loading = ref(false)
+/** 表单引用 */
 const infoForm = ref(null)
+/** 表单数据对象 */
 const saveObject = reactive({})
+/** 表单字段配置 */
 const formItems = ref([])
 
-// Layout
+/** 表单布局配置 */
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
@@ -120,22 +128,30 @@ const formItemLayout = {
   }
 }
 
-// Methods
-const getConfig = () => {
-  if (props.ifDefine) {
-    loading.value = true
-    payConfigApi.getPayConfigById(props.infoId, props.ifDefine.ifCode)
-      .then((res) => {
-        showCard.value = true
-        formItems.value = res.configItems
-        formItems.value.forEach((item) => {
-          saveObject[item.key] = item.value
-        })
-        loading.value = false
-      })
+/**
+ * 获取支付配置数据
+ */
+const getConfig = async () => {
+  if (!props.ifDefine) return
+
+  loading.value = true
+  try {
+    const res = await payConfigApi.getPayConfigById(props.infoId, props.ifDefine.ifCode)
+    showCard.value = true
+    formItems.value = res.configItems
+    formItems.value.forEach((item) => {
+      saveObject[item.key] = item.value
+    })
+  } catch (error) {
+    console.error('获取支付配置失败:', error)
+  } finally {
+    loading.value = false
   }
 }
 
+/**
+ * 重置表单数据
+ */
 const reset = () => {
   showCard.value = false
   formItems.value = []
@@ -144,26 +160,31 @@ const reset = () => {
   })
 }
 
-const onSubmit = () => {
-  infoForm.value.validate((errors) => {
-    if (!errors) {
-      loading.value = true
-      const params = {
-        infoId: props.infoId,
-        infoType: props.infoType,
-        ifCode: props.ifDefine.ifCode,
-        configItems: formItems.value.map((item) => ({
-          key: item.key,
-          value: saveObject[item.key]
-        }))
-      }
-      payConfigApi.addPayConfig(params).then((res) => {
-        message.success('保存成功')
-        props.callbackFunc()
-        loading.value = false
-      })
+/**
+ * 提交表单
+ */
+const onSubmit = async () => {
+  try {
+    await infoForm.value.validate()
+    loading.value = true
+    const params = {
+      infoId: props.infoId,
+      infoType: props.infoType,
+      ifCode: props.ifDefine.ifCode,
+      configItems: formItems.value.map((item) => ({
+        key: item.key,
+        value: saveObject[item.key]
+      }))
     }
-  })
+    await payConfigApi.addPayConfig(params)
+    message.success('保存成功')
+    props.callbackFunc()
+  } catch (error) {
+    // 表单验证失败或接口调用失败
+    console.error('保存支付配置失败:', error)
+  } finally {
+    loading.value = false
+  }
 }
 
 // Watch

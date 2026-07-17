@@ -1,28 +1,18 @@
 <template>
   <div>
-    <a-card :bordered="false">
-      <a-tabs :animated="false" @change="selectTabs">
+    <a-card :bordered="false" class="config-card">
+      <a-tabs :animated="false" @change="selectTabs" v-model="groupKey">
         <a-tab-pane key="applicationConfig" tab="域名管理">
-          <div v-if="['applicationConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+          <div v-if="groupKey === 'applicationConfig'" class="account-settings-info-view">
             <a-form ref="configForm">
               <a-row>
                 <a-col v-for="(item, config) in configData" :key="config" :span="8" :offset="1">
                   <a-form-item :label="item.configName">
                     <a-input
-                      v-model="item.configVal"
+                      v-model:value="item.configVal"
                       :type="item.type === 'text' ? 'text' : 'textarea'"
                       autocomplete="off"
                     />
-                  </a-form-item>
-                </a-col>
-              </a-row>
-              <a-row>
-                <a-col :span="19">
-                  <a-form-item style="display: flex; justify-content: center">
-                    <a-button type="primary" :loading="loading" @click="confirm($event, '域名地址')">
-                      <template #icon><CheckCircleOutlined /></template>
-                      确认更新
-                    </a-button>
                   </a-form-item>
                 </a-col>
               </a-row>
@@ -30,64 +20,44 @@
           </div>
         </a-tab-pane>
         <a-tab-pane key="mchTreatyConfig" tab="文章管理">
-          <div v-if="['mchTreatyConfig', 'agentTreatyConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+          <div v-if="['mchTreatyConfig', 'agentTreatyConfig'].includes(groupKey)" class="account-settings-info-view">
             <a-tabs v-model="groupKey" tab-position="left" @change="selectTabs">
               <a-tab-pane key="mchTreatyConfig" tab="商户通">
-                <div v-if="['mchTreatyConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <div v-if="groupKey === 'mchTreatyConfig'" class="account-settings-info-view">
                   <a-row>
                     <a-col v-for="(item, config) in configData" :key="config" :span="22" :offset="1">
                       <a-row>
-                        <a-col :span="24"
-                          ><h2 style="text-align: center">
+                        <a-col :span="24">
+                          <h2 style="text-align: center">
                             <b>{{ item.configName }}</b>
-                          </h2></a-col
-                        >
+                          </h2>
+                        </a-col>
                         <a-col :span="24">
                           <a-form-item>
                             <ag-editor v-model="item.configVal" :height="500"></ag-editor>
                           </a-form-item>
                         </a-col>
                       </a-row>
-                    </a-col>
-                  </a-row>
-                  <a-row>
-                    <a-col :span="24">
-                      <a-form-item style="display: flex; justify-content: center">
-                        <a-button type="primary" :loading="loading" @click="confirm($event, '商户通条约')">
-                          <template #icon><CheckCircleOutlined /></template>
-                          确认更新
-                        </a-button>
-                      </a-form-item>
                     </a-col>
                   </a-row>
                 </div>
               </a-tab-pane>
               <a-tab-pane key="agentTreatyConfig" tab="展业宝">
-                <div v-if="['agentTreatyConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <div v-if="groupKey === 'agentTreatyConfig'" class="account-settings-info-view">
                   <a-row>
                     <a-col v-for="(item, config) in configData" :key="config" :span="22" :offset="1">
                       <a-row>
-                        <a-col :span="24"
-                          ><h2 style="text-align: center">
+                        <a-col :span="24">
+                          <h2 style="text-align: center">
                             <b>{{ item.configName }}</b>
-                          </h2></a-col
-                        >
+                          </h2>
+                        </a-col>
                         <a-col :span="24">
                           <a-form-item>
                             <ag-editor v-model="item.configVal" :height="500"></ag-editor>
                           </a-form-item>
                         </a-col>
                       </a-row>
-                    </a-col>
-                  </a-row>
-                  <a-row>
-                    <a-col :span="24">
-                      <a-form-item style="display: flex; justify-content: center">
-                        <a-button type="primary" :loading="loading" @click="confirm($event, '展业宝条约')">
-                          <template #icon><CheckCircleOutlined /></template>
-                          确认更新
-                        </a-button>
-                      </a-form-item>
                     </a-col>
                   </a-row>
                 </div>
@@ -96,13 +66,10 @@
           </div>
         </a-tab-pane>
         <a-tab-pane key="smsConfig" tab="高级配置">
-          <div
-            v-if="['smsConfig', 'ocrConfig', 'ossConfig', 'apiMapConfig'].indexOf(groupKey) >= 0"
-            class="account-settings-info-view"
-          >
+          <div v-if="['smsConfig', 'ocrConfig', 'ossConfig', 'apiMapConfig'].includes(groupKey)" class="account-settings-info-view">
             <a-tabs v-model="groupKey" tab-position="left" @change="selectTabs">
               <a-tab-pane key="smsConfig" tab="短信配置">
-                <div v-if="['smsConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <div v-if="groupKey === 'smsConfig'" class="account-settings-info-view">
                   <a-form ref="configForm" layout="vertical">
                     <a-row justify="space-between">
                       <a-col :span="20" :offset="1">
@@ -142,7 +109,7 @@
                         <a-col :span="10" :offset="1">
                           <a-form-item label="密码" name="accountPwd">
                             <a-input
-                              v-model="smsConfig.agpaydxSmsConfigDesen.accountPwd"
+                              v-model:value="smsConfig.agpaydxSmsConfigDesen.accountPwd"
                               :placeholder="
                                 smsConfig.agpaydxSmsConfigDesen.accountPwd
                                   ? smsConfig.agpaydxSmsConfigDesen.accountPwd
@@ -187,7 +154,7 @@
                         <a-col :span="10" :offset="1">
                           <a-form-item label="AccessKeySecret" name="accessKeySecret">
                             <a-input
-                              v-model="smsConfig.aliyundySmsConfig.accessKeySecret"
+                              v-model:value="smsConfig.aliyundySmsConfig.accessKeySecret"
                               :placeholder="
                                 smsConfig.aliyundySmsConfigDesen.accessKeySecret
                                   ? smsConfig.aliyundySmsConfigDesen.accessKeySecret
@@ -211,7 +178,7 @@
                         <a-col :span="10" :offset="1">
                           <a-form-item label="【商户注册】短信模板ID" name="registerMchTemplateId">
                             <a-input
-                              v-model="smsConfig.aliyundySmsConfig.registerMchTemplateId"
+                              v-model:value="smsConfig.aliyundySmsConfig.registerMchTemplateId"
                               placeholder="请填写[商户注册短信模板ID]"
                             />
                           </a-form-item>
@@ -219,7 +186,7 @@
                         <a-col :span="10" :offset="1">
                           <a-form-item label="【忘记密码】短信模板ID" name="forgetPwdTemplateId">
                             <a-input
-                              v-model="smsConfig.aliyundySmsConfig.forgetPwdTemplateId"
+                              v-model:value="smsConfig.aliyundySmsConfig.forgetPwdTemplateId"
                               placeholder="请填写[忘记密码短信模板ID]"
                             />
                           </a-form-item>
@@ -227,7 +194,7 @@
                         <a-col :span="10" :offset="1">
                           <a-form-item label="【短信登录】短信模板ID" name="loginMchTemplateId">
                             <a-input
-                              v-model="smsConfig.aliyundySmsConfig.loginMchTemplateId"
+                              v-model:value="smsConfig.aliyundySmsConfig.loginMchTemplateId"
                               placeholder="请填写[短信登录短信模板ID]"
                             />
                           </a-form-item>
@@ -235,7 +202,7 @@
                         <a-col :span="10" :offset="1">
                           <a-form-item label="【账号开通】短信模板ID" name="accountOpenTemplateId">
                             <a-input
-                              v-model="smsConfig.aliyundySmsConfig.accountOpenTemplateId"
+                              v-model:value="smsConfig.aliyundySmsConfig.accountOpenTemplateId"
                               placeholder="请填写[账号开通短信模板ID]"
                             />
                           </a-form-item>
@@ -243,7 +210,7 @@
                         <a-col :span="10" :offset="1">
                           <a-form-item label="【会员绑定】短信模板ID" name="mbrTelBindTemplateId">
                             <a-input
-                              v-model="smsConfig.aliyundySmsConfig.mbrTelBindTemplateId"
+                              v-model:value="smsConfig.aliyundySmsConfig.mbrTelBindTemplateId"
                               placeholder="请填写[会员绑定短信模板ID]"
                             />
                           </a-form-item>
@@ -264,21 +231,11 @@
                         </a-col>
                       </a-row>
                     </div>
-                    <a-row justify="space-between" type="flex">
-                      <a-col :span="21" :offset="1">
-                        <a-form-item style="display: flex; justify-content: center">
-                          <a-button type="primary" :loading="loading" @click="confirm($event, '短信配置')">
-                          <template #icon><CheckCircleOutlined /></template>
-                          确认更新
-                        </a-button>
-                        </a-form-item>
-                      </a-col>
-                    </a-row>
-                  </a-form>
+                    </a-form>
                 </div>
               </a-tab-pane>
               <a-tab-pane key="ocrConfig" tab="OCR配置">
-                <div v-if="['ocrConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <div v-if="groupKey === 'ocrConfig'" class="account-settings-info-view">
                   <a-form ref="configForm" layout="vertical">
                     <a-row justify="space-between">
                       <a-col :span="10" :offset="1">
@@ -312,7 +269,7 @@
                               <a-col :span="22" :offset="1">
                                 <a-form-item label="SecretKey" name="secretKey">
                                   <a-input
-                                    v-model="ocrConfig.tencentOcrConfig.secretKey"
+                                    v-model:value="ocrConfig.tencentOcrConfig.secretKey"
                                     :placeholder="
                                       ocrConfig.tencentOcrConfigDesen.secretKey
                                         ? ocrConfig.tencentOcrConfigDesen.secretKey
@@ -333,7 +290,7 @@
                               <a-col :span="22" :offset="1">
                                 <a-form-item label="AccessKey Secret" name="accessKeySecret">
                                   <a-input
-                                    v-model="ocrConfig.aliOcrConfig.accessKeySecret"
+                                    v-model:value="ocrConfig.aliOcrConfig.accessKeySecret"
                                     :placeholder="
                                       ocrConfig.aliOcrConfigDesen.accessKeySecret
                                         ? ocrConfig.aliOcrConfigDesen.accessKeySecret
@@ -354,7 +311,7 @@
                               <a-col :span="22" :offset="1">
                                 <a-form-item label="SecretKey" name="aecretKey">
                                   <a-input
-                                    v-model="ocrConfig.baiduOcrConfig.aecretKey"
+                                    v-model:value="ocrConfig.baiduOcrConfig.aecretKey"
                                     :placeholder="
                                       ocrConfig.baiduOcrConfigDesen.aecretKey
                                         ? ocrConfig.baiduOcrConfigDesen.aecretKey
@@ -368,21 +325,11 @@
                         </a-collapse>
                       </a-col>
                     </a-row>
-                    <a-row justify="space-between" type="flex" style="padding-top: 20px">
-                      <a-col :span="20" :offset="1">
-                        <a-form-item style="display: flex; justify-content: center">
-                          <a-button type="primary" :loading="loading" @click="confirm($event, 'OCR配置')">
-                          <template #icon><CheckCircleOutlined /></template>
-                          确认更新
-                        </a-button>
-                        </a-form-item>
-                      </a-col>
-                    </a-row>
-                  </a-form>
+                    </a-form>
                 </div>
               </a-tab-pane>
               <a-tab-pane key="ossConfig" tab="存储配置">
-                <div v-if="['ossConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <div v-if="groupKey === 'ossConfig'" class="account-settings-info-view">
                   <a-form ref="configForm" :label-col="{ span: 7 }" :wrapper-col="{ span: 15 }">
                     <a-row>
                       <a-col :span="12">
@@ -408,7 +355,7 @@
                         <a-col :span="12">
                           <a-form-item v-if="item.configKey === 'ossPublicSiteUrl'" :label="item.configName">
                             <a-input
-                              v-model="item.configVal"
+                              v-model:value="item.configVal"
                               :type="item.type === 'text' ? 'text' : 'textarea'"
                               autocomplete="off"
                             />
@@ -428,7 +375,7 @@
                         <a-col :span="12">
                           <a-form-item label="endpoint" name="endpoint">
                             <a-input
-                              v-model="ossConfig.aliyunOssConfig.endpoint"
+                              v-model:value="ossConfig.aliyunOssConfig.endpoint"
                               placeholder="例如： oss-cn-beijing.aliyuncs.com"
                             />
                           </a-form-item>
@@ -438,7 +385,7 @@
                         <a-col :span="12">
                           <a-form-item label="[公共读]桶名称" name="publicBucketName">
                             <a-input
-                              v-model="ossConfig.aliyunOssConfig.publicBucketName"
+                              v-model:value="ossConfig.aliyunOssConfig.publicBucketName"
                               placeholder="请填写[公共读]桶名称"
                             />
                           </a-form-item>
@@ -448,7 +395,7 @@
                         <a-col :span="12">
                           <a-form-item label="[私有]桶名称" name="privateBucketName">
                             <a-input
-                              v-model="ossConfig.aliyunOssConfig.privateBucketName"
+                              v-model:value="ossConfig.aliyunOssConfig.privateBucketName"
                               placeholder="请填写[私有]桶名称"
                             />
                           </a-form-item>
@@ -465,7 +412,7 @@
                         <a-col :span="12">
                           <a-form-item label="AccessKeySecret" name="accessKeySecret">
                             <a-input
-                              v-model="ossConfig.aliyunOssConfig.accessKeySecret"
+                              v-model:value="ossConfig.aliyunOssConfig.accessKeySecret"
                               :placeholder="
                                 ossConfig.aliyunOssConfigDesen.accessKeySecret
                                   ? ossConfig.aliyunOssConfigDesen.accessKeySecret
@@ -479,34 +426,24 @@
                         <a-col :span="12">
                           <a-form-item label="请求过期时间" name="contactTel">
                             <a-input
-                              v-model="ossConfig.aliyunOssConfig.expireTime"
+                              v-model:value="ossConfig.aliyunOssConfig.expireTime"
                               placeholder="请填写请求过期时间， 默认30000， 单位： ms"
                             />
                           </a-form-item>
                         </a-col>
                       </a-row>
                     </div>
-                    <a-row justify="space-between" type="flex">
-                      <a-col :span="24">
-                        <a-form-item style="display: flex; justify-content: center">
-                          <a-button type="primary" :loading="loading" @click="confirm($event, '存储配置')">
-                          <template #icon><CheckCircleOutlined /></template>
-                          确认更新
-                        </a-button>
-                        </a-form-item>
-                      </a-col>
-                    </a-row>
-                  </a-form>
+                    </a-form>
                 </div>
               </a-tab-pane>
               <a-tab-pane key="apiMapConfig" tab="地图配置">
-                <div v-if="['apiMapConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+                <div v-if="groupKey === 'apiMapConfig'" class="account-settings-info-view">
                   <a-form ref="configForm">
                     <a-row v-for="(item, config) in configData" :key="config">
                       <a-col :span="8">
                         <a-form-item :label="item.configName">
                           <a-input
-                            v-model="item.configVal"
+                            v-model:value="item.configVal"
                             :type="item.type === 'text' ? 'text' : 'textarea'"
                             :placeholder="item.configValDesen ? item.configValDesen : '请填写'"
                             autocomplete="off"
@@ -514,24 +451,14 @@
                         </a-form-item>
                       </a-col>
                     </a-row>
-                    <a-row>
-                      <a-col :span="8">
-                        <a-form-item style="display: flex; justify-content: center">
-                          <a-button type="primary" :loading="loading" @click="confirm($event, '地图配置')">
-                          <template #icon><CheckCircleOutlined /></template>
-                          确认更新
-                        </a-button>
-                        </a-form-item>
-                      </a-col>
-                    </a-row>
-                  </a-form>
+                    </a-form>
                 </div>
               </a-tab-pane>
             </a-tabs>
           </div>
         </a-tab-pane>
         <a-tab-pane key="securityConfig" tab="安全配置">
-          <div v-if="['securityConfig'].indexOf(groupKey) >= 0" class="account-settings-info-view">
+          <div v-if="groupKey === 'securityConfig'" class="account-settings-info-view">
             <a-form ref="configForm" layout="vertical">
               <a-row>
                 <a-col :span="8" :offset="1">
@@ -545,25 +472,16 @@
                     <a-checkbox
                       v-model="requireUppercaseLowercaseDigits"
                       style="margin-left: auto"
-                      @change="passwordRegexpChange"
-                      >是否要求大小写和数字</a-checkbox
-                    >
-                    <a-checkbox v-model:checked="requireMinimumLength" style="margin-left: auto" @change="passwordRegexpChange"
-                      >密码最少<a-input-number
-                        v-model="minimumLength"
-                        @change="passwordMinimumLengthChange"
-                      />位</a-checkbox
-                    >
-                  </a-form-item>
-                </a-col>
-              </a-row>
-              <a-row>
-                <a-col :span="19">
-                  <a-form-item style="display: flex; justify-content: center">
-                    <a-button type="primary" :loading="loading" @click="confirm($event, '安全配置')">
-                      <template #icon><CheckCircleOutlined /></template>
-                      确认更新
-                    </a-button>
+                      @change="passwordRegexpChange">
+                      是否要求大小写和数字
+                    </a-checkbox>
+                    <a-checkbox v-model:checked="requireMinimumLength" style="margin-left: auto" @change="passwordRegexpChange">
+                      密码最少
+                      <a-input-number
+                        v-model:value="minimumLength"
+                        @change="passwordMinimumLengthChange" />
+                      位
+                    </a-checkbox>
                   </a-form-item>
                 </a-col>
               </a-row>
@@ -575,10 +493,20 @@
         <!--</div>-->
         <!--</a-tab-pane>-->
       </a-tabs>
+      <div class="config-footer">
+        <a-button type="primary" :loading="loading" @click="confirm()">
+          <template #icon><CheckCircleOutlined /></template>
+          确认更新
+        </a-button>
+      </div>
     </a-card>
   </div>
 </template>
 <script setup>
+/**
+ * 系统配置管理页面组件
+ * 功能：管理系统的各种配置项，包括域名管理、文章管理、高级配置（短信/OCR/存储/地图）、安全配置等
+ */
 import { CheckCircleOutlined, FireOutlined } from '@ant-design/icons-vue'
 import { sysConfigApi } from '@/api/business/sys/sys-config-api'
 import { AgEditor } from '@/components'
@@ -660,35 +588,29 @@ const extractMinimumLengths = (regexpRules) => {
   return minimumLengths
 }
 
-const detail = async () => {
-  configData.value = []
-  const res = await sysConfigApi.queryGroupConfigs(groupKey.value)
-  configData.value = res || []
-  if (configData.value.length > 0) {
-    groupKey.value = configData.value[0]?.groupKey || groupKey.value
-  }
-
-  if (groupKey.value === 'ossConfig') {
+/**
+ * 配置加载映射表
+ * 将配置分组key映射到对应的加载函数
+ */
+const configLoadMap = {
+  ossConfig: () => {
     setConfigVal(ossConfig, 'ossUseType', 'localFile')
     setJSONConfigDesen(ossConfig, 'aliyunOssConfig', true)
-  }
-
-  if (groupKey.value === 'smsConfig') {
+  },
+  smsConfig: () => {
     setConfigVal(smsConfig, 'smsProviderKey', 'agpaydx')
     setJSONConfigDesen(smsConfig, 'agpaydxSmsConfig', true)
     setJSONConfigDesen(smsConfig, 'aliyundySmsConfig', true)
     setJSONConfigDesen(smsConfig, 'mocktestSmsConfig', false)
-  }
-
-  if (groupKey.value === 'ocrConfig') {
+  },
+  ocrConfig: () => {
     setConfigVal(ocrConfig, 'ocrType', 1)
     setConfigVal(ocrConfig, 'ocrState', 1)
     setJSONConfigDesen(ocrConfig, 'tencentOcrConfig', true)
     setJSONConfigDesen(ocrConfig, 'aliOcrConfig', true)
     setJSONConfigDesen(ocrConfig, 'baiduOcrConfig', true)
-  }
-
-  if (groupKey.value === 'securityConfig') {
+  },
+  securityConfig: () => {
     setJSONConfigDesen(securityConfig, 'loginErrorMaxLimit', false)
     setJSONConfigDesen(securityConfig, 'passwordRegexp', false)
 
@@ -700,6 +622,28 @@ const detail = async () => {
   }
 }
 
+/**
+ * 加载配置详情
+ * 根据当前配置分组加载对应的配置数据
+ */
+const detail = async () => {
+  configData.value = []
+  const res = await sysConfigApi.queryGroupConfigs(groupKey.value)
+  configData.value = res || []
+  if (configData.value.length > 0) {
+    groupKey.value = configData.value[0]?.groupKey || groupKey.value
+  }
+
+  const loadFn = configLoadMap[groupKey.value]
+  if (loadFn) {
+    loadFn()
+  }
+}
+
+/**
+ * 切换配置分组标签
+ * @param {string} key - 配置分组key
+ */
 const selectTabs = (key) => {
   if (key) {
     groupKey.value = key
@@ -707,6 +651,10 @@ const selectTabs = (key) => {
   }
 }
 
+/**
+ * 存储类型变更处理
+ * @param {Event|string} e - 事件对象或选中值
+ */
 const ossUseTypeChange = (e) => {
   const selected = e?.target?.value ?? e
   const targetConfig = configData.value.find((item) => item.configKey === 'ossUseType')
@@ -715,84 +663,119 @@ const ossUseTypeChange = (e) => {
   }
 }
 
+/**
+ * 密码最小长度变更处理
+ */
 const passwordMinimumLengthChange = () => {
   requireMinimumLength.value = false
   passwordRegexpChange()
 }
 
-const passwordRegexpChange = () => {
-  if (requireUppercaseLowercaseDigits.value && requireMinimumLength.value) {
-    securityConfig.passwordRegexp.regexpRules = `^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{${minimumLength.value},}$`
-    securityConfig.passwordRegexp.errTips = `密码不符合规则，必须包含大小写字母和数字，最少${minimumLength.value}位`
-  } else if (requireUppercaseLowercaseDigits.value && !requireMinimumLength.value) {
-    securityConfig.passwordRegexp.regexpRules = '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])$'
-    securityConfig.passwordRegexp.errTips = '密码不符合规则，必须包含大小写字母和数字'
-  } else if (requireMinimumLength.value) {
-    securityConfig.passwordRegexp.regexpRules = `^.{${minimumLength.value},}$`
-    securityConfig.passwordRegexp.errTips = `密码不符合规则，最少${minimumLength.value}位`
-  } else {
-    securityConfig.passwordRegexp.regexpRules = ''
-    securityConfig.passwordRegexp.errTips = ''
+/**
+ * 密码规则配置映射表
+ * 根据不同的规则组合生成对应的正则表达式和错误提示
+ */
+const passwordRuleMap = {
+  'upper-lower-digit-length': {
+    regexp: (len) => `^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{${len},}$`,
+    tip: (len) => `密码不符合规则，必须包含大小写字母和数字，最少${len}位`
+  },
+  'upper-lower-digit': {
+    regexp: () => '^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])$',
+    tip: () => '密码不符合规则，必须包含大小写字母和数字'
+  },
+  'length': {
+    regexp: (len) => `^.{${len},}$`,
+    tip: (len) => `密码不符合规则，最少${len}位`
+  },
+  'none': {
+    regexp: () => '',
+    tip: () => ''
   }
 }
 
 /**
- * 确认更新配置
- * @param {Event} _e - 事件对象
- * @param {string} title - 配置名称
- * @param {string} content - 提示内容
+ * 获取密码规则组合key
+ * @returns {string} 规则组合key
  */
-const confirm = (_e, title, content) => {
-  infoBox.confirmPrimary(`确认修改${title}吗？`, content, async () => {
+const getPasswordRuleKey = () => {
+  const hasUpperLowerDigit = requireUppercaseLowercaseDigits.value
+  const hasLength = requireMinimumLength.value
+  if (hasUpperLowerDigit && hasLength) return 'upper-lower-digit-length'
+  if (hasUpperLowerDigit) return 'upper-lower-digit'
+  if (hasLength) return 'length'
+  return 'none'
+}
+
+/**
+ * 密码正则表达式规则变更处理
+ * 根据用户选择的密码规则选项，动态生成对应的正则表达式和错误提示
+ */
+const passwordRegexpChange = () => {
+  const ruleKey = getPasswordRuleKey()
+  const rule = passwordRuleMap[ruleKey]
+  securityConfig.passwordRegexp.regexpRules = rule.regexp(minimumLength.value)
+  securityConfig.passwordRegexp.errTips = rule.tip(minimumLength.value)
+}
+
+/**
+ * 配置分组key到标题的映射表
+ * 将配置分组key映射到对应的显示标题，用于确认对话框
+ */
+const groupKeyToTitle = {
+  applicationConfig: '域名地址',
+  mchTreatyConfig: '商户通条约',
+  agentTreatyConfig: '展业宝条约',
+  smsConfig: '短信配置',
+  ocrConfig: 'OCR配置',
+  ossConfig: '存储配置',
+  apiMapConfig: '地图配置',
+  securityConfig: '安全配置'
+}
+
+/**
+ * 配置值获取映射表
+ * 将配置key映射到对应的配置对象和处理方式
+ */
+const configValueMap = {
+  ossUseType: { source: () => ossConfig.ossUseType },
+  aliyunOssConfig: { source: () => JSON.stringify(ossConfig.aliyunOssConfig) },
+  smsProviderKey: { source: () => smsConfig.smsProviderKey },
+  agpaydxSmsConfig: { source: () => JSON.stringify(smsConfig.agpaydxSmsConfig) },
+  aliyundySmsConfig: { source: () => JSON.stringify(smsConfig.aliyundySmsConfig) },
+  ocrType: { source: () => ocrConfig.ocrType },
+  ocrState: { source: () => ocrConfig.ocrState },
+  tencentOcrConfig: { source: () => JSON.stringify(ocrConfig.tencentOcrConfig) },
+  aliOcrConfig: { source: () => JSON.stringify(ocrConfig.aliOcrConfig) },
+  baiduOcrConfig: { source: () => JSON.stringify(ocrConfig.baiduOcrConfig) },
+  loginErrorMaxLimit: { source: () => JSON.stringify(securityConfig.loginErrorMaxLimit) },
+  passwordRegexp: { source: () => JSON.stringify(securityConfig.passwordRegexp) }
+}
+
+/**
+ * 获取配置值
+ * @param {string} configKey - 配置key
+ * @param {string} defaultVal - 默认值
+ * @returns {string|number} 配置值
+ */
+const getConfigValue = (configKey, defaultVal) => {
+  const config = configValueMap[configKey]
+  return config ? config.source() : defaultVal
+}
+
+/**
+ * 确认更新配置
+ * 根据当前激活的 groupKey 自动推导配置标题，无需手动传递参数
+ */
+const confirm = () => {
+  const title = groupKeyToTitle[groupKey.value] || '配置'
+  infoBox.confirmPrimary(`确认修改${title}吗？`, undefined, async () => {
     loading.value = true
     try {
       const jsonObject = {}
       for (const item of configData.value) {
-        const configKey = item.configKey
-        let configVal = item.configVal
-        switch (configKey) {
-          case 'ossUseType':
-            configVal = ossConfig.ossUseType
-            break
-          case 'aliyunOssConfig':
-            configVal = JSON.stringify(ossConfig.aliyunOssConfig)
-            break
-          case 'smsProviderKey':
-            configVal = smsConfig.smsProviderKey
-            break
-          case 'agpaydxSmsConfig':
-            configVal = JSON.stringify(smsConfig.agpaydxSmsConfig)
-            break
-          case 'aliyundySmsConfig':
-            configVal = JSON.stringify(smsConfig.aliyundySmsConfig)
-            break
-          case 'ocrType':
-            configVal = ocrConfig.ocrType
-            break
-          case 'ocrState':
-            configVal = ocrConfig.ocrState
-            break
-          case 'tencentOcrConfig':
-            configVal = JSON.stringify(ocrConfig.tencentOcrConfig)
-            break
-          case 'aliOcrConfig':
-            configVal = JSON.stringify(ocrConfig.aliOcrConfig)
-            break
-          case 'baiduOcrConfig':
-            configVal = JSON.stringify(ocrConfig.baiduOcrConfig)
-            break
-          case 'loginErrorMaxLimit':
-            configVal = JSON.stringify(securityConfig.loginErrorMaxLimit)
-            break
-          case 'passwordRegexp':
-            configVal = JSON.stringify(securityConfig.passwordRegexp)
-            break
-          default:
-            break
-        }
-        jsonObject[configKey] = configVal
+        jsonObject[item.configKey] = getConfigValue(item.configKey, item.configVal)
       }
-
       await sysConfigApi.updateGroupConfigs(groupKey.value, jsonObject)
       message.success('修改成功')
     } finally {
@@ -806,4 +789,15 @@ onMounted(() => {
 })
 </script>
 <style lang="less">
+.config-card {
+  margin-bottom: 16px;
+}
+
+.config-footer {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+}
 </style>

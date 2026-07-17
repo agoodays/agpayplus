@@ -243,7 +243,7 @@ import {
 } from '@ant-design/icons-vue'
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
-import { usePermission } from '@/composables/useCommon'
+import { useModal, usePermission } from '@/composables/useCommon'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { onMounted, reactive, ref } from 'vue'
@@ -275,7 +275,7 @@ const tableColumns = [
 
 // 响应式数据
 const tableRef = ref(null)
-const detailOpen = ref(false)
+const { open: detailOpen, showModal: showDetail } = useModal()
 const currentRecordId = ref(null)
 const loading = ref(false)
 const route = useRoute()
@@ -354,7 +354,7 @@ const searchFunc = () => {
 // 详情函数
 const detailFunc = (mchNo) => {
   currentRecordId.value = mchNo
-  detailOpen.value = true
+  showDetail()
 }
 
 // 组件挂载时

@@ -8,7 +8,7 @@
         :default-collapsed="false"
         :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
-        @reset="onReset"
+        @reset="searchFunc"
       >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
@@ -90,13 +90,15 @@
             >
               应用分配
             </a-button>
-            <a-popconfirm
+            <a-button
               v-if="hasPermission('ENT_MCH_STORE_DEL')"
-              title="确认删除该门店吗？"
-              @confirm="() => handleDelete(record)"
+              type="link"
+              size="small"
+              danger
+              @click="handleDelete(record)"
             >
-              <a-button type="link" size="small" danger> 删除 </a-button>
-            </a-popconfirm>
+              删除
+            </a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -126,10 +128,10 @@
  */
 import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
 import { AgInput, AgSearch, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
-import { useModal, usePermission } from '@/composables/useCommon'
+import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { message, Modal } from 'ant-design-vue'
-import { onMounted, reactive, ref, computed } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
 import BindApp from './bind-app.vue'
@@ -137,22 +139,34 @@ import Detail from './detail.vue'
 
 const route = useRoute()
 
-const { open: modalOpen, showModal, hideModal } = useModal()
-const { open: detailOpen, showModal: showDetail } = useModal()
-const { open: bindAppOpen, showModal: showBindApp } = useModal()
+/** 权限校验 */
 const { hasPermission } = usePermission()
 
-// State
-const tableRef = ref(null)
-const currentRecordId = ref('')
+/** 应用分配弹窗额外状态 */
+const bindAppOpen = ref(false)
 const currentBindAppId = ref('')
 const currentMchNo = ref('')
 
-// 搜索表单
-const searchData = reactive({
-  mchNo: '',
-  storeId: '',
-  storeName: ''
+/**
+ * 使用 CRUD 表格页面组合式函数
+ */
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  detailOpen,
+  currentRecordId,
+  reloadTable,
+  openCreate,
+  openEdit,
+  openDetail,
+  closeModal,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: (recordId) => mchStoreApi.delById(recordId),
+  deleteConfirmTitle: '确认删除',
+  deleteConfirmContent: '确认删除该门店吗？',
+  deleteSuccessMessage: '删除成功'
 })
 
 // 表格列定义
@@ -211,42 +225,23 @@ const searchMch = (params) => mchStoreApi.queryMchPage(params)
  * 搜索
  */
 function searchFunc() {
-  tableRef.value.reload()
-}
-
-/**
- * 重置
- */
-function onReset() {
-  searchData.mchNo = ''
-  searchData.storeId = ''
-  searchData.storeName = ''
-  tableRef.value.reload()
+  reloadTable()
 }
 
 /**
  * 新增门店
  */
-const handleAdd = () => {
-  currentRecordId.value = ''
-  showModal()
-}
+const handleAdd = () => openCreate()
 
 /**
  * 编辑门店
  */
-const handleEdit = (record) => {
-  currentRecordId.value = record.storeId
-  showModal()
-}
+const handleEdit = (record) => openEdit(record.storeId)
 
 /**
  * 查看详情
  */
-const handleDetail = (record) => {
-  currentRecordId.value = record.storeId
-  showDetail()
-}
+const handleDetail = (record) => openDetail(record.storeId)
 
 /**
  * 应用分配
@@ -255,34 +250,20 @@ const handleBindApp = (record) => {
   currentRecordId.value = record.storeId
   currentBindAppId.value = record.bindAppId
   currentMchNo.value = record.mchNo
-  showBindApp()
+  bindAppOpen.value = true
 }
 
 /**
  * 删除门店
  */
-const handleDelete = async (record) => {
-  Modal.confirm({
-    title: '确认删除',
-    content: '确认删除该门店吗？',
-    onOk: async () => {
-      try {
-        await mchStoreApi.delById(record.storeId)
-        message.success('删除成功')
-        tableRef.value.reload()
-      } catch (error) {
-        console.error('删除失败:', error)
-      }
-    }
-  })
-}
+const handleDelete = (record) => confirmDelete(record.storeId)
 
 /**
  * 弹窗操作成功
  */
 const handleModalSuccess = () => {
-  hideModal()
-  tableRef.value.reload()
+  closeModal()
+  reloadTable()
 }
 </script>
 

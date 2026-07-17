@@ -7,7 +7,7 @@
         :collapsible="true"
         :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
-        @reset="onReset"
+        @reset="searchFunc"
       >
         <!-- 基础搜索条件 -->
         <template #base="{ colSpan }">
@@ -500,22 +500,6 @@ function searchFunc() {
 }
 
 /**
- * 重置回调函数
- */
-function onReset() {
-  searchData.dateRange = ''
-  searchData.unionOrderId = ''
-  searchData.mchNo = ''
-  searchData.appId = ''
-  searchData.isvNo = ''
-  searchData.state = ''
-  searchData.ifCode = ''
-  searchData.mchType = ''
-  tableRef.value.reload()
-  tableRef.value.reloadStatistics()
-}
-
-/**
  * 获取状态颜色
  * @param {number} state - 状态值
  * @returns {string} 状态颜色
@@ -580,12 +564,13 @@ const changeStr2ellipsis = (str, len) => {
  * 复制订单号到剪贴板
  * @param {string} text - 要复制的文本
  */
-const copyOrderNo = (text) => {
-  navigator.clipboard.writeText(text).then(() => {
+const copyOrderNo = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
     message.success('复制成功')
-  }).catch(() => {
+  } catch (err) {
     message.error('复制失败')
-  })
+  }
 }
 </script>
 

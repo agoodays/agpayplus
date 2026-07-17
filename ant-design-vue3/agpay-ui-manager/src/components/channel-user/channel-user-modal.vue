@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-modal v-model="visible" title="自动获取渠道用户ID" :footer="null" :width="300" @ok="handleClose">
+    <a-modal :open="visible" title="自动获取渠道用户ID" :footer="null" :width="300" @ok="handleClose">
       <div style="width: 100%; margin-bottom: 20px; text-align: center">
         <div id="qrCodeUrl" style="width: 300px" class="qrcode"></div>
         <vueQr :text="qrImgUrl" />
@@ -11,6 +11,10 @@
   </div>
 </template>
 <script setup>
+/**
+ * 渠道用户ID获取弹窗组件
+ * 功能：通过展示二维码，让用户扫码获取渠道用户ID（微信/支付宝）
+ */
 import { ref } from 'vue'
 import ReconnectingWebSocket from 'reconnectingwebsocket'
 import vueQr from 'vue-qr'
@@ -18,15 +22,26 @@ import { basicApi } from '@/api/system/basic-api'
 
 const emit = defineEmits(['changeChannelUserId'])
 
+/** 弹窗显示状态 */
 const visible = ref(false)
+/** 二维码图片地址 */
 const qrImgUrl = ref('')
-const payText = ref('') // 二维码底部描述文字
-const transferOrderWebSocket = ref(null) // 支付订单webSocket对象
-const extObject = ref(null) // 扩展对象， 将原样返回。
+/** 二维码底部描述文字 */
+const payText = ref('')
+/** WebSocket 连接对象 */
+const transferOrderWebSocket = ref(null)
+/** 扩展对象，将原样返回 */
+const extObject = ref(null)
 
-// show
-function showModal(appId, ifCode, extObj) {
+/**
+ * 显示弹窗并获取二维码
+ * @param {string} appId - 应用ID
+ * @param {string} ifCode - 支付接口代码（wxpay/alipay）
+ * @param {Object} extObj - 扩展对象
+ */
+async function showModal(appId, ifCode, extObj) {
   extObject.value = extObj
+
   // 关闭上一个webSocket监听
   if (transferOrderWebSocket.value) {
     transferOrderWebSocket.value.close()
@@ -42,11 +57,12 @@ function showModal(appId, ifCode, extObj) {
 
   // 当前客户端CID
   const cid = appId + new Date().getTime()
-  // 获取二维码地址
-  basicApi.getChannelUserQrImgUrl(ifCode, appId, cid).then((res) => {
-    qrImgUrl.value = res
 
-    visible.value = true // 打开弹窗
+  try {
+    // 获取二维码地址
+    const res = await basicApi.getChannelUserQrImgUrl(ifCode, appId, cid)
+    qrImgUrl.value = res
+    visible.value = true
 
     // 监听响应结果
     transferOrderWebSocket.value = new ReconnectingWebSocket(
@@ -54,12 +70,17 @@ function showModal(appId, ifCode, extObj) {
     )
     transferOrderWebSocket.value.onopen = () => {}
     transferOrderWebSocket.value.onmessage = (msgObject) => {
-      emit('changeChannelUserId', { channelUserId: msgObject.data, extObject: extObject.value }) // 上层赋值
+      emit('changeChannelUserId', { channelUserId: msgObject.data, extObject: extObject.value })
       handleClose()
     }
-  })
+  } catch (error) {
+    console.error('获取渠道用户二维码失败:', error)
+  }
 }
 
+/**
+ * 关闭弹窗并清理WebSocket连接
+ */
 function handleClose() {
   if (transferOrderWebSocket.value) {
     transferOrderWebSocket.value.close()

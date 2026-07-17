@@ -51,6 +51,10 @@
 </template>
 
 <script setup>
+/**
+ * 卡片列表组件
+ * 功能：以卡片形式展示数据，支持新增卡片入口、分页、响应式布局
+ */
 import { ref, onMounted } from 'vue'
 
 const props = defineProps({
@@ -69,10 +73,16 @@ const props = defineProps({
 
 const emit = defineEmits(['add', 'loadComplete'])
 
+/** 卡片数据列表 */
 const cardDataList = ref([])
+/** 分页信息 */
 const paginationInfo = ref({ current: 1, pageSize: props.pageSize, total: 0 })
 
-const refreshCardList = (isToFirst = false) => {
+/**
+ * 刷新卡片列表数据
+ * @param {boolean} isToFirst - 是否回到第一页
+ */
+const refreshCardList = async (isToFirst = false) => {
   if (props.usePagination && isToFirst) {
     paginationInfo.value.current = 1
   }
@@ -87,29 +97,28 @@ const refreshCardList = (isToFirst = false) => {
     }
   }
 
-  if (typeof props.reqCardListFunc === 'function') {
-    props
-      .reqCardListFunc(params)
-      .then((res) => {
-        if (props.usePagination) {
-          cardDataList.value = res.records || []
-          paginationInfo.value.total = res.total || 0
-        } else {
-          cardDataList.value = Array.isArray(res) ? res : res.records || []
-          paginationInfo.value.total = cardDataList.value.length
-        }
-        emit('loadComplete')
-      })
-      .catch((err) => {
-        console.error('AgCard 加载失败:', err)
-        cardDataList.value = []
-        paginationInfo.value.total = 0
-        emit('loadComplete')
-      })
-  } else {
+  if (typeof props.reqCardListFunc !== 'function') {
     console.error('AgCard: reqCardListFunc 不是一个函数')
     cardDataList.value = []
     paginationInfo.value.total = 0
+    emit('loadComplete')
+    return
+  }
+
+  try {
+    const res = await props.reqCardListFunc(params)
+    if (props.usePagination) {
+      cardDataList.value = res.records || []
+      paginationInfo.value.total = res.total || 0
+    } else {
+      cardDataList.value = Array.isArray(res) ? res : res.records || []
+      paginationInfo.value.total = cardDataList.value.length
+    }
+  } catch (err) {
+    console.error('AgCard 加载失败:', err)
+    cardDataList.value = []
+    paginationInfo.value.total = 0
+  } finally {
     emit('loadComplete')
   }
 }

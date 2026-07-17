@@ -6,8 +6,9 @@
         v-model="searchData"
         :collapsible="false"
         :search-loading="tableRef?.isLoading?.value || false"
+        :reset-exclude="['sysType']"
         @search="searchFunc"
-        @reset="onReset"
+        @reset="searchFunc"
       >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
@@ -92,7 +93,8 @@
 import { entApi } from '@/api/business/ent/ent-api'
 import { AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
-import { onMounted, reactive, ref } from 'vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import AddOrEdit from './add-or-edit.vue'
 import SetEntMatchRule from './set-ent-match-rule.vue'
@@ -100,20 +102,24 @@ import SetEntMatchRule from './set-ent-match-rule.vue'
 /** 权限检查 */
 const { hasPermission } = usePermission()
 
-/** 弹窗控制 */
-const { open: modalOpen, showModal: showEditModal, hideModal: closeModal } = useModal()
+/** 设置权限匹配规则弹窗控制 */
 const { open: setRuleOpen, showModal: showSetRuleModal, hideModal: closeSetRuleModal } = useModal()
 
-/** 组件引用 */
-const tableRef = ref(null)
-const currentRecordId = ref('')
-
 /**
- * 搜索表单数据
+ * 使用 CRUD 表格页面组合式函数
  */
-const searchData = reactive({
-  sysType: 'MGR'
-})
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  currentRecordId,
+  reloadTable,
+  openEdit,
+  closeModal
+} = useCrudTablePage()
+
+// 初始化默认搜索参数
+searchData.sysType = 'MGR'
 
 /**
  * 表格列配置
@@ -145,13 +151,6 @@ const reqTableDataFunc = async (params) => {
 }
 
 /**
- * 刷新表格
- */
-const reloadTable = () => {
-  tableRef.value?.reload()
-}
-
-/**
  * 更新状态
  * @param {string} recordId - 资源权限ID
  * @param {number} state - 状态值
@@ -174,22 +173,13 @@ const setFunc = () => {
  * @param {string} recordId - 资源权限ID
  */
 const editFunc = (recordId) => {
-  currentRecordId.value = recordId
-  showEditModal()
+  openEdit(recordId)
 }
 
 /**
  * 搜索回调函数
  */
 const searchFunc = () => {
-  reloadTable()
-}
-
-/**
- * 重置回调函数
- */
-const onReset = () => {
-  searchData.sysType = 'MGR'
   reloadTable()
 }
 
@@ -208,12 +198,6 @@ const handleSetRuleSuccess = () => {
   closeSetRuleModal()
   reloadTable()
 }
-
-/**
- * 初始化
- */
-onMounted(() => {
-})
 </script>
 
 <style lang="less" scoped>

@@ -7,8 +7,9 @@
         v-model="searchData"
         :collapsible="true"
         :search-loading="tableRef?.isLoading?.value || false"
+        :reset-exclude="['dateRange']"
         @search="searchFunc"
-        @reset="onReset"
+        @reset="searchFunc"
       >
         <!-- 基础搜索条件 -->
         <template #base="{ colSpan }">
@@ -135,7 +136,7 @@
 import { ref, reactive } from 'vue'
 import { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput, AgSelect } from '@/components'
 import { orderApi } from '@/api/business/order/order-api'
-import { usePermission } from '@/composables/useCommon'
+import { useModal, usePermission } from '@/composables/useCommon'
 import { message } from 'ant-design-vue'
 import DetailDrawer from './detail-drawer.vue'
 
@@ -204,19 +205,6 @@ function searchFunc() {
 }
 
 /**
- * 重置函数
- */
-function onReset() {
-  searchData.dateRange = 'today'
-  searchData.orderId = ''
-  searchData.mchOrderNo = ''
-  searchData.state = ''
-  searchData.isvNo = ''
-  searchData.orderType = ''
-  tableRef.value?.refresh()
-}
-
-/**
  * 获取通知状态颜色
  * @param {number} state - 状态码
  * @returns {string} - 颜色
@@ -278,7 +266,7 @@ function getOrderTypeText(type) {
  */
 function handleDetail(record) {
   currentNotifyId.value = record.notifyId
-  detailOpen.value = true
+  showDetail()
 }
 
 /**

@@ -222,16 +222,20 @@ const clearEmptyKey = (obj, key) => {
   obj[key + '_ph'] = undefined
 }
 
-const validate = (callback) => {
-  return new Promise((resolve) => {
-    infoForm.value.validate().then(() => {
-      callback?.(true)
-      resolve(true)
-    }).catch(() => {
-      callback?.(false)
-      resolve(false)
-    })
-  })
+/**
+ * 验证表单
+ * @param {Function} callback - 验证结果回调
+ * @returns {Promise<boolean>}
+ */
+const validate = async (callback) => {
+  try {
+    await infoForm.value.validate()
+    callback?.(true)
+    return true
+  } catch {
+    callback?.(false)
+    return false
+  }
 }
 
 const resetFields = () => {

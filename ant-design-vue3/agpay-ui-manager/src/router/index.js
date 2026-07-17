@@ -281,7 +281,7 @@ function checkDevModeState() {
 
 // ==================== 路由守卫 ====================
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   nProgress.start()
 
   // 设置页面标题
@@ -348,31 +348,29 @@ router.beforeEach((to, from, next) => {
   devLog('🔍', '检查用户信息:', userStore.userId)
   if (!userStore.userId) {
     // 本地存储没有用户信息，调用API获取
-    loginApi
-      .getCurrentInfo()
-      .then((bizData) => {
-        userStore.setUserLoginInfo(bizData)
-        registerDynamicRoutes(bizData.allMenuRouteTree)
+    try {
+      const bizData = await loginApi.getCurrentInfo()
+      userStore.setUserLoginInfo(bizData)
+      registerDynamicRoutes(bizData.allMenuRouteTree)
 
-        const redirectPath = to.query.redirect
-        if (redirectPath && redirectPath !== to.path) {
-          next(redirectPath)
-        } else if (to.path === '/') {
-          const firstUri = findFirstAvailableUri(bizData.allMenuRouteTree)
-          if (firstUri && firstUri !== to.path) {
-            next({ path: firstUri || PAGE_PATH_404 })
-          } else {
-            next()
-          }
+      const redirectPath = to.query.redirect
+      if (redirectPath && redirectPath !== to.path) {
+        next(redirectPath)
+      } else if (to.path === '/') {
+        const firstUri = findFirstAvailableUri(bizData.allMenuRouteTree)
+        if (firstUri && firstUri !== to.path) {
+          next({ path: firstUri || PAGE_PATH_404 })
         } else {
-          next({ ...to, replace: true })
+          next()
         }
-      })
-      .catch((error) => {
-        console.error('获取用户信息失败:', error)
-        userStore.logout()
-        next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath } })
-      })
+      } else {
+        next({ ...to, replace: true })
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+      userStore.logout()
+      next({ path: PAGE_PATH_LOGIN, query: { redirect: to.fullPath } })
+    }
     return
   }
 

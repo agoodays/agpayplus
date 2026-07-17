@@ -19,25 +19,38 @@ export function useTableData({ props, state, emit, t }) {
     }
   }
 
-  function resolveBeforeHookResult(hook, payload, timeoutMs, hookName, onTimeout) {
+  /**
+   * 安全执行前置钩子函数，支持超时控制
+   * @param {Function} hook - 钩子函数
+   * @param {Object} payload - 钩子参数
+   * @param {number} timeoutMs - 超时时间(毫秒)
+   * @param {string} hookName - 钩子名称(用于日志)
+   * @param {Function} onTimeout - 超时回调
+   * @returns {Promise<any>}
+   */
+  async function resolveBeforeHookResult(hook, payload, timeoutMs, hookName, onTimeout) {
     const safeTimeout = Number(timeoutMs) > 0 ? Number(timeoutMs) : 0
 
     if (!safeTimeout) {
-      return Promise.resolve(safeCallHook(hook, payload)).catch((err) => {
+      try {
+        return await Promise.resolve(safeCallHook(hook, payload))
+      } catch (err) {
         console.warn(`[ag-table] ${hookName} async execution failed:`, err)
         return undefined
-      })
+      }
     }
 
-    return Promise.race([
-      Promise.resolve(safeCallHook(hook, payload)).catch((err) => {
-        console.warn(`[ag-table] ${hookName} async execution failed:`, err)
-        return undefined
-      }),
-      new Promise((resolve) => {
-        setTimeout(() => resolve('__ag_table_before_hook_timeout__'), safeTimeout)
-      }),
-    ]).then((result) => {
+    try {
+      const result = await Promise.race([
+        Promise.resolve(safeCallHook(hook, payload)).catch((err) => {
+          console.warn(`[ag-table] ${hookName} async execution failed:`, err)
+          return undefined
+        }),
+        new Promise((resolve) => {
+          setTimeout(() => resolve('__ag_table_before_hook_timeout__'), safeTimeout)
+        }),
+      ])
+
       if (result === '__ag_table_before_hook_timeout__') {
         console.warn(`[ag-table] ${hookName} timed out after ${safeTimeout}ms, continue by default.`)
         safeCallHook(onTimeout, {
@@ -49,7 +62,10 @@ export function useTableData({ props, state, emit, t }) {
       }
 
       return result
-    })
+    } catch (err) {
+      console.warn(`[ag-table] ${hookName} async execution failed:`, err)
+      return undefined
+    }
   }
 
   const isPaginationControlled = computed(() => typeof props.pagination === 'object' && props.pagination !== null)
@@ -83,7 +99,11 @@ export function useTableData({ props, state, emit, t }) {
     }
   })
 
-  function reload(goToFirst = false) {
+  /**
+   * 重新加载表格数据
+   * @param {boolean} goToFirst - 是否回到第一页
+   */
+  async function reload(goToFirst = false) {
     if (!props.onLoad) {
       console.warn('[ag-table] onLoad is not provided, using static data from props.data')
       emit('load-complete')
@@ -101,104 +121,103 @@ export function useTableData({ props, state, emit, t }) {
     latestLoadRequestId.value = requestId
     localLoading.value = true
 
-    resolveBeforeHookResult(
-      props.onBeforeLoad,
-      {
-        requestId,
-        params,
-        goToFirst,
-      },
-      props.onBeforeLoadTimeout,
-      'onBeforeLoad',
-      props.onBeforeLoadTimeoutHit
-    )
-      .then((beforeResult) => {
-        if (beforeResult === false) {
-          if (requestId === latestLoadRequestId.value) {
-            localLoading.value = false
-            emit('load-complete')
-          }
+    try {
+      const beforeResult = await resolveBeforeHookResult(
+        props.onBeforeLoad,
+        {
+          requestId,
+          params,
+          goToFirst,
+        },
+        props.onBeforeLoadTimeout,
+        'onBeforeLoad',
+        props.onBeforeLoadTimeoutHit
+      )
 
-          safeCallHook(props.onAfterLoad, {
-            requestId,
-            params,
-            cancelled: true,
-            stale: false,
-            success: false,
-          })
-          return null
+      if (beforeResult === false) {
+        if (requestId === latestLoadRequestId.value) {
+          localLoading.value = false
+          emit('load-complete')
         }
 
-        return props.onLoad(params)
-      })
-      .then((res) => {
-        if (res === null) return
+        safeCallHook(props.onAfterLoad, {
+          requestId,
+          params,
+          cancelled: true,
+          stale: false,
+          success: false,
+        })
+        return
+      }
 
-        if (requestId !== latestLoadRequestId.value) {
-          safeCallHook(props.onAfterLoad, {
-            requestId,
-            params,
-            result: res,
-            stale: true,
-            cancelled: false,
-            success: false,
-          })
-          return
-        }
+      const res = await props.onLoad(params)
 
-        if (!props.data || (Array.isArray(props.data) && props.data.length === 0)) {
-          internalData.value = res.records || res.list || []
-        }
-
-        if (!isPaginationControlled.value) {
-          state.pagination.total = res.total || 0
-          state.pagination.current = params.pageNumber || state.pagination.current
-          state.pagination.pageSize = params.pageSize || state.pagination.pageSize
-        }
-
-        emit('reload', res)
-        emit('load-complete')
+      if (requestId !== latestLoadRequestId.value) {
         safeCallHook(props.onAfterLoad, {
           requestId,
           params,
           result: res,
-          stale: false,
+          stale: true,
           cancelled: false,
-          success: true,
+          success: false,
         })
-      })
-      .catch((err) => {
-        if (requestId !== latestLoadRequestId.value) {
-          safeCallHook(props.onAfterLoad, {
-            requestId,
-            params,
-            error: err,
-            stale: true,
-            cancelled: false,
-            success: false,
-          })
-          return
-        }
+        return
+      }
 
-        console.error('[ag-table] Failed to load data:', err)
-        emit('load-complete')
+      if (!props.data || (Array.isArray(props.data) && props.data.length === 0)) {
+        internalData.value = res.records || res.list || []
+      }
+
+      if (!isPaginationControlled.value) {
+        state.pagination.total = res.total || 0
+        state.pagination.current = params.pageNumber || state.pagination.current
+        state.pagination.pageSize = params.pageSize || state.pagination.pageSize
+      }
+
+      emit('reload', res)
+      emit('load-complete')
+      safeCallHook(props.onAfterLoad, {
+        requestId,
+        params,
+        result: res,
+        stale: false,
+        cancelled: false,
+        success: true,
+      })
+    } catch (err) {
+      if (requestId !== latestLoadRequestId.value) {
         safeCallHook(props.onAfterLoad, {
           requestId,
           params,
           error: err,
-          stale: false,
+          stale: true,
           cancelled: false,
           success: false,
         })
+        return
+      }
+
+      console.error('[ag-table] Failed to load data:', err)
+      emit('load-complete')
+      safeCallHook(props.onAfterLoad, {
+        requestId,
+        params,
+        error: err,
+        stale: false,
+        cancelled: false,
+        success: false,
       })
-      .finally(() => {
-        if (requestId === latestLoadRequestId.value) {
-          localLoading.value = false
-        }
-      })
+    } finally {
+      if (requestId === latestLoadRequestId.value) {
+        localLoading.value = false
+      }
+    }
   }
 
-  function reloadStatistics() {
+  /**
+   * 重新加载统计数据
+   */
+  async function reloadStatistics() {
     if (!props.onLoadStatistics) return
 
     const requestId = latestStatisticsRequestId.value + 1
@@ -208,84 +227,84 @@ export function useTableData({ props, state, emit, t }) {
       ...props.searchData,
     }
 
-    resolveBeforeHookResult(
-      props.onBeforeLoadStatistics,
-      {
-        requestId,
-        params,
-      },
-      props.onBeforeLoadStatisticsTimeout,
-      'onBeforeLoadStatistics',
-      props.onBeforeLoadStatisticsTimeoutHit
-    )
-      .then((beforeResult) => {
-        if (beforeResult === false) {
-          safeCallHook(props.onAfterLoadStatistics, {
-            requestId,
-            params,
-            cancelled: true,
-            stale: false,
-            success: false,
-          })
-          return null
-        }
+    try {
+      const beforeResult = await resolveBeforeHookResult(
+        props.onBeforeLoadStatistics,
+        {
+          requestId,
+          params,
+        },
+        props.onBeforeLoadStatisticsTimeout,
+        'onBeforeLoadStatistics',
+        props.onBeforeLoadStatisticsTimeoutHit
+      )
 
-        return props.onLoadStatistics(params)
-      })
-      .then((res) => {
-        if (res === null) return
+      if (beforeResult === false) {
+        safeCallHook(props.onAfterLoadStatistics, {
+          requestId,
+          params,
+          cancelled: true,
+          stale: false,
+          success: false,
+        })
+        return
+      }
 
-        if (requestId !== latestStatisticsRequestId.value) {
-          safeCallHook(props.onAfterLoadStatistics, {
-            requestId,
-            params,
-            result: res,
-            stale: true,
-            cancelled: false,
-            success: false,
-          })
-          return
-        }
+      const res = await props.onLoadStatistics(params)
 
-        state.statistics = res
-        emit('statistics-loaded', res)
-        emit('load-complete')
+      if (requestId !== latestStatisticsRequestId.value) {
         safeCallHook(props.onAfterLoadStatistics, {
           requestId,
           params,
           result: res,
-          stale: false,
+          stale: true,
           cancelled: false,
-          success: true,
+          success: false,
         })
-      })
-      .catch((err) => {
-        if (requestId !== latestStatisticsRequestId.value) {
-          safeCallHook(props.onAfterLoadStatistics, {
-            requestId,
-            params,
-            error: err,
-            stale: true,
-            cancelled: false,
-            success: false,
-          })
-          return
-        }
+        return
+      }
 
-        console.warn('[ag-table] Failed to load statistics:', err)
-        emit('load-complete')
+      state.statistics = res
+      emit('statistics-loaded', res)
+      emit('load-complete')
+      safeCallHook(props.onAfterLoadStatistics, {
+        requestId,
+        params,
+        result: res,
+        stale: false,
+        cancelled: false,
+        success: true,
+      })
+    } catch (err) {
+      if (requestId !== latestStatisticsRequestId.value) {
         safeCallHook(props.onAfterLoadStatistics, {
           requestId,
           params,
           error: err,
-          stale: false,
+          stale: true,
           cancelled: false,
           success: false,
         })
+        return
+      }
+
+      console.warn('[ag-table] Failed to load statistics:', err)
+      emit('load-complete')
+      safeCallHook(props.onAfterLoadStatistics, {
+        requestId,
+        params,
+        error: err,
+        stale: false,
+        cancelled: false,
+        success: false,
       })
+    }
   }
 
-  function handleDownload() {
+  /**
+   * 处理下载/导出操作
+   */
+  async function handleDownload() {
     if (!props.onDownload) {
       message.warning(t('agTable.downloadNotConfigured'))
       return
@@ -300,12 +319,13 @@ export function useTableData({ props, state, emit, t }) {
     const promise = props.onDownload(params)
 
     if (promise && typeof promise.then === 'function') {
-      promise
-        .then(() => message.success(t('agTable.exportTriggered')))
-        .catch((err) => {
-          const msg = (err && err.msg) || t('agTable.exportFailed')
-          message.error(msg)
-        })
+      try {
+        await promise
+        message.success(t('agTable.exportTriggered'))
+      } catch (err) {
+        const msg = (err && err.msg) || t('agTable.exportFailed')
+        message.error(msg)
+      }
     }
   }
 

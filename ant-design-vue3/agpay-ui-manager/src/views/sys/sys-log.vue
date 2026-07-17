@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
@@ -115,6 +115,7 @@
 import { ref, reactive, computed } from 'vue'
 import { message, Modal } from 'ant-design-vue'
 import { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput, AgSelect } from '@/components'
+import { useModal } from '@/composables/useCommon'
 import { sysApi } from '@/api/business/sys/sys-api'
 import Detail from './detail.vue'
 
@@ -145,7 +146,7 @@ const selectedIds = ref([])
 /**
  * 详情抽屉状态
  */
-const detailOpen = ref(false)
+const { open: detailOpen, showModal: showDetail, hideModal: closeDetail } = useModal()
 const currentLogId = ref('')
 
 /**
@@ -237,6 +238,6 @@ const delFunc = async () => {
  */
 const detailFunc = (recordId) => {
   currentLogId.value = recordId
-  detailOpen.value = true
+  showDetail()
 }
 </script>

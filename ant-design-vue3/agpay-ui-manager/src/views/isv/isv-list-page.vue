@@ -2,7 +2,7 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :collapsible="false" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="resetFunc">
+      <ag-search v-model="searchData" :collapsible="false" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -154,11 +154,6 @@ const reqTableDataFunc = async (params) => {
  * 搜索回调函数
  */
 const searchFunc = () => reloadTable()
-
-/**
- * 重置回调函数
- */
-const resetFunc = () => reloadTable()
 
 /**
  * 确认删除

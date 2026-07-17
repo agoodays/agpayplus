@@ -17,6 +17,10 @@
 </template>
 
 <script setup>
+/**
+ * 表格操作按钮组件
+ * 功能：封装表格行内常用操作按钮（查看、编辑、删除、更多）
+ */
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -28,15 +32,19 @@ const props = defineProps({
 
 const emit = defineEmits(['view', 'edit', 'delete', 'more'])
 
+/** 触发查看事件 */
 function emitView() {
   emit('view', props.record)
 }
+/** 触发编辑事件 */
 function emitEdit() {
   emit('edit', props.record)
 }
+/** 触发删除事件 */
 function emitDelete() {
   emit('delete', props.record)
 }
+/** 触发更多操作事件 */
 function onMoreClick(item) {
   emit('more', { item, record: props.record })
 }

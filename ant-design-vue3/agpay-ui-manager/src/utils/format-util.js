@@ -1,6 +1,7 @@
 /*
  * 格式化工具类
  *
+ * 提供数字格式化、日期格式化等通用工具函数
  */
 import dayjs from 'dayjs'
 
@@ -29,3 +30,6 @@ export function formatDate(dateStr, pattern = 'YYYY-MM-DD HH:mm:ss') {
 
 // 保持与原项目的 moment 过滤器兼容
 export const momentFormat = formatDate
+
+// 兼容旧版命名
+export const NumberFormat = numberFormat

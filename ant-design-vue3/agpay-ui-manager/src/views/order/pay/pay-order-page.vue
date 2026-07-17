@@ -7,7 +7,7 @@
         :collapsible="true"
         :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
-        @reset="onReset"
+        @reset="searchFunc"
       >
         <!-- 基础搜索条件 -->
         <template #base="{ colSpan }">
@@ -487,21 +487,6 @@ const loadStatistics = async (params) => {
  * 搜索回调函数
  */
 const searchFunc = () => {
-  refresh()
-}
-
-/**
- * 重置回调函数
- */
-const onReset = () => {
-  searchData.dateRange = ''
-  searchData.payOrderId = ''
-  searchData.mchOrderNo = ''
-  searchData.channelOrderNo = ''
-  searchData.state = ''
-  searchData.notifyState = ''
-  searchData.appId = ''
-  searchData.storeId = ''
   refresh()
 }
 

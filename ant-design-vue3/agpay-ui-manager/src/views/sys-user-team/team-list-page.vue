@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card :bordered="false">
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" :reset-exclude="['sysType']" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -79,12 +79,11 @@ import { teamApi } from '@/api/business/sys-user-team/team-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
-import { ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
 import { STAT_RANGE_TYPE_ENUM, SYS_TYPE_ENUM, SYS_TYPE_OPTIONS } from '@/constants/common-const'
 
-// 权限检查
+/** 权限检查 */
 const { hasPermission } = usePermission()
 
 /**
@@ -127,19 +126,19 @@ const tableColumns = [
 ]
 
 /**
- * 加载状态
- */
-const loading = ref(false)
-
-/**
  * 使用CRUD表格页面组合式函数
  */
 const {
   tableRef,
   searchData,
+  modalOpen,
   detailOpen,
   currentRecordId,
   reloadTable,
+  openCreate,
+  openEdit,
+  openDetail,
+  closeModal,
   confirmDelete
 } = useCrudTablePage({
   deleteAction: (recordId) => teamApi.delById(recordId),
@@ -147,11 +146,6 @@ const {
   deleteConfirmContent: '',
   deleteSuccessMessage: '删除成功'
 })
-
-/**
- * 弹窗状态
- */
-const modalOpen = ref(false)
 
 // 初始化默认搜索参数
 Object.assign(searchData, defaultSearchData)
@@ -168,36 +162,24 @@ const reqTableDataFunc = async (params) => {
 /**
  * 搜索函数
  */
-const searchFunc = () => {
-  loading.value = true
-  reloadTable()
-}
+const searchFunc = () => reloadTable()
 
 /**
  * 新增团队
  */
-const addFunc = () => {
-  currentRecordId.value = ''
-  modalOpen.value = true
-}
+const addFunc = () => openCreate()
 
 /**
  * 编辑团队
  * @param {string} recordId - 团队ID
  */
-const editFunc = (recordId) => {
-  currentRecordId.value = recordId
-  modalOpen.value = true
-}
+const editFunc = (recordId) => openEdit(recordId)
 
 /**
  * 查看团队详情
  * @param {string} recordId - 团队ID
  */
-const detailFunc = (recordId) => {
-  currentRecordId.value = recordId
-  detailOpen.value = true
-}
+const detailFunc = (recordId) => openDetail(recordId)
 
 /**
  * 删除团队
@@ -209,6 +191,7 @@ const delFunc = (recordId) => confirmDelete(recordId)
  * 操作成功回调
  */
 const handleSuccess = () => {
-  searchFunc()
+  closeModal()
+  reloadTable()
 }
 </script>

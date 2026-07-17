@@ -2,7 +2,7 @@
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="resetFunc">
+      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" :reset-exclude="['queryDateRange']" @search="searchFunc" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -242,15 +242,6 @@ const reqIfDefineListFunc = async () => {
 
 /** 搜索函数 */
 const searchFunc = () => reloadTable()
-
-/** 重置搜索条件 */
-const resetFunc = () => {
-  Object.keys(searchData).forEach((key) => {
-    searchData[key] = ''
-  })
-  searchData.queryDateRange = 'today'
-  reloadTable()
-}
 
 /**
  * 查看分账记录详情

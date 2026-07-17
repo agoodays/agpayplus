@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card :bordered="false">
-      <ag-search v-model="searchData" :search-loading="isLoading" @search="handleSearch" @reset="handleReset">
+      <ag-search v-model="searchData" :search-loading="isLoading" @search="searchFunc" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -114,7 +114,7 @@
       </template>
     </a-card>
 
-    <add-or-edit v-model:open="addOrEditOpen" :record-id="editRecordId" @success="handleSearch" />
+    <add-or-edit v-model:open="addOrEditOpen" :record-id="editRecordId" @success="searchFunc" />
   </div>
 </template>
 
@@ -228,7 +228,7 @@ async function loadCardData(params) {
  */
 function switchViewMode(mode) {
   viewMode.value = mode
-  handleSearch()
+  searchFunc()
 }
 
 /**
@@ -246,15 +246,7 @@ function refreshList(isToFirst = false) {
 /**
  * 搜索功能
  */
-function handleSearch() {
-  refreshList(true)
-}
-
-/**
- * 重置搜索条件
- */
-function handleReset() {
-  searchData.shellAlias = ''
+function searchFunc() {
   refreshList(true)
 }
 
@@ -263,7 +255,6 @@ function handleReset() {
  * @param {string} url - 图片URL
  */
 function handlePreview(url) {
-  console.log(url)
   viewerApi({
     images: [url],
     options: {

@@ -756,11 +756,25 @@ export const upload = {
 // ================================= 下载 =================================
 
 /**
+ * 将 Blob 内容读取为文本（Promise 形式）
+ * @param {Blob} blob - Blob 对象
+ * @returns {Promise<string>} 文本内容
+ */
+function readBlobAsText(blob) {
+  return new Promise((resolve, reject) => {
+    const fileReader = new FileReader()
+    fileReader.onload = () => resolve(fileReader.result)
+    fileReader.onerror = () => reject(fileReader.error)
+    fileReader.readAsText(blob)
+  })
+}
+
+/**
  * 处理下载错误
  * 
  * 错误处理策略：
  * 1. Blob 类型错误：后端返回的 JSON 格式错误信息（如权限不足、参数错误等）
- *    - 使用 FileReader 读取 Blob 内容
+ *    - 异步读取 Blob 内容
  *    - 解析 JSON 获取错误消息
  *    - 显示错误提示
  * 2. 普通错误：网络错误、请求超时等
@@ -769,17 +783,16 @@ export const upload = {
  * @param {Error|Blob} error - 错误对象或 Blob（后端返回的错误信息）
  */
 async function handleDownloadError(error) {
-  if (error instanceof Blob) {
-    const fileReader = new FileReader()
-    fileReader.readAsText(error)
-    fileReader.onload = () => {
-      const msg = fileReader.result
+  message.destroy()
+  try {
+    if (error instanceof Blob) {
+      const msg = await readBlobAsText(error)
       const jsonMsg = JSON.parse(msg)
-      message.destroy()
       message.error(jsonMsg.msg)
+    } else {
+      message.error(translate('common.networkError'), error)
     }
-  } else {
-    message.destroy()
+  } catch (readError) {
     message.error(translate('common.networkError'), error)
   }
 }

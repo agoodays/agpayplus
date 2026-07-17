@@ -27,11 +27,12 @@ const [Editor, Toolbar, editorLoaded] = (() => {
   let ToolbarComponent = null
 
   // 动态加载
-  import('@wangeditor/editor-for-vue').then((module) => {
+  ;(async () => {
+    const module = await import('@wangeditor/editor-for-vue')
     EditorComponent = module.Editor
     ToolbarComponent = module.Toolbar
     loaded.value = true
-  })
+  })()
 
   // 动态加载样式
   import('@wangeditor/editor/dist/css/style.css')

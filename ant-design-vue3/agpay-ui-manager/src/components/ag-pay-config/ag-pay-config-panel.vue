@@ -351,6 +351,12 @@ const resetSearchFunc = () => {
   })
 }
 
+/**
+ * 更新通道状态
+ * @param {Object} record - 通道记录
+ * @param {number} state - 目标状态（1启用/0停用）
+ * @returns {Promise<void>}
+ */
 const updateState = (record, state) => {
   const title = state === 1 ? '确认[启用]该通道？' : '确认[停用]该通道？'
   const content = state === 1 ? '启用后将会将其他通道关闭' : '停用后将无法正常支付'
@@ -359,15 +365,19 @@ const updateState = (record, state) => {
     infoBox.confirmDanger(
       title,
       content,
-      () => {
-        payConfigApi.updateMchPassageState(infoId.value, currentWayCode.value, record.ifCode, state).then((res) => {
+      async () => {
+        try {
+          await payConfigApi.updateMchPassageState(infoId.value, currentWayCode.value, record.ifCode, state)
           message.success('已配置')
           searchFunc()
           searchPassageFunc()
-        })
+          resolve()
+        } catch (error) {
+          reject(error)
+        }
       },
       () => {
-        reject(new Error())
+        reject(new Error('用户取消'))
       }
     )
   })
@@ -378,17 +388,29 @@ const searchIfCodeFunc = () => {
   reset()
 }
 
-const getDiyList = () => {
-  payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: infoId.value }).then((res) => {
+/**
+ * 获取自定义配置列表
+ */
+const getDiyList = async () => {
+  try {
+    const res = await payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: infoId.value })
     diyList.value = res
-  })
+  } catch (error) {
+    console.error('获取自定义配置列表失败:', error)
+  }
 }
 
-const refIfCodeList = () => {
-  const params = Object.assign({}, { configMode: props.configMode, infoId: infoId.value }, ifCodeListSearchData.value)
-  payConfigApi.queryPayConfigIfCodes(params).then((resData) => {
+/**
+ * 刷新支付接口代码列表
+ */
+const refIfCodeList = async () => {
+  try {
+    const params = Object.assign({}, { configMode: props.configMode, infoId: infoId.value }, ifCodeListSearchData.value)
+    const resData = await payConfigApi.queryPayConfigIfCodes(params)
     ifCodeList.value = resData
-  })
+  } catch (error) {
+    console.error('刷新支付接口代码列表失败:', error)
+  }
 }
 
 const getConfigComponent = (code) => {
@@ -421,43 +443,45 @@ const getAppConfigComponent = () => {
   }
 }
 
-const getConfig = (code) => {
-  if (currentIfCode.value) {
-    switch (code) {
-      case 'paramsTab':
-        restConfig()
-        const record = ifCodeList.value.find((f) => f.ifCode === currentIfCode.value)
-        ifDefine.value = record
-        if (record.configPageType === 1) {
-          import('./diy/config-page.vue').then((module) => {
-            configComponent.value = module.default || module
-          })
-        } else if (record.configPageType === 2) {
-          let pageCode = 'Isv'
-          if (props.configMode === 'mgrMch' || props.configMode === 'agentMch' || props.configMode === 'mchSelfApp1') {
-            pageCode = 'Mch'
-          }
-          getConfigComponent(pageCode).then((module) => {
-            configComponent.value = module.default || module
-          })
+/**
+ * 加载对应配置组件
+ * @param {string} code - 标签页代码
+ */
+const getConfig = async (code) => {
+  if (!currentIfCode.value) return
+
+  switch (code) {
+    case 'paramsTab': {
+      restConfig()
+      const record = ifCodeList.value.find((f) => f.ifCode === currentIfCode.value)
+      ifDefine.value = record
+      if (record.configPageType === 1) {
+        const module = await import('./diy/config-page.vue')
+        configComponent.value = module.default || module
+      } else if (record.configPageType === 2) {
+        let pageCode = 'Isv'
+        if (props.configMode === 'mgrMch' || props.configMode === 'agentMch' || props.configMode === 'mchSelfApp1') {
+          pageCode = 'Mch'
         }
-        break
-      case 'channelConfigTab':
-        getAppConfigComponent()
-          .then((module) => {
-            appConfigComponent.value = module.default || module
-          })
-          .catch(() => {
-            appConfigComponent.value = null
-            message.error('当前渠道不支持参数配置！')
-          })
-        break
-      case 'rateTab':
-        if (rateConfigComponentRef.value) {
-          rateConfigComponentRef.value.getRateConfig(currentIfCode.value)
-        }
-        break
+        const module = await getConfigComponent(pageCode)
+        configComponent.value = module.default || module
+      }
+      break
     }
+    case 'channelConfigTab':
+      try {
+        const module = await getAppConfigComponent()
+        appConfigComponent.value = module.default || module
+      } catch {
+        appConfigComponent.value = null
+        message.error('当前渠道不支持参数配置！')
+      }
+      break
+    case 'rateTab':
+      if (rateConfigComponentRef.value) {
+        rateConfigComponentRef.value.getRateConfig(currentIfCode.value)
+      }
+      break
   }
 }
 

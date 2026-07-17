@@ -94,13 +94,16 @@ const tabSelected = (code) => {
   }
 }
 
-const getConfigComponent = (code) => {
-  if (props.ifDefine) {
-    if (code === 'appParamTab') {
-      return import('./config-page.vue').then((module) => {
-        configComponent.value = module.default || module
-      })
-    }
+/**
+ * 根据标签页代码加载对应配置组件
+ * @param {string} code - 标签页代码
+ */
+const getConfigComponent = async (code) => {
+  if (!props.ifDefine) return
+
+  if (code === 'appParamTab') {
+    const module = await import('./config-page.vue')
+    configComponent.value = module.default || module
   }
 }
 

@@ -7,7 +7,7 @@
         :collapsible="false"
         :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
-        @reset="onReset"
+        @reset="searchFunc"
       >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
@@ -337,43 +337,9 @@ const loadStatistics = async (params) => {
 }
 
 /**
- * 搜索商户
- * @param {string} keyword - 搜索关键词
- */
-const handleSearchMch = async (keyword) => {
-  if (!keyword) {
-    mchList.value = []
-    return
-  }
-
-  try {
-    const res = await basicApi.queryMchPage({
-      mchName: keyword,
-      pageSize: 20
-    })
-    mchList.value = res.records || []
-  } catch (error) {
-    console.error('搜索商户失败:', error)
-  }
-}
-
-/**
  * 搜索回调函数
  */
 function searchFunc() {
-  tableRef.value.reload()
-  tableRef.value.reloadStatistics()
-}
-
-/**
- * 重置回调函数
- */
-function onReset() {
-  searchData.dateRange = ''
-  searchData.unionOrderId = ''
-  searchData.mchNo = ''
-  searchData.appId = ''
-  searchData.state = ''
   tableRef.value.reload()
   tableRef.value.reloadStatistics()
 }
@@ -471,12 +437,13 @@ const changeStr2ellipsis = (str, len) => {
  * 复制订单号到剪贴板
  * @param {string} text - 要复制的文本
  */
-const copyOrderNo = (text) => {
-  navigator.clipboard.writeText(text).then(() => {
+const copyOrderNo = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text)
     message.success('复制成功')
-  }).catch(() => {
+  } catch (err) {
     message.error('复制失败')
-  })
+  }
 }
 </script>
 

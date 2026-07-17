@@ -6,8 +6,9 @@
         :collapsible="true"
         :default-collapsed="true"
         :search-loading="tableRef?.isLoading?.value || false"
+        :reset-exclude="['dateRange']"
         @search="searchFunc"
-        @reset="onReset"
+        @reset="resetFunc"
       >
         <!-- 基础搜索条件（始终显示） -->
         <template #base="{ colSpan }">
@@ -298,11 +299,7 @@ function searchFunc(vals) {
   message.success('开始搜索')
 }
 
-function onReset() {
-  searchForm.orderNo = ''
-  searchForm.dateRange = 'today'
-  searchForm.state = ''
-  searchForm.amountRange = [undefined, undefined]
+function resetFunc() {
 }
 
 function onView(record) {

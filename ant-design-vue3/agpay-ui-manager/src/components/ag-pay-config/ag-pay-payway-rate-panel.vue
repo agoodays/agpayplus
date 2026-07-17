@@ -562,6 +562,11 @@
 </template>
 
 <script setup>
+/**
+ * 支付费率配置面板组件
+ * 功能：根据配置模式（服务商/代理商/商户）展示和配置各支付产品的费率，
+ * 支持单费率、阶梯费率、银联模式，以及合并/拆分配置模式。
+ */
 import { ref, reactive, onMounted, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { BulbOutlined, CheckOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
@@ -825,6 +830,10 @@ const toRateConfig = (key, feeRateConfig) => {
   })
 }
 
+/**
+ * 获取费率配置信息
+ * @param {string} currentIfCodeVal - 接口代码
+ */
 const getRateConfig = async (currentIfCodeVal) => {
   if (currentIfCodeVal) {
     currentIfCode.value = currentIfCodeVal
@@ -847,12 +856,18 @@ const getRateConfig = async (currentIfCodeVal) => {
   })
   const params = {}
   Object.assign(params, { configMode: props.configMode, infoId: props.infoId, ifCode: currentIfCode.value })
+
   let mapData = {}
-  await payConfigApi.queryRateConfigList('/savedMapData', params).then((res) => {
-    mapData = res
-  })
+  try {
+    mapData = await payConfigApi.queryRateConfigList('/savedMapData', params)
+  } catch (error) {
+    console.error('获取费率配置映射数据失败:', error)
+    return
+  }
+
   Object.assign(params, { pageSize: -1 })
-  await payConfigApi.queryRateConfigList('/payways', params).then((res) => {
+  try {
+    const res = await payConfigApi.queryRateConfigList('/payways', params)
     res.records.forEach((payWay) => {
       payWay.checked = false
       allPaywayList.value.push(payWay)
@@ -913,7 +928,10 @@ const getRateConfig = async (currentIfCodeVal) => {
     mapData && (mapData.ISVCOST || mapData.AGENTRATE || mapData.MCHRATE) && configTypeMaps.value.push('mainFee')
     mapData && mapData.AGENTDEF && configTypeMaps.value.push('agentdefFee')
     mapData && mapData.MCHAPPLYDEF && configTypeMaps.value.push('mchapplydefFee')
-  })
+  } catch (error) {
+    console.error('获取支付产品列表失败:', error)
+    return
+  }
 
   mergeFeeList.value.forEach((item) => {
     item.isMergeMode = false
@@ -1487,7 +1505,7 @@ const onSubmit = () => {
     content += '】，点击确定将同时关闭操作对象的下级代理商和商户的配置！'
   }
 
-  infoBox.confirmPrimary('确认操作？', content, () => {
+  infoBox.confirmPrimary('确认操作？', content, async () => {
     const params = {
       infoId: props.infoId,
       ifCode: props.ifCode,
@@ -1496,15 +1514,18 @@ const onSubmit = () => {
       delPayWayCodes: delPayWayCodes
     }
     Object.assign(params, feeRateConfig)
-    payConfigApi.addRateConfig(params)
-      .then((res) => {
-        message.success('保存成功')
-        typeof originSavedListVal === 'object' && (originSavedList.value = originSavedListVal)
-        loading.value = false
-      })
-      .catch((res) => {
-        loading.value = false
-      })
+    loading.value = true
+    try {
+      await payConfigApi.addRateConfig(params)
+      message.success('保存成功')
+      if (typeof originSavedListVal === 'object') {
+        originSavedList.value = originSavedListVal
+      }
+    } catch (error) {
+      console.error('保存费率配置失败:', error)
+    } finally {
+      loading.value = false
+    }
   })
 }
 

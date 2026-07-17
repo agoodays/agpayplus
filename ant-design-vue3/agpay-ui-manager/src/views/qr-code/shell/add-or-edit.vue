@@ -95,6 +95,7 @@
                 <color-picker
                   v-if="saveObject.configInfo.bgColor === 'custom'"
                   v-model="saveObject.configInfo.customBgColor"
+                  locale="zh-CN"
                   @change="onChange"
                 />
               </a-col>

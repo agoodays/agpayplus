@@ -28,6 +28,10 @@
 </template>
 
 <script setup>
+/**
+ * 表格操作按钮容器组件
+ * 功能：控制表格行内操作按钮的显示数量，超出部分折叠到"更多"下拉菜单中
+ */
 import { computed, useSlots } from 'vue'
 import { EllipsisOutlined, DownOutlined } from '@ant-design/icons-vue'
 import { useI18n } from 'vue-i18n'
@@ -35,7 +39,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 
 const props = defineProps({
-  // 最多显示几个操作按钮，超过的放入"更多"菜单
+  /** 最多显示几个操作按钮，超过的放入"更多"菜单 */
   maxShowNum: {
     type: Number,
     default: 2
@@ -44,7 +48,7 @@ const props = defineProps({
 
 const slots = useSlots()
 
-// 获取所有有效的操作子节点
+/** 获取所有有效的操作子节点 */
 const visibleActions = computed(() => {
   const defaultSlot = slots.default?.() || []
   // 过滤出有效的 VNode
@@ -54,7 +58,7 @@ const visibleActions = computed(() => {
   })
 })
 
-// 需要放入"更多"菜单的操作
+/** 需要放入"更多"菜单的操作 */
 const moreActions = computed(() => {
   if (visibleActions.value.length <= props.maxShowNum) {
     return []

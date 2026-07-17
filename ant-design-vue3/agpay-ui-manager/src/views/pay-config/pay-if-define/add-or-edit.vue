@@ -180,7 +180,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="卡片背景色" name="bgColor">
-            <color-picker v-model="saveObject.bgColor" style="height: 66px; margin-top: 8px;" />
+            <color-picker v-model="saveObject.bgColor" locale="zh-CN" />
           </a-form-item>
         </a-col>
       </a-row>

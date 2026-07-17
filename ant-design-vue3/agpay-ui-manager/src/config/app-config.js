@@ -91,7 +91,6 @@ export const asyncRouteDefine = {
   IfDefinePage: { defaultPath: '/ifdefines', component: () => import('@/views/pay-config/pay-if-define/list.vue') },
   PayWayPage: { defaultPath: '/payways', component: () => import('@/views/pay-config/pay-way/list.vue') },
   SysUserPage: { defaultPath: '/users', component: () => import('@/views/sys-user/sys-user-page.vue') },
-  MchConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') },
   NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/notice/notice-list-page.vue') },
   PlatformProfitPage: { defaultPath: '/platformProfits', component: () => import('@/views/statistic/agent/agent-count-page.vue') },
   SysLogPage: { defaultPath: '/log', component: () => import('@/views/sys/sys-log.vue') }

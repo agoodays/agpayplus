@@ -8,7 +8,7 @@
         :default-collapsed="true"
         :search-loading="tableRef?.isLoading?.value || false"
         @search="searchFunc"
-        @reset="resetFunc"
+        @reset="searchFunc"
       >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
@@ -184,11 +184,6 @@ const reqTableDataFunc = async (params) => {
  * 搜索回调函数
  */
 const searchFunc = () => reloadTable()
-
-/**
- * 重置回调函数
- */
-const resetFunc = () => reloadTable()
 
 /**
  * 打开新增弹窗
