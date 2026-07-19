@@ -210,6 +210,7 @@ import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
 import AgPayWayRatePanel from './ag-pay-payway-rate-panel.vue'
 import { infoBox } from '@/utils/info-box'
+import { getStateInfo, STATE_ENUM } from '@/constants/common-const.js'
 
 const props = defineProps({
   isDrawer: {
@@ -358,8 +359,9 @@ const resetSearchFunc = () => {
  * @returns {Promise<void>}
  */
 const updateState = (record, state) => {
-  const title = state === 1 ? '确认[启用]该通道？' : '确认[停用]该通道？'
-  const content = state === 1 ? '启用后将会将其他通道关闭' : '停用后将无法正常支付'
+  const currentState = getStateInfo(state)
+  const title = `确认[${currentState.desc}]该通道？`
+  const content = currentState === STATE_ENUM.ENABLED ? '启用后将会将其他通道关闭' : '停用后将无法正常支付'
 
   return new Promise((resolve, reject) => {
     infoBox.confirmDanger(

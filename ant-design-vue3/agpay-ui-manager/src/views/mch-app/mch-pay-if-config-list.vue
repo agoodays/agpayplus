@@ -23,7 +23,7 @@
               </div>
               <div class="ag-card-content-body">
                 <div class="title">{{ record.ifName }}</div>
-                <a-badge :status="record.ifConfigState === 1 ? 'processing' : 'error'" :text="record.ifConfigState === 1 ? '启用' : '未开通'" />
+                <a-badge v-bind="getStateInfo(record.ifConfigState, t)" />
               </div>
               <div class="ag-card-ops">
                 <a v-if="record.mchType === 2 && record.ifCode === 'alipay'" @click="toAlipayAuthPageFunc(record)">扫码授权 <component :is="icons.RightOutlined" style="fontSize: 13px"></component></a>
@@ -74,7 +74,7 @@
           :search-data="searchData2"
         >
           <template #stateSlot="{ record }">
-            <a-badge :status="record.passageState === 0 ? 'error' : 'processing'" :text="record.passageState === 0 ? '禁用' : '启用'" />
+            <a-badge v-bind="getStateInfo(record.passageState, t)" />
           </template>
           <template #opSlot="{ record }">
             <a-button type="link" @click="editPayPassageFunc(record)">配置</a-button>
@@ -114,6 +114,13 @@ import { ArrowLeftOutlined, ArrowRightOutlined, CloseOutlined, ReloadOutlined, R
 import { AgPayConfig as agPayConfig } from '@/components/ag-pay-config'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import MchPayConfigAddOrEdit from './mch-pay-config-add-or-edit.vue'
+import { getStateOptions, getStateInfo } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 const icons = { ArrowLeftOutlined, ArrowRightOutlined, CloseOutlined, ReloadOutlined, RightOutlined, SearchOutlined }
 

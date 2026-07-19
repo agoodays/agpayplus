@@ -175,12 +175,19 @@ import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
 import { AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { infoBox } from '@/utils/info-box'
 import AddOrEdit from './add-or-edit.vue'
 import InviteCode from './invite-code.vue'
 import RoleDist from './role-dist.vue'
+import { getStateOptions, getStateInfo } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
@@ -404,8 +411,9 @@ const openRoleDist = (recordId, sysType, belongInfoId) => {
  * @param {number} state - 状态值
  */
 const updateState = async (recordId, state) => {
-  const title = state === 1 ? '确认[启用]该用户？' : '确认[停用]该用户？'
-  const content = state === 1 ? '启用后用户可进行登陆等一系列操作' : '停用后该用户将立即退出系统并不可再次登陆'
+  const stateInfo = getStateInfo(state)
+  const title = `确认[${stateInfo.desc}]该用户？`
+  const content = stateInfo === ENABLE_ENUM.ENABLE ? '启用后用户可进行登陆等一系列操作' : '停用后该用户将立即退出系统并不可再次登陆'
 
   infoBox.confirmPrimary(title, content, async () => {
     await sysUserApi.updateStateById(recordId, { state })

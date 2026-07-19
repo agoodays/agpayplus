@@ -28,7 +28,7 @@
             <ag-select
               v-model="saveObject.statRangeType"
               placeholder="请选择统计周期"
-              :options="STAT_RANGE_TYPE_OPTIONS"
+              :options="statRangeTypeOptions"
             />
           </a-form-item>
         </a-col>
@@ -46,7 +46,13 @@ import { AgDrawer, AgInput, AgSelect } from '@/components'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
 import { message } from 'ant-design-vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { STAT_RANGE_TYPE_ENUM, STAT_RANGE_TYPE_OPTIONS } from '@/constants/common-const'
+import { STAT_RANGE_TYPE_ENUM, getStatRangeTypeOptions } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const statRangeTypeOptions = computed(() => getStatRangeTypeOptions(t))
 
 const props = defineProps({
   open: { type: Boolean, default: false },

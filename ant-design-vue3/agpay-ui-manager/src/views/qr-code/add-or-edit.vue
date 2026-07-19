@@ -52,10 +52,7 @@
         </a-col>
         <a-col :span="10">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="1">启用</a-radio>
-              <a-radio :value="0">禁用</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
@@ -64,9 +61,10 @@
               <a-radio :value="0">任意金额</a-radio>
               <a-radio :value="1">固定金额</a-radio>
             </a-radio-group>
-            <span v-if="saveObject.fixedFlag === 1"
-              ><a-input-number v-model:value="saveObject.fixedPayAmount" addon-after="元" />元</span
-            >
+            <span v-if="saveObject.fixedFlag === 1">
+              <a-input-number v-model:value="saveObject.fixedPayAmount" addon-after="元" />
+              元
+            </span>
           </a-form-item>
         </a-col>
         <a-col v-if="isAdd" :span="24">
@@ -135,6 +133,12 @@ import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
 import { viewerApi } from '@/utils/viewer-api'
+import { getStateOptions } from '@/constants/common-const'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 const icons = { QuestionCircleOutlined }
 

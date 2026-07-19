@@ -51,10 +51,7 @@
                 label="状态"
                 placeholder="请选择状态"
                 allow-clear
-                :options="[
-                  { value: '0', label: '禁用' },
-                  { value: '1', label: '启用' }
-                ]"
+                :options="stateOptions"
               />
             </a-form-item>
           </a-col>
@@ -80,7 +77,7 @@
           <b>{{ record.appId }}</b>
         </template>
         <template #stateSlot="{ record }">
-          <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
+          <a-badge v-bind="getStateInfo(record.state, t)" />
         </template>
         <template #defaultFlagSlot="{ record }">
           <a-badge
@@ -148,9 +145,14 @@ import { onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
+import { getStateOptions, getStateInfo } from '@/constants/common-const'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 const route = useRoute()
-const { t } = useI18n()
 
 /**
  * 权限检查
@@ -191,8 +193,6 @@ Object.assign(searchData, {
   appName: '',
   state: ''
 })
-
-
 
 /**
  * 表格列定义

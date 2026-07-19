@@ -1,258 +1,157 @@
 /*
  * 通用常量
- *
  */
 
 export const PAGE_SIZE = 10
-
 export const PAGE_SIZE_OPTIONS = ['5', '10', '15', '20', '30', '40', '50', '75', '100', '150', '200', '300', '500']
 
-//登录页面名字
+// 路由路径
 export const PAGE_PATH_LOGIN = '/login'
-
-//404页面名字
 export const PAGE_PATH_404 = '/404'
 
-export const showTableTotal = function (total) {
-  return `共${total}条`
+// 分页总数显示 (需传入 t 函数)
+export const showTableTotal = (t, total) => {
+  return t('pagination.total', { total })
 }
 
+// ================= 枚举定义 (使用 descKey) =================
+
 export const FLAG_NUMBER_ENUM = {
-  TRUE: {
-    value: 1,
-    desc: '是'
-  },
-  FALSE: {
-    value: 0,
-    desc: '否'
-  }
+  TRUE: { value: 1, descKey: 'common.yes' },
+  FALSE: { value: 0, descKey: 'common.no' }
 }
 
 export const GENDER_ENUM = {
-  UNKNOWN: {
-    value: 0,
-    desc: '未知'
-  },
-  MAN: {
-    value: 1,
-    desc: '男'
-  },
-  WOMAN: {
-    value: 2,
-    desc: '女'
-  }
+  UNKNOWN: { value: 0, descKey: 'common.gender.unknown' },
+  MAN: { value: 1, descKey: 'common.gender.man' },
+  WOMAN: { value: 2, descKey: 'common.gender.woman' }
 }
 
 export const USER_TYPE_ENUM = {
-  ADMIN_EMPLOYEE: {
-    value: 1,
-    desc: '员工'
-  }
+  ADMIN_EMPLOYEE: { value: 1, descKey: 'common.userType.employee' }
 }
 
 export const DATA_TYPE_ENUM = {
-  NORMAL: {
-    value: 1,
-    desc: '普通'
-  },
-  ENCRYPT: {
-    value: 10,
-    desc: '加密'
-  }
+  NORMAL: { value: 1, descKey: 'common.dataType.normal' },
+  ENCRYPT: { value: 10, descKey: 'common.dataType.encrypt' }
 }
 
 export const STAT_RANGE_TYPE_ENUM = {
-  YEAR: {
-    value: 'year',
-    desc: '年'
-  },
-  QUARTER: {
-    value: 'quarter',
-    desc: '季度'
-  },
-  MONTH: {
-    value: 'month',
-    desc: '月'
-  },
-  WEEK: {
-    value: 'week',
-    desc: '周'
-  }
+  YEAR: { value: 'year', descKey: 'common.statRange.year' },
+  QUARTER: { value: 'quarter', descKey: 'common.statRange.quarter' },
+  MONTH: { value: 'month', descKey: 'common.statRange.month' },
+  WEEK: { value: 'week', descKey: 'common.statRange.week' }
 }
-
-export const STAT_RANGE_TYPE_OPTIONS = Object.values(STAT_RANGE_TYPE_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const SYS_TYPE_ENUM = {
-  MGR: {
-    value: 'MGR',
-    desc: '运营平台'
-  },
-  AGENT: {
-    value: 'AGENT',
-    desc: '代理商系统'
-  },
-  MCH: {
-    value: 'MCH',
-    desc: '商户系统'
-  }
+  MGR: { value: 'MGR', descKey: 'common.sysType.mgr' },
+  AGENT: { value: 'AGENT', descKey: 'common.sysType.agent' },
+  MCH: { value: 'MCH', descKey: 'common.sysType.mch' }
 }
-
-export const SYS_TYPE_OPTIONS = Object.values(SYS_TYPE_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const STATE_ENUM = {
-  DISABLED: {
-    value: 0,
-    desc: '禁用',
-    color: 'volcano'
-  },
-  ENABLED: {
-    value: 1,
-    desc: '启用',
-    color: 'green'
-  }
+  DISABLED: { value: 0, descKey: 'common.state.disabled', color: 'volcano' },
+  ENABLED: { value: 1, descKey: 'common.state.enabled', color: 'green' }
 }
-
-export const STATE_OPTIONS = Object.values(STATE_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const FLAG_ENUM = {
-  NO: {
-    value: 0,
-    desc: '否',
-    color: 'volcano'
-  },
-  YES: {
-    value: 1,
-    desc: '是',
-    color: 'green'
-  }
+  NO: { value: 0, descKey: 'common.no', color: 'volcano' },
+  YES: { value: 1, descKey: 'common.yes', color: 'green' }
 }
-
-export const FLAG_OPTIONS = Object.values(FLAG_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const AGENT_TYPE_ENUM = {
-  INDIVIDUAL: {
-    value: 1,
-    desc: '个人'
-  },
-  ENTERPRISE: {
-    value: 2,
-    desc: '企业'
-  }
+  INDIVIDUAL: { value: 1, descKey: 'common.agentType.individual', labelKey: 'common.label.legalPerson' },
+  ENTERPRISE: { value: 2, descKey: 'common.agentType.enterprise', labelKey: 'common.label.contactPerson' }
 }
-
-export const AGENT_TYPE_OPTIONS = Object.values(AGENT_TYPE_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const SETT_ACCOUNT_TYPE_ENUM = {
-  WX_CASH: {
-    value: 'WX_CASH',
-    desc: '个人微信',
-    noLabel: '个人微信号'
-  },
-  ALIPAY_CASH: {
-    value: 'ALIPAY_CASH',
-    desc: '个人支付宝',
-    noLabel: '支付宝账号'
-  },
-  BANK_PRIVATE: {
-    value: 'BANK_PRIVATE',
-    desc: '对私账户',
-    noLabel: '收款银行卡号'
-  },
-  BANK_PUBLIC: {
-    value: 'BANK_PUBLIC',
-    desc: '对公账户',
-    noLabel: '对公账号'
-  }
+  WX_CASH: { value: 'WX_CASH', descKey: 'common.settAccount.wx', labelKey: 'common.settAccount.wxNo' },
+  ALIPAY_CASH: { value: 'ALIPAY_CASH', descKey: 'common.settAccount.alipay', labelKey: 'common.settAccount.alipayNo' },
+  BANK_PRIVATE: { value: 'BANK_PRIVATE', descKey: 'common.settAccount.private', labelKey: 'common.settAccount.privateNo' },
+  BANK_PUBLIC: { value: 'BANK_PUBLIC', descKey: 'common.settAccount.public', labelKey: 'common.settAccount.publicNo' }
 }
-
-export const SETT_ACCOUNT_TYPE_OPTIONS = Object.values(SETT_ACCOUNT_TYPE_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const MCH_TYPE_ENUM = {
-  NORMAL: {
-    value: 1,
-    desc: '普通商户',
-    color: 'green'
-  },
-  SPECIAL: {
-    value: 2,
-    desc: '特约商户',
-    color: 'orange'
-  }
+  NORMAL: { value: 1, descKey: 'common.mchType.normal', color: 'green' },
+  SPECIAL: { value: 2, descKey: 'common.mchType.special', color: 'orange' }
 }
-
-export const MCH_TYPE_OPTIONS = Object.values(MCH_TYPE_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const MCH_LEVEL_ENUM = {
-  M0: {
-    value: 'M0',
-    desc: 'M0',
-    tips: '简单模式（页面简洁，仅基础收款功能）'
-  },
-  M1: {
-    value: 'M1',
-    desc: 'M1',
-    tips: '高级模式（支持API调用，支持配置应用及分账、转账功能）'
-  }
+  M0: { value: 'M0', descKey: 'common.mchLevel.m0', tipsKey: 'common.mchLevel.m0Tips' },
+  M1: { value: 'M1', descKey: 'common.mchLevel.m1', tipsKey: 'common.mchLevel.m1Tips' }
 }
-
-export const MCH_LEVEL_OPTIONS = Object.values(MCH_LEVEL_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const REFUND_MODE_ENUM = {
-  PLAT: {
-    value: 'plat',
-    desc: '平台退款'
-  },
-  API: {
-    value: 'api',
-    desc: '接口退款'
-  }
+  PLAT: { value: 'plat', descKey: 'common.refundMode.plat', color: 'blue' },
+  API: { value: 'api', descKey: 'common.refundMode.api', color: 'green' }
 }
-
-export const REFUND_MODE_OPTIONS = Object.values(REFUND_MODE_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
 
 export const CASH_OUT_FEE_TYPE_ENUM = {
-  FIX: {
-    value: 'FIX',
-    desc: '单笔固定'
-  },
-  SINGLE: {
-    value: 'SINGLE',
-    desc: '单笔费率'
-  },
-  FIXANDRATE: {
-    value: 'FIXANDRATE',
-    desc: '固定+费率'
-  }
+  FIX: { value: 'FIX', descKey: 'common.cashOutFee.fix' },
+  SINGLE: { value: 'SINGLE', descKey: 'common.cashOutFee.single' },
+  FIXANDRATE: { value: 'FIXANDRATE', descKey: 'common.cashOutFee.fixAndRate' }
 }
 
-export const CASH_OUT_FEE_TYPE_OPTIONS = Object.values(CASH_OUT_FEE_TYPE_ENUM).map(item => ({
-  value: item.value,
-  label: item.desc
-}))
+// ================= 动态选项生成函数 (接收 t) =================
+
+const generateOptions = (enumObj, t) => {
+  return Object.values(enumObj).map(item => ({
+    value: item.value,
+    label: t(item.descKey)
+  }))
+}
+
+export const getStatRangeTypeOptions = (t) => generateOptions(STAT_RANGE_TYPE_ENUM, t)
+export const getSysTypeOptions = (t) => generateOptions(SYS_TYPE_ENUM, t)
+export const getStateOptions = (t) => generateOptions(STATE_ENUM, t)
+export const getFlagOptions = (t) => generateOptions(FLAG_ENUM, t)
+export const getAgentTypeOptions = (t) => generateOptions(AGENT_TYPE_ENUM, t)
+export const getSettAccountTypeOptions = (t) => generateOptions(SETT_ACCOUNT_TYPE_ENUM, t)
+export const getMchTypeOptions = (t) => generateOptions(MCH_TYPE_ENUM, t)
+export const getMchLevelOptions = (t) => generateOptions(MCH_LEVEL_ENUM, t)
+export const getRefundModeOptions = (t) => generateOptions(REFUND_MODE_ENUM, t)
+export const getCashOutFeeTypeOptions = (t) => generateOptions(CASH_OUT_FEE_TYPE_ENUM, t)
+
+// ================= 状态获取工具函数 =================
+/**
+ * 通用枚举信息获取函数
+ * @param {object} enumObj - 枚举对象 (如 STATE_ENUM)
+ * @param {number|string} value - 当前状态值
+ * @param {function} t - i18n 翻译函数
+ */
+export const getEnumInfo = (enumObj, value, t) => {
+  // 遍历枚举找到匹配项，找不到则取第一个作为兜底
+  const current = Object.values(enumObj).find(item => item.value === value) || Object.values(enumObj)[0]
+
+  // 基础返回对象（包含所有原始属性，如 value, color, tipsKey 等）
+  const result = {
+    ...current,
+    desc: t(current.descKey), // descKey 是必须存在的
+    text: t(current.descKey)
+  }
+
+  // 只有当存在 color 时，才映射给 status（兼容 a-badge / a-tag）
+  if (current.color) {
+    result.status = current.color
+  }
+
+  // 只有当存在 labelKey 时，才进行翻译并挂载
+  if (current.labelKey) {
+    result.label = t(current.labelKey)
+  }
+
+  return result
+}
+
+// 使用时极其简洁：
+// const stateInfo = getEnumInfo(STATE_ENUM, record.state, t)
+// const mchInfo = getEnumInfo(MCH_TYPE_ENUM, record.mchType, t)
+
+export const getFlagInfo = (flag, t) => getEnumInfo(FLAG_ENUM, flag, t)
+export const getStateInfo = (state, t) => getEnumInfo(STATE_ENUM, state, t)
+export const getAgentTypeInfo = (type, t) => getEnumInfo(AGENT_TYPE_ENUM, type, t)
+export const getSettAccountTypeInfo = (type, t) => getEnumInfo(SETT_ACCOUNT_TYPE_ENUM, type, t)
+export const getMchTypeInfo = (type, t) => getEnumInfo(MCH_TYPE_ENUM, type, t)
+export const getMchLevelInfo = (level, t) => getEnumInfo(MCH_LEVEL_ENUM, level, t)
+export const getRefundModeInfo = (mode, t) => getEnumInfo(REFUND_MODE_ENUM, mode, t)
+export const getCashOutFeeTypeInfo = (type, t) => getEnumInfo(CASH_OUT_FEE_TYPE_ENUM, type, t)

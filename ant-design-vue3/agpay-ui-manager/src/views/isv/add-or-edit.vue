@@ -42,10 +42,7 @@
         </a-col>
         <a-col :span="10">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="1">启用</a-radio>
-              <a-radio :value="0">禁用</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -64,7 +61,14 @@
 import { isvApi } from '@/api/business/isv/isv-api'
 import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { getStateOptions } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 const props = defineProps({
   open: {

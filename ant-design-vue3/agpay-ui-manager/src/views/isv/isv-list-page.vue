@@ -21,10 +21,7 @@
                 label="服务商状态"
                 placeholder="请选择服务商状态"
                 allow-clear
-                :options="[
-                  { value: '0', label: '禁用' },
-                  { value: '1', label: '启用' }
-                ]"
+                :options="stateOptions"
               />
             </a-form-item>
           </a-col>
@@ -54,17 +51,17 @@
 
         <!-- 服务商状态列自定义渲染 -->
         <template #stateSlot="{ record }">
-          <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
+          <a-badge v-bind="getStateInfo(record.state, t)" />
         </template>
 
         <!-- 操作列 -->
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_ISV_INFO_EDIT')" type="link" @click="editFunc(record.isvNo)">编辑</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_OAUTH2_CONFIG_VIEW')" type="link" @click="payOauth2ConfigFunc(record.isvNo)">Oauth2配置</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payConfigFunc(record.isvNo)">支付配置</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="showPayIfConfigList(record.isvNo)">支付配置(新)</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_INFO_DEL')" type="link" style="color: red" @click="delFunc(record.isvNo)">删除</a-button>
+            <a-button type="link" @click="editFunc(record.isvNo)" v-if="hasPermission('ENT_ISV_INFO_EDIT')">修改</a-button>
+            <a-button type="link" @click="payOauth2ConfigFunc(record.isvNo)" v-if="hasPermission('ENT_ISV_OAUTH2_CONFIG_VIEW')">Oauth2配置</a-button>
+            <a-button type="link" @click="payConfigFunc(record.isvNo)" v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')">支付配置</a-button>
+            <a-button type="link" @click="showPayIfConfigList(record.isvNo)" v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')">支付配置(新)</a-button>
+            <a-button type="link" @click="delFunc(record.isvNo)" danger v-if="hasPermission('ENT_ISV_INFO_DEL')">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -89,15 +86,21 @@
  * 服务商列表页面组件
  * 功能：展示服务商列表、搜索、新增、编辑、配置管理、删除等操作
  */
-
 import { isvApi } from '@/api/business/isv/isv-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions, AgPayConfigDrawer, AgPayOauth2ConfigDrawer } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import IsvPayIfConfigList from './isv-pay-if-config-list.vue'
+import { getStateOptions, getStateInfo } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 // 权限检查
 const { hasPermission } = usePermission()

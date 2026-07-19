@@ -23,10 +23,7 @@
               <div class="title">
                 {{ record.ifName }}
               </div>
-              <a-badge
-                :status="record.ifConfigState === 1 ? 'processing' : 'error'"
-                :text="record.ifConfigState === 1 ? '启用' : '未开通'"
-              ></a-badge>
+              <a-badge v-bind="getStateInfo(record.ifConfigState, t)" />
             </div>
             <!-- 卡片底部操作栏 -->
             <div class="ag-card-ops">
@@ -55,10 +52,7 @@
           </a-col>
           <a-col :span="12">
             <a-form-item label="状态" name="state">
-              <a-radio-group v-model:value="saveObject.state">
-                <a-radio :value="1"> 启用 </a-radio>
-                <a-radio :value="0"> 停用 </a-radio>
-              </a-radio-group>
+              <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
             </a-form-item>
           </a-col>
           <a-col :span="24">
@@ -136,12 +130,20 @@
 import { CheckOutlined, CloseOutlined, LoadingOutlined, RightOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { AgDrawer, AgCard, AgUpload } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-const icons = { LoadingOutlined, RightOutlined, UploadOutlined }
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
 import { message } from 'ant-design-vue'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import AlipayPayConfig from './custom/alipay-pay-config.vue'
 import WxpayPayConfig from './custom/wxpay-pay-config.vue'
+import { getStateOptions, getStateInfo } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
+
+const icons = { LoadingOutlined, RightOutlined, UploadOutlined }
 
 // 权限检查
 const { hasPermission } = usePermission()

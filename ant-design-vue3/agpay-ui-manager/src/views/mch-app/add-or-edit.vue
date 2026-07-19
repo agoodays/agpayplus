@@ -49,19 +49,13 @@
 
         <a-col :span="10">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="1">启用</a-radio>
-              <a-radio :value="0">停用</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
           </a-form-item>
         </a-col>
 
         <a-col :span="10">
           <a-form-item label="是否设置为默认应用" name="defaultFlag">
-            <a-radio-group v-model:value="saveObject.defaultFlag">
-              <a-radio :value="0">否</a-radio>
-              <a-radio :value="1">是</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.defaultFlag" :options="flagOptions" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -134,6 +128,13 @@ import { CheckOutlined, CloseOutlined, QuestionCircleOutlined, SyncOutlined } fr
 import { message } from 'ant-design-vue'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { getStateOptions, getFlagOptions } from '@/constants/common-const'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
+const flagOptions = computed(() => getFlagOptions(t))
 
 // Props & Emits
 const props = defineProps({
@@ -174,8 +175,6 @@ const saveObject = reactive({
   appSecret: '',
   appRsa2PublicKey: ''
 })
-
-const { t } = useI18n()
 
 // MD5秘钥占位符
 const appSecretPlaceholder = computed(() => {

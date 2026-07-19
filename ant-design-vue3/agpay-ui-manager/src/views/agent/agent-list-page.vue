@@ -51,10 +51,7 @@
                 label="状态"
                 placeholder="请选择状态"
                 allow-clear
-                :options="[
-                  { value: '0', label: '禁用' },
-                  { value: '1', label: '启用' }
-                ]"
+                :options="stateOptions"
               />
             </a-form-item>
           </a-col>
@@ -87,15 +84,15 @@
 
         <!-- 状态列 -->
         <template #stateSlot="{ record }">
-          <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
+          <a-badge v-bind="getStateInfo(record.state, t)" />
         </template>
 
         <!-- 操作列 -->
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_AGENT_INFO_EDIT')" type="link" @click="editFunc(record.agentNo)">编辑</a-button>
-            <a-button v-if="hasPermission('ENT_AGENT_PAY_CONFIG_LIST')" type="link" @click="payConfigFunc(record.agentNo)">支付配置</a-button>
-            <a-button v-if="hasPermission('ENT_AGENT_INFO_DEL')" type="link" style="color: red" @click="delFunc(record.agentNo)">删除</a-button>
+            <a-button type="link" @click="editFunc(record.agentNo)" v-if="hasPermission('ENT_AGENT_INFO_EDIT')">修改</a-button>
+            <a-button type="link" @click="payConfigFunc(record.agentNo)" v-if="hasPermission('ENT_AGENT_PAY_CONFIG_LIST')">支付配置</a-button>
+            <a-button type="link" @click="delFunc(record.agentNo)" danger v-if="hasPermission('ENT_AGENT_INFO_DEL')">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -123,9 +120,16 @@ import AgPayConfig from '@/components/ag-pay-config'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
+import { getStateOptions, getStateInfo } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 /** 权限校验 */
 const { hasPermission } = usePermission()

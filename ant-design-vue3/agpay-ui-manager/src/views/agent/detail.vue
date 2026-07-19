@@ -20,13 +20,13 @@
         <a-descriptions-item label="联系人手机号">{{ detailData.contactTel }}</a-descriptions-item>
         <a-descriptions-item label="联系人邮箱">{{ detailData.contactEmail }}</a-descriptions-item>
         <a-descriptions-item label="是否允许发展下级">
-          <a-tag :color="detailData.addAgentFlag === FLAG_ENUM.YES.value ? FLAG_ENUM.YES.color : FLAG_ENUM.NO.color">
-            {{ detailData.addAgentFlag === FLAG_ENUM.YES.value ? FLAG_ENUM.YES.desc : FLAG_ENUM.NO.desc }}
+          <a-tag v-bind="getFlagInfo(detailData.addAgentFlag, t)">
+            {{ getFlagInfo(detailData.addAgentFlag, t).text }}
           </a-tag>
         </a-descriptions-item>
         <a-descriptions-item label="状态">
-          <a-tag :color="detailData.state === STATE_ENUM.ENABLED.value ? STATE_ENUM.ENABLED.color : STATE_ENUM.DISABLED.color">
-            {{ detailData.state === STATE_ENUM.ENABLED.value ? STATE_ENUM.ENABLED.desc : STATE_ENUM.DISABLED.desc }}
+          <a-tag v-bind="getStateInfo(detailData.state, t)">
+            {{ getStateInfo(detailData.state, t).text }}
           </a-tag>
         </a-descriptions-item>
         <a-descriptions-item label="钱包余额">
@@ -52,16 +52,16 @@
         <a-tag color="#FF4B33">账户信息</a-tag>
       </a-divider>
       <a-descriptions :column="2" :bordered="false">
-        <a-descriptions-item label="代理商类型">{{ detailData.agentType === AGENT_TYPE_ENUM.INDIVIDUAL.value ? AGENT_TYPE_ENUM.INDIVIDUAL.desc : AGENT_TYPE_ENUM.ENTERPRISE.desc }}</a-descriptions-item>
+        <a-descriptions-item label="代理商类型">{{ getAgentTypeInfo(detailData.agentType, t).text }}</a-descriptions-item>
         <a-descriptions-item label="收款账户类型">{{ detailData.settAccountTypeName }}</a-descriptions-item>
-        <a-descriptions-item v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value" label="对公账户名称">
+        <a-descriptions-item label="对公账户名称" v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
           {{ detailData.settAccountName }}
         </a-descriptions-item>
         <a-descriptions-item :label="detailData.settAccountNoLabel">{{ detailData.settAccountNo }}</a-descriptions-item>
-        <a-descriptions-item v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value" label="开户银行名称">
+        <a-descriptions-item label="开户银行名称" v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
           {{ detailData.settAccountBank }}
         </a-descriptions-item>
-        <a-descriptions-item v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value" label="开户行支行名称">
+        <a-descriptions-item label="开户行支行名称" v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
           {{ detailData.settAccountSubBank }}
         </a-descriptions-item>
       </a-descriptions>
@@ -145,7 +145,17 @@ import { agentApi } from '@/api/business/agent/agent-api'
 import { AgDrawer, AgUpload } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
-import { STATE_ENUM, FLAG_ENUM, AGENT_TYPE_ENUM, SETT_ACCOUNT_TYPE_ENUM } from '@/constants/common-const'
+import { 
+  AGENT_TYPE_ENUM,
+  SETT_ACCOUNT_TYPE_ENUM,
+  getFlagInfo,
+  getStateInfo,
+  getAgentTypeInfo,
+  getSettAccountTypeInfo
+} from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 /** Props 定义 */
 const props = defineProps({
@@ -169,99 +179,15 @@ const loading = ref(false)
 const localOpen = ref(false)
 
 /** 图片标签（联系人/法人） */
-const imgLabel = ref('联系人')
+const imgLabel = ref('')
 
 /** 详情数据 */
-const detailData = reactive({
-  agentNo: '',
-  agentName: '',
-  loginUsername: '',
-  agentShortName: '',
-  pid: '',
-  isvNo: '',
-  isvName: '',
-  contactName: '',
-  contactTel: '',
-  contactEmail: '',
-  addAgentFlag: 1,
-  state: 1,
-  balanceAmount: 0,
-  unAmount: 0,
-  auditProfitAmount: 0,
-  remark: '',
-  agentType: 1,
-  settAccountType: '',
-  settAccountTypeName: '个人微信',
-  settAccountNo: '',
-  settAccountName: '',
-  settAccountBank: '',
-  settAccountSubBank: '',
-  settAccountNoLabel: '个人微信号',
-  licenseImg: '',
-  permitImg: '',
-  idcard1Img: '',
-  idcard2Img: '',
-  idcardInHandImg: '',
-  bankCardImg: ''
-})
+const detailData = reactive({})
 
 /** 重置详情数据 */
 function resetDetailData() {
-  Object.assign(detailData, {
-    agentNo: '',
-    agentName: '',
-    loginUsername: '',
-    agentShortName: '',
-    pid: '',
-    isvNo: '',
-    isvName: '',
-    contactName: '',
-    contactTel: '',
-    contactEmail: '',
-    addAgentFlag: 1,
-    state: 1,
-    balanceAmount: 0,
-    unAmount: 0,
-    auditProfitAmount: 0,
-    remark: '',
-    agentType: 1,
-    settAccountType: '',
-    settAccountTypeName: '个人微信',
-    settAccountNo: '',
-    settAccountName: '',
-    settAccountBank: '',
-    settAccountSubBank: '',
-    settAccountNoLabel: '个人微信号',
-    licenseImg: '',
-    permitImg: '',
-    idcard1Img: '',
-    idcard2Img: '',
-    idcardInHandImg: '',
-    bankCardImg: ''
-  })
-  imgLabel.value = '联系人'
-}
-
-/** 规范化收款账户标签 */
-function normalizeSettleLabels(target) {
-  switch (target.settAccountType) {
-    case 'WX_CASH':
-      target.settAccountTypeName = '个人微信'
-      target.settAccountNoLabel = '个人微信号'
-      break
-    case 'ALIPAY_CASH':
-      target.settAccountTypeName = '个人支付宝'
-      target.settAccountNoLabel = '支付宝账号'
-      break
-    case 'BANK_PRIVATE':
-      target.settAccountTypeName = '对私账户'
-      target.settAccountNoLabel = '收款银行卡号'
-      break
-    case 'BANK_PUBLIC':
-      target.settAccountTypeName = '对公账户'
-      target.settAccountNoLabel = '对公账号'
-      break
-  }
+  Object.assign(detailData, {})
+  imgLabel.value = ''
 }
 
 /** 监听 open 属性变化 */
@@ -288,8 +214,9 @@ const loadDetail = async () => {
     loading.value = true
     const res = await agentApi.getById(props.recordId)
     Object.assign(detailData, res)
-    normalizeSettleLabels(detailData)
-    imgLabel.value = res.agentType === 2 ? '法人' : '联系人'
+    detailData.settAccountTypeName = getSettAccountTypeInfo(detailData.settAccountType, t).text
+    detailData.settAccountNoLabel = getSettAccountTypeInfo(detailData.settAccountType, t).label
+    imgLabel.value = getAgentTypeInfo(res.agentType, t).label
   } catch (error) {
     console.error('加载详情失败:', error)
     message.error(error?.msg || error?.message || '加载详情失败')

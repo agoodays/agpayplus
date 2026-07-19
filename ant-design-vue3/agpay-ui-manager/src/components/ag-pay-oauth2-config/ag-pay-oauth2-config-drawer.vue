@@ -1,9 +1,7 @@
 <template>
   <a-drawer
     v-model:open="localOpen"
-    :title="true ? 'Oauth2配置' : ''"
-    :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
-    :body-style="{ padding: '24px', overflowY: 'auto' }"
+    :title="'Oauth2配置'"
     width="80%"
     @close="handleClose"
   >
@@ -58,23 +56,34 @@
       <a-divider />
     </div>
     <a-tabs v-model:activeKey="currentIfCode" type="card" @change="getSavedConfigs">
-      <a-tab-pane v-for="item in tabData" :key="item.code" :tab="item.name" />
+      <a-tab-pane v-for="item in tabData" :key="item.code" :tab="item.name">        
+        <a-card style="padding: 30px">
+          <component
+            :is="currentComponent"
+            ref="currentComponentRef"
+            :config-mode="configMode"
+            :form-data="ifParams"
+            @update-if-params="handleUpdateIfParams"
+          />
+        </a-card>
+      </a-tab-pane>
     </a-tabs>
-    <a-card style="padding: 30px">
-      <component
-        :is="currentComponent"
-        ref="currentComponentRef"
-        :config-mode="configMode"
-        :form-data="ifParams"
-        @update-if-params="handleUpdateIfParams"
-      />
-      <div style="display: flex; justify-content: space-around; flex-direction: row">
-        <a-button type="primary" :loading="loading" @click="onSubmit">
-          <template #icon><CheckOutlined /></template>
-          保存
-        </a-button>
+    <template #footer>
+      <div class="drawer-footer">
+        <slot name="footer">
+          <a-space>
+            <a-button @click="handleClose">
+              <close-outlined />
+              关闭
+            </a-button>
+            <a-button type="primary" :loading="loading" @click="onSubmit">
+              <check-outlined />
+              保存
+            </a-button>
+          </a-space>
+        </slot>
       </div>
-    </a-card>
+    </template>
   </a-drawer>
 </template>
 
@@ -249,16 +258,9 @@ const onSubmit = async () => {
 </script>
 
 <style scoped>
-::v-deep(.ant-tabs-bar) {
-  border-bottom: 1px solid #f0f2f5;
-}
-::v-deep(.ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab-active) {
-  border-color: #fff;
-}
-::v-deep(.ant-collapse-borderless) {
-  background-color: #ffffff;
-}
-::v-deep(.ant-collapse-borderless > .ant-collapse-item) {
-  border-bottom: 0px solid #ffffff;
+.drawer-footer {
+  text-align: right;
+  padding: 10px 16px;
+  /* border-top: 1px solid #f0f0f0; */
 }
 </style>

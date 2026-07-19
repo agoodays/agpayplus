@@ -52,10 +52,7 @@
 
         <a-col :span="10">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="1">启用</a-radio>
-              <a-radio :value="0">停用</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
           </a-form-item>
         </a-col>
 
@@ -81,10 +78,7 @@
 
         <a-col :span="10" v-if="saveObject.userType === 3">
           <a-form-item label="是否队长" name="isTeamLeader">
-            <a-radio-group v-model:value="saveObject.isTeamLeader">
-              <a-radio :value="1">是</a-radio>
-              <a-radio :value="0">否</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.isTeamLeader" :options="flagOptions" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -97,10 +91,7 @@
         <a-row justify="space-between" type="flex" v-if="isAdd">
           <a-col :span="10">
             <a-form-item label="是否发送开通提醒" name="isNotify">
-              <a-radio-group v-model:value="saveObject.isNotify">
-                <a-radio :value="0">否</a-radio>
-                <a-radio :value="1">是</a-radio>
-              </a-radio-group>
+              <a-radio-group v-model:value="saveObject.isNotify" :options="flagOptions" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -178,6 +169,13 @@ import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
 import { Base64 } from '@/lib/encrypt'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
+import { getFlagOptions, getStateOptions } from '@/constants/common-const'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
+const flagOptions = computed(() => getFlagOptions(t))
 
 /** 组件属性定义 */
 const props = defineProps({

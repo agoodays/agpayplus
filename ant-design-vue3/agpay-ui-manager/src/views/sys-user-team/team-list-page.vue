@@ -10,7 +10,7 @@
                 label="所属系统"
                 placeholder="请选择所属系统"
                 allow-clear
-                :options="SYS_TYPE_OPTIONS"
+                :options="sysTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -81,7 +81,13 @@ import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
-import { STAT_RANGE_TYPE_ENUM, SYS_TYPE_ENUM, SYS_TYPE_OPTIONS } from '@/constants/common-const'
+import { STAT_RANGE_TYPE_ENUM, SYS_TYPE_ENUM, getSysTypeOptions } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const sysTypeOptions = computed(() => getSysTypeOptions(t))
 
 /** 权限检查 */
 const { hasPermission } = usePermission()

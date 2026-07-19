@@ -27,17 +27,11 @@
       </a-form-item>
 
       <a-form-item label="快速开始：" name="quickJump">
-        <a-radio-group v-model:value="saveObject.quickJump" :disabled="saveObject.menuType == 'PB' || !saveObject.menuUri">
-          <a-radio :value="1">是</a-radio>
-          <a-radio :value="0">否</a-radio>
-        </a-radio-group>
+        <a-radio-group v-model:value="saveObject.quickJump" :options="flagOptions" :disabled="saveObject.menuType == 'PB' || !saveObject.menuUri" />
       </a-form-item>
 
       <a-form-item label="状态：" name="state">
-        <a-radio-group v-model:value="saveObject.state">
-          <a-radio :value="1">启用</a-radio>
-          <a-radio :value="0">停用</a-radio>
-        </a-radio-group>
+        <a-radio-group v-model:value="saveObject.state" :options="flagOptions" />
       </a-form-item>
       <div>
         <!-- 匹配规则板块 -->
@@ -90,6 +84,15 @@
 import { entApi } from '@/api/business/ent/ent-api'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
+import { getFlagOptions, getSysTypeOptions, getUserTypeOptions } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const sysTypeOptions = computed(() => getSysTypeOptions(t))
+const userTypeOptions = computed(() => getUserTypeOptions(t))
+const flagOptions = computed(() => getFlagOptions(t))
 
 /**
  * 组件属性

@@ -126,12 +126,19 @@ import { ExclamationCircleOutlined, PlusOutlined, QrcodeOutlined } from '@ant-de
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgSelectInfinite, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
 import Bind from './bind.vue'
 import { message } from 'ant-design-vue'
 import { viewerApi } from '@/utils/viewer-api'
+import { getStateOptions, getStateInfo } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 const icons = { ExclamationCircleOutlined, QrcodeOutlined }
 
@@ -306,7 +313,8 @@ const unbindFunc = async (recordId) => {
  */
 const updateState = async (recordId, state) => {
   const { infoBox } = await import('@/utils/info-box')
-  const title = state === 1 ? '确认[启用]吗' : '确认[停用]吗'
+  const stateInfo = getStateInfo(state)
+  const title = `确认[${stateInfo.desc}]该二维码？`
   return new Promise((resolve, reject) => {
     infoBox.confirmDanger(title, '', async () => {
       try {

@@ -494,7 +494,7 @@
         <!--</a-tab-pane>-->
       </a-tabs>
       <div class="config-footer">
-        <a-button type="primary" :loading="loading" @click="confirm()">
+        <a-button type="primary" :loading="loading" @click="confirm">
           <template #icon><CheckCircleOutlined /></template>
           确认更新
         </a-button>

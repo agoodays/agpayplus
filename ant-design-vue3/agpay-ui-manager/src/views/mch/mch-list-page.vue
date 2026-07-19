@@ -28,10 +28,7 @@
                 label="商户状态"
                 placeholder="请选择商户状态"
                 allow-clear
-                :options="[
-                  { value: '0', label: '禁用' },
-                  { value: '1', label: '启用' }
-                ]"
+                :options="stateOptions"
               />
             </a-form-item>
           </a-col>
@@ -67,8 +64,16 @@
           </a-button>
         </template>
 
+        <!-- 商户名称列（支持点击查看详情） -->
+        <template #mchNameSlot="{ record }">
+          <b v-if="!hasPermission('ENT_MCH_INFO_VIEW')" :title="record.mchName">{{ record.mchName }}</b>
+          <a v-else :title="record.mchName" @click="detailFunc(record.mchNo)">
+            <b>{{ record.mchName }}</b>
+          </a>
+        </template>
+
         <template #stateSlot="{ record }">
-          <a-badge :status="record.state === 0 ? 'error' : 'processing'" :text="record.state === 0 ? '禁用' : '启用'" />
+          <a-badge v-bind="getStateInfo(record.state, t)" />
         </template>
 
         <template #typeSlot="{ record }">
@@ -79,11 +84,10 @@
 
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button type="link" @click="detailFunc(record)">查看</a-button>
-            <a-button type="link" @click="editFunc(record)">修改</a-button>
-            <a-button type="link" @click="appConfigFunc(record)">应用配置</a-button>
-            <a-button type="link" @click="advancedConfigFunc(record)">高级功能</a-button>
-            <a-button v-if="hasPermission('ENT_MCH_INFO_DEL')" type="link" style="color: red" @click="delFunc(record)">删除</a-button>
+            <a-button type="link" @click="editFunc(record.mchNo)" v-if="hasPermission('ENT_MCH_INFO_EDIT')">修改</a-button>
+            <a-button type="link" @click="appConfigFunc(record.mchNo)" v-if="hasPermission('ENT_MCH_APP_CONFIG')">应用配置</a-button>
+            <a-button type="link" @click="advancedConfigFunc(record.mchNo)" v-if="hasPermission('ENT_MCH_ADVANCED_CONFIG')">高级功能</a-button>
+            <a-button type="link" @click="delFunc(record.mchNo)" danger v-if="hasPermission('ENT_MCH_INFO_DEL')">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -112,10 +116,17 @@ import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
 import MchConfig from './mch-config.vue'
+import { getStateOptions, getStateInfo } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 // 路由实例
 const router = useRouter()
@@ -131,7 +142,7 @@ const mchConfigRecordId = ref(null)
  * 表格列配置
  */
 const tableColumns = [
-  { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 200, fixed: 'left', ellipsis: true },
+  { key: 'mchName', title: '商户名称', width: 200, fixed: 'left', ellipsis: true, customRender: 'mchNameSlot' },
   { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
   { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
@@ -192,41 +203,41 @@ const addFunc = () => openCreate()
 
 /**
  * 打开编辑弹窗
- * @param {Object} record - 商户记录
+ * @param {Object} recordId - 商户号
  */
-const editFunc = (record) => openEdit(record.mchNo)
+const editFunc = (recordId) => openEdit(recordId)
 
 /**
  * 打开详情抽屉
- * @param {Object} record - 商户记录
+ * @param {Object} recordId - 商户号
  */
-const detailFunc = (record) => openDetail(record.mchNo)
+const detailFunc = (recordId) => openDetail(recordId)
 
 /**
  * 跳转应用配置页面
- * @param {Object} record - 商户记录
+ * @param {Object} recordId - 商户号
  */
-const appConfigFunc = (record) => {
+const appConfigFunc = (recordId) => {
   router.push({
     path: '/apps',
-    query: { mchNo: record.mchNo }
+    query: { mchNo: recordId }
   })
 }
 
 /**
  * 打开高级配置抽屉
- * @param {Object} record - 商户记录
+ * @param {Object} recordId - 商户号
  */
-const advancedConfigFunc = (record) => {
-  mchConfigRecordId.value = record.mchNo
+const advancedConfigFunc = (recordId) => {
+  mchConfigRecordId.value = recordId
   mchConfigOpen.value = true
 }
 
 /**
  * 确认删除
- * @param {Object} record - 商户记录
+ * @param {Object} recordId - 商户号
  */
-const delFunc = (record) => confirmDelete(record.mchNo)
+const delFunc = (recordId) => confirmDelete(recordId)
 
 /**
  * 弹窗操作成功回调

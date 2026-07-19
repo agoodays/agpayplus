@@ -118,10 +118,7 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="1">启用</a-radio>
-              <a-radio :value="0">停用</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
@@ -198,6 +195,12 @@ import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { onMounted, reactive, ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
+import { getStateOptions } from '@/constants/common-const'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 const icons = { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined }
 

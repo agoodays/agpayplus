@@ -27,9 +27,7 @@
         <a-input v-model:value="saveObject.receiverGroupName" />
       </a-form-item>
       <a-form-item label="自动分账组" name="autoDivisionFlag">
-        <a-radio-group v-model:value="saveObject.autoDivisionFlag">
-          <a-radio :value="1">是</a-radio> <a-radio :value="0">否</a-radio>
-        </a-radio-group>
+        <a-radio-group v-model:value="saveObject.autoDivisionFlag" :options="flagOptions" />
         <div class="agpay-tip-text">
           <p style="line-height: 20px">
             1. 自动分账组: 当订单分账模式为自动分账，该组下的所有正常分账状态的账号将作为订单分账对象
@@ -50,6 +48,12 @@ import { divisionGroupApi } from '@/api/business/division/division-group-api'
 import { AgSelectInfinite } from '@/components'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
+import { getFlagOptions } from '@/constants/common-const'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const flagOptions = computed(() => getFlagOptions(t))
 
 defineOptions({ components: { AgSelectInfinite } })
 

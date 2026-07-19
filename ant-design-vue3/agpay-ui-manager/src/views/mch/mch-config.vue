@@ -13,10 +13,7 @@
             <a-row>
               <a-col :span="8" :offset="1" :key="config" v-for="(item, config) in configData">
                 <a-form-item :label="item.configName">
-                  <a-radio-group v-model:value="item.configVal">
-                    <a-radio value="1">启用</a-radio>
-                    <a-radio value="0">禁用</a-radio>
-                  </a-radio-group>
+                  <a-radio-group v-model:value="item.configVal" :options="stateOptions" />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -203,6 +200,13 @@ import { mchApi } from '@/api/business/mch/mch-api'
 import { InfoCircleOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { ref, computed, watch } from 'vue'
+import { getStateOptions } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
 
 const props = defineProps({
   open: {

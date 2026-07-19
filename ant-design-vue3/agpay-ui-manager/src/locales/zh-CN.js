@@ -113,7 +113,73 @@ export default {
     operationFailed: '操作失败',
     uploadSuccess: '上传成功',
     uploadFailed: '上传失败',
-    loadDataFailed: '加载数据失败'
+    loadDataFailed: '加载数据失败',
+    yes: "是",
+    no: "否",
+    state: {
+      disabled: "禁用",
+      enabled: "启用"
+    },
+    gender: {
+      unknown: "未知",
+      man: "男",
+      woman: "女"
+    },
+    userType: {
+      employee: "员工"
+    },
+    dataType: {
+      normal: "普通",
+      encrypt: "加密"
+    },
+    statRange: {
+      year: "年",
+      quarter: "季度",
+      month: "月",
+      week: "周"
+    },
+    sysType: {
+      mgr: "运营平台",
+      agent: "代理商系统",
+      mch: "商户系统"
+    },
+    agentType: {
+      individual: "个人",
+      enterprise: "企业"
+    },
+    label: {
+      legalPerson: "法人",
+      contactPerson: "联系人"
+    },
+    settAccount: {
+      wx: "个人微信",
+      wxNo: "个人微信号",
+      alipay: "个人支付宝",
+      alipayNo: "支付宝账号",
+      private: "对私账户",
+      privateNo: "收款银行卡号",
+      public: "对公账户",
+      publicNo: "对公账号"
+    },
+    mchType: {
+      normal: "普通商户",
+      special: "特约商户"
+    },
+    mchLevel: {
+      m0: "M0",
+      m0Tips: "简单模式（页面简洁，仅基础收款功能）",
+      m1: "M1",
+      m1Tips: "高级模式（支持API调用，支持配置应用及分账、转账功能）"
+    },
+    refundMode: {
+      plat: "平台退款",
+      api: "接口退款"
+    },
+    cashOutFee: {
+      fix: "单笔固定",
+      single: "单笔费率",
+      fixAndRate: "固定+费率"
+    }
   },
   main: {
     welcomeDesc: '欢迎使用 AgPay 运营管理平台',
@@ -277,5 +343,8 @@ export default {
     downloadNotConfigured: '未配置下载功能',
     exportTriggered: '导出任务已触发',
     exportFailed: '导出失败'
+  },
+  pagination: {
+    total: "共 {total} 条"
   }
 }

@@ -77,18 +77,12 @@
         </a-col>
         <a-col :span="10">
           <a-form-item label="是否允许发展下级" name="addAgentFlag">
-            <a-radio-group v-model:value="saveObject.addAgentFlag">
-              <a-radio :value="1">是</a-radio>
-              <a-radio :value="0">否</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.addAgentFlag" :options="flagOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="1">启用</a-radio>
-              <a-radio :value="0">禁用</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="24">
@@ -108,10 +102,7 @@
         <a-row :gutter="16">
           <a-col :span="10">
             <a-form-item label="是否发送开通提醒" name="isNotify">
-              <a-radio-group v-model:value="saveObject.isNotify">
-                <a-radio :value="0">否</a-radio>
-                <a-radio :value="1">是</a-radio>
-              </a-radio-group>
+              <a-radio-group v-model:value="saveObject.isNotify" :options="flagOptions" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -188,11 +179,12 @@
       <a-row :gutter="16">
         <a-col :span="10">
           <a-form-item label="代理商类型" name="agentType">
-            <a-select v-model:value="saveObject.agentType" placeholder="请选择代理商类型" @change="agentTypeChange">
-              <a-select-option v-for="d in agentTypeList" :key="d.agentType" :value="d.agentType">
-                {{ d.agentTypeName }}
-              </a-select-option>
-            </a-select>
+            <ag-select
+              v-model="saveObject.agentType"
+              placeholder="请选择代理商类型"
+              :options="agentTypeOptions"
+              @change="agentTypeChange"
+            />
           </a-form-item>
         </a-col>
         <a-col :span="10">
@@ -270,23 +262,23 @@
         <a-col :span="24">
           <a-form-item class="cashout-fee-type" label="手续费计算模式：" name="feeType">
             <a-radio-group v-model:value="cashoutFeeRule.feeType">
-              <a-radio value="FIX">
-                单笔固定
-                <div v-if="cashoutFeeRule.feeType === 'FIX'" style="display: contents">
+              <a-radio :value="CASH_OUT_FEE_TYPE_ENUM.FIX.value">
+                {{ t(CASH_OUT_FEE_TYPE_ENUM.FIX.descKey) }}
+                <div v-if="cashoutFeeRule.feeType === CASH_OUT_FEE_TYPE_ENUM.FIX.value" style="display: contents">
                   <a-input-number v-model:value="cashoutFeeRule.fixFee" />
                   元
                 </div>
               </a-radio>
-              <a-radio value="SINGLE">
-                单笔费率
-                <div v-if="cashoutFeeRule.feeType === 'SINGLE'" style="display: contents">
+              <a-radio :value="CASH_OUT_FEE_TYPE_ENUM.SINGLE.value">
+                {{ t(CASH_OUT_FEE_TYPE_ENUM.SINGLE.descKey) }}
+                <div v-if="cashoutFeeRule.feeType === CASH_OUT_FEE_TYPE_ENUM.SINGLE.value" style="display: contents">
                   <a-input-number v-model:value="cashoutFeeRule.feeRate" />
                   %
                 </div>
               </a-radio>
-              <a-radio value="FIXANDRATE">
-                固定+费率
-                <div v-if="cashoutFeeRule.feeType === 'FIXANDRATE'" style="display: contents">
+              <a-radio :value="CASH_OUT_FEE_TYPE_ENUM.FIXANDRATE.value">
+                {{ t(CASH_OUT_FEE_TYPE_ENUM.FIXANDRATE.descKey) }}
+                <div v-if="cashoutFeeRule.feeType === CASH_OUT_FEE_TYPE_ENUM.FIXANDRATE.value" style="display: contents">
                   <a-input-number v-model:value="cashoutFeeRule.fixFee" />
                   元 +
                   <a-input-number v-model:value="cashoutFeeRule.feeRate" />
@@ -400,7 +392,7 @@
 import { agentApi } from '@/api/business/agent/agent-api'
 import { isvApi } from '@/api/business/isv/isv-api'
 import { basicApi } from '@/api/system/basic-api'
-import { AgDrawer, AgSelectInfinite, AgUpload, AgInput, AgTextarea } from '@/components'
+import { AgDrawer, AgSelect, AgSelectInfinite, AgUpload, AgInput, AgTextarea } from '@/components'
 import { upload } from '@/lib/ag-axios'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
@@ -411,9 +403,41 @@ import {
   FLAG_ENUM,
   AGENT_TYPE_ENUM,
   SETT_ACCOUNT_TYPE_ENUM,
-  SETT_ACCOUNT_TYPE_OPTIONS,
-  CASH_OUT_FEE_TYPE_ENUM
+  CASH_OUT_FEE_TYPE_ENUM,
+  getStateOptions,
+  getFlagOptions,
+  getAgentTypeOptions,
+  getSettAccountTypeOptions,
+  getAgentTypeInfo,
+  getSettAccountTypeInfo
 } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+// 获取翻译后的下拉选项
+const stateOptions = computed(() => getStateOptions(t))
+const flagOptions = computed(() => getFlagOptions(t))
+
+/** 代理商类型列表 */
+const agentTypeOptions = computed(() => getAgentTypeOptions(t))
+
+/**
+ * 收款账户类型列表（响应式）
+ * 1. 当语言切换时，t() 变化，列表自动更新。
+ * 2. 当代理商类型切换时，saveObject.value.agentType 变化，列表自动更新。
+ */
+const settAccountTypeOptions = computed(() => {
+  // 1. 获取当前语言下的完整选项列表
+  const allOptions = getSettAccountTypeOptions(t)
+
+  // 2. 核心判断：如果是企业，显示全部；如果不是企业，过滤掉对公账户
+  const isEnterprise = saveObject.value.agentType === AGENT_TYPE_ENUM.ENTERPRISE.value
+
+  return isEnterprise
+    ? allOptions
+    : allOptions.filter(item => item.value !== 'BANK_PUBLIC')
+})
 
 /** 图标集合 */
 const icons = { LoadingOutlined, UploadOutlined }
@@ -457,18 +481,6 @@ const passwordRules = reactive({
 
 /** 上传地址 */
 const action = upload.form
-
-/** 代理商类型列表 */
-const agentTypeList = [
-  { agentType: AGENT_TYPE_ENUM.INDIVIDUAL.value, agentTypeName: AGENT_TYPE_ENUM.INDIVIDUAL.desc },
-  { agentType: AGENT_TYPE_ENUM.ENTERPRISE.value, agentTypeName: AGENT_TYPE_ENUM.ENTERPRISE.desc }
-]
-
-/** 基础收款账户类型列表 */
-const baseSettAccountTypeList = SETT_ACCOUNT_TYPE_OPTIONS.filter(item => item.value !== 'BANK_PUBLIC')
-
-/** 收款账户类型列表（响应式，根据代理商类型动态调整） */
-const settAccountTypeOptions = ref([...baseSettAccountTypeList])
 
 /** 系统密码重置状态 */
 const sysPassword = reactive({
@@ -616,33 +628,12 @@ function resetPassEmpty() {
   saveObject.value.confirmPwd = ''
 }
 
-/** 根据代理商类型规范化收款账户类型列表 */
-function normalizeSettAccountTypeList(agentType) {
-  const bankPublicOption = SETT_ACCOUNT_TYPE_OPTIONS.find(item => item.value === 'BANK_PUBLIC')
-  const hasPublic = settAccountTypeOptions.value.some((item) => item.value === 'BANK_PUBLIC')
-  if (agentType === AGENT_TYPE_ENUM.ENTERPRISE.value && !hasPublic && bankPublicOption) {
-    settAccountTypeOptions.value = [...settAccountTypeOptions.value, bankPublicOption]
-  }
-  if (agentType !== AGENT_TYPE_ENUM.ENTERPRISE.value && hasPublic) {
-    settAccountTypeOptions.value = settAccountTypeOptions.value.filter((item) => item.value !== 'BANK_PUBLIC')
-  }
-}
-
-/** 设置收款账号标签 */
-function setSettAccountNoLabel(value) {
-  settAccountNoLabel.value = SETT_ACCOUNT_TYPE_ENUM[value]?.noLabel || SETT_ACCOUNT_TYPE_ENUM.WX_CASH.noLabel
-}
-
 /** 初始化表单 */
 async function initForm(currentRecordId) {
   isAdd.value = !currentRecordId
   saveObject.value = getDefaultSaveObject()
   resetSysPasswordState()
   resetPassEmpty()
-  imgLabel.value = '联系人'
-  settAccountTypeList.value = [...baseSettAccountTypeList]
-  setSettAccountNoLabel(saveObject.value.settAccountType)
-
   if (infoForm.value) {
     infoForm.value.resetFields()
   }
@@ -651,14 +642,13 @@ async function initForm(currentRecordId) {
     try {
       const res = await agentApi.getById(currentRecordId)
       saveObject.value = { ...res }
-      normalizeSettAccountTypeList(saveObject.value.agentType)
-      imgLabel.value = saveObject.value.agentType === 2 ? '法人' : '联系人'
-      setSettAccountNoLabel(saveObject.value.settAccountType)
     } catch (error) {
       console.error('加载代理商信息失败:', error)
       message.error(error.msg || '加载代理商信息失败')
     }
   }
+  settAccountNoLabel.value = getSettAccountTypeInfo(saveObject.value.settAccountType, t).label
+  imgLabel.value = getAgentTypeInfo(saveObject.value.agentType, t).label
 }
 
 /** 监听 open 属性变化 */
@@ -797,22 +787,21 @@ function pidChange(val, selected) {
 /** 代理商类型变更处理 */
 function agentTypeChange() {
   if (saveObject.value.agentType === AGENT_TYPE_ENUM.ENTERPRISE.value) {
-    imgLabel.value = '法人'
+    imgLabel.value = t('common.label.legalPerson')
   } else {
-    imgLabel.value = '联系人'
+    imgLabel.value = t('common.label.contactPerson')
   }
 
-  normalizeSettAccountTypeList(saveObject.value.agentType)
-
-  if (saveObject.value.agentType === AGENT_TYPE_ENUM.INDIVIDUAL.value && saveObject.value.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value) {
+  if (saveObject.value.agentType === AGENT_TYPE_ENUM.INDIVIDUAL.value && 
+    saveObject.value.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value) {
     saveObject.value.settAccountType = SETT_ACCOUNT_TYPE_ENUM.WX_CASH.value
-    setSettAccountNoLabel(SETT_ACCOUNT_TYPE_ENUM.WX_CASH.value)
+    settAccountNoLabel.value = getSettAccountTypeInfo(saveObject.value.settAccountType, t).label
   }
 }
 
 /** 收款账户类型变更处理 */
 function settAccountTypeChange(value) {
-  setSettAccountNoLabel(value)
+  settAccountNoLabel.value = getSettAccountTypeInfo(value, t).label
 }
 
 /** 上传成功处理 */

@@ -55,16 +55,13 @@
               <span>商户级别</span>
               <a-tooltip>
                 <template #title>
-                  <div>{{ MCH_LEVEL_ENUM.M0.desc }}商户：{{ MCH_LEVEL_ENUM.M0.tips }}</div>
-                  <div>{{ MCH_LEVEL_ENUM.M1.desc }}商户：{{ MCH_LEVEL_ENUM.M1.tips }}</div>
+                  <div>{{ t(MCH_LEVEL_ENUM.M0.descKey) }}商户：{{ t(MCH_LEVEL_ENUM.M0.tipsKey) }}</div>
+                  <div>{{ t(MCH_LEVEL_ENUM.M1.descKey) }}商户：{{ t(MCH_LEVEL_ENUM.M1.tipsKey) }}</div>
                 </template>
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
-            <a-radio-group v-model:value="saveObject.mchLevel">
-              <a-radio :value="MCH_LEVEL_ENUM.M0.value">{{ MCH_LEVEL_ENUM.M0.desc }}</a-radio>
-              <a-radio :value="MCH_LEVEL_ENUM.M1.value">{{ MCH_LEVEL_ENUM.M1.desc }}</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.mchLevel" :options="mchLevelOptions" />
           </a-form-item>
         </a-col>
 
@@ -76,10 +73,7 @@
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
-            <a-checkbox-group v-model:value="saveObject.refundMode">
-              <a-checkbox :value="REFUND_MODE_ENUM.PLAT.value">{{ REFUND_MODE_ENUM.PLAT.desc }}</a-checkbox>
-              <a-checkbox :value="REFUND_MODE_ENUM.API.value">{{ REFUND_MODE_ENUM.API.desc }}</a-checkbox>
-            </a-checkbox-group>
+            <a-checkbox-group v-model:value="saveObject.refundMode" :options="refundModeOptions" />
           </a-form-item>
         </a-col>
 
@@ -89,25 +83,19 @@
               <span>商户类型</span>
               <a-tooltip>
                 <template #title>
-                  <div>{{ MCH_TYPE_ENUM.NORMAL.desc }}：商户自行申请入驻，单独调接口</div>
-                  <div>{{ MCH_TYPE_ENUM.SPECIAL.desc }}：由服务商协助完成入驻，走服务商接口</div>
+                  <div>{{ t(MCH_TYPE_ENUM.NORMAL.descKey) }}：商户自行申请入驻，单独调接口</div>
+                  <div>{{ t(MCH_TYPE_ENUM.SPECIAL.descKey) }}：由服务商协助完成入驻，走服务商接口</div>
                 </template>
                 <question-circle-outlined style="margin-left: 4px" />
               </a-tooltip>
             </template>
-            <a-radio-group v-model:value="saveObject.type" :disabled="!isAdd">
-              <a-radio :value="MCH_TYPE_ENUM.NORMAL.value">{{ MCH_TYPE_ENUM.NORMAL.desc }}</a-radio>
-              <a-radio :value="MCH_TYPE_ENUM.SPECIAL.value">{{ MCH_TYPE_ENUM.SPECIAL.desc }}</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.type" :disabled="!isAdd" :options="mchTypeOptions" />
           </a-form-item>
         </a-col>
 
         <a-col :span="10">
           <a-form-item label="状态" name="state">
-            <a-radio-group v-model:value="saveObject.state">
-              <a-radio :value="STATE_ENUM.ENABLED.value">{{ STATE_ENUM.ENABLED.desc }}</a-radio>
-              <a-radio :value="STATE_ENUM.DISABLED.value">{{ STATE_ENUM.DISABLED.desc }}</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
           </a-form-item>
         </a-col>
 
@@ -161,10 +149,7 @@
       <a-row v-if="isAdd" :gutter="16">
         <a-col :span="10">
           <a-form-item label="是否发送开通提醒" name="isNotify">
-            <a-radio-group v-model:value="saveObject.isNotify">
-              <a-radio :value="FLAG_ENUM.NO.value">{{ FLAG_ENUM.NO.desc }}</a-radio>
-              <a-radio :value="FLAG_ENUM.YES.value">{{ FLAG_ENUM.YES.desc }}</a-radio>
-            </a-radio-group>
+            <a-radio-group v-model:value="saveObject.isNotify" :options="flagOptions" />
           </a-form-item>
         </a-col>
 
@@ -234,15 +219,32 @@
  */
 import { AgDrawer, AgInput, AgTextarea, AgSelectInfinite } from '@/components'
 import { mchApi } from '@/api/business/mch/mch-api'
-import { loginApi } from '@/api/system/login-api'
+import { basicApi } from '@/api/system/basic-api'
 import { CheckOutlined, CloseOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
-import { nextTick, reactive, ref, watch } from 'vue'
+import { nextTick, reactive, ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { STATE_ENUM, FLAG_ENUM, MCH_TYPE_ENUM, MCH_LEVEL_ENUM, REFUND_MODE_ENUM } from '@/constants/common-const'
+import { 
+  STATE_ENUM,
+  FLAG_ENUM,
+  MCH_TYPE_ENUM,
+  MCH_LEVEL_ENUM,
+  REFUND_MODE_ENUM,
+  getFlagOptions,
+  getStateOptions,
+  getMchTypeOptions,
+  getMchLevelOptions,
+  getRefundModeOptions
+} from '@/constants/common-const'
 
 const { t } = useI18n()
+
+const flagOptions = computed(() => getFlagOptions(t))
+const stateOptions = computed(() => getStateOptions(t))
+const mchTypeOptions = computed(() => getMchTypeOptions(t))
+const mchLevelOptions = computed(() => getMchLevelOptions(t))
+const refundModeOptions = computed(() => getRefundModeOptions(t))
 
 // Props & Emits
 const props = defineProps({
@@ -420,7 +422,7 @@ const initForm = async () => {
  */
 const fetchPasswordRules = async () => {
   try {
-    const res = await loginApi.getPwdRulesRegexp()
+    const res = await basicApi.getPwdRulesRegexp()
     if (res) {
       passwordRules.regexpRules = res.regexpRules
       passwordRules.errTips = res.errTips

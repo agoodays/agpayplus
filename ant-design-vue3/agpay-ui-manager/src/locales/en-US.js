@@ -113,7 +113,73 @@ export default {
     operationFailed: 'Operation failed',
     uploadSuccess: 'Uploaded successfully',
     uploadFailed: 'Upload failed',
-    loadDataFailed: 'Failed to load data'
+    loadDataFailed: 'Failed to load data',    
+    yes: "Yes",
+    no: "No",
+    state: {
+      disabled: "Disabled",
+      enabled: "Enabled"
+    },
+    gender: {
+      unknown: "Unknown",
+      man: "Male",
+      woman: "Female"
+    },
+    userType: {
+      employee: "Employee"
+    },
+    dataType: {
+      normal: "Normal",
+      encrypt: "Encrypted"
+    },
+    statRange: {
+      year: "Year",
+      quarter: "Quarter",
+      month: "Month",
+      week: "Week"
+    },
+    sysType: {
+      mgr: "Operations Platform",
+      agent: "Agent System",
+      mch: "Merchant System"
+    },
+    agentType: {
+      individual: "Individual",
+      enterprise: "Enterprise"
+    },
+    label: {
+      legalPerson: "Legal Person",
+      contactPerson: "Contact Person"
+    },
+    settAccount: {
+      wx: "WeChat Pay",
+      wxNo: "WeChat Pay Account",
+      alipay: "Alipay",
+      alipayNo: "Alipay Account",
+      private: "Private Account",
+      privateNo: "Private Account Number",
+      public: "Public Account",
+      publicNo: "Public Account Number"
+    },
+    mchType: {
+      normal: "Normal Merchant",
+      special: "Special Merchant"
+    },
+    mchLevel: {
+      m0: "M0",
+      m0Tips: "Simple Mode",
+      m1: "M1",
+      m1Tips: "Advanced Mode (Supports API Calls, Application Configuration, and Settlement)"
+    },
+    refundMode: {
+      plat: "Platform Refund",
+      api: "API Refund"
+    },
+    cashOutFee: {
+      fix: "Fixed Fee (Per Transaction)",
+      single: "Single Fee (Per Transaction)",
+      fixAndRate: "Fixed Fee + Rate"
+    }
   },
   main: {
     welcomeDesc: 'Welcome to AgPay Operations Management Platform',

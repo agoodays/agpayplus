@@ -25,8 +25,8 @@
         </a-descriptions-item>
 
         <a-descriptions-item label="商户类型">
-          <a-tag :color="detailData.type === MCH_TYPE_ENUM.NORMAL.value ? MCH_TYPE_ENUM.NORMAL.color : MCH_TYPE_ENUM.SPECIAL.color">
-            {{ detailData.type === MCH_TYPE_ENUM.NORMAL.value ? MCH_TYPE_ENUM.NORMAL.desc : MCH_TYPE_ENUM.SPECIAL.desc }}
+          <a-tag v-bind="getMchTypeInfo(detailData.type, t)">
+            {{ getMchTypeInfo(detailData.type, t).desc }}
           </a-tag>
         </a-descriptions-item>
 
@@ -63,15 +63,11 @@
         </a-descriptions-item>
 
         <a-descriptions-item label="退款方式">
-          <a-tag v-if="detailData.refundMode?.includes(REFUND_MODE_ENUM.PLAT.value)" color="blue"> {{ REFUND_MODE_ENUM.PLAT.desc }} </a-tag>
-          <a-tag v-if="detailData.refundMode?.includes(REFUND_MODE_ENUM.API.value)" color="green"> {{ REFUND_MODE_ENUM.API.desc }} </a-tag>
+          <a-tag v-for="mode in detailData.refundMode" v-bind="getRefundModeInfo(mode, t)"> {{ getRefundModeInfo(mode, t).text }} </a-tag>
         </a-descriptions-item>
 
         <a-descriptions-item label="状态">
-          <a-badge
-            :status="detailData.state === STATE_ENUM.DISABLED.value ? 'error' : 'processing'"
-            :text="detailData.state === STATE_ENUM.DISABLED.value ? STATE_ENUM.DISABLED.desc : STATE_ENUM.ENABLED.desc"
-          />
+          <a-badge v-bind="getStateInfo(detailData.state, t)" />
         </a-descriptions-item>
 
         <a-descriptions-item label="创建时间" :span="2">
@@ -95,7 +91,16 @@ import { AgDrawer } from '@/components'
 import { mchApi } from '@/api/business/mch/mch-api'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
-import { STATE_ENUM, MCH_TYPE_ENUM, REFUND_MODE_ENUM } from '@/constants/common-const'
+import {
+  MCH_TYPE_ENUM,
+  REFUND_MODE_ENUM,
+  getMchTypeInfo,
+  getRefundModeInfo,
+  getStateInfo
+} from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // Props & Emits
 const props = defineProps({
@@ -128,7 +133,7 @@ const detailData = reactive({
   contactName: '',
   contactTel: '',
   contactEmail: '',
-  refundMode: '',
+  refundMode: [],
   state: 1,
   createdAt: '',
   remark: ''
