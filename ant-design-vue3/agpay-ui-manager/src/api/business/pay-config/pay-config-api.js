@@ -46,17 +46,17 @@ export const payConfigApi = {
   queryPayConfigIfCodes(params) {
     return req.list(`${API_URL_PAYCONFIGS_LIST}/ifCodes`, params)
   },
-  getPayConfigById(infoId, ifCode) {
-    return req.get(`${API_URL_PAYCONFIGS_LIST}`, { infoId, infoType: '', ifCode })
+  getPayInterfaceSavedConfigs(configMode, infoId, ifCode) {
+    return req.get(`${API_URL_PAYCONFIGS_LIST}/interfaceSavedConfigs`, { configMode, infoId, ifCode })
   },
-  addPayConfig(data) {
-    return req.add(API_URL_PAYCONFIGS_LIST, data)
+  saveOrUpdatePayInterfaceConfig(data) {
+    return req.add(`${API_URL_PAYCONFIGS_LIST}/interfaceParams`, data)
   },
   queryMchPayPassagePage(params) {
     return req.list(API_URL_MCH_PAYPASSAGE_LIST, params)
   },
   getAvailablePayInterfaceList(mchNo, wayCode, params) {
-    return req.get(`/api/mch/payPassages/availablePayInterface/${mchNo}/${wayCode}`, params)
+    return req.get(`${API_URL_MCH_PAYPASSAGE_LIST}/availablePayInterface/${mchNo}/${wayCode}`, params)
   },
   updateMchPassageState(appId, wayCode, ifCode, state) {
     const params = { appId, wayCode, ifCode, state }

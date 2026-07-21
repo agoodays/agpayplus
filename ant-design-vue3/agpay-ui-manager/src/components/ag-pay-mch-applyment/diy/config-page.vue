@@ -128,12 +128,13 @@ const getConfig = async () => {
 
   loading.value = true
   try {
-    const res = await payConfigApi.getPayConfigById(props.infoId, props.ifDefine.ifCode)
+    const res = await payConfigApi.getPayInterfaceSavedConfigs(props.configMode, props.infoId, props.ifDefine.ifCode)
     showCard.value = true
-    formItems.value = res.configItems
-    formItems.value.forEach((item) => {
-      saveObject[item.key] = item.value
-    })
+    if (res) {
+      Object.assign(saveObject, res)
+      saveObject.oauth2InfoId = res.oauth2InfoId || ''
+      saveObject.cashoutParams = typeof res.cashoutParams === 'string' ? JSON.parse(res.cashoutParams || '{}') : res.cashoutParams || {}
+    }
   } catch (error) {
     console.error('获取支付配置失败:', error)
   } finally {
@@ -159,16 +160,22 @@ const onSubmit = async () => {
   try {
     await infoForm.value.validate()
     loading.value = true
-    const params = {
-      infoId: props.infoId,
-      infoType: props.infoType,
-      ifCode: props.ifDefine.ifCode,
-      configItems: formItems.value.map((item) => ({
-        key: item.key,
-        value: saveObject[item.key]
-      }))
+    const reqParams = {
+      infoId: saveObject.infoId || props.infoId,
+      infoType: saveObject.infoType || props.infoType,
+      ifCode: saveObject.ifCode || props.ifDefine.ifCode,
+      ifRate: saveObject.ifRate,
+      state: saveObject.state,
+      settHoldDay: saveObject.settHoldDay,
+      isOpenApplyment: saveObject.isOpenApplyment,
+      isOpenCashout: saveObject.isOpenCashout,
+      cashoutParams: typeof saveObject.cashoutParams === 'string' ? saveObject.cashoutParams : JSON.stringify(saveObject.cashoutParams),
+      isOpenCheckBill: saveObject.isOpenCheckBill,
+      ignoreCheckBillMchNos: saveObject.ignoreCheckBillMchNos,
+      remark: saveObject.remark,
+      ifParams: '{}'
     }
-    await payConfigApi.addPayConfig(params)
+    await payConfigApi.saveOrUpdatePayInterfaceConfig(reqParams)
     message.success('保存成功')
     props.callbackFunc()
   } catch (error) {

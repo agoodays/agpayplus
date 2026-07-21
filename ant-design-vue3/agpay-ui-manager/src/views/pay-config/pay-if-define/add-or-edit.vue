@@ -193,9 +193,10 @@
 import { AgDrawer, AgUpload } from '@/components'
 import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
-import { onMounted, reactive, ref, watch } from 'vue'
+import { onMounted, reactive, ref, watch, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { getStateOptions } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

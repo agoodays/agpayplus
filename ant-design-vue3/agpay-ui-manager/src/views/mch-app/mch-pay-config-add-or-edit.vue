@@ -76,12 +76,13 @@
  * 功能：配置商户支付接口参数
  */
 import { AgDrawer, AgUpload } from '@/components'
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { message } from 'ant-design-vue'
 import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { upload } from '@/lib/ag-axios'
 import { getStateOptions } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

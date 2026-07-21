@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, shallowRef } from 'vue'
 
 const props = defineProps({
   infoId: {
@@ -69,7 +69,7 @@ const title = ref('')
 const currentTabVal = ref('')
 const currentIfCode = ref(null)
 const tabData = ref([])
-const configComponent = ref(null)
+const configComponent = shallowRef(null)
 
 // Refs
 const configComponentRef = ref(null)

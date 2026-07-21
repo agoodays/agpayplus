@@ -201,7 +201,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, shallowRef } from 'vue'
 import { message } from 'ant-design-vue'
 import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
 const icons = { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined }
@@ -240,8 +240,8 @@ const topTabData = ref([
 ])
 const currentIfCode = ref(null)
 const selectIfCode = ref(null)
-const configComponent = ref(null)
-const appConfigComponent = ref(null)
+const configComponent = shallowRef(null)
+const appConfigComponent = shallowRef(null)
 const ifCodeList = ref([])
 const diyList = ref([])
 const ifCodeListSearchData = ref({})
@@ -505,13 +505,25 @@ const tabSelected = (code) => {
   }
 }
 
-const onSubmit = () => {}
+/**
+ * 统一提交保存所有标签页数据
+ * @returns {Promise<void>}
+ */
+const onSubmit = async () => {
+  if (paramsAndRateTabVal.value === 'paramsTab' && configComponentRef.value) {
+    await configComponentRef.value.onSubmit()
+  }
+  if (rateConfigComponentRef.value) {
+    await rateConfigComponentRef.value.onSubmit()
+  }
+}
 
 // Expose methods
 defineExpose({
   getPayConfig,
   reset,
-  refIfCodeList
+  refIfCodeList,
+  onSubmit
 })
 </script>
 
@@ -540,9 +552,9 @@ defineExpose({
 }
 
 .btn-center {
-  border-top: 1px solid rgb(233, 233, 233);
+  border-top: 1px solid var(--border-color);
   padding: 10px 16px;
-  background: rgb(255, 255, 255);
+  background: var(--base-bg-color);
   text-align: center;
 }
 
@@ -610,8 +622,8 @@ defineExpose({
   width: 100%;
   height: 90px;
   border-radius: 5px;
-  border: 1px solid #dedede;
-  background: #fff;
+  border: 1px solid var(--border-color);
+  background: var(--base-bg-color);
   cursor: pointer;
 }
 
@@ -642,7 +654,7 @@ defineExpose({
   width: 12px;
   height: 12px;
   background-color: rgb(217, 217, 217);
-  border: 3px solid #fff;
+  border: 3px solid var(--base-bg-color);
   border-radius: 50%;
 }
 
@@ -653,12 +665,12 @@ defineExpose({
 
 .pay-content .pay-info .pay-code {
   font-size: 13px;
-  color: #1a1919;
+  color: var(--text-color);
 }
 
 .pay-selected {
-  border: 2px solid #1a79ff;
-  background: rgba(25, 121, 255, 0.05);
+  border: 2px solid var(--primary-color);
+  background: var(--primary-color-weak);
 }
 
 .pay-selected:after {
@@ -671,8 +683,8 @@ defineExpose({
   align-items: center;
   width: 30px;
   height: 30px;
-  background-color: #1a79ff;
-  color: #fff;
+  background-color: var(--primary-color);
+  color: var(--text-on-primary);
   font-size: 18px;
   font-weight: 700;
   border-radius: 0 0 0 5px;
@@ -691,7 +703,7 @@ defineExpose({
   top: 50%;
   width: 100%;
   height: 1px;
-  background-color: #d9d9d9;
+  background-color: var(--border-color);
 }
 
 .tab-wrapper .open-close {
@@ -703,8 +715,8 @@ defineExpose({
   -ms-user-select: none;
   user-select: none;
   border-radius: 5px;
-  background: #fff;
-  border: 1px solid #e8e8e8;
+  background: var(--base-bg-color);
+  border: 1px solid var(--border-color);
   border-top: none;
   position: absolute;
   top: 50%;
@@ -726,7 +738,7 @@ defineExpose({
   z-index: 10;
   width: 10px;
   height: 18px;
-  background-color: #fff;
+  background-color: var(--base-bg-color);
 }
 
 .tab-wrapper .open-close:after {
@@ -749,10 +761,10 @@ defineExpose({
   padding: 0 5px;
   height: 50px;
   border-radius: 5px;
-  background-color: #f7f7f7;
-  border: 1px solid #d9d9d9;
+  background-color: var(--layout-surface);
+  border: 1px solid var(--border-color);
   font-size: 14px;
-  color: gray;
+  color: var(--text-color-weak);
 }
 
 .tab-content .tab-item {
@@ -766,9 +778,9 @@ defineExpose({
 }
 
 .tab-selected {
-  color: #000;
-  box-shadow: 0 1px 4px #0000001a;
-  background-color: #fff;
+  color: var(--text-color);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--base-bg-color);
 }
 
 .content-box {

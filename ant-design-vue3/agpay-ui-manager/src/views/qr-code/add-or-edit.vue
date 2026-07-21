@@ -131,9 +131,10 @@ import { AgDrawer } from '@/components'
 import { QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { message } from 'ant-design-vue'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { viewerApi } from '@/utils/viewer-api'
 import { getStateOptions } from '@/constants/common-const'
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

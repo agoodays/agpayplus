@@ -1,192 +1,368 @@
 <template>
   <div class="drawer">
-    <a-alert type="info" style="margin-bottom: 20px" show-icon>
+    <a-alert type="info" style="margin-bottom: 20px;" show-icon>
       <template #message>
-        <span style="color: #1890ff"
-          >注意：代理商费率不得低于服务商费率，下及代理商费率不得低于上级代理商费率，商家费率不得低于所属代理商费率</span
-        >
+        <span style="color: #1890ff">注意：代理商费率不得低于服务商费率，下及代理商费率不得低于上级代理商费率，商家费率不得低于所属代理商费率</span>
       </template>
     </a-alert>
     <div>
-      <div
-        v-for="(mergeFeeItem, mergeFeeKey) in mergeFeeList"
-        v-if="mergeFeeItem.selectedWayCodeList.length > 0"
-        :key="mergeFeeKey"
-      >
-        <div class="rate-header">
-          <div class="rate-title">{{ mergeFeeItem.name }}产品费率</div>
-          <div class="rate-header-right">
-            <a-checkbox
-              v-for="(payWayItem, payWayKey) in mergeFeeItem.selectedWayCodeList"
-              v-if="mergeFeeItem.isMergeMode"
-              :key="payWayKey"
-              v-model:checked="payWayItem.checked"
-              :disabled="configMode === 'agentSelf'"
-              @change="onChangeWayCode(payWayItem.wayCode, $event, mergeFeeItem)"
-              >{{ payWayItem.wayName }}</a-checkbox
-            >
-            <a-button
-              type="primary"
-              :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-              @click="mergeFeeItem.isMergeMode = !mergeFeeItem.isMergeMode"
-            >
-              {{ mergeFeeItem.isMergeMode ? '拆分配置' : '合并配置' }}
-            </a-button>
+      <template v-for="(mergeFeeItem, mergeFeeKey) in mergeFeeList" :key="mergeFeeKey">
+        <div v-if="mergeFeeItem && mergeFeeItem.selectedWayCodeList && mergeFeeItem.selectedWayCodeList.length > 0">
+          <div class="rate-header">
+            <div class="rate-title">
+              {{ mergeFeeItem.name }}产品费率
+            </div>
+            <div class="rate-header-right">
+              <a-checkbox
+                v-if="mergeFeeItem.isMergeMode"
+                :disabled="configMode === 'agentSelf'"
+                v-for="(payWayItem, payWayKey) in mergeFeeItem.selectedWayCodeList"
+                :key="payWayKey"
+                v-model:checked="payWayItem.checked"
+                @change="onChangeWayCode(payWayItem.wayCode, $event, mergeFeeItem)"
+              >{{ payWayItem.wayName }}</a-checkbox>
+              <a-button type="primary" :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'" @click="mergeFeeItem.isMergeMode = !mergeFeeItem.isMergeMode">
+                {{ mergeFeeItem.isMergeMode ? '拆分配置' : '合并配置' }}
+              </a-button>
+            </div>
           </div>
-        </div>
-        <div v-if="!mergeFeeItem.isMergeMode">
-          <div
-            v-for="(payWayItem, payWayKey) in mergeFeeItem.selectedWayCodeList"
-            :key="payWayKey"
-            class="rate-card-wrapper"
-          >
+          <div v-if="!mergeFeeItem.isMergeMode">
+            <div class="rate-card-wrapper" v-for="(payWayItem, payWayKey) in mergeFeeItem.selectedWayCodeList" :key="payWayKey">
+              <div class="card-header">
+                <div class="h-left">
+                  {{ payWayItem.wayName }} ({{ payWayItem.wayCode }})
+                  <a-popover placement="top">
+                    <template #content>
+                      <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
+                    </template>
+                    <a-button
+                      v-if="!!configTypeReadonlyMaps.length"
+                      @click="onReadDefaultFeeRate(mergeFeeItem.isMergeMode, payWayItem.wayCode)"
+                      style="margin-left: 8px;"
+                      size="small"
+                      shape="round"
+                    >
+                      <template #icon><BulbOutlined /></template>
+                      读取默认费率
+                    </a-button>
+                  </a-popover>
+                </div>
+                <div class="h-right h-right2" style="display: flex;">
+                  <div class="h-right2-div">
+                    是否开通：
+                    <a-switch
+                      @change="onChangeState(payWayItem.wayCode, $event)"
+                      :checked="!!rateConfig.mainFee[payWayItem.wayCode]?.state"
+                      :disabled="configMode === 'agentSelf'" />
+                  </div>
+                  <div class="h-right2-div" v-if="!!rateConfig.mainFee[payWayItem.wayCode]?.state">
+                    是否可进件：
+                    <a-switch
+                      @change="onChangeApplymentSupport(payWayItem.wayCode, $event)"
+                      :checked="!!rateConfig.mainFee[payWayItem.wayCode]?.applymentSupport"
+                      :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"/>
+                  </div>
+                  <div class="h-right2-div" v-if="!!rateConfig.mainFee[payWayItem.wayCode]?.state">
+                    阶梯费率：
+                    <a-switch
+                      @change="onChangeFeeType(payWayItem.wayCode, $event)"
+                      :checked="rateConfig.mainFee[payWayItem.wayCode]?.feeType === 'LEVEL'"
+                      :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"/>
+                  </div>
+                  <div class="h-right2-div" v-if="!!rateConfig.mainFee[payWayItem.wayCode]?.state">
+                    银联模式：
+                    <a-switch
+                      @change="onChangeLevelMode(payWayItem.wayCode, $event)"
+                      :disabled="rateConfig.mainFee[payWayItem.wayCode]?.feeType !== 'LEVEL' || !!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
+                      :checked="rateConfig.mainFee[payWayItem.wayCode]?.feeType === 'LEVEL'
+                        && rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'UNIONPAY'" />
+                  </div>
+                </div>
+              </div>
+              <div class="rate-card-content" v-if="!!rateConfig.mainFee[payWayItem.wayCode]?.state">
+                <div v-if="rateConfig.mainFee[payWayItem.wayCode]?.feeType === 'LEVEL'">
+                  <div
+                    v-for="(levelModeItem, levelModeKey) in rateConfig.mainFee[payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]"
+                    :key="levelModeKey">
+                    <a-divider orientation="left" v-if="rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'UNIONPAY'">
+                      {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
+                    </a-divider>
+                    <div
+                      :style="{ marginTop: levelKey > 0 ? '15px': 0 }"
+                      class="weChat-pay-list"
+                      v-for="(levelItem, levelKey) in levelModeItem.levelList"
+                      :key="levelKey">
+                      <div
+                        class="w-pay-item"
+                        style="min-width: 138px;">
+                        <div class="w-pay-title" v-if="levelKey === 0">
+                          <div>
+                            <span>价格区间：</span>
+                            <a-popover placement="top">
+                              <template #content>
+                                <span>范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span>
+                              </template>
+                              <QuestionCircleOutlined />
+                            </a-popover>
+                          </div>
+                        </div>
+                        <div
+                          v-if="rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'UNIONPAY'"
+                          style="height: 32px; line-height: 32px;">
+                          金额 {{ levelItem.minAmount > 0 ? `> ${levelItem.minAmount}` : `<= ${levelItem.maxAmount}` }} 元：
+                        </div>
+                        <div v-else style="display: flex; gap: 0px;">
+                          <a-input-number
+                            :min="0"
+                            :precision="2"
+                            addon-after="~"
+                            @change="(e) => inputChangeAmount(payWayItem.wayCode, 'min', levelItem.id, { target: { value: e } })"
+                            v-model:value="levelItem.minAmount"
+                            :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"/>
+                          <a-input-number
+                            style="width: 50%;min-width: 100px;"
+                            :min="0"
+                            :precision="2"
+                            addon-after="元"
+                            @change="(e) => inputChangeAmount(payWayItem.wayCode, 'max', levelItem.id, { target: { value: e } })"
+                            v-model:value="levelItem.maxAmount"
+                            :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"/>
+                        </div>
+                      </div>
+                      <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
+                        <div class="w-pay-title" v-if="levelKey === 0">{{ getPayTitle(item) }}费率：</div>
+                        <a-input-number
+                          :min="0"
+                          :step="0.01"
+                          :precision="6"
+                          addon-after="%"
+                          :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
+                          :value="rateConfig[item][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]
+                            ?.find(f => f.bankCardType === levelModeItem.bankCardType)?.levelList[levelKey]?.feeRate"
+                          @change="(e) => {
+                            const target = rateConfig[item][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]
+                              ?.find(f => f.bankCardType === levelModeItem.bankCardType)?.levelList[levelKey]
+                            if (target) target.feeRate = e
+                          }"/>
+                      </div>
+                      <div v-if="rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'NORMAL'" class="w-pay-item">
+                        <div class="w-pay-title" v-if="levelKey === 0" style="height: 21px;"><span></span></div>
+                        <a-popconfirm
+                          title="确定要删除该阶梯费率吗？"
+                          ok-text="确定"
+                          cancel-text="取消"
+                          @confirm="deleteLevelFee(payWayItem.wayCode, levelItem.id)"
+                        >
+                          <a-button v-if="!configTypeReadonlyMaps.length" type="link" danger @click.stop>
+                            <template #icon><DeleteOutlined /></template>
+                            删除
+                          </a-button>
+                        </a-popconfirm>
+                      </div>
+                    </div>
+                    <div
+                      v-if="rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'NORMAL' && !configTypeReadonlyMaps.length"
+                      style="margin-top: 30px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
+                      <a-button type="dashed" @click="addLevelFee(payWayItem.wayCode)">新增阶梯</a-button>
+                    </div>
+                  </div>
+                  <div :style="{ marginTop: '20px' }">
+                    <a-collapse>
+                      <a-collapse-panel header="高级配置">
+                        <div
+                          v-for="(levelModeItem, levelModeKey) in rateConfig.mainFee[payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]"
+                          :key="levelModeKey">
+                          <a-divider orientation="left" v-if="rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'UNIONPAY'">
+                            {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
+                          </a-divider>
+                          <div class="weChat-pay-list">
+                            <div class="w-pay-item">
+                              <div class="w-pay-title">价格类型：</div>
+                              <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
+                            </div>
+                            <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
+                            <div class="w-pay-title">{{ getPayTitle(item) }}费用：</div>
+                            <a-input-number
+                              :min="0"
+                              :precision="2"
+                              addon-before="保底"
+                              addon-after="元"
+                              :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
+                              :value="rateConfig[item][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]?.[levelModeKey]?.minFee"
+                              @change="(e) => {
+                                const target = rateConfig[item][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]?.[levelModeKey]
+                                if (target) target.minFee = e
+                              }"/>
+                          </div>
+                          </div>
+                          <div class="weChat-pay-list" style="margin-top: 15px;">
+                            <div class="w-pay-item">
+                              <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
+                            </div>
+                            <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
+                              <a-input-number
+                                :min="0"
+                                :precision="2"
+                                addon-before="封顶"
+                                addon-after="元"
+                                :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
+                                :value="rateConfig[item][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]?.[levelModeKey]?.maxFee"
+                                @change="(e) => {
+                                  const target = rateConfig[item][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]?.[levelModeKey]
+                                  if (target) target.maxFee = e
+                                }"/>
+                            </div>
+                          </div>
+                        </div>
+                      </a-collapse-panel>
+                    </a-collapse>
+                  </div>
+                </div>
+                <div v-else class="weChat-pay-list">
+                  <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
+                    <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
+                    <a-input-number
+                      :min="0"
+                      :step="0.01"
+                      :precision="6"
+                      addon-after="%"
+                      :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
+                      v-model:value="rateConfig[item][payWayItem.wayCode].feeRate"/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="rate-card-wrapper">
             <div class="card-header">
               <div class="h-left">
-                {{ payWayItem.wayName }} ({{ payWayItem.wayCode }})
+                合并配置
+                <a-alert v-if="!!mergeFeeItem.mainFee?.state && mergeFeeItem.selectedWayCodeList.filter(f => f.checked === true).length <= 0" banner>
+                  <template #message>
+                    <span style="color: #faad14">未勾选任何产品</span>
+                  </template>
+                </a-alert>
                 <a-popover placement="top">
                   <template #content>
                     <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
                   </template>
                   <a-button
                     v-if="!!configTypeReadonlyMaps.length"
-                    style="margin-left: 8px"
+                    @click="onReadDefaultFeeRate(mergeFeeItem.isMergeMode, mergeFeeKey)"
+                    style="margin-left: 8px;"
                     size="small"
                     shape="round"
-                    @click="onReadDefaultFeeRate(mergeFeeItem.isMergeMode, payWayItem.wayCode)"
                   >
                     <template #icon><BulbOutlined /></template>
                     读取默认费率
                   </a-button>
                 </a-popover>
               </div>
-              <div class="h-right h-right2" style="display: flex">
+              <div class="h-right h-right2" style="display: flex;">
                 <div class="h-right2-div">
                   是否开通：
                   <a-switch
-                    :checked="!!rateConfig.mainFee[payWayItem.wayCode].state"
-                    :disabled="configMode === 'agentSelf'"
-                    @change="onChangeState(payWayItem.wayCode, $event)"
-                  />
+                    @change="onChangeState(mergeFeeItem.mainFee?.wayCode, $event, mergeFeeItem)"
+                    :checked="!!mergeFeeItem.mainFee?.state"
+                    :disabled="configMode === 'agentSelf'" />
                 </div>
-                <div v-if="!!rateConfig.mainFee[payWayItem.wayCode].state" class="h-right2-div">
+                <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee?.state">
                   是否可进件：
                   <a-switch
-                    :checked="!!rateConfig.mainFee[payWayItem.wayCode].applymentSupport"
-                    :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-                    @change="onChangeApplymentSupport(payWayItem.wayCode, $event)"
-                  />
+                    @change="onChangeApplymentSupport(mergeFeeItem.mainFee?.wayCode, $event, mergeFeeItem)"
+                    :checked="!!mergeFeeItem.mainFee?.applymentSupport"
+                    :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"/>
                 </div>
-                <div v-if="!!rateConfig.mainFee[payWayItem.wayCode].state" class="h-right2-div">
+                <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee?.state">
                   阶梯费率：
                   <a-switch
-                    :checked="rateConfig.mainFee[payWayItem.wayCode].feeType === 'LEVEL'"
-                    :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-                    @change="onChangeFeeType(payWayItem.wayCode, $event)"
-                  />
+                    @change="onChangeFeeType(mergeFeeItem.mainFee?.wayCode, $event, mergeFeeItem)"
+                    :checked="mergeFeeItem.mainFee?.feeType === 'LEVEL'"
+                    :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"/>
                 </div>
-                <div v-if="!!rateConfig.mainFee[payWayItem.wayCode].state" class="h-right2-div">
+                <div class="h-right2-div" v-if="!!mergeFeeItem.mainFee?.state">
                   银联模式：
                   <a-switch
-                    :disabled="
-                      rateConfig.mainFee[payWayItem.wayCode].feeType !== 'LEVEL' ||
-                      !!configTypeReadonlyMaps.length ||
-                      configMode === 'agentSelf'
-                    "
-                    :checked="
-                      rateConfig.mainFee[payWayItem.wayCode].feeType === 'LEVEL' &&
-                      rateConfig.mainFee[payWayItem.wayCode].levelMode === 'UNIONPAY'
-                    "
-                    @change="onChangeLevelMode(payWayItem.wayCode, $event)"
-                  />
+                    @change="onChangeLevelMode(mergeFeeItem.mainFee?.wayCode, $event, mergeFeeItem)"
+                    :disabled="mergeFeeItem.mainFee?.feeType !== 'LEVEL' || !!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
+                    :checked="mergeFeeItem.mainFee?.feeType === 'LEVEL'
+                      && mergeFeeItem.mainFee?.levelMode === 'UNIONPAY'" />
                 </div>
               </div>
             </div>
-            <div v-if="!!rateConfig.mainFee[payWayItem.wayCode].state" class="rate-card-content">
-              <div v-if="rateConfig.mainFee[payWayItem.wayCode].feeType === 'LEVEL'">
+            <div class="rate-card-content" v-if="!!mergeFeeItem.mainFee?.state">
+              <div v-if="mergeFeeItem.mainFee?.feeType === 'LEVEL'">
                 <div
-                  v-for="(levelModeItem, levelModeKey) in rateConfig.mainFee[payWayItem.wayCode][
-                    rateConfig.mainFee[payWayItem.wayCode].levelMode
-                  ]"
-                  :key="levelModeKey"
-                >
-                  <a-divider v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode === 'UNIONPAY'" orientation="left">
+                  v-for="(levelModeItem, levelModeKey) in mergeFeeItem.mainFee?.[mergeFeeItem.mainFee?.levelMode]"
+                  :key="levelModeKey">
+                  <a-divider orientation="left" v-if="mergeFeeItem.mainFee?.levelMode === 'UNIONPAY'">
                     {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                   </a-divider>
                   <div
-                    v-for="(levelItem, levelKey) in levelModeItem.levelList"
-                    :key="levelKey"
-                    :style="{ marginTop: levelKey > 0 ? '15px' : 0 }"
+                    :style="{ marginTop: levelKey > 0 ? '15px': 0 }"
                     class="weChat-pay-list"
-                  >
-                    <div class="w-pay-item" style="min-width: 138px">
-                      <div v-if="levelKey === 0" class="w-pay-title">
+                    v-for="(levelItem, levelKey) in levelModeItem.levelList"
+                    :key="levelKey">
+                    <div
+                      class="w-pay-item"
+                      style="min-width: 138px;">
+                      <div class="w-pay-title" v-if="levelKey === 0">
                         <div>
                           <span>价格区间：</span>
                           <a-popover placement="top">
                             <template #content>
-                              <span
-                                >范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span
-                              >
+                              <span>范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span>
                             </template>
-                            <icons.QuestionCircleOutlined />
+                            <QuestionCircleOutlined />
                           </a-popover>
                         </div>
                       </div>
                       <div
-                        v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode === 'UNIONPAY'"
-                        style="height: 32px; line-height: 32px"
-                      >
-                        金额
-                        {{ levelItem.minAmount > 0 ? `> ${levelItem.minAmount}` : `<= ${levelItem.maxAmount}` }} 元：
+                        v-if="mergeFeeItem.mainFee?.levelMode === 'UNIONPAY'"
+                        style="height: 32px; line-height: 32px;">
+                        金额 {{ levelItem.minAmount > 0 ? `> ${levelItem.minAmount}` : `<= ${levelItem.maxAmount}` }} 元：
                       </div>
-                      <div v-else>
-                        <a-input
-                          v-model:value="levelItem.minAmount"
-                          style="width: 50%; min-width: 100px"
+                      <div v-else style="display: flex; gap: 0px;">
+                        <a-input-number
                           :min="0"
-                          type="number"
+                          :precision="2"
                           addon-after="~"
-                          :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-                          @change="inputChangeAmount(payWayItem.wayCode, 'min', levelItem.id, $event)"
-                        />
-                        <a-input
-                          v-model:value="levelItem.maxAmount"
-                          style="width: 50%; min-width: 100px"
+                          @change="(e) => inputChangeAmount(mergeFeeItem.mainFee?.wayCode, 'min', levelItem.id, { target: { value: e } }, mergeFeeItem)"
+                          v-model:value="levelItem.minAmount"
+                          :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"/>
+                        <a-input-number
+                          style="width: 50%;min-width: 100px;"
                           :min="0"
-                          type="number"
+                          :precision="2"
                           addon-after="元"
-                          :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-                          @change="inputChangeAmount(payWayItem.wayCode, 'max', levelItem.id, $event)"
-                        />
+                          @change="(e) => inputChangeAmount(mergeFeeItem.mainFee?.wayCode, 'max', levelItem.id, { target: { value: e } }, mergeFeeItem)"
+                          v-model:value="levelItem.maxAmount"
+                          :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"/>
                       </div>
                     </div>
-                    <div
-                      v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)"
-                      :key="key"
-                      class="w-pay-item"
-                    >
-                      <div v-if="levelKey === 0" class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
-                      <a-input
-                        v-model:value="
-                          rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode].find(
-                            (f) => f.bankCardType === levelModeItem.bankCardType
-                          ).levelList[levelKey].feeRate
-                        "
+                    <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
+                      <div class="w-pay-title" v-if="levelKey === 0">{{ getPayTitle(item) }}费率：</div>
+                      <a-input-number
                         :min="0"
                         :step="0.01"
-                        type="number"
+                        :precision="6"
                         addon-after="%"
                         :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
-                        @change="inputChange"
-                      />
+                        :value="mergeFeeItem[item]?.[mergeFeeItem.mainFee?.levelMode]
+                          ?.find(f => f.bankCardType === levelModeItem.bankCardType)?.levelList[levelKey]?.feeRate"
+                        @change="(e) => {
+                          const target = mergeFeeItem[item]?.[mergeFeeItem.mainFee?.levelMode]
+                            ?.find(f => f.bankCardType === levelModeItem.bankCardType)?.levelList[levelKey]
+                          if (target) target.feeRate = e
+                        }"/>
                     </div>
-                    <div v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode === 'NORMAL'" class="w-pay-item">
-                      <div v-if="levelKey === 0" class="w-pay-title" style="height: 21px"><span></span></div>
+                    <div v-if="mergeFeeItem.mainFee?.levelMode === 'NORMAL'" class="w-pay-item">
+                      <div class="w-pay-title" v-if="levelKey === 0" style="height: 21px;"><span></span></div>
                       <a-popconfirm
                         title="确定要删除该阶梯费率吗？"
                         ok-text="确定"
                         cancel-text="取消"
-                        @confirm="deleteLevelFee(payWayItem.wayCode, levelItem.id)"
+                        @confirm="deleteLevelFee(mergeFeeItem.mainFee?.wayCode, levelItem.id, mergeFeeItem)"
                       >
                         <a-button v-if="!configTypeReadonlyMaps.length" type="link" danger @click.stop>
                           <template #icon><DeleteOutlined /></template>
@@ -196,81 +372,56 @@
                     </div>
                   </div>
                   <div
-                    v-if="
-                      rateConfig.mainFee[payWayItem.wayCode].levelMode === 'NORMAL' && !configTypeReadonlyMaps.length
-                    "
-                    style="margin-top: 30px; display: flex; flex-flow: row nowrap; justify-content: space-around"
-                  >
-                    <a-button type="dashed" @click="addLevelFee(payWayItem.wayCode)">新增阶梯</a-button>
+                    v-if="mergeFeeItem.mainFee?.levelMode === 'NORMAL' && !configTypeReadonlyMaps.length"
+                    style="margin-top: 30px; display: flex; flex-flow: row nowrap; justify-content: space-around;">
+                    <a-button type="dashed" @click="addLevelFee(mergeFeeItem.mainFee?.wayCode, mergeFeeItem)">新增阶梯</a-button>
                   </div>
                 </div>
                 <div :style="{ marginTop: '20px' }">
                   <a-collapse>
                     <a-collapse-panel header="高级配置">
                       <div
-                        v-for="(levelModeItem, levelModeKey) in rateConfig.mainFee[payWayItem.wayCode][
-                          rateConfig.mainFee[payWayItem.wayCode].levelMode
-                        ]"
-                        :key="levelModeKey"
-                      >
-                        <a-divider
-                          v-if="rateConfig.mainFee[payWayItem.wayCode].levelMode === 'UNIONPAY'"
-                          orientation="left"
-                        >
-                          {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
+                        v-for="(levelModeItem, levelModeKey) in mergeFeeItem.mainFee?.[mergeFeeItem.mainFee?.levelMode]"
+                        :key="levelModeKey">
+                        <a-divider orientation="left" v-if="mergeFeeItem.mainFee?.levelMode === 'UNIONPAY'">
+                          {{ levelModeItem.bankCardType === 'DEBIT'? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                         </a-divider>
                         <div class="weChat-pay-list">
                           <div class="w-pay-item">
                             <div class="w-pay-title">价格类型：</div>
-                            <div style="height: 30px; line-height: 30px; min-width: 75px">保底费用：</div>
+                            <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
                           </div>
-                          <div
-                            v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)"
-                            :key="key"
-                            class="w-pay-item"
-                          >
+                          <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                             <div class="w-pay-title">{{ getPayTitle(item) }}费用：</div>
-                            <a-input
-                              v-model:value="
-                                rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][
-                                  levelModeKey
-                                ].minFee
-                              "
+                            <a-input-number
                               :min="0"
-                              type="number"
-                              addon-before="保底："
+                              :precision="2"
+                              addon-before="保底"
                               addon-after="元"
-                              :disabled="
-                                item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')
-                              "
-                              @change="inputChange"
-                            />
+                              :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
+                              :value="mergeFeeItem[item]?.[mergeFeeItem.mainFee?.levelMode]?.[levelModeKey]?.minFee"
+                              @change="(e) => {
+                                const target = mergeFeeItem[item]?.[mergeFeeItem.mainFee?.levelMode]?.[levelModeKey]
+                                if (target) target.minFee = e
+                              }"/>
                           </div>
                         </div>
-                        <div class="weChat-pay-list" style="margin-top: 15px">
+                        <div class="weChat-pay-list" style="margin-top: 15px;">
                           <div class="w-pay-item">
-                            <div style="height: 30px; line-height: 30px; min-width: 75px">封顶费用：</div>
+                            <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
                           </div>
-                          <div
-                            v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)"
-                            :key="key"
-                            class="w-pay-item"
-                          >
-                            <a-input
-                              v-model:value="
-                                rateConfig[item][payWayItem.wayCode][rateConfig.mainFee[payWayItem.wayCode].levelMode][
-                                  levelModeKey
-                                ].maxFee
-                              "
+                          <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
+                            <a-input-number
                               :min="0"
-                              type="number"
-                              addon-before="封顶："
+                              :precision="2"
+                              addon-before="封顶"
                               addon-after="元"
-                              :disabled="
-                                item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')
-                              "
-                              @change="inputChange"
-                            />
+                              :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
+                              :value="mergeFeeItem[item]?.[mergeFeeItem.mainFee?.levelMode]?.[levelModeKey]?.maxFee"
+                              @change="(e) => {
+                                const target = mergeFeeItem[item]?.[mergeFeeItem.mainFee?.levelMode]?.[levelModeKey]
+                                if (target) target.maxFee = e
+                              }"/>
                           </div>
                         </div>
                       </div>
@@ -279,333 +430,49 @@
                 </div>
               </div>
               <div v-else class="weChat-pay-list">
-                <div v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key" class="w-pay-item">
+                <div class="w-pay-item" v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key">
                   <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
-                  <a-input
-                    v-model:value="rateConfig[item][payWayItem.wayCode].feeRate"
+                  <a-input-number
                     :min="0"
                     :step="0.01"
-                    type="number"
+                    :precision="6"
                     addon-after="%"
                     :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
-                    @change="inputChange"
-                  />
+                    :value="mergeFeeItem[item]?.feeRate"
+                    @change="(e) => {
+                      if (mergeFeeItem[item]) mergeFeeItem[item].feeRate = e
+                    }"/>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <div v-else class="rate-card-wrapper">
-          <div class="card-header">
-            <div class="h-left">
-              合并配置
-              <a-alert
-                v-if="
-                  !!mergeFeeItem.mainFee.state &&
-                  mergeFeeItem.selectedWayCodeList.filter((f) => f.checked === true).length <= 0
-                "
-                banner
-              >
-                <template #message>
-                  <span style="color: #faad14">未勾选任何产品</span>
-                </template>
-              </a-alert>
-              <a-popover placement="top">
-                <template #content>
-                  <p>自动读取上级设置的费率值并填充至输入框， 优先级： 默认费率 --> 上级费率</p>
-                </template>
-                <a-button
-                  v-if="!!configTypeReadonlyMaps.length"
-                  style="margin-left: 8px"
-                  size="small"
-                  shape="round"
-                  @click="onReadDefaultFeeRate(mergeFeeItem.isMergeMode, mergeFeeKey)"
-                >
-                  <template #icon><BulbOutlined /></template>
-                  读取默认费率
-                </a-button>
-              </a-popover>
-            </div>
-            <div class="h-right h-right2" style="display: flex">
-              <div class="h-right2-div">
-                是否开通：
-                <a-switch
-                  :checked="!!mergeFeeItem.mainFee.state"
-                  :disabled="configMode === 'agentSelf'"
-                  @change="onChangeState(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                />
-              </div>
-              <div v-if="!!mergeFeeItem.mainFee.state" class="h-right2-div">
-                是否可进件：
-                <a-switch
-                  :checked="!!mergeFeeItem.mainFee.applymentSupport"
-                  :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-                  @change="onChangeApplymentSupport(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                />
-              </div>
-              <div v-if="!!mergeFeeItem.mainFee.state" class="h-right2-div">
-                阶梯费率：
-                <a-switch
-                  :checked="mergeFeeItem.mainFee.feeType === 'LEVEL'"
-                  :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-                  @change="onChangeFeeType(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                />
-              </div>
-              <div v-if="!!mergeFeeItem.mainFee.state" class="h-right2-div">
-                银联模式：
-                <a-switch
-                  :disabled="
-                    mergeFeeItem.mainFee.feeType !== 'LEVEL' ||
-                    !!configTypeReadonlyMaps.length ||
-                    configMode === 'agentSelf'
-                  "
-                  :checked="mergeFeeItem.mainFee.feeType === 'LEVEL' && mergeFeeItem.mainFee.levelMode === 'UNIONPAY'"
-                  @change="onChangeLevelMode(mergeFeeItem.mainFee.wayCode, $event, mergeFeeItem)"
-                />
-              </div>
-            </div>
-          </div>
-          <div v-if="!!mergeFeeItem.mainFee.state" class="rate-card-content">
-            <div v-if="mergeFeeItem.mainFee.feeType === 'LEVEL'">
-              <div
-                v-for="(levelModeItem, levelModeKey) in mergeFeeItem.mainFee[mergeFeeItem.mainFee.levelMode]"
-                :key="levelModeKey"
-              >
-                <a-divider v-if="mergeFeeItem.mainFee.levelMode === 'UNIONPAY'" orientation="left">
-                  {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
-                </a-divider>
-                <div
-                  v-for="(levelItem, levelKey) in levelModeItem.levelList"
-                  :key="levelKey"
-                  :style="{ marginTop: levelKey > 0 ? '15px' : 0 }"
-                  class="weChat-pay-list"
-                >
-                  <div class="w-pay-item" style="min-width: 138px">
-                    <div v-if="levelKey === 0" class="w-pay-title">
-                      <div>
-                        <span>价格区间：</span>
-                        <a-popover placement="top">
-                          <template #content>
-                            <span
-                              >范围描述：(大于 ~ 小于等于]， 比如 100 ~ 200 表示：大于100并且小于等于200的范围。</span
-                            >
-                          </template>
-                          <icons.QuestionCircleOutlined />
-                        </a-popover>
-                      </div>
-                    </div>
-                    <div v-if="mergeFeeItem.mainFee.levelMode === 'UNIONPAY'" style="height: 32px; line-height: 32px">
-                      金额 {{ levelItem.minAmount > 0 ? `> ${levelItem.minAmount}` : `<= ${levelItem.maxAmount}` }} 元：
-                    </div>
-                    <div v-else>
-                      <a-input
-                        v-model:value="levelItem.minAmount"
-                        style="width: 50%; min-width: 100px"
-                        :min="0"
-                        type="number"
-                        addon-after="~"
-                        :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-                        @change="
-                          inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'min', levelItem.id, $event, mergeFeeItem)
-                        "
-                      />
-                      <a-input
-                        v-model:value="levelItem.maxAmount"
-                        style="width: 50%; min-width: 100px"
-                        :min="0"
-                        type="number"
-                        addon-after="元"
-                        :disabled="!!configTypeReadonlyMaps.length || configMode === 'agentSelf'"
-                        @change="
-                          inputChangeAmount(mergeFeeItem.mainFee.wayCode, 'max', levelItem.id, $event, mergeFeeItem)
-                        "
-                      />
-                    </div>
-                  </div>
-                  <div
-                    v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)"
-                    :key="key"
-                    class="w-pay-item"
-                  >
-                    <div v-if="levelKey === 0" class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
-                    <a-input
-                      v-model:value="
-                        mergeFeeItem[item][mergeFeeItem.mainFee.levelMode].find(
-                          (f) => f.bankCardType === levelModeItem.bankCardType
-                        ).levelList[levelKey].feeRate
-                      "
-                      :min="0"
-                      :step="0.01"
-                      type="number"
-                      addon-after="%"
-                      :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
-                      @change="inputChange"
-                    />
-                  </div>
-                  <div v-if="mergeFeeItem.mainFee.levelMode === 'NORMAL'" class="w-pay-item">
-                    <div v-if="levelKey === 0" class="w-pay-title" style="height: 21px"><span></span></div>
-                    <a-popconfirm
-                      title="确定要删除该阶梯费率吗？"
-                      ok-text="确定"
-                      cancel-text="取消"
-                      @confirm="deleteLevelFee(mergeFeeItem.mainFee.wayCode, levelItem.id, mergeFeeItem)"
-                    >
-                      <a-button v-if="!configTypeReadonlyMaps.length" type="link" danger @click.stop>
-                        <template #icon><DeleteOutlined /></template>
-                        删除
-                      </a-button>
-                    </a-popconfirm>
-                  </div>
-                </div>
-                <div
-                  v-if="mergeFeeItem.mainFee.levelMode === 'NORMAL' && !configTypeReadonlyMaps.length"
-                  style="margin-top: 30px; display: flex; flex-flow: row nowrap; justify-content: space-around"
-                >
-                  <a-button type="dashed" @click="addLevelFee(mergeFeeItem.mainFee.wayCode, mergeFeeItem)"
-                    >新增阶梯</a-button
-                  >
-                </div>
-              </div>
-              <div :style="{ marginTop: '20px' }">
-                <a-collapse>
-                  <a-collapse-panel header="高级配置">
-                    <div
-                      v-for="(levelModeItem, levelModeKey) in mergeFeeItem.mainFee[mergeFeeItem.mainFee.levelMode]"
-                      :key="levelModeKey"
-                    >
-                      <a-divider v-if="mergeFeeItem.mainFee.levelMode === 'UNIONPAY'" orientation="left">
-                        {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
-                      </a-divider>
-                      <div class="weChat-pay-list">
-                        <div class="w-pay-item">
-                          <div class="w-pay-title">价格类型：</div>
-                          <div style="height: 30px; line-height: 30px; min-width: 75px">保底费用：</div>
-                        </div>
-                        <div
-                          v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)"
-                          :key="key"
-                          class="w-pay-item"
-                        >
-                          <div class="w-pay-title">{{ getPayTitle(item) }}费用：</div>
-                          <a-input
-                            v-model:value="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].minFee"
-                            :min="0"
-                            type="number"
-                            addon-before="保底："
-                            addon-after="元"
-                            :disabled="
-                              item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')
-                            "
-                            @change="inputChange"
-                          />
-                        </div>
-                      </div>
-                      <div class="weChat-pay-list" style="margin-top: 15px">
-                        <div class="w-pay-item">
-                          <div style="height: 30px; line-height: 30px; min-width: 75px">封顶费用：</div>
-                        </div>
-                        <div
-                          v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)"
-                          :key="key"
-                          class="w-pay-item"
-                        >
-                          <a-input
-                            v-model:value="mergeFeeItem[item][mergeFeeItem.mainFee.levelMode][levelModeKey].maxFee"
-                            :min="0"
-                            type="number"
-                            addon-before="封顶："
-                            addon-after="元"
-                            :disabled="
-                              item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')
-                            "
-                            @change="inputChange"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </a-collapse-panel>
-                </a-collapse>
-              </div>
-            </div>
-            <div v-else class="weChat-pay-list">
-              <div v-for="(item, key) in configTypeReadonlyMaps.concat(configTypeMaps)" :key="key" class="w-pay-item">
-                <div class="w-pay-title">{{ getPayTitle(item) }}费率：</div>
-                <a-input
-                  v-model:value="mergeFeeItem[item].feeRate"
-                  :min="0"
-                  :step="0.01"
-                  type="number"
-                  addon-after="%"
-                  :disabled="item.startsWith('readonly') || (configMode === 'agentSelf' && item === 'mainFee')"
-                  @change="inputChange"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      </template>
       <a-collapse v-if="configMode === 'mgrIsv'">
         <a-collapse-panel header="【保存】高级配置项">
-          <a-checkbox :checked="!!noCheckRuleFlag" @change="noCheckRuleFlag = +!noCheckRuleFlag"
-            >不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox
-          >
+          <a-checkbox :checked="!!noCheckRuleFlag" @change="noCheckRuleFlag = +!noCheckRuleFlag">不校验服务商的费率配置信息 （仅特殊情况才可使用）。</a-checkbox>
         </a-collapse-panel>
       </a-collapse>
-      <div :class="isDrawer ? 'drawer-btn-center' : 'btn-center'">
-        <a-button type="primary" :loading="loading" @click="onSubmit">
-          <template #icon><CheckOutlined /></template>
-          保存
-        </a-button>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-/**
- * 支付费率配置面板组件
- * 功能：根据配置模式（服务商/代理商/商户）展示和配置各支付产品的费率，
- * 支持单费率、阶梯费率、银联模式，以及合并/拆分配置模式。
- */
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import { BulbOutlined, CheckOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
-const icons = { BulbOutlined, CheckOutlined, DeleteOutlined, QuestionCircleOutlined }
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
-import { infoBox } from '@/utils/info-box'
 
 const props = defineProps({
-  isDrawer: {
-    type: Boolean,
-    default: false
-  },
-  infoId: {
-    type: String,
-    default: null
-  },
-  infoType: {
-    type: String,
-    default: null
-  },
-  ifCode: {
-    type: String,
-    default: ''
-  },
-  permCode: {
-    type: String,
-    default: ''
-  },
-  configMode: {
-    type: String,
-    default: ''
-  },
-  callbackFunc: {
-    type: Function,
-    default: () => ({})
-  }
+  isDrawer: { type: Boolean, default: false },
+  infoId: { type: String, default: null },
+  infoType: { type: String, default: null },
+  ifCode: { type: String, default: '' },
+  permCode: { type: String, default: '' },
+  configMode: { type: String, default: '' },
+  callbackFunc: { type: Function, default: () => ({}) }
 })
 
-// State
 const loading = ref(false)
 const currentIfCode = ref(props.ifCode)
 const configTypeReadonlyMaps = ref([])
@@ -614,7 +481,8 @@ const allPaywayList = ref([])
 const allPaywayMap = ref({})
 const noCheckRuleFlag = ref(0)
 const originSavedList = ref([])
-const rateConfig = ref({
+
+const rateConfig = reactive({
   mainFee: {},
   agentdefFee: {},
   mchapplydefFee: {},
@@ -622,7 +490,8 @@ const rateConfig = ref({
   readonlyParentAgent: {},
   readonlyParentDefRate: {}
 })
-const mergeFeeList = ref([
+
+const mergeFeeList = reactive([
   {
     key: 'WECHAT1',
     name: '微信线下',
@@ -631,7 +500,7 @@ const mergeFeeList = ref([
     mchapplydefFee: {},
     isMergeMode: false,
     selectedWayCodeList: [],
-    filter: (f) => f.wayType === 'WECHAT' && ['WX_BAR', 'WX_JSAPI', 'WX_LITE'].indexOf(f.wayCode) >= 0
+    filter: f => f.wayType === 'WECHAT' && ['WX_BAR', 'WX_JSAPI', 'WX_LITE'].indexOf(f.wayCode) >= 0
   },
   {
     key: 'WECHAT2',
@@ -641,7 +510,7 @@ const mergeFeeList = ref([
     mchapplydefFee: {},
     isMergeMode: false,
     selectedWayCodeList: [],
-    filter: (f) => f.wayType === 'WECHAT' && ['WX_BAR', 'WX_JSAPI', 'WX_LITE'].indexOf(f.wayCode) < 0
+    filter: f => f.wayType === 'WECHAT' && ['WX_BAR', 'WX_JSAPI', 'WX_LITE'].indexOf(f.wayCode) < 0
   },
   {
     key: 'ALIPAY1',
@@ -651,7 +520,7 @@ const mergeFeeList = ref([
     mchapplydefFee: {},
     isMergeMode: false,
     selectedWayCodeList: [],
-    filter: (f) => f.wayType === 'ALIPAY' && ['ALI_BAR', 'ALI_JSAPI', 'ALI_LITE', 'ALI_QR'].indexOf(f.wayCode) >= 0
+    filter: f => f.wayType === 'ALIPAY' && ['ALI_BAR', 'ALI_JSAPI', 'ALI_LITE', 'ALI_QR'].indexOf(f.wayCode) >= 0
   },
   {
     key: 'ALIPAY2',
@@ -661,7 +530,7 @@ const mergeFeeList = ref([
     mchapplydefFee: {},
     isMergeMode: false,
     selectedWayCodeList: [],
-    filter: (f) => f.wayType === 'ALIPAY' && ['ALI_BAR', 'ALI_JSAPI', 'ALI_LITE', 'ALI_QR'].indexOf(f.wayCode) < 0
+    filter: f => f.wayType === 'ALIPAY' && ['ALI_BAR', 'ALI_JSAPI', 'ALI_LITE', 'ALI_QR'].indexOf(f.wayCode) < 0
   },
   {
     key: 'YSFPAY',
@@ -671,7 +540,7 @@ const mergeFeeList = ref([
     mchapplydefFee: {},
     isMergeMode: false,
     selectedWayCodeList: [],
-    filter: (f) => f.wayType === 'YSFPAY'
+    filter: f => f.wayType === 'YSFPAY'
   },
   {
     key: 'UNIONPAY',
@@ -681,7 +550,7 @@ const mergeFeeList = ref([
     mchapplydefFee: {},
     isMergeMode: false,
     selectedWayCodeList: [],
-    filter: (f) => f.wayType === 'UNIONPAY'
+    filter: f => f.wayType === 'UNIONPAY'
   },
   {
     key: 'OTHER',
@@ -691,11 +560,10 @@ const mergeFeeList = ref([
     mchapplydefFee: {},
     isMergeMode: false,
     selectedWayCodeList: [],
-    filter: (f) => f.wayType === 'OTHER'
+    filter: f => f.wayType === 'OTHER'
   }
 ])
 
-// Methods
 const initRateConfig = (wayCode) => {
   const k = {
     wayCode: wayCode,
@@ -707,26 +575,24 @@ const initRateConfig = (wayCode) => {
 }
 
 const initNormal = (id1, id2) => {
-  return [
-    {
-      minFee: 0,
-      maxFee: 99999,
-      levelList: [
-        {
-          id: id1,
-          minAmount: 0,
-          maxAmount: 1000,
-          feeRate: null
-        },
-        {
-          id: id2,
-          minAmount: 1000,
-          maxAmount: 999999.99,
-          feeRate: null
-        }
-      ]
-    }
-  ]
+  return [{
+    minFee: 0,
+    maxFee: 99999,
+    levelList: [
+      {
+        id: id1,
+        minAmount: 0,
+        maxAmount: 1000,
+        feeRate: null
+      },
+      {
+        id: id2,
+        minAmount: 1000,
+        maxAmount: 999999.99,
+        feeRate: null
+      }
+    ]
+  }]
 }
 
 const initUnionpay = (id1, id2) => {
@@ -784,14 +650,14 @@ const initLevel = (id) => {
 const isMergeMode = (rateConfigs) => {
   let rateConfigTemp = null
   for (const i in rateConfigs) {
-    const rateConfig = JSON.parse(JSON.stringify(rateConfigs[i]))
-    if (rateConfig.state === 1) {
-      rateConfig.wayCode = null
+    const rateConfigItem = JSON.parse(JSON.stringify(rateConfigs[i]))
+    if (rateConfigItem.state === 1) {
+      rateConfigItem.wayCode = null
       if (rateConfigTemp === null) {
-        rateConfigTemp = rateConfig
+        rateConfigTemp = rateConfigItem
         continue
       }
-      if (JSON.stringify(rateConfigTemp) !== JSON.stringify(rateConfig)) {
+      if (JSON.stringify(rateConfigTemp) !== JSON.stringify(rateConfigItem)) {
         return false
       }
     }
@@ -800,7 +666,7 @@ const isMergeMode = (rateConfigs) => {
 }
 
 const toRateConfig = (key, feeRateConfig) => {
-  Object.values(rateConfig.value[key]).forEach((item) => {
+  Object.values(rateConfig[key]).forEach(item => {
     item.feeType = 'SINGLE'
     delete item.feeRate
     delete item.minFee
@@ -812,28 +678,21 @@ const toRateConfig = (key, feeRateConfig) => {
     typeof item.feeRate === 'number' && (item.feeRate = Number.parseFloat((item.feeRate * 100).toFixed(6)))
     if (item.levelMode && item[item.levelMode]) {
       for (const i in item[item.levelMode]) {
-        typeof item[item.levelMode][i].maxFee === 'number' &&
-          (item[item.levelMode][i].maxFee = Number.parseFloat((item[item.levelMode][i].maxFee / 100).toFixed(2)))
-        typeof item[item.levelMode][i].minFee === 'number' &&
-          (item[item.levelMode][i].minFee = Number.parseFloat((item[item.levelMode][i].minFee / 100).toFixed(2)))
+        typeof item[item.levelMode][i].maxFee === 'number' && (item[item.levelMode][i].maxFee = Number.parseFloat((item[item.levelMode][i].maxFee / 100).toFixed(2)))
+        typeof item[item.levelMode][i].minFee === 'number' && (item[item.levelMode][i].minFee = Number.parseFloat((item[item.levelMode][i].minFee / 100).toFixed(2)))
         let id = 1
-        item[item.levelMode][i].levelList &&
-          item[item.levelMode][i].levelList.forEach((s) => {
-            s.id = id
-            typeof s.feeRate === 'number' && (s.feeRate = Number.parseFloat((s.feeRate * 100).toFixed(6)))
-            typeof s.maxAmount === 'number' && (s.maxAmount = Number.parseFloat((s.maxAmount / 100).toFixed(2)))
-            typeof s.minAmount === 'number' && (s.minAmount = Number.parseFloat((s.minAmount / 100).toFixed(2)))
-            id++
-          })
+        item[item.levelMode][i].levelList && item[item.levelMode][i].levelList.forEach(s => {
+          s.id = id
+          typeof s.feeRate === 'number' && (s.feeRate = Number.parseFloat((s.feeRate * 100).toFixed(6)))
+          typeof s.maxAmount === 'number' && (s.maxAmount = Number.parseFloat((s.maxAmount / 100).toFixed(2)))
+          typeof s.minAmount === 'number' && (s.minAmount = Number.parseFloat((s.minAmount / 100).toFixed(2)))
+          id++
+        })
       }
     }
   })
 }
 
-/**
- * 获取费率配置信息
- * @param {string} currentIfCodeVal - 接口代码
- */
 const getRateConfig = async (currentIfCodeVal) => {
   if (currentIfCodeVal) {
     currentIfCode.value = currentIfCodeVal
@@ -842,20 +701,22 @@ const getRateConfig = async (currentIfCodeVal) => {
   configTypeReadonlyMaps.value = []
   allPaywayList.value = []
   allPaywayMap.value = {}
-  rateConfig.value = {
-    mainFee: {},
-    agentdefFee: {},
-    mchapplydefFee: {},
-    readonlyIsvCost: {},
-    readonlyParentAgent: {},
-    readonlyParentDefRate: {}
-  }
-  originSavedList.value = []
-  mergeFeeList.value.forEach((item) => {
-    item.selectedWayCodeList = []
+  Object.keys(rateConfig).forEach(key => {
+    rateConfig[key] = {}
   })
-  const params = {}
-  Object.assign(params, { configMode: props.configMode, infoId: props.infoId, ifCode: currentIfCode.value })
+  originSavedList.value = []
+  mergeFeeList.forEach(item => {
+    item.selectedWayCodeList = []
+    item.mainFee = {}
+    item.agentdefFee = {}
+    item.mchapplydefFee = {}
+    item.readonlyIsvCost = null
+    item.readonlyParentAgent = null
+    item.readonlyParentDefRate = null
+    item.isMergeMode = false
+  })
+
+  const params = { configMode: props.configMode, infoId: props.infoId, ifCode: currentIfCode.value }
 
   let mapData = {}
   try {
@@ -868,20 +729,17 @@ const getRateConfig = async (currentIfCodeVal) => {
   Object.assign(params, { pageSize: -1 })
   try {
     const res = await payConfigApi.queryRateConfigList('/payways', params)
-    res.records.forEach((payWay) => {
+    res.records.forEach(payWay => {
       payWay.checked = false
       allPaywayList.value.push(payWay)
       allPaywayMap.value[payWay.wayCode] = payWay
-      rateConfig.value.mainFee[payWay.wayCode] = initRateConfig(payWay.wayCode)
-      rateConfig.value.agentdefFee[payWay.wayCode] = initRateConfig(payWay.wayCode)
-      rateConfig.value.mchapplydefFee[payWay.wayCode] = initRateConfig(payWay.wayCode)
-      rateConfig.value.readonlyIsvCost[payWay.wayCode] =
-        mapData && mapData.READONLYISVCOST ? initRateConfig(payWay.wayCode) : null
-      rateConfig.value.readonlyParentAgent[payWay.wayCode] =
-        mapData && mapData.READONLYPARENTAGENT ? initRateConfig(payWay.wayCode) : null
-      rateConfig.value.readonlyParentDefRate[payWay.wayCode] =
-        mapData && mapData.READONLYPARENTDEFRATE ? initRateConfig(payWay.wayCode) : null
-      mergeFeeList.value.forEach((item) => {
+      rateConfig.mainFee[payWay.wayCode] = initRateConfig(payWay.wayCode)
+      rateConfig.agentdefFee[payWay.wayCode] = initRateConfig(payWay.wayCode)
+      rateConfig.mchapplydefFee[payWay.wayCode] = initRateConfig(payWay.wayCode)
+      rateConfig.readonlyIsvCost[payWay.wayCode] = mapData && mapData.READONLYISVCOST ? initRateConfig(payWay.wayCode) : null
+      rateConfig.readonlyParentAgent[payWay.wayCode] = mapData && mapData.READONLYPARENTAGENT ? initRateConfig(payWay.wayCode) : null
+      rateConfig.readonlyParentDefRate[payWay.wayCode] = mapData && mapData.READONLYPARENTDEFRATE ? initRateConfig(payWay.wayCode) : null
+      mergeFeeList.forEach(item => {
         item.mainFee = initRateConfig(null)
         item.agentdefFee = initRateConfig(null)
         item.mchapplydefFee = initRateConfig(null)
@@ -891,8 +749,8 @@ const getRateConfig = async (currentIfCodeVal) => {
       })
     })
 
-    mergeFeeList.value.forEach((item) => {
-      allPaywayList.value.filter(item.filter).forEach((payWay) => {
+    mergeFeeList.forEach(item => {
+      allPaywayList.value.filter(item.filter).forEach(payWay => {
         item.selectedWayCodeList.push({
           wayCode: payWay.wayCode,
           wayName: payWay.wayName,
@@ -933,33 +791,16 @@ const getRateConfig = async (currentIfCodeVal) => {
     return
   }
 
-  mergeFeeList.value.forEach((item) => {
+  mergeFeeList.forEach(item => {
     item.isMergeMode = false
     const payWays = []
-    item.selectedWayCodeList.forEach((c) => payWays.push(c.wayCode))
-    const mainFee = isMergeMode(Object.values(rateConfig.value.mainFee).filter((f) => payWays.indexOf(f.wayCode) >= 0))
-    const agentdefFee = isMergeMode(
-      Object.values(rateConfig.value.agentdefFee).filter((f) => payWays.indexOf(f.wayCode) >= 0)
-    )
-    const mchapplydefFee = isMergeMode(
-      Object.values(rateConfig.value.mchapplydefFee).filter((f) => payWays.indexOf(f.wayCode) >= 0)
-    )
-    const readonlyIsvCost =
-      mapData && mapData.READONLYISVCOST
-        ? isMergeMode(Object.values(rateConfig.value.readonlyIsvCost).filter((f) => payWays.indexOf(f.wayCode) >= 0))
-        : null
-    const readonlyParentAgent =
-      mapData && mapData.READONLYPARENTAGENT
-        ? isMergeMode(
-            Object.values(rateConfig.value.readonlyParentAgent).filter((f) => payWays.indexOf(f.wayCode) >= 0)
-          )
-        : null
-    const readonlyParentDefRate =
-      mapData && mapData.READONLYPARENTDEFRATE
-        ? isMergeMode(
-            Object.values(rateConfig.value.readonlyParentDefRate).filter((f) => payWays.indexOf(f.wayCode) >= 0)
-          )
-        : null
+    item.selectedWayCodeList.forEach(c => payWays.push(c.wayCode))
+    const mainFee = isMergeMode(Object.values(rateConfig.mainFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
+    const agentdefFee = isMergeMode(Object.values(rateConfig.agentdefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
+    const mchapplydefFee = isMergeMode(Object.values(rateConfig.mchapplydefFee).filter(f => payWays.indexOf(f.wayCode) >= 0))
+    const readonlyIsvCost = mapData && mapData.READONLYISVCOST ? isMergeMode(Object.values(rateConfig.readonlyIsvCost).filter(f => payWays.indexOf(f.wayCode) >= 0)) : null
+    const readonlyParentAgent = mapData && mapData.READONLYPARENTAGENT ? isMergeMode(Object.values(rateConfig.readonlyParentAgent).filter(f => payWays.indexOf(f.wayCode) >= 0)) : null
+    const readonlyParentDefRate = mapData && mapData.READONLYPARENTDEFRATE ? isMergeMode(Object.values(rateConfig.readonlyParentDefRate).filter(f => payWays.indexOf(f.wayCode) >= 0)) : null
     if (typeof mainFee === 'object' && typeof agentdefFee === 'object' && typeof mchapplydefFee === 'object') {
       if (mainFee) {
         item.mainFee = mainFee
@@ -987,31 +828,25 @@ const getRateConfig = async (currentIfCodeVal) => {
       if (readonlyParentDefRate) {
         item.readonlyParentDefRate = readonlyParentDefRate
       }
-      item.selectedWayCodeList.forEach((c) => {
-        c.checked = rateConfig.value.mainFee[c.wayCode] != null && !!rateConfig.value.mainFee[c.wayCode].state
+      item.selectedWayCodeList.forEach(c => {
+        c.checked = rateConfig.mainFee[c.wayCode] != null && !!rateConfig.mainFee[c.wayCode].state
       })
       item.isMergeMode = true
     }
   })
 }
 
-const onReadDefaultFeeRate = (isMergeMode, key) => {
-  if (!isMergeMode) {
-    const mainFee = mergeFeeList.value[key].mainFee
-    const readonlyFee =
-      rateConfig.value.readonlyParentDefRate[key] ||
-      rateConfig.value.readonlyParentAgent[key] ||
-      rateConfig.value.readonlyIsvCost[key]
+const onReadDefaultFeeRate = (isMergeModeVal, key) => {
+  if (!isMergeModeVal) {
+    const mainFee = mergeFeeList[key].mainFee
+    const readonlyFee = rateConfig.readonlyParentDefRate[key] || rateConfig.readonlyParentAgent[key] || rateConfig.readonlyIsvCost[key]
     const { state, ...readonlyFeeWithoutState } = readonlyFee
-    rateConfig.value.mainFee[key] = Object.assign(mainFee, readonlyFeeWithoutState)
+    rateConfig.mainFee[key] = Object.assign(mainFee, readonlyFeeWithoutState)
   } else {
-    const mainFee = mergeFeeList.value[key].mainFee
-    const readonlyFee =
-      mergeFeeList.value[key].readonlyParentDefRate ||
-      mergeFeeList.value[key].readonlyParentAgent ||
-      mergeFeeList.value[key].readonlyIsvCost
+    const mainFee = mergeFeeList[key].mainFee
+    const readonlyFee = mergeFeeList[key].readonlyParentDefRate || mergeFeeList[key].readonlyParentAgent || mergeFeeList[key].readonlyIsvCost
     const { state, ...readonlyFeeWithoutState } = readonlyFee
-    mergeFeeList.value[key].mainFee = Object.assign(mainFee, readonlyFeeWithoutState)
+    mergeFeeList[key].mainFee = Object.assign(mainFee, readonlyFeeWithoutState)
   }
 }
 
@@ -1049,63 +884,66 @@ const onChangeWayCode = (wayCode, event, mergeFeeItem) => {
 }
 
 const onChangeState = (wayCode, checked, mergeFeeItem) => {
+  const isChecked = typeof checked === 'boolean' ? checked : checked.target?.checked
   if (wayCode) {
-    configTypeMaps.value.map((item) => {
-      if (checked && !rateConfig.value[item][wayCode]) {
-        rateConfig.value[item][wayCode] = initRateConfig(wayCode)
+    configTypeMaps.value.map(item => {
+      if (isChecked && !rateConfig[item][wayCode]) {
+        rateConfig[item][wayCode] = initRateConfig(wayCode)
       } else {
-        rateConfig.value[item][wayCode].state = +checked
+        rateConfig[item][wayCode].state = +isChecked
       }
     })
   }
   if (!wayCode && mergeFeeItem) {
-    configTypeMaps.value.map((item) => {
-      if (checked && !mergeFeeItem[item]) {
+    configTypeMaps.value.map(item => {
+      if (isChecked && !mergeFeeItem[item]) {
         mergeFeeItem[item] = initRateConfig(wayCode)
       } else {
-        mergeFeeItem[item].state = +checked
+        mergeFeeItem[item].state = +isChecked
       }
     })
   }
 }
 
 const onChangeApplymentSupport = (wayCode, checked, mergeFeeItem) => {
+  const isChecked = typeof checked === 'boolean' ? checked : checked.target?.checked
   if (wayCode) {
-    configTypeMaps.value.map((item) => {
-      rateConfig.value[item][wayCode].applymentSupport = +checked
+    configTypeMaps.value.map(item => {
+      rateConfig[item][wayCode].applymentSupport = +isChecked
     })
   }
   if (!wayCode && mergeFeeItem) {
-    configTypeMaps.value.map((item) => {
+    configTypeMaps.value.map(item => {
       if (mergeFeeItem[item]) {
-        mergeFeeItem[item].applymentSupport = +checked
+        mergeFeeItem[item].applymentSupport = +isChecked
       }
     })
   }
 }
 
 const onChangeFeeType = (wayCode, checked, mergeFeeItem) => {
+  const isChecked = typeof checked === 'boolean' ? checked : checked.target?.checked
   const currentTime = new Date()
   const id1 = currentTime.getTime()
   currentTime.setSeconds(currentTime.getSeconds() + 1)
   const id2 = currentTime.getTime()
   if (wayCode) {
-    configTypeMaps.value.map((item) => {
-      if (checked) {
-        rateConfig.value[item][wayCode].feeType = 'LEVEL'
-        rateConfig.value[item][wayCode].levelMode = 'NORMAL'
-        if (!rateConfig.value[item][wayCode]['NORMAL']) {
-          rateConfig.value[item][wayCode]['NORMAL'] = initNormal(id1, id2)
+    configTypeMaps.value.map(item => {
+      if (isChecked) {
+        rateConfig[item][wayCode].feeType = 'LEVEL'
+        rateConfig[item][wayCode].levelMode = 'NORMAL'
+        if (!rateConfig[item][wayCode]['NORMAL']) {
+          rateConfig[item][wayCode]['NORMAL'] = initNormal(id1, id2)
         }
       } else {
-        rateConfig.value[item][wayCode].feeType = 'SINGLE'
-        delete rateConfig.value[item][wayCode]['levelMode']
+        rateConfig[item][wayCode].feeType = 'SINGLE'
+        delete rateConfig[item][wayCode]['levelMode']
       }
     })
   }
   if (!wayCode && mergeFeeItem) {
-    configTypeMaps.value.map((item) => {
-      if (checked) {
+    configTypeMaps.value.map(item => {
+      if (isChecked) {
         mergeFeeItem[item].feeType = 'LEVEL'
         mergeFeeItem[item].levelMode = 'NORMAL'
         if (!mergeFeeItem[item]['NORMAL']) {
@@ -1120,28 +958,29 @@ const onChangeFeeType = (wayCode, checked, mergeFeeItem) => {
 }
 
 const onChangeLevelMode = (wayCode, checked, mergeFeeItem) => {
+  const isChecked = typeof checked === 'boolean' ? checked : checked.target?.checked
   const currentTime = new Date()
   const id1 = currentTime.getTime()
   currentTime.setSeconds(currentTime.getSeconds() + 1)
   const id2 = currentTime.getTime()
   if (wayCode) {
-    configTypeMaps.value.map((item) => {
-      rateConfig.value[item][wayCode].levelMode = checked ? 'UNIONPAY' : 'NORMAL'
-      if (checked && !rateConfig.value[item][wayCode]['UNIONPAY']) {
-        rateConfig.value[item][wayCode]['UNIONPAY'] = initUnionpay(id1, id2)
+    configTypeMaps.value.map(item => {
+      rateConfig[item][wayCode].levelMode = isChecked ? 'UNIONPAY' : 'NORMAL'
+      if (isChecked && !rateConfig[item][wayCode]['UNIONPAY']) {
+        rateConfig[item][wayCode]['UNIONPAY'] = initUnionpay(id1, id2)
       }
-      if (!checked && !rateConfig.value[item][wayCode]['NORMAL']) {
-        rateConfig.value[item][wayCode]['NORMAL'] = initNormal(id1, id2)
+      if (!isChecked && !rateConfig[item][wayCode]['NORMAL']) {
+        rateConfig[item][wayCode]['NORMAL'] = initNormal(id1, id2)
       }
     })
   }
   if (!wayCode && mergeFeeItem) {
-    configTypeMaps.value.map((item) => {
-      mergeFeeItem[item].levelMode = checked ? 'UNIONPAY' : 'NORMAL'
-      if (checked && !mergeFeeItem[item]['UNIONPAY']) {
+    configTypeMaps.value.map(item => {
+      mergeFeeItem[item].levelMode = isChecked ? 'UNIONPAY' : 'NORMAL'
+      if (isChecked && !mergeFeeItem[item]['UNIONPAY']) {
         mergeFeeItem[item]['UNIONPAY'] = initUnionpay(id1, id2)
       }
-      if (!checked && !mergeFeeItem[item]['NORMAL']) {
+      if (!isChecked && !mergeFeeItem[item]['NORMAL']) {
         mergeFeeItem[item]['NORMAL'] = initNormal(id1, id2)
       }
     })
@@ -1150,95 +989,50 @@ const onChangeLevelMode = (wayCode, checked, mergeFeeItem) => {
 
 const getPayTitle = (f) => {
   if (props.configMode === 'mgrIsv') {
-    if (f === 'mainFee') {
-      return '服务商底价'
-    }
-    if (f === 'agentdefFee') {
-      return '代理商默认'
-    }
-    if (f === 'mchapplydefFee') {
-      return '商户进件默认'
-    }
+    if (f === 'mainFee') return '服务商底价'
+    if (f === 'agentdefFee') return '代理商默认'
+    if (f === 'mchapplydefFee') return '商户进件默认'
   }
   if (props.configMode === 'mgrMch') {
-    if (f === 'readonlyIsvCost') {
-      return '服务商底价'
-    }
-    if (f === 'readonlyParentAgent') {
-      return '上级代理商'
-    }
+    if (f === 'readonlyIsvCost') return '服务商底价'
+    if (f === 'readonlyParentAgent') return '上级代理商'
   }
   if (props.configMode === 'mgrAgent') {
-    if (f === 'mainFee') {
-      return '当前代理商'
-    }
-    if (f === 'agentdefFee') {
-      return '下级代理商默认'
-    }
-    if (f === 'mchapplydefFee') {
-      return '代理商子商户进件默认'
-    }
-
-    if (f === 'readonlyIsvCost') {
-      return '服务商底价'
-    }
-    if (f === 'readonlyParentAgent') {
-      return '上级代理商'
-    }
+    if (f === 'mainFee') return '当前代理商'
+    if (f === 'agentdefFee') return '下级代理商默认'
+    if (f === 'mchapplydefFee') return '代理商子商户进件默认'
+    if (f === 'readonlyIsvCost') return '服务商底价'
+    if (f === 'readonlyParentAgent') return '上级代理商'
   }
   if (props.configMode === 'agentSelf') {
-    if (f === 'mainFee') {
-      return '我的代理'
-    }
-    if (f === 'agentdefFee') {
-      return '下级代理商默认'
-    }
-    if (f === 'mchapplydefFee') {
-      return '商户进件默认'
-    }
+    if (f === 'mainFee') return '我的代理'
+    if (f === 'agentdefFee') return '下级代理商默认'
+    if (f === 'mchapplydefFee') return '商户进件默认'
   }
-
   if (props.configMode === 'agentSubagent') {
-    if (f === 'mainFee') {
-      return '当前代理商'
-    }
-    if (f === 'agentdefFee') {
-      return '下级代理商默认'
-    }
-    if (f === 'mchapplydefFee') {
-      return '商户进件默认'
-    }
-
-    if (f === 'readonlyParentAgent') {
-      return '我的代理'
-    }
+    if (f === 'mainFee') return '当前代理商'
+    if (f === 'agentdefFee') return '下级代理商默认'
+    if (f === 'mchapplydefFee') return '商户进件默认'
+    if (f === 'readonlyParentAgent') return '我的代理'
   }
-
-  if (props.configMode === 'agentSubagent' && f === 'mainFee') {
-    return '代理'
-  } else if ((props.configMode === 'mgrMch' || props.configMode === 'agentMch') && f === 'mainFee') {
-    return '商户'
-  } else if ((props.configMode === 'mgrApplyment' || props.configMode === 'agentApplyment') && f === 'mainFee') {
-    return '进件'
-  } else if (props.configMode === 'mchSelfApp1' && f === 'mainFee') {
-    return '接口'
-  } else if (props.configMode === 'mchApplyment' && f === 'mainFee') {
-    return '进件'
-  } else {
-    return ''
-  }
+  if (props.configMode === 'agentSubagent' && f === 'mainFee') return '代理'
+  if ((props.configMode === 'mgrMch' || props.configMode === 'agentMch') && f === 'mainFee') return '商户'
+  if ((props.configMode === 'mgrApplyment' || props.configMode === 'agentApplyment') && f === 'mainFee') return '进件'
+  if (props.configMode === 'mchSelfApp1' && f === 'mainFee') return '接口'
+  if (props.configMode === 'mchApplyment' && f === 'mainFee') return '进件'
+  return ''
 }
 
 const inputChangeAmount = (wayCode, flag, id, event, mergeFeeItem) => {
   const amount = event.target.value
   if (wayCode) {
-    configTypeMaps.value.map((item) => {
-      rateConfig.value[item][wayCode]['NORMAL'][0].levelList.find((f) => f.id === id)[flag + 'Amount'] = amount
+    configTypeMaps.value.map(item => {
+      rateConfig[item][wayCode]['NORMAL'][0].levelList.find(f => f.id === id)[flag + 'Amount'] = amount
     })
   }
   if (!wayCode && mergeFeeItem) {
-    configTypeMaps.value.map((item) => {
-      mergeFeeItem[item]['NORMAL'][0].levelList.find((f) => f.id === id)[flag + 'Amount'] = amount
+    configTypeMaps.value.map(item => {
+      mergeFeeItem[item]['NORMAL'][0].levelList.find(f => f.id === id)[flag + 'Amount'] = amount
     })
   }
 }
@@ -1248,12 +1042,12 @@ const inputChange = () => {}
 const addLevelFee = (wayCode, mergeFeeItem) => {
   const id = new Date().getTime()
   if (wayCode) {
-    configTypeMaps.value.map((item) => {
-      rateConfig.value[item][wayCode]['NORMAL'][0].levelList.push(initLevel(id))
+    configTypeMaps.value.map(item => {
+      rateConfig[item][wayCode]['NORMAL'][0].levelList.push(initLevel(id))
     })
   }
   if (!wayCode && mergeFeeItem) {
-    configTypeMaps.value.map((item) => {
+    configTypeMaps.value.map(item => {
       mergeFeeItem[item]['NORMAL'][0].levelList.push(initLevel(id))
     })
   }
@@ -1261,17 +1055,15 @@ const addLevelFee = (wayCode, mergeFeeItem) => {
 
 const deleteLevelFee = (wayCode, id, mergeFeeItem) => {
   if (wayCode) {
-    configTypeMaps.value.map((item) => {
-      rateConfig.value[item][wayCode]['NORMAL'][0].levelList = rateConfig.value[item][wayCode][
-        'NORMAL'
-      ][0].levelList.filter((item) => item.id !== id)
+    configTypeMaps.value.map(item => {
+      rateConfig[item][wayCode]['NORMAL'][0].levelList =
+          rateConfig[item][wayCode]['NORMAL'][0].levelList.filter(item => item.id !== id)
     })
   }
   if (!wayCode && mergeFeeItem) {
-    configTypeMaps.value.map((item) => {
-      mergeFeeItem[item]['NORMAL'][0].levelList = mergeFeeItem[item]['NORMAL'][0].levelList.filter(
-        (item) => item.id !== id
-      )
+    configTypeMaps.value.map(item => {
+      mergeFeeItem[item]['NORMAL'][0].levelList =
+          mergeFeeItem[item]['NORMAL'][0].levelList.filter(item => item.id !== id)
     })
   }
 }
@@ -1279,7 +1071,6 @@ const deleteLevelFee = (wayCode, id, mergeFeeItem) => {
 const checkOverlap = (limits) => {
   for (let i = 0; i < limits.length; i++) {
     const { minAmount: min1, maxAmount: max1 } = limits[i]
-
     for (let j = i + 1; j < limits.length; j++) {
       const { minAmount: min2, maxAmount: max2 } = limits[j]
       if (min1 <= max2 && min2 < max1) {
@@ -1290,8 +1081,8 @@ const checkOverlap = (limits) => {
   return false
 }
 
-const levelValidate = (fee, rateConfig) => {
-  const levelFees = rateConfig[rateConfig.levelMode]
+const levelValidate = (fee, rateConfigItem) => {
+  const levelFees = rateConfigItem[rateConfigItem.levelMode]
   for (const i in levelFees) {
     const levelFee = levelFees[i]
     if (isNaN(+levelFee.minFee) || levelFee.minFee === '') {
@@ -1317,16 +1108,12 @@ const levelValidate = (fee, rateConfig) => {
 
     for (const k in levelFee.levelList) {
       const levelItem = levelFee.levelList[k]
-      if (isNaN(+levelItem.feeRate) || levelFee.feeRate === '' || +levelItem.feeRate <= 0) {
+      if (isNaN(+levelItem.feeRate) || levelItem.feeRate === '' || +levelItem.feeRate <= 0) {
         message.error('请录入阶梯费率')
         return false
       }
-      if (
-        isNaN(+levelItem.minAmount) ||
-        levelFee.minAmount === '' ||
-        isNaN(+levelItem.maxAmount) ||
-        levelFee.maxAmount === ''
-      ) {
+      if (isNaN(+levelItem.minAmount) || levelItem.minAmount === '' ||
+          isNaN(+levelItem.maxAmount) || levelItem.maxAmount === '') {
         message.error('阶梯费率请填入金额区间值')
         return false
       }
@@ -1339,14 +1126,23 @@ const levelValidate = (fee, rateConfig) => {
       levelFees[i].levelList[k].maxAmount = Number.parseInt(+levelItem.maxAmount * 100 + '')
     }
   }
-  fee.levelMode = rateConfig.levelMode
-  fee[rateConfig.levelMode] = levelFees
+  fee.levelMode = rateConfigItem.levelMode
+  fee[rateConfigItem.levelMode] = levelFees
+  return true
+}
+
+const singleValidate = (fee) => {
+  if (isNaN(+fee.feeRate) || fee.feeRate === '' || +fee.feeRate <= 0) {
+    message.error('请录入费率')
+    return false
+  }
+  fee.feeRate = Number.parseFloat((+fee.feeRate / 100).toFixed(6))
   return true
 }
 
 const getMergeFeeItem = (wayCode) => {
-  for (const i in mergeFeeList.value) {
-    const mergeFeeItem = mergeFeeList.value[i]
+  for (const i in mergeFeeList) {
+    const mergeFeeItem = mergeFeeList[i]
     for (const k in mergeFeeItem.selectedWayCodeList) {
       const payWay = mergeFeeItem.selectedWayCodeList[k]
       if (payWay.wayCode === wayCode) {
@@ -1360,37 +1156,36 @@ const getMergeFeeItem = (wayCode) => {
 const getFees = (key, rateConfigs, flag = false) => {
   const fees = []
   for (const i in rateConfigs) {
-    let rateConfig = rateConfigs[i]
-    const wayCode = rateConfig.wayCode
-    const mergeFeeItem = getMergeFeeItem(wayCode)
-    const mergeFee = mergeFeeItem[0]
-    const checked = mergeFeeItem[1]
-    if (
-      mergeFee == null ||
-      (mergeFee.isMergeMode && mergeFee.mainFee.state !== 1) ||
-      (mergeFee.isMergeMode && !checked) ||
-      (!mergeFee.isMergeMode && rateConfig.state !== 1)
+    let rateConfigItem = rateConfigs[i]
+    const wayCode = rateConfigItem.wayCode
+    const mergeFeeResult = getMergeFeeItem(wayCode)
+    const mergeFee = mergeFeeResult[0]
+    const checked = mergeFeeResult[1]
+    if (mergeFee == null ||
+        (mergeFee.isMergeMode && mergeFee.mainFee.state !== 1) ||
+        (mergeFee.isMergeMode && !checked) ||
+        (!mergeFee.isMergeMode && rateConfigItem.state !== 1)
     ) {
       continue
     }
     if (mergeFee.isMergeMode) {
-      rateConfig = JSON.parse(JSON.stringify(mergeFee[key]))
-      rateConfig.wayCode = wayCode
+      rateConfigItem = JSON.parse(JSON.stringify(mergeFee[key]))
+      rateConfigItem.wayCode = wayCode
     }
 
     const fee = {}
-    fee.wayCode = rateConfig.wayCode
-    fee.feeType = rateConfig.feeType
-    fee.state = rateConfig.state
-    fee.applymentSupport = rateConfig.applymentSupport
-    if (rateConfig.feeType === 'SINGLE') {
-      if (isNaN(+rateConfig.feeRate) || rateConfig.feeRate === '' || +rateConfig.feeRate < 0) {
+    fee.wayCode = rateConfigItem.wayCode
+    fee.feeType = rateConfigItem.feeType
+    fee.state = rateConfigItem.state
+    fee.applymentSupport = rateConfigItem.applymentSupport
+    if (rateConfigItem.feeType === 'SINGLE') {
+      if (isNaN(+rateConfigItem.feeRate) || rateConfigItem.feeRate === '' || +rateConfigItem.feeRate < 0) {
         message.error('费率值不可小于0')
         return false
       }
-      fee.feeRate = Number.parseFloat((+rateConfig.feeRate / 100).toFixed(6))
+      fee.feeRate = Number.parseFloat((+rateConfigItem.feeRate / 100).toFixed(6))
     } else {
-      if (levelValidate(fee, rateConfig) !== true) {
+      if (!levelValidate(fee, rateConfigItem)) {
         return false
       }
     }
@@ -1400,143 +1195,104 @@ const getFees = (key, rateConfigs, flag = false) => {
 }
 
 const getFeeRateConfig = () => {
-  for (const i in mergeFeeList.value) {
-    const mergeFeeItem = mergeFeeList.value[i]
+  for (const i in mergeFeeList) {
+    const mergeFeeItem = mergeFeeList[i]
     if (
       mergeFeeItem.isMergeMode &&
       mergeFeeItem.selectedWayCodeList.length > 0 &&
-      mergeFeeItem.selectedWayCodeList.filter((f) => f.checked).length <= 0 &&
+      mergeFeeItem.selectedWayCodeList.filter(f => f.checked).length <= 0 &&
       mergeFeeItem.mainFee.state === 1
     ) {
       message.error(`【${mergeFeeItem.name}】合并模式为开通状态但没有选择任何产品， 请点击关闭或勾选产品！`)
       return false
     }
   }
-  const mainFee = getFees('mainFee', Object.values(rateConfig.value.mainFee))
-  if (typeof mainFee !== 'object') {
-    return false
-  }
+  const mainFee = getFees('mainFee', Object.values(rateConfig.mainFee))
+  if (typeof mainFee !== 'object') return false
   let agentdefFee = null
   let mchapplydefFee = null
-  if (
-    props.configMode === 'mgrIsv' ||
-    props.configMode === 'mgrAgent' ||
-    props.configMode === 'agentSubagent' ||
-    props.configMode === 'agentSelf'
-  ) {
-    agentdefFee = getFees('agentdefFee', Object.values(rateConfig.value.agentdefFee))
-    if (typeof agentdefFee !== 'object') {
-      return false
-    }
-    mchapplydefFee = getFees('mchapplydefFee', Object.values(rateConfig.value.mchapplydefFee), true)
-    if (typeof mchapplydefFee !== 'object') {
-      return false
-    }
+  if (props.configMode === 'mgrIsv' || props.configMode === 'mgrAgent' || props.configMode === 'agentSubagent' || props.configMode === 'agentSelf') {
+    agentdefFee = getFees('agentdefFee', Object.values(rateConfig.agentdefFee))
+    if (typeof agentdefFee !== 'object') return false
+    mchapplydefFee = getFees('mchapplydefFee', Object.values(rateConfig.mchapplydefFee), true)
+    if (typeof mchapplydefFee !== 'object') return false
   }
   if (props.configMode === 'mgrIsv') {
-    return {
-      ISVCOST: mainFee,
-      AGENTDEF: agentdefFee,
-      MCHAPPLYDEF: mchapplydefFee
-    }
+    return { ISVCOST: mainFee, AGENTDEF: agentdefFee, MCHAPPLYDEF: mchapplydefFee }
   }
   if (props.configMode === 'mgrAgent' || props.configMode === 'agentSubagent' || props.configMode === 'agentSelf') {
-    return {
-      AGENTRATE: mainFee,
-      AGENTDEF: agentdefFee,
-      MCHAPPLYDEF: mchapplydefFee
-    }
+    return { AGENTRATE: mainFee, AGENTDEF: agentdefFee, MCHAPPLYDEF: mchapplydefFee }
   }
-  if (
-    props.configMode === 'mgrMch' ||
-    props.configMode === 'agentMch' ||
-    props.configMode === 'mgrApplyment' ||
-    props.configMode === 'mchApplyment' ||
-    props.configMode === 'agentApplyment'
-  ) {
-    return {
-      MCHRATE: mainFee
-    }
+  if (props.configMode === 'mgrMch' || props.configMode === 'agentMch') {
+    return { MCHRATE: mainFee }
+  }
+  if (props.configMode === 'mgrApplyment' || props.configMode === 'agentApplyment') {
+    return { MCHAPPLYDEF: mainFee }
+  }
+  if (props.configMode === 'agentSelf') {
+    return { AGENTRATE: mainFee }
   }
   if (props.configMode === 'mchSelfApp1') {
-    return {
-      MCHRATE: mainFee
-    }
+    return { MCHRATE: mainFee }
   }
+  if (props.configMode === 'mchApplyment') {
+    return { MCHAPPLYDEF: mainFee }
+  }
+  return { AGENTRATE: mainFee }
 }
 
-const onSubmit = () => {
+const onSubmit = async () => {
   const feeRateConfig = getFeeRateConfig()
-  if (!feeRateConfig) {
-    return false
+  if (typeof feeRateConfig !== 'object') {
+    return
   }
   const getDelWayCodes = (s) => {
     const wayCodes = []
-    originSavedList.value.forEach((wayCode) => {
-      s.filter((f) => f.wayCode === wayCode).length <= 0 && wayCodes.push(wayCode)
+    originSavedList.value.forEach(wayCode => {
+      if (s.filter(f => f.wayCode === wayCode).length <= 0) {
+        wayCodes.push(wayCode)
+      }
     })
     return wayCodes
   }
   let delPayWayCodes = []
-  let originSavedListVal = null
+  let originSavedListResult = null
   if (props.configMode === 'mgrIsv') {
     delPayWayCodes = getDelWayCodes(feeRateConfig.ISVCOST)
-    originSavedListVal = []
-    feeRateConfig.ISVCOST.forEach((s) => {
-      originSavedListVal.push(s.wayCode)
+    originSavedListResult = []
+    feeRateConfig.ISVCOST.forEach(s => {
+      originSavedListResult.push(s.wayCode)
     })
   } else {
     if (props.configMode === 'mgrAgent' || props.configMode === 'agentSubagent') {
       delPayWayCodes = getDelWayCodes(feeRateConfig.AGENTRATE)
-      originSavedListVal = []
-      feeRateConfig.AGENTRATE.forEach((s) => {
-        originSavedListVal.push(s.wayCode)
+      originSavedListResult = []
+      feeRateConfig.AGENTRATE.forEach(s => {
+        originSavedListResult.push(s.wayCode)
       })
     }
   }
-  let content = ''
-  if (delPayWayCodes.length > 0) {
-    content = '系统检测到关闭了' + delPayWayCodes.length + '个支付产品：【'
-    delPayWayCodes.forEach((wayCode) => {
-      allPaywayMap.value[wayCode]
-        ? (content += `${allPaywayMap.value[wayCode].wayName}(${wayCode});`)
-        : (content += `${wayCode}(已禁用);`)
-    })
-    content += '】，点击确定将同时关闭操作对象的下级代理商和商户的配置！'
+  const params = {
+    infoId: props.infoId,
+    ifCode: props.ifCode,
+    configMode: props.configMode,
+    noCheckRuleFlag: noCheckRuleFlag.value,
+    delPayWayCodes: delPayWayCodes,
+    ...feeRateConfig
   }
-
-  infoBox.confirmPrimary('确认操作？', content, async () => {
-    const params = {
-      infoId: props.infoId,
-      ifCode: props.ifCode,
-      configMode: props.configMode,
-      noCheckRuleFlag: noCheckRuleFlag.value,
-      delPayWayCodes: delPayWayCodes
-    }
-    Object.assign(params, feeRateConfig)
-    loading.value = true
-    try {
-      await payConfigApi.addRateConfig(params)
-      message.success('保存成功')
-      if (typeof originSavedListVal === 'object') {
-        originSavedList.value = originSavedListVal
-      }
-    } catch (error) {
-      console.error('保存费率配置失败:', error)
-    } finally {
-      loading.value = false
-    }
-  })
+  await payConfigApi.addRateConfig(params)
+  if (typeof originSavedListResult === 'object') {
+    originSavedList.value = originSavedListResult
+  }
+  props.callbackFunc()
 }
 
-// Lifecycle
 onMounted(() => {
   if (currentIfCode.value) {
     getRateConfig(currentIfCode.value)
   }
 })
 
-// Expose methods
 defineExpose({
   getRateConfig
 })
@@ -1547,72 +1303,32 @@ defineExpose({
   margin-bottom: 20px;
   position: relative;
   width: 100%;
-  border: 1px solid #d9d9d9;
-  border-radius: 5px;
+  background: var(--base-bg-color);
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  box-sizing: border-box;
 }
 
-.rate-card-wrapper .card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  height: 48px;
-  border-radius: 5px 5px 0 0;
-  background-color: #fafafa;
-}
-
-.rate-card-wrapper .card-header .card-title {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.rate-card-wrapper .card-header .h-left,
-.rate-card-wrapper .card-header .h-left div {
-  display: flex;
-  align-items: center;
-}
-
-.rate-card-wrapper .card-header .h-left div:nth-child(n + 2) {
-  margin-left: 30px;
-}
-
-.rate-card-wrapper .rate-card-content {
-  padding: 30px 30px 40px;
-}
-
-.weChat-pay-list {
-  display: flex;
-  align-items: center;
-}
-
-.weChat-pay-list .w-pay-title {
-  margin-bottom: 8px;
-}
-
-.weChat-pay-list .w-pay-item {
-  margin-right: 30px;
-  min-width: 150px;
-}
-
-.rate-header {
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.rate-title {
+.h-left {
+  display: flex;
+  align-items: center;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 500;
 }
 
-.rate-header-right {
+.h-right {
   display: flex;
   align-items: center;
-}
-
-.rate-header-right .ant-checkbox {
-  margin-right: 10px;
 }
 
 .h-right2 {
@@ -1621,28 +1337,62 @@ defineExpose({
 }
 
 .h-right2-div {
-  margin-left: 20px;
+  margin-right: 16px;
   display: flex;
   align-items: center;
 }
 
-.h-right2-div .ant-switch {
-  margin-left: 8px;
+.rate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.btn-center {
+.rate-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.rate-header-right {
   display: flex;
-  justify-content: center;
-  margin-top: 30px;
+  align-items: center;
+}
+
+.rate-card-content {
+  padding-top: 16px;
+}
+
+.weChat-pay-list {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.w-pay-item {
+  margin-right: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.w-pay-title {
+  font-size: 12px;
+  color: var(--text-color-weak);
+  margin-bottom: 4px;
+  height: 21px;
+  line-height: 21px;
 }
 
 .drawer-btn-center {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 30px;
+  text-align: center;
+  padding: 16px;
+  border-top: 1px solid var(--border-color);
 }
 
-.drawer {
-  padding: 20px;
+.btn-center {
+  text-align: center;
+  padding: 16px;
+  margin-top: 16px;
 }
 </style>

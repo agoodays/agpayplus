@@ -7,9 +7,6 @@
     v-model:open="localOpen"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')"
-    :confirm-loading="loading"
-    @confirm="handleConfirm"
     @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
@@ -32,7 +29,7 @@
       </a-row>
     </a-form>
     <a-divider orientation="left">
-      <a-tag color="#FF4B33"> {{ saveObject.ifCode }} 服务商参数配置 </a-tag>
+      <a-tag color="var(--error-color)"> {{ saveObject.ifCode }} 服务商参数配置 </a-tag>
     </a-divider>
     <a-form ref="isvParamForm" :model="ifParams" layout="vertical" :rules="ifParamsRules">
       <a-row :gutter="16">
@@ -129,6 +126,16 @@
         </a-col>
       </a-row>
     </a-form>
+    <div class="drawer-btn-center" v-if="hasPermission('ENT_MCH_PAY_CONFIG_ADD')">
+      <a-button :style="{ marginRight: '8px' }" @click="handleClose">
+        <template #icon><CloseOutlined /></template>
+        取消
+      </a-button>
+      <a-button type="primary" :loading="loading" @click="handleConfirm">
+        <template #icon><CheckOutlined /></template>
+        保存
+      </a-button>
+    </div>
   </ag-drawer>
 </template>
 
@@ -138,7 +145,7 @@
  * 功能：配置服务商微信支付相关参数
  */
 import { AgDrawer, AgUpload } from '@/components'
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { LoadingOutlined, UploadOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
 import { usePermission } from '@/composables/useCommon'
 import { message } from 'ant-design-vue'

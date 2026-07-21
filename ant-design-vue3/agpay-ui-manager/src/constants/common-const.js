@@ -111,6 +111,7 @@ export const getMchTypeOptions = (t) => generateOptions(MCH_TYPE_ENUM, t)
 export const getMchLevelOptions = (t) => generateOptions(MCH_LEVEL_ENUM, t)
 export const getRefundModeOptions = (t) => generateOptions(REFUND_MODE_ENUM, t)
 export const getCashOutFeeTypeOptions = (t) => generateOptions(CASH_OUT_FEE_TYPE_ENUM, t)
+export const getUserTypeOptions = (t) => generateOptions(USER_TYPE_ENUM, t)
 
 // ================= 状态获取工具函数 =================
 /**

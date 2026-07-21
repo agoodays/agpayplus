@@ -71,12 +71,13 @@ const { t } = useI18n()
 
 const props = defineProps({
   modelValue: { type: Object, default: () => ({}) },
+  defaultModelValue: { type: Object, default: () => ({}) },
   searchLoading: { type: Boolean, default: false },
   loading: { type: Boolean, default: undefined },
   resetMode: {
     type: String,
     default: 'undefined',
-    validator: (val) => ['undefined', 'null', 'empty-string', 'empty-array', 'keep'].includes(val)
+    validator: (val) => ['undefined', 'null', 'empty-string', 'empty-array', 'keep', 'default'].includes(val)
   },
   resetExclude: { type: Array, default: () => [] },
   collapsible: { type: Boolean, default: false },
@@ -224,6 +225,8 @@ function getResetValue() {
       return []
     case 'keep':
       return '__AG_SEARCH_KEEP__'
+    case 'default':
+      return '__AG_SEARCH_DEFAULT__'
     case 'undefined':
     default:
       return undefined
@@ -238,12 +241,21 @@ function onSearch() {
 
 function onReset() {
   const resetValue = getResetValue()
-  const keys = Object.keys(model.value)
-  keys.forEach((key) => {
-    if (props.resetExclude.includes(key)) return
-    if (resetValue === '__AG_SEARCH_KEEP__') return
-    model.value[key] = Array.isArray(resetValue) ? [] : resetValue
-  })
+  
+  if (resetValue === '__AG_SEARCH_DEFAULT__') {
+    Object.keys(model.value).forEach((key) => {
+      delete model.value[key]
+    })
+    Object.assign(model.value, props.defaultModelValue)
+  } else {
+    const keys = Object.keys(model.value)
+    keys.forEach((key) => {
+      if (props.resetExclude.includes(key)) return
+      if (resetValue === '__AG_SEARCH_KEEP__') return
+      model.value[key] = Array.isArray(resetValue) ? [] : resetValue
+    })
+  }
+  
   emit('reset', model.value)
   emit('update:modelValue', model.value)
 }

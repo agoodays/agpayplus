@@ -167,12 +167,11 @@ const handleClose = () => {
 }
 
 const getCurrentComponent = () => {
-  const suffix = props.isIsvSubMch ? 'IsvSubMch' : ''
+  const suffix = props.isIsvSubMch ? 'isv-sub-mch-' : ''
   switch (currentIfCode.value) {
     case 'wxpay':
-      return import(`./diy/wxpay/${suffix}Oauth2ConfigPage.vue`)
     case 'alipay':
-      return import(`./diy/alipay/${suffix}Oauth2ConfigPage.vue`)
+      return import(`./diy/${currentIfCode.value}/${suffix}oauth2-config-page.vue`)
     default:
       return Promise.reject(new Error('Unknown variable dynamic import: ' + currentIfCode.value))
   }

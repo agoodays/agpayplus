@@ -1,81 +1,55 @@
 <template>
   <div>
-    <div v-if="showCard" class="card">
-      <div class="content-box">
-        <a-form v-bind="formItemLayout" ref="infoForm" :model="saveObject">
-          <a-row :gutter="24">
-            <a-col v-for="(item, key) in formItems" :key="key" :span="item.span || 6" class="form-item">
-              <a-form-item :label="item.label" :required="item.required" :rules="item.rules" :name="item.key">
-                <a-input
-                  v-if="item.type === 'text'"
-                  v-model:value="saveObject[item.key]"
-                  :disabled="item.readonly"
-                  :placeholder="item.placeholder"
-                />
-                <a-textarea
-                  v-else-if="item.type === 'textarea'"
-                  v-model:value="saveObject[item.key]"
-                  :disabled="item.readonly"
-                  :placeholder="item.placeholder"
-                />
-                <a-select
-                  v-else-if="item.type === 'select'"
-                  v-model:value="saveObject[item.key]"
-                  :disabled="item.readonly"
-                  :placeholder="item.placeholder"
-                >
-                  <a-select-option v-for="(option, optionKey) in item.options" :key="optionKey" :value="option.value">
-                    {{ option.label }}
-                  </a-select-option>
-                </a-select>
-                <a-switch
-                  v-else-if="item.type === 'switch'"
-                  v-model:checked="saveObject[item.key]"
-                  :disabled="item.readonly"
-                />
-                <ag-upload
-                  v-else-if="item.type === 'upload'"
-                  v-model:value="saveObject[item.key]"
-                  :disabled="item.readonly"
-                  :max-size="item.maxSize || 2"
-                  :max-count="item.maxCount || 1"
-                  :is-multiple="item.isMultiple || false"
-                  :preview-mode="item.previewMode || 'file'"
-                  :action="item.action"
-                  :data="item.data"
-                  :accept="item.accept"
-                  :file-list="item.fileList"
-                  :remove="item.remove"
-                  :before-upload="item.beforeUpload"
-                  :on-success="item.onSuccess"
-                  :on-error="item.onError"
-                  :on-progress="item.onProgress"
-                  :on-change="item.onChange"
-                  :custom-request="item.customRequest"
-                  :list-type="item.listType || 'text'"
-                  :show-upload-list="item.showUploadList !== false"
-                  :auto-upload="item.autoUpload !== false"
-                />
-              </a-form-item>
-            </a-col>
-          </a-row>
-          <a-form-item>
-            <a-button type="primary" :loading="loading" @click="onSubmit"> 保存 </a-button>
+    <BasePage ref="infoFormRef" :form-data="saveObject" :diy-list="diyList" />
+    <a-divider orientation="left" v-if="ifDefineArray.length && saveObject.infoType !== 'AGENT'">
+      <a-tag color="#FF4B33">
+        {{ saveObject.ifCode }} {{ saveObject.infoType === 'ISV' ? '服务商' : saveObject.infoType === 'MCH_APP' ? '商户' : saveObject.infoType === 'AGENT' ? '代理商' : '' }}参数配置
+      </a-tag>
+    </a-divider>
+    <a-form v-if="saveObject.infoType !== 'AGENT'" ref="paramFormRef" :model="ifParams" layout="vertical">
+      <a-row :gutter="16">
+        <a-col v-for="(item, key) in ifDefineArray" :key="key" :span="item.type === 'text' ? 12 : 24">
+          <a-form-item :label="item.desc" :name="item.name" :rules="getItemRules(item)">
+            <a-input
+              v-if="item.type === 'text' || item.type === 'textarea'"
+              v-model:value="ifParams[item.name]"
+              :placeholder="ifParams[item.name + '_ph'] || '请输入' + item.desc"
+              :type="item.type"
+            />
+            <a-radio-group v-else-if="item.type === 'radio'" v-model:value="ifParams[item.name]">
+              <a-radio v-for="(radioItem, radioKey) in item.values" :key="radioKey" :value="radioItem.value">
+                {{ radioItem.title }}
+              </a-radio>
+            </a-radio-group>
+            <ag-upload
+              v-else-if="item.type === 'file'"
+              :action="uploadAction"
+              :bind-name="item.name"
+              :urls="[ifParams[item.name]]"
+              :list-type="'picture'"
+              @upload-success="uploadSuccess"
+            >
+              <template #uploadSlot="{ loading }">
+                <a-button class="ag-upload-btn">
+                  <component :is="loading ? LoadingOutlined : UploadOutlined" /> 上传
+                </a-button>
+              </template>
+            </ag-upload>
           </a-form-item>
-        </a-form>
-      </div>
-    </div>
+        </a-col>
+      </a-row>
+    </a-form>
   </div>
 </template>
 
 <script setup>
-/**
- * 支付配置 - 通用配置页面组件
- * 功能：根据支付接口定义动态渲染配置表单，支持文本、文本域、下拉选择、开关、上传等类型
- */
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
+import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
+import { upload } from '@/lib/ag-axios'
+import BasePage from './base-page.vue'
 import { AgUpload } from '@/components'
 
 const props = defineProps({
@@ -99,125 +73,206 @@ const props = defineProps({
     type: String,
     default: ''
   },
+  diyList: {
+    type: Array,
+    default: () => []
+  },
   callbackFunc: {
     type: Function,
     default: () => {}
   }
 })
 
-/** 是否显示卡片 */
-const showCard = ref(false)
-/** 加载状态 */
-const loading = ref(false)
-/** 表单引用 */
-const infoForm = ref(null)
-/** 表单数据对象 */
-const saveObject = reactive({})
-/** 表单字段配置 */
-const formItems = ref([])
+const emit = defineEmits(['success'])
 
-/** 表单布局配置 */
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 6 }
+const infoFormRef = ref(null)
+const paramFormRef = ref(null)
+const uploadAction = ref(upload.cert)
+
+const saveObject = reactive({
+  infoId: props.infoId,
+  infoType: props.infoType,
+  ifCode: props.ifDefine?.ifCode || '',
+  state: props.ifDefine?.ifConfigState === 0 ? 0 : 1,
+  ifRate: null,
+  settHoldDay: null,
+  isOpenApplyment: 0,
+  isOpenCashout: 0,
+  cashoutParams: {
+    isOpenMchOrderCashout: 0,
+    isOpenMchTaskCashout: 0,
+    minCashoutAmount: null,
+    maxCashoutAmount: null,
+    startTime: null,
+    endTime: null
   },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 18 }
+  isOpenCheckBill: 0,
+  ignoreCheckBillMchNos: null,
+  isSupportApplyment: props.ifDefine?.isSupportApplyment === 1 ? 1 : 0,
+  isSupportCashout: props.ifDefine?.isSupportCashout === 1 ? 1 : 0,
+  isSupportCheckBill: props.ifDefine?.isSupportCheckBill === 1 ? 1 : 0,
+  remark: '',
+  oauth2InfoId: ''
+})
+
+const ifParams = reactive({})
+const ifDefineArray = ref([])
+
+const getItemRules = (item) => {
+  const rules = []
+  if (item.verify === 'required' && (item.star !== '1' || !ifParams[item.name + '_ph'])) {
+    rules.push({
+      required: true,
+      message: '请输入' + item.desc,
+      trigger: 'blur'
+    })
   }
+  return rules
 }
 
-/**
- * 获取支付配置数据
- */
-const getConfig = async () => {
+const getPayConfig = async () => {
   if (!props.ifDefine) return
 
-  loading.value = true
   try {
-    const res = await payConfigApi.getPayConfigById(props.infoId, props.ifDefine.ifCode)
-    showCard.value = true
-    formItems.value = res.configItems
-    formItems.value.forEach((item) => {
-      saveObject[item.key] = item.value
+    const params = {
+      configMode: props.configMode,
+      infoId: saveObject.infoId,
+      ifCode: saveObject.ifCode
+    }
+    const res = await payConfigApi.getPayInterfaceSavedConfigs(params.configMode, params.infoId, params.ifCode)
+
+    if (res) {
+      Object.assign(saveObject, res)
+      saveObject.oauth2InfoId = res.oauth2InfoId || ''
+      saveObject.cashoutParams = typeof res.cashoutParams === 'string' ? JSON.parse(res.cashoutParams || '{}') : res.cashoutParams || {}
+      const parsedIfParams = typeof res.ifParams === 'string' ? JSON.parse(res.ifParams || '{}') : res.ifParams || {}
+      Object.keys(ifParams).forEach(key => delete ifParams[key])
+      Object.assign(ifParams, parsedIfParams)
+    }
+
+    const newItems = []
+    const paramsData = props.ifDefine.mchType
+      ? props.ifDefine.mchType === 1
+        ? props.ifDefine.normalMchParams
+        : props.ifDefine.isvsubMchParams
+      : props.ifDefine.isvParams
+
+    JSON.parse(paramsData || '[]').forEach(item => {
+      const radioItems = []
+      if (item.type === 'radio') {
+        const valueItems = item.values.split(',')
+        const titleItems = item.titles.split(',')
+        for (const i in valueItems) {
+          let radioVal = valueItems[i]
+          if (!isNaN(radioVal)) {
+            radioVal = Number(radioVal)
+          }
+          radioItems.push({
+            value: radioVal,
+            title: titleItems[i]
+          })
+        }
+      }
+
+      if (item.star === '1') {
+        ifParams[item.name + '_ph'] = ifParams[item.name] || '请输入' + item.desc
+        if (ifParams[item.name]) {
+          ifParams[item.name] = ''
+        }
+      }
+
+      newItems.push({
+        name: item.name,
+        desc: item.desc,
+        type: item.type,
+        verify: item.verify,
+        values: radioItems,
+        star: item.star
+      })
     })
+
+    ifDefineArray.value = newItems
   } catch (error) {
     console.error('获取支付配置失败:', error)
-  } finally {
-    loading.value = false
   }
 }
 
-/**
- * 重置表单数据
- */
-const reset = () => {
-  showCard.value = false
-  formItems.value = []
-  Object.keys(saveObject).forEach((key) => {
-    delete saveObject[key]
-  })
-}
-
-/**
- * 提交表单
- */
 const onSubmit = async () => {
   try {
-    await infoForm.value.validate()
-    loading.value = true
-    const params = {
-      infoId: props.infoId,
-      infoType: props.infoType,
-      ifCode: props.ifDefine.ifCode,
-      configItems: formItems.value.map((item) => ({
-        key: item.key,
-        value: saveObject[item.key]
-      }))
+    if (infoFormRef.value) {
+      await infoFormRef.value.validate()
     }
-    await payConfigApi.addPayConfig(params)
-    message.success('保存成功')
-    props.callbackFunc()
+
+    if (paramFormRef.value && ifDefineArray.value.length > 0) {
+      await paramFormRef.value.validate()
+    }
+
+    if (Object.keys(ifParams).length === 0) {
+      message.error('参数不能为空！')
+      return
+    }
+
+    const ifParamsCopy = JSON.parse(JSON.stringify(ifParams) || '{}')
+    ifDefineArray.value.forEach(item => {
+      if (item.star === '1' && !ifParamsCopy[item.name]) {
+        ifParamsCopy[item.name] = undefined
+      }
+      ifParamsCopy[item.name + '_ph'] = undefined
+    })
+
+    await submitRequest(JSON.stringify(ifParamsCopy))
   } catch (error) {
-    // 表单验证失败或接口调用失败
     console.error('保存支付配置失败:', error)
-  } finally {
-    loading.value = false
   }
 }
 
-// Watch
+const submitRequest = async (ifParamsData = '{}') => {
+  const reqParams = {
+    infoId: saveObject.infoId,
+    infoType: saveObject.infoType,
+    ifCode: saveObject.ifCode,
+    ifRate: saveObject.ifRate,
+    state: saveObject.state,
+    settHoldDay: saveObject.settHoldDay,
+    isOpenApplyment: saveObject.isOpenApplyment,
+    isOpenCashout: saveObject.isOpenCashout,
+    cashoutParams: typeof saveObject.cashoutParams === 'string' ? saveObject.cashoutParams : JSON.stringify(saveObject.cashoutParams),
+    isOpenCheckBill: saveObject.isOpenCheckBill,
+    ignoreCheckBillMchNos: saveObject.ignoreCheckBillMchNos,
+    remark: saveObject.remark,
+    ifParams: ifParamsData
+  }
+
+  await payConfigApi.saveOrUpdatePayInterfaceConfig(reqParams)
+  props.callbackFunc()
+  emit('success')
+}
+
+const uploadSuccess = (name, fileList) => {
+  const [firstItem] = fileList
+  ifParams[name] = firstItem?.url
+}
+
+const hasPermission = (permCode) => {
+  return true
+}
+
+onMounted(() => {
+  getPayConfig()
+})
+
 watch(
   () => props.ifDefine,
-  (newVal) => {
-    if (newVal) {
-      getConfig()
-    } else {
-      reset()
-    }
+  () => {
+    getPayConfig()
   },
-  { immediate: true }
+  { immediate: false }
 )
-
-// Expose methods
-defineExpose({
-  getConfig,
-  reset
-})
 </script>
 
 <style scoped>
-.card {
-  margin: 0 20px 20px 0;
-  min-height: 700px;
-}
-
-.content-box {
-  padding: 30px 50px;
-}
-
-.form-item {
-  margin-bottom: 24px;
+.drawer-btn-center {
+  position: fixed;
+  width: 90%;
 }
 </style>
