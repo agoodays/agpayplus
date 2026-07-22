@@ -11,7 +11,7 @@
     <slot></slot>
 
     <template v-if="showFooter" #footer>
-      <div class="drawer-footer">
+      <div class="ag-drawer-footer">
         <slot name="footer">
           <a-space>
             <a-button @click="handleClose">
@@ -130,10 +130,4 @@ defineExpose({
 })
 </script>
 
-<style scoped>
-.drawer-footer {
-  text-align: right;
-  padding: 10px 16px;
-  /* border-top: 1px solid #f0f0f0; */
-}
-</style>
+<style scoped></style>

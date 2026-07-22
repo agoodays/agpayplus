@@ -196,53 +196,46 @@ const ifParams = reactive({
   apiClientKey: ''
 })
 
-const validateAppSecret = (_rule, value, callback) => {
+const validateAppSecret = async (_rule, value) => {
   if (isAdd.value && !value) {
-    callback(new Error('请输入应用AppSecret'))
+    throw new Error('请输入应用AppSecret')
   }
-  callback()
 }
 
-const validateKey = (_rule, _value, callback) => {
+const validateKey = async (_rule, _value) => {
   if (ifParams.apiVersion === 'V2' && isAdd.value && !ifParams.key) {
-    callback(new Error('请输入API密钥'))
+    throw new Error('请输入API密钥')
   }
-  callback()
 }
 
-const validateApiV3Key = (_rule, _value, callback) => {
+const validateApiV3Key = async (_rule, _value) => {
   if (ifParams.apiVersion === 'V3' && isAdd.value && !ifParams.apiV3Key) {
-    callback(new Error('请输入API V3秘钥'))
+    throw new Error('请输入API V3秘钥')
   }
-  callback()
 }
 
-const validateSerialNo = (_rule, _value, callback) => {
+const validateSerialNo = async (_rule, _value) => {
   if (ifParams.apiVersion === 'V3' && isAdd.value && !ifParams.serialNo) {
-    callback(new Error('请输入序列号'))
+    throw new Error('请输入序列号')
   }
-  callback()
 }
 
-const validateCert = (_rule, _value, callback) => {
+const validateCert = async (_rule, _value) => {
   if (ifParams.apiVersion === 'V3' && isAdd.value && !ifParams.cert) {
-    callback(new Error('请上传API证书(apiclient_cert.p12)'))
+    throw new Error('请上传API证书(apiclient_cert.p12)')
   }
-  callback()
 }
 
-const validateApiClientCert = (_rule, _value, callback) => {
+const validateApiClientCert = async (_rule, _value) => {
   if (ifParams.apiVersion === 'V3' && isAdd.value && !ifParams.apiClientCert) {
-    callback(new Error('请上传证书文件(apiclient_cert.pem)'))
+    throw new Error('请上传证书文件(apiclient_cert.pem)')
   }
-  callback()
 }
 
-const validateApiClientKey = (_rule, _value, callback) => {
+const validateApiClientKey = async (_rule, _value) => {
   if (ifParams.apiVersion === 'V3' && !ifParams.apiClientKey) {
-    callback(new Error('请上传私钥文件(apiclient_key.pem)'))
+    throw new Error('请上传私钥文件(apiclient_key.pem)')
   }
-  callback()
 }
 
 const getPayConfig = async () => {
@@ -261,7 +254,6 @@ const getPayConfig = async () => {
       saveObject.oauth2InfoId = res.oauth2InfoId || ''
       saveObject.cashoutParams = typeof res.cashoutParams === 'string' ? JSON.parse(res.cashoutParams || '{}') : res.cashoutParams || {}
       const parsedIfParams = typeof res.ifParams === 'string' ? JSON.parse(res.ifParams || '{}') : res.ifParams || {}
-      Object.keys(ifParams).forEach(key => delete ifParams[key])
       Object.assign(ifParams, parsedIfParams)
 
       ifParams.appSecret_ph = ifParams.appSecret || '请输入'
@@ -309,6 +301,7 @@ const onSubmit = async () => {
     await submitRequest(JSON.stringify(ifParamsCopy))
   } catch (error) {
     console.error('保存支付配置失败:', error)
+    throw error
   }
 }
 
@@ -350,6 +343,10 @@ const hasPermission = (permCode) => {
 
 onMounted(() => {
   getPayConfig()
+})
+
+defineExpose({
+  onSubmit
 })
 </script>
 

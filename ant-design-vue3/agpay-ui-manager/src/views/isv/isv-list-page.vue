@@ -71,7 +71,7 @@
     <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
 
     <!-- 支付配置抽屉 -->
-    <ag-pay-config-drawer v-model:open="payConfigOpen" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" :info-id="currentRecordId" />
+    <ag-pay-config-drawer v-model:open="payConfigOpen" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" :info-id="currentRecordId" :channel-list-config="{ autoSelectFirst: false }"/>
 
     <!-- OAuth2配置抽屉 -->
     <ag-pay-oauth2-config-drawer v-model:open="payOauth2ConfigOpen" :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'" :config-mode="'mgrIsv'" :info-id="currentRecordId" />

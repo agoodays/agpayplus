@@ -87,6 +87,12 @@ const reset = () => {
   }
 }
 
+const onSubmit = async () => {
+  if (configComponentRef.value && configComponentRef.value.onSubmit) {
+    await configComponentRef.value.onSubmit()
+  }
+}
+
 const tabSelected = (code) => {
   if (currentTabVal.value !== code) {
     currentTabVal.value = code
@@ -131,7 +137,8 @@ watch(
 // Expose methods
 defineExpose({
   getConfig,
-  reset
+  reset,
+  onSubmit
 })
 </script>
 

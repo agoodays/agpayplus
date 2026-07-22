@@ -1,24 +1,31 @@
 <template>
   <a-drawer
-    v-model:open="localOpen"
+    :open="open"
     title="支付配置"
-    @close="handleClose"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ padding: '0px', overflowY: 'auto' }"
     width="90%"
+    @close="handleClose"
   >
     <ag-pay-config-panel
-      ref="payConfig"
+      ref="payConfigRef"
       :is-drawer="true"
       :perm-code="permCode"
       :config-mode="configMode"
+      :info-id="infoId"
+      :is-isv-sub-mch="isIsvSubMch"
+      :channel-list-config="channelListConfig"
+      @channel-change="handleChannelChange"
+      @tab-change="handleTabChange"
+      @passage-state-update="handlePassageStateUpdate"
+      @submit-success="handleSubmitSuccess"
     />
     <template #footer>
-      <div class="drawer-footer">
+      <div class="ag-drawer-footer">
         <a-button @click="handleClose">
           <close-outlined />取消
         </a-button>
-        <a-button type="primary" :loading="btnLoading" @click="onSubmit">
+        <a-button v-if="hasSelectedChannel" type="primary" :loading="btnLoading" @click="onSubmit">
           <check-outlined />保存
         </a-button>
       </div>
@@ -27,64 +34,55 @@
 </template>
 
 <script setup>
-/**
- * 支付配置抽屉组件
- * 功能：展示支付配置面板
- */
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import AgPayConfigPanel from './ag-pay-config-panel.vue'
 
-/** Props 定义 */
 const props = defineProps({
+  open: { type: Boolean, default: false },
   permCode: { type: String, default: '' },
   configMode: { type: String, default: '' },
-  open: { type: Boolean, default: false },
-  infoId: { type: String, default: '' },
-  isIsvSubMch: { type: Boolean, default: false }
+  infoId: { type: [String, Number], default: null },
+  isIsvSubMch: { type: Boolean, default: false },
+  channelListConfig: { type: Object, default: () => ({}) }
 })
 
-/** 事件定义 */
-const emit = defineEmits(['update:open', 'success'])
+const emit = defineEmits(['update:open', 'success', 'channel-change', 'tab-change', 'passage-state-update'])
 
-const localOpen = ref(false)
-const payConfig = ref(null)
+const payConfigRef = ref(null)
 const btnLoading = ref(false)
+const hasSelectedChannel = ref(false)
 
-/** 监听 open 属性变化 */
-watch(
-  () => props.open,
-  (val) => {
-    localOpen.value = val
-    if (val && props.infoId && payConfig.value) {
-      payConfig.value.getPayConfig(props.infoId, props.isIsvSubMch)
-    }
-  }
-)
-
-/** 监听本地 open 变化，同步 emit */
-watch(localOpen, (val) => {
-  emit('update:open', val)
-})
-
-/** 处理关闭 */
 const handleClose = () => {
-  localOpen.value = false
-  if (payConfig.value) {
-    payConfig.value.reset()
-  }
+  emit('update:open', false)
 }
 
-/** 提交保存 */
+const handleChannelChange = (channelCode) => {
+  hasSelectedChannel.value = !!channelCode
+  emit('channel-change', channelCode)
+}
+
+const handleTabChange = (tabCode) => {
+  emit('tab-change', tabCode)
+}
+
+const handlePassageStateUpdate = (data) => {
+  emit('passage-state-update', data)
+}
+
+const handleSubmitSuccess = () => {
+  message.success('保存成功')
+  handleClose()
+  emit('success')
+}
+
 const onSubmit = async () => {
   btnLoading.value = true
   try {
-    if (payConfig.value) {
-      await payConfig.value.onSubmit()
-      message.success('保存成功')
-      handleClose()
-      emit('success')
+    if (payConfigRef.value) {
+      await payConfigRef.value.onSubmit()
+      handleSubmitSuccess()
     }
   } catch (error) {
     console.error('保存失败:', error)
@@ -95,10 +93,4 @@ const onSubmit = async () => {
 }
 </script>
 
-<style scoped>
-.drawer-footer {
-  text-align: right;
-  padding: 10px 16px;
-  /* border-top: 1px solid #f0f0f0; */
-}
-</style>
+<style scoped></style>

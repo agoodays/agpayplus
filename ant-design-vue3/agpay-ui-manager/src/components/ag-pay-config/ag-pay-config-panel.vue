@@ -1,529 +1,393 @@
 <template>
-  <a-tabs v-model:active-key="topTabsVal">
+  <a-tabs v-model:active-key="activeTopTab" @change="tabConfig.selectTopTab">
     <a-tab-pane
-      v-if="topTabData.some((tab) => tab.code === 'paramsAndRateTab')"
-      :key="'paramsAndRateTab'"
+      v-if="topTabList.some(tab => tab.code === CONFIG_TAB_CODES.PARAMS_AND_RATE)"
+      :key="CONFIG_TAB_CODES.PARAMS_AND_RATE"
       :tab="'参数及费率的填写'"
     >
-      <div class="search">
-        <a-input v-model:value="ifCodeListSearchData.ifName" class="if-input" placeholder="搜索渠道名称" />
-        <a-input v-model:value="ifCodeListSearchData.ifCode" class="if-input" placeholder="搜索渠道代码" />
-        <a-button type="primary" @click="searchIfCodeFunc">
+      <div class="search-bar">
+        <slot name="search-prepend"></slot>
+        <a-input 
+          v-model:value="searchForm.channelName" 
+          class="search-input" 
+          placeholder="搜索渠道名称" 
+        />
+        <a-input 
+          v-model:value="searchForm.channelCode" 
+          class="search-input" 
+          placeholder="搜索渠道代码" 
+        />
+        <a-button type="primary" @click="channelList.handleSearch">
           <template #icon><SearchOutlined /></template>
           查询
         </a-button>
-        <a-button style="margin-left: 8px" @click="() => (ifCodeListSearchData = {})">
+        <a-button style="margin-left: 8px" @click="channelList.handleResetSearch">
           <template #icon><ReloadOutlined /></template>
           重置
         </a-button>
+        <slot name="search-append"></slot>
       </div>
-      <div class="pay-list-wrapper" :style="{ height: isShowMore ? 'auto' : '110px' }">
-        <div v-for="(item, key) in ifCodeList" :key="key" class="pay-item-wrapper">
+      <div 
+        class="channel-list-wrapper" 
+        :style="{ height: displayHeight }"
+      >
+        <div 
+          v-for="(item, index) in sortedChannelList" 
+          :key="item.ifCode" 
+          class="channel-item-wrapper"
+        >
           <div
-            class="pay-content"
-            :class="{ 'pay-selected': currentIfCode === item.ifCode }"
-            @click="ifCodeSelected(item.ifCode)"
+            class="channel-card"
+            :class="{ 'channel-card-selected': activeChannelCode === item.ifCode }"
+            @click="handleChannelSelect(item.ifCode)"
           >
-            <div class="pay-img" :style="{ backgroundColor: item.bgColor }">
+            <div class="channel-icon" :style="{ backgroundColor: item.bgColor }">
               <img :src="item.icon" alt="" />
               <div
-                class="pay-state-dot"
+                class="channel-status-dot"
                 :style="{ backgroundColor: item.ifConfigState ? '#29CC96FF' : '#D9D9D9FF' }"
               ></div>
             </div>
-            <div class="pay-info">
-              <div class="pay-title">{{ item.ifName }}</div>
-              <div class="pay-code">{{ item.ifCode }}</div>
+            <div class="channel-info">
+              <div class="channel-name">{{ item.ifName }}</div>
+              <div class="channel-code">{{ item.ifCode }}</div>
             </div>
+            <slot name="channel-card-extra" :channel="item"></slot>
           </div>
         </div>
       </div>
-      <div v-if="currentIfCode" class="tab-wrapper">
-        <div class="tab-content">
+      <div v-if="activeChannelCode" class="sub-tab-wrapper">
+        <div class="sub-tab-content">
           <div
-            v-for="(item, key) in tabData"
-            :key="key"
-            class="tab-item"
-            :class="{ 'tab-selected': paramsAndRateTabVal === item.code }"
-            @click="tabSelected(item.code)"
+            v-for="(item, key) in subTabList"
+            :key="item.code"
+            class="sub-tab-item"
+            :class="{ 'sub-tab-item-selected': activeSubTab === item.code }"
+            @click="handleSubTabSelect(item.code)"
           >
             {{ item.name }}
           </div>
         </div>
-        <div class="open-close" @click="isShowMore = !isShowMore">
-          {{ isShowMore ? '收起' : '展开' }}
-          <component :is="isShowMore ? icons.UpOutlined : icons.DownOutlined" />
+        <div class="expand-toggle" @click="channelList.toggleExpand">
+          {{ isExpanded ? '收起' : '展开' }}
+          <component :is="isExpanded ? icons.UpOutlined : icons.DownOutlined" />
         </div>
       </div>
-      <div class="content-box">
-        <component
-          :is="configComponent"
-          v-if="paramsAndRateTabVal === 'paramsTab'"
-          ref="configComponentRef"
-          :info-id="infoId"
-          :info-type="infoType"
-          :if-define="ifDefine"
-          :perm-code="permCode"
-          :config-mode="configMode"
-          :diy-list="diyList"
-          :callback-func="refIfCodeList"
-        />
-        <ag-pay-way-rate-panel
-          v-show="currentIfCode"
-          v-if="paramsAndRateTabVal === 'rateTab'"
-          ref="rateConfigComponentRef"
-          :is-drawer="isDrawer"
-          :info-id="infoId"
-          :info-type="infoType"
-          :if-code="currentIfCode"
-          :perm-code="permCode"
-          :config-mode="configMode"
-          :callback-func="refIfCodeList"
-        />
-        <div v-if="paramsAndRateTabVal === 'channelConfigTab'">
-          <component
-            :is="appConfigComponent"
-            v-if="paramsAndRateTabVal === 'channelConfigTab'"
-            ref="appConfigComponentRef"
-            :if-code="currentIfCode"
-          />
-        </div>
+      <div class="content-area">
+        <template v-if="activeSubTab === CONFIG_TAB_CODES.PARAMS">
+          <slot name="params-content" :channel-code="activeChannelCode">
+            <component
+              :is="configLoader.currentConfigComponent.value"
+              ref="configComponentRef"
+              :info-id="currentInfoId"
+              :info-type="currentInfoType"
+              :if-define="configLoader.currentChannelDefine.value"
+              :perm-code="permCode"
+              :config-mode="configMode"
+              :diy-list="diyConfigList"
+              :callback-func="channelList.refreshChannelList"
+            />
+          </slot>
+        </template>
+        <template v-if="activeSubTab === CONFIG_TAB_CODES.RATE">
+          <slot name="rate-content" :channel-code="activeChannelCode">
+            <ag-pay-way-rate-panel
+              v-show="activeChannelCode"
+              ref="rateConfigComponentRef"
+              :is-drawer="isDrawer"
+              :info-id="currentInfoId"
+              :info-type="currentInfoType"
+              :if-code="activeChannelCode"
+              :perm-code="permCode"
+              :config-mode="configMode"
+              :callback-func="channelList.refreshChannelList"
+            />
+          </slot>
+        </template>
+        <template v-if="activeSubTab === CONFIG_TAB_CODES.CHANNEL_CONFIG">
+          <slot name="channel-config-content" :channel-code="activeChannelCode">
+            <component
+              :is="configLoader.currentAppConfigComponent"
+              ref="appConfigComponentRef"
+              :if-code="activeChannelCode"
+            />
+          </slot>
+        </template>
       </div>
     </a-tab-pane>
     <a-tab-pane
-      v-if="topTabData.some((tab) => tab.code === 'mchPassageTab')"
-      :key="'mchPassageTab'"
+      v-if="topTabList.some(tab => tab.code === CONFIG_TAB_CODES.MCH_PASSAGE)"
+      :key="CONFIG_TAB_CODES.MCH_PASSAGE"
       :tab="'支付渠道的选择'"
     >
-      <div class="content-box">
-        <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc(true)" @reset="resetSearchFunc">
-          <template #base="{ colSpan }">
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-input v-model="searchData.wayCode" placeholder="支付方式代码" />
-              </a-form-item>
-            </a-col>
-            <a-col v-bind="colSpan">
-              <a-form-item label="">
-                <ag-input v-model="searchData.wayName" placeholder="支付方式名称" />
-              </a-form-item>
-            </a-col>
-          </template>
-        </ag-search>
-        <div class="table-box">
-          <div class="table-item">
-            <!-- 列表渲染 -->
-            <ag-table
-              ref="infoTableRef"
-              row-key="wayCode"
-              :on-load="reqTableDataFunc"
-              :columns="tableColumns"
-              :search-data="searchData"
-              :row-selection="rowSelection"
-            >
-              <template #stateSlot="{ record }">
-                <a-badge
-                  :status="record.isConfig === 0 ? 'error' : 'processing'"
-                  :text="record.isConfig === 0 ? '未配置' : '已配置'"
-                />
-              </template>
-            </ag-table>
+      <div class="content-area">
+        <slot name="passage-search">
+          <ag-search 
+            v-model="passageManager.passageSearchForm" 
+            :search-loading="passageManager.isLoading" 
+            @search="handlePassageSearch" 
+            @reset="passageManager.handleResetPassageSearch"
+          >
+            <template #base="{ colSpan }">
+              <a-col v-bind="colSpan">
+                <a-form-item label="">
+                  <ag-input v-model="passageManager.passageSearchForm.wayCode" placeholder="支付方式代码" />
+                </a-form-item>
+              </a-col>
+              <a-col v-bind="colSpan">
+                <a-form-item label="">
+                  <ag-input v-model="passageManager.passageSearchForm.wayName" placeholder="支付方式名称" />
+                </a-form-item>
+              </a-col>
+            </template>
+          </ag-search>
+        </slot>
+        <div class="passage-table-box">
+          <div class="passage-table-item">
+            <slot name="way-table">
+              <ag-table
+                ref="wayTableRef"
+                row-key="wayCode"
+                :on-load="passageManager.fetchWayTableData"
+                :columns="passageManager.wayTableColumns"
+                :search-data="passageManager.passageSearchForm"
+                :row-selection="passageManager.wayRowSelection"
+              >
+                <template #stateSlot="{ record }">
+                  <a-badge
+                    :status="record.isConfig === 0 ? 'error' : 'processing'"
+                    :text="record.isConfig === 0 ? '未配置' : '已配置'"
+                  />
+                </template>
+              </ag-table>
+            </slot>
           </div>
-          <div class="table-item" style="margin-left: 10px">
-            <!-- 列表渲染 -->
-            <ag-table
-              ref="passageInfoTableRef"
-              row-key="ifCode"
-              :on-load="reqPassageTableDataFunc"
-              :columns="passageTableColumns"
-              :search-data="passageSearchData"
-            >
-              <template #ifNameSlot="{ record }">
-                <div class="if-name">
-                  <div class="back" :style="{ backgroundColor: record.bgColor }">
-                    <img :src="record.icon" alt="" />
+          <div class="passage-table-item" style="margin-left: 10px">
+            <slot name="passage-table">
+              <ag-table
+                ref="passageTableRef"
+                row-key="ifCode"
+                :on-load="passageManager.fetchPassageTableData"
+                :columns="passageManager.passageTableColumns"
+                :search-data="passageManager.passageSearchForm"
+              >
+                <template #ifNameSlot="{ record }">
+                  <div class="passage-name">
+                    <div class="passage-icon" :style="{ backgroundColor: record.bgColor }">
+                      <img :src="record.icon" alt="" />
+                    </div>
+                    <div>{{ record.ifName }}</div>
                   </div>
-                  <div>{{ record.ifName }}</div>
-                </div>
-              </template>
-              <template #rateSlot="{ record }">
-                <div v-if="record.payWayFee.feeType === 'SINGLE'">
-                  单笔费率：{{
-                    typeof record.payWayFee.feeRate === 'number' &&
-                    Number.parseFloat((record.payWayFee.feeRate * 100).toFixed(2))
-                  }}%
-                </div>
-                <div
-                  v-for="(item, index) in record.payWayFee.feeType === 'LEVEL' &&
-                  record.payWayFee[record.payWayFee.levelMode.toLowerCase()]"
-                  :key="index"
-                >
-                  <p style="margin-bottom: 0">
-                    {{
-                      item.bankCardType
-                        ? item.bankCardType === 'DEBIT'
-                          ? '【借记卡（储蓄卡）】'
-                          : item.bankCardType === 'CREDIT'
-                            ? '【贷记卡（信用卡）】'
-                            : ''
-                        : '阶梯'
-                    }}费率：[ 保底费用：{{
-                      typeof item.minFee === 'number' && Number.parseFloat((item.minFee / 100).toFixed(2))
-                    }}元，封顶费用：{{
-                      typeof item.maxFee === 'number' && Number.parseFloat((item.maxFee / 100).toFixed(2))
-                    }}元 ]
-                  </p>
-                  <p v-for="(level, lindex) in item.levelList" :key="lindex" style="margin-bottom: 0">
-                    {{ typeof level.minAmount === 'number' && Number.parseFloat((level.minAmount / 100).toFixed(2)) }}元
-                    ~
-                    {{
-                      typeof level.maxAmount === 'number' && Number.parseFloat((level.maxAmount / 100).toFixed(2))
-                    }}元，费率：{{
-                      typeof level.feeRate === 'number' && Number.parseFloat((level.feeRate * 100).toFixed(2))
+                </template>
+                <template #rateSlot="{ record }">
+                  <div v-if="record.payWayFee.feeType === 'SINGLE'">
+                    单笔费率：{{
+                      typeof record.payWayFee.feeRate === 'number' &&
+                      Number.parseFloat((record.payWayFee.feeRate * 100).toFixed(2))
                     }}%
-                  </p>
-                  <hr v-if="index < record.payWayFee[record.payWayFee.levelMode.toLowerCase()].length - 1" />
-                </div>
-              </template>
-              <template #stateSlot="{ record }">
-                <ag-table-actions
-                  :state="record.state"
-                  :show-switch-type="true"
-                  :on-change="(state) => updateState(record, state)"
-                />
-              </template>
-            </ag-table>
+                  </div>
+                  <div
+                    v-for="(item, index) in record.payWayFee.feeType === 'LEVEL' &&
+                    record.payWayFee[record.payWayFee.levelMode.toLowerCase()]"
+                    :key="index"
+                  >
+                    <p style="margin-bottom: 0">
+                      {{
+                        item.bankCardType
+                          ? item.bankCardType === 'DEBIT'
+                            ? '【借记卡（储蓄卡）】'
+                            : item.bankCardType === 'CREDIT'
+                              ? '【贷记卡（信用卡）】'
+                              : ''
+                          : '阶梯'
+                      }}费率：[ 保底费用：{{
+                        typeof item.minFee === 'number' && Number.parseFloat((item.minFee / 100).toFixed(2))
+                      }}元，封顶费用：{{
+                        typeof item.maxFee === 'number' && Number.parseFloat((item.maxFee / 100).toFixed(2))
+                      }}元 ]
+                    </p>
+                    <p v-for="(level, lindex) in item.levelList" :key="lindex" style="margin-bottom: 0">
+                      {{ typeof level.minAmount === 'number' && Number.parseFloat((level.minAmount / 100).toFixed(2)) }}元
+                      ~
+                      {{
+                        typeof level.maxAmount === 'number' && Number.parseFloat((level.maxAmount / 100).toFixed(2))
+                      }}元，费率：{{
+                        typeof level.feeRate === 'number' && Number.parseFloat((level.feeRate * 100).toFixed(2))
+                      }}%
+                    </p>
+                    <hr v-if="index < record.payWayFee[record.payWayFee.levelMode.toLowerCase()].length - 1" />
+                  </div>
+                </template>
+                <template #stateSlot="{ record }">
+                  <ag-table-actions
+                    :state="record.state"
+                    :show-switch-type="true"
+                    :on-change="(state) => handlePassageStateUpdate(record, state)"
+                  />
+                </template>
+              </ag-table>
+            </slot>
           </div>
         </div>
       </div>
     </a-tab-pane>
+    <slot name="extra-tabs"></slot>
   </a-tabs>
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, shallowRef } from 'vue'
+import { ref, watch } from 'vue'
 import { message } from 'ant-design-vue'
 import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
-const icons = { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined }
 import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
-import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
 import AgPayWayRatePanel from './ag-pay-payway-rate-panel.vue'
-import { infoBox } from '@/utils/info-box'
-import { getStateInfo, STATE_ENUM } from '@/constants/common-const.js'
+import { useChannelList } from './composables/useChannelList'
+import { useConfigLoader } from './composables/useConfigLoader'
+import { useTabConfig } from './composables/useTabConfig'
+import { usePassageManager } from './composables/usePassageManager'
+
+const icons = { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined }
 
 const props = defineProps({
-  isDrawer: {
-    type: Boolean,
-    default: false
-  },
-  permCode: {
-    type: String,
-    default: ''
-  },
-  configMode: {
-    type: String,
-    default: ''
+  isDrawer: { type: Boolean, default: false },
+  permCode: { type: String, default: '' },
+  configMode: { type: String, default: '' },
+  infoId: { type: [String, Number], default: null },
+  isIsvSubMch: { type: Boolean, default: false },
+  channelListConfig: { type: Object, default: () => ({}) }
+})
+
+const emit = defineEmits(['channel-change', 'tab-change', 'passage-state-update', 'submit-success'])
+
+const currentInfoId = ref(null)
+const currentInfoType = ref(null)
+const diyConfigList = ref([])
+const configModeRef = ref(props.configMode)
+const infoIdRef = ref(props.infoId)
+
+const channelList = useChannelList(configModeRef, infoIdRef, props.channelListConfig, (channelCode) => {
+  emit('channel-change', channelCode)
+})
+const tabConfig = useTabConfig(configModeRef)
+const passageManager = usePassageManager(infoIdRef)
+
+const {
+  isExpanded,
+  activeChannelCode,
+  sortedChannelList,
+  searchForm,
+  displayHeight
+} = channelList
+
+const {
+  topTabList,
+  subTabList,
+  activeTopTab,
+  activeSubTab,
+  CONFIG_TAB_CODES
+} = tabConfig
+
+const configLoader = useConfigLoader(activeChannelCode, activeSubTab, configModeRef, channelList.channelList)
+
+watch(activeChannelCode, (channelCode) => {
+  if (channelCode) {
+    configLoader.loadConfigComponent(activeSubTab.value)
   }
 })
 
-// State
-const infoId = ref(null)
-const infoType = ref(null)
-const ifDefine = ref(null)
-const loading = ref(false)
-const isShowMore = ref(true)
-const topTabsVal = ref('paramsAndRateTab')
-const topTabData = ref([
-  { code: 'paramsAndRateTab', name: '参数及费率的填写' },
-  { code: 'mchPassageTab', name: '支付渠道的选择' }
-])
-const currentIfCode = ref(null)
-const selectIfCode = ref(null)
-const configComponent = shallowRef(null)
-const appConfigComponent = shallowRef(null)
-const ifCodeList = ref([])
-const diyList = ref([])
-const ifCodeListSearchData = ref({})
-const searchData = ref({})
-const tableColumns = ref([
-  { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式代码' },
-  { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称' },
-  { key: 'isConfig', title: '状态', customRender: 'stateSlot' }
-])
-const passageTableColumns = ref([
-  { key: 'ifName', title: '通道名称', customRender: 'ifNameSlot' },
-  { key: 'rate', title: '费率', customRender: 'rateSlot' },
-  { key: 'state', title: '状态', customRender: 'stateSlot' }
-])
-const passageSearchData = ref({})
-const currentWayCode = ref(null)
-const paramsAndRateTabVal = ref('paramsTab')
-const tabData = ref([
-  { code: 'paramsTab', name: '参数配置' },
-  { code: 'rateTab', name: '费率配置' }
-])
-const saveObject = ref({})
-
-// Refs
 const configComponentRef = ref(null)
 const rateConfigComponentRef = ref(null)
 const appConfigComponentRef = ref(null)
-const infoTableRef = ref(null)
-const passageInfoTableRef = ref(null)
+const wayTableRef = ref(null)
+const passageTableRef = ref(null)
 
-// Computed
-const rowSelection = computed(() => {
-  return {
-    type: 'radio',
-    onChange: (selectedRowKeys, selectedRows) => {
-      currentWayCode.value = selectedRowKeys
-      searchPassageFunc(true)
-    }
-  }
+const resetState = () => {
+  tabConfig.resetTabs()
+  channelList.resetSelection()
+  passageManager.resetState()
+  configLoader.clearConfigComponent()
+}
+
+watch(() => props.configMode, (val) => {
+  configModeRef.value = val
 })
 
-// Methods
-const getPayConfig = (infoIdVal, configMchAppIsIsvSubMch) => {
-  infoId.value = infoIdVal
-  topTabData.value = [{ code: 'paramsAndRateTab', name: '参数及费率的填写' }]
-  tabData.value = [
-    { code: 'paramsTab', name: '参数配置' },
-    { code: 'rateTab', name: '费率配置' }
-  ]
-  let infoTypeVal = 'ISV'
-  if (props.configMode === 'mgrAgent' || props.configMode === 'agentSelf' || props.configMode === 'agentSubagent') {
-    infoTypeVal = 'AGENT'
-    if (props.configMode === 'agentSelf') {
-      tabData.value = [{ code: 'rateTab', name: '费率配置' }]
+watch([() => props.infoId, () => props.isIsvSubMch], async ([infoIdVal, isIsvSubMch]) => {
+  if (infoIdVal) {
+    currentInfoId.value = infoIdVal
+    infoIdRef.value = infoIdVal
+    currentInfoType.value = tabConfig.getInfoTypeByConfigMode(props.configMode)
+    tabConfig.initTabConfig(isIsvSubMch)
+    resetState()
+    await channelList.refreshChannelList()
+    if (currentInfoType.value === 'AGENT') {
+      await fetchDiyConfigList()
     }
   }
-  if (props.configMode === 'mgrMch' || props.configMode === 'agentMch' || props.configMode === 'mchSelfApp1') {
-    infoTypeVal = 'MCH_APP'
-    topTabData.value.push({ code: 'mchPassageTab', name: '支付渠道的选择' })
-    if (configMchAppIsIsvSubMch) {
-      tabData.value.push({ code: 'channelConfigTab', name: '渠道配置' })
-    }
-  }
-  if (props.configMode === 'mchSelfApp2') {
-    infoTypeVal = 'MCH_APP'
-    topTabData.value = [{ code: 'mchPassageTab', name: '支付渠道的选择' }]
-  }
-  infoType.value = infoTypeVal
-  reset()
-  ifCodeListSearchData.value = {}
-  ifCodeListSearchData.value.infoId = infoId.value
-  refIfCodeList()
-  if (infoTypeVal === 'AGENT') {
-    getDiyList()
-  }
-}
+}, { immediate: true })
 
-const reset = () => {
-  const [firstTopTab] = topTabData.value
-  const [firstTab] = tabData.value
-  loading.value = false
-  isShowMore.value = true
-  topTabsVal.value = firstTopTab.code
-  currentIfCode.value = null
-  paramsAndRateTabVal.value = firstTab.code
-  restConfig()
-}
-
-const reqTableDataFunc = (params) => {
-  return payConfigApi.queryMchPayPassagePage(Object.assign(params, { appId: infoId.value }))
-}
-
-const searchFunc = (isToFirst = false) => {
-  infoTableRef.value?.reload(isToFirst)
-}
-
-const reqPassageTableDataFunc = (params) => {
-  return payConfigApi.getAvailablePayInterfaceList(infoId.value, currentWayCode.value, params)
-}
-
-const searchPassageFunc = (isToFirst = false) => {
-  passageInfoTableRef.value?.reload(isToFirst)
-}
-
-const resetSearchFunc = () => {
-  Object.keys(searchData.value).forEach((key) => {
-    delete searchData.value[key]
-  })
-}
-
-/**
- * 更新通道状态
- * @param {Object} record - 通道记录
- * @param {number} state - 目标状态（1启用/0停用）
- * @returns {Promise<void>}
- */
-const updateState = (record, state) => {
-  const currentState = getStateInfo(state)
-  const title = `确认[${currentState.desc}]该通道？`
-  const content = currentState === STATE_ENUM.ENABLED ? '启用后将会将其他通道关闭' : '停用后将无法正常支付'
-
-  return new Promise((resolve, reject) => {
-    infoBox.confirmDanger(
-      title,
-      content,
-      async () => {
-        try {
-          await payConfigApi.updateMchPassageState(infoId.value, currentWayCode.value, record.ifCode, state)
-          message.success('已配置')
-          searchFunc()
-          searchPassageFunc()
-          resolve()
-        } catch (error) {
-          reject(error)
-        }
-      },
-      () => {
-        reject(new Error('用户取消'))
-      }
-    )
-  })
-}
-
-const searchIfCodeFunc = () => {
-  refIfCodeList()
-  reset()
-}
-
-/**
- * 获取自定义配置列表
- */
-const getDiyList = async () => {
+const fetchDiyConfigList = async () => {
   try {
-    const res = await payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: infoId.value })
-    diyList.value = res
-  } catch (error) {
+    const res = await payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: currentInfoId.value })
+    diyConfigList.value = res
+  }
+  catch (error) {
     console.error('获取自定义配置列表失败:', error)
   }
 }
 
-/**
- * 刷新支付接口代码列表
- */
-const refIfCodeList = async () => {
+const handleChannelSelect = (channelCode) => {
+  channelList.selectChannel(channelCode)
+  emit('channel-change', channelCode)
+}
+
+const handleSubTabSelect = (tabCode) => {
+  tabConfig.selectSubTab(tabCode)
+  configLoader.loadConfigComponent(tabCode)
+  emit('tab-change', tabCode)
+}
+
+const handlePassageSearch = (isToFirst = false) => {
+  wayTableRef.value?.reload(isToFirst)
+}
+
+const handlePassageStateUpdate = async (record, state) => {
   try {
-    const params = Object.assign({}, { configMode: props.configMode, infoId: infoId.value }, ifCodeListSearchData.value)
-    const resData = await payConfigApi.queryPayConfigIfCodes(params)
-    ifCodeList.value = resData
+    await passageManager.handlePassageStateUpdate(record, state)
+    message.success('已配置')
+    handlePassageSearch()
+    emit('passage-state-update', { record, state })
   } catch (error) {
-    console.error('刷新支付接口代码列表失败:', error)
+    console.error('更新通道状态失败:', error)
+    message.error('配置失败')
   }
 }
 
-const getConfigComponent = (code) => {
-  switch (currentIfCode.value + code) {
-    case 'alipay' + 'Isv':
-      return import('./diy/alipay/isv-page.vue')
-    case 'alipay' + 'Mch':
-      return import('./diy/alipay/mch-page.vue')
-    case 'wxpay' + 'Isv':
-      return import('./diy/wxpay/isv-page.vue')
-    case 'wxpay' + 'Mch':
-      return import('./diy/wxpay/mch-page.vue')
-    default:
-      return import('./diy/config-page.vue')
-  }
-}
-
-const getAppConfigComponent = () => {
-  switch (currentIfCode.value) {
-    case 'ysfpay':
-      return import('../ag-pay-mch-applyment/diy/ysfpay/app-config.vue')
-    case 'lespay':
-      return import('../ag-pay-mch-applyment/diy/lespay/app-config.vue')
-    case 'sxfpay':
-      return import('../ag-pay-mch-applyment/diy/sxfpay/app-config.vue')
-    case 'shengpay':
-      return import('../ag-pay-mch-applyment/diy/shengpay/app-config.vue')
-    default:
-      return Promise.reject(new Error('Unknown variable dynamic import: ' + currentIfCode.value))
-  }
-}
-
-/**
- * 加载对应配置组件
- * @param {string} code - 标签页代码
- */
-const getConfig = async (code) => {
-  if (!currentIfCode.value) return
-
-  switch (code) {
-    case 'paramsTab': {
-      restConfig()
-      const record = ifCodeList.value.find((f) => f.ifCode === currentIfCode.value)
-      ifDefine.value = record
-      if (record.configPageType === 1) {
-        const module = await import('./diy/config-page.vue')
-        configComponent.value = module.default || module
-      } else if (record.configPageType === 2) {
-        let pageCode = 'Isv'
-        if (props.configMode === 'mgrMch' || props.configMode === 'agentMch' || props.configMode === 'mchSelfApp1') {
-          pageCode = 'Mch'
-        }
-        const module = await getConfigComponent(pageCode)
-        configComponent.value = module.default || module
-      }
-      break
-    }
-    case 'channelConfigTab':
-      try {
-        const module = await getAppConfigComponent()
-        appConfigComponent.value = module.default || module
-      } catch {
-        appConfigComponent.value = null
-        message.error('当前渠道不支持参数配置！')
-      }
-      break
-    case 'rateTab':
-      if (rateConfigComponentRef.value) {
-        rateConfigComponentRef.value.getRateConfig(currentIfCode.value)
-      }
-      break
-  }
-}
-
-const restConfig = () => {
-  configComponent.value = null
-}
-
-const ifCodeSelected = (code) => {
-  if (currentIfCode.value !== code) {
-    currentIfCode.value = code
-    getConfig(paramsAndRateTabVal.value)
-  }
-}
-
-const tabSelected = (code) => {
-  if (paramsAndRateTabVal.value !== code) {
-    paramsAndRateTabVal.value = code
-    getConfig(paramsAndRateTabVal.value)
-  }
-}
-
-/**
- * 统一提交保存所有标签页数据
- * @returns {Promise<void>}
- */
-const onSubmit = async () => {
-  if (paramsAndRateTabVal.value === 'paramsTab' && configComponentRef.value) {
+const handleSubmit = async () => {
+  if (activeSubTab.value === CONFIG_TAB_CODES.PARAMS && configComponentRef.value) {
     await configComponentRef.value.onSubmit()
+  }
+  if (activeSubTab.value === CONFIG_TAB_CODES.CHANNEL_CONFIG && appConfigComponentRef.value) {
+    await appConfigComponentRef.value.onSubmit()
   }
   if (rateConfigComponentRef.value) {
     await rateConfigComponentRef.value.onSubmit()
   }
+  emit('submit-success')
 }
 
-// Expose methods
 defineExpose({
-  getPayConfig,
-  reset,
-  refIfCodeList,
-  onSubmit
+  reset: resetState,
+  refIfCodeList: channelList.refreshChannelList,
+  onSubmit: handleSubmit,
+  channelList,
+  tabConfig,
+  passageManager,
+  configLoader,
+  configComponentRef,
+  rateConfigComponentRef,
+  appConfigComponentRef
 })
 </script>
 
@@ -558,20 +422,20 @@ defineExpose({
   text-align: center;
 }
 
-.table-box {
+.passage-table-box {
   display: flex;
 }
 
-.table-box .table-item {
+.passage-table-box .passage-table-item {
   width: 50%;
 }
 
-.if-name {
+.passage-name {
   display: flex;
   align-items: center;
 }
 
-.if-name .back {
+.passage-name .passage-icon {
   margin-right: 20px;
   width: 30px;
   height: 30px;
@@ -581,41 +445,39 @@ defineExpose({
   align-items: center;
 }
 
-.if-name .back img {
+.passage-name .passage-icon img {
   width: 16px;
   height: 16px;
 }
 
-.ant-table-wrapper {
-  margin: 0;
-}
-
-.search {
+.search-bar {
   display: flex;
   margin-top: 30px;
   margin-left: 50px;
 }
 
-.search .if-input {
+.search-bar .search-input {
   width: 200px;
   margin-right: 10px;
 }
 
-.pay-list-wrapper {
+.channel-list-wrapper {
   display: flex;
   flex-wrap: wrap;
   padding: 0 40px;
   margin-top: 20px;
   overflow: hidden;
+  transition: height 0.3s ease;
 }
 
-.pay-item-wrapper {
+.channel-item-wrapper {
   padding: 10px;
   min-width: 220px;
   width: 20%;
+  box-sizing: border-box;
 }
 
-.pay-content {
+.channel-card {
   position: relative;
   display: flex;
   align-items: center;
@@ -625,9 +487,15 @@ defineExpose({
   border: 1px solid var(--border-color);
   background: var(--base-bg-color);
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.pay-content .pay-img {
+.channel-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.channel-card .channel-icon {
   flex-shrink: 0;
   position: relative;
   display: flex;
@@ -641,11 +509,11 @@ defineExpose({
   border-radius: 50%;
 }
 
-.pay-content .pay-img img {
+.channel-card .channel-icon img {
   width: 50%;
 }
 
-.pay-content .pay-img .pay-state-dot {
+.channel-card .channel-icon .channel-status-dot {
   box-sizing: content-box;
   display: block;
   position: absolute;
@@ -658,22 +526,22 @@ defineExpose({
   border-radius: 50%;
 }
 
-.pay-content .pay-info .pay-title {
+.channel-card .channel-info .channel-name {
   font-size: 14px;
   font-weight: 600;
 }
 
-.pay-content .pay-info .pay-code {
+.channel-card .channel-info .channel-code {
   font-size: 13px;
-  color: var(--text-color);
+  color: var(--text-color-weak);
 }
 
-.pay-selected {
+.channel-card-selected {
   border: 2px solid var(--primary-color);
   background: var(--primary-color-weak);
 }
 
-.pay-selected:after {
+.channel-card-selected:after {
   content: '\221a';
   position: absolute;
   right: 0;
@@ -690,13 +558,13 @@ defineExpose({
   border-radius: 0 0 0 5px;
 }
 
-.tab-wrapper {
+.sub-tab-wrapper {
   position: relative;
   min-width: 718px;
   height: 50px;
 }
 
-.tab-wrapper:after {
+.sub-tab-wrapper:after {
   content: '';
   display: block;
   position: absolute;
@@ -706,7 +574,7 @@ defineExpose({
   background-color: var(--border-color);
 }
 
-.tab-wrapper .open-close {
+.sub-tab-wrapper .expand-toggle {
   width: 80px;
   height: 36px;
   cursor: pointer;
@@ -727,10 +595,16 @@ defineExpose({
   display: flex;
   justify-content: center;
   align-items: center;
+  transition: all 0.2s ease;
 }
 
-.tab-wrapper .open-close:after,
-.tab-wrapper .open-close:before {
+.sub-tab-wrapper .expand-toggle:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.sub-tab-wrapper .expand-toggle:after,
+.sub-tab-wrapper .expand-toggle:before {
   content: '';
   display: block;
   position: absolute;
@@ -741,15 +615,15 @@ defineExpose({
   background-color: var(--base-bg-color);
 }
 
-.tab-wrapper .open-close:after {
+.sub-tab-wrapper .expand-toggle:after {
   left: -1px;
 }
 
-.tab-wrapper .open-close:before {
+.sub-tab-wrapper .expand-toggle:before {
   right: -1px;
 }
 
-.tab-content {
+.sub-tab-content {
   position: relative;
   margin-top: 30px;
   display: flex;
@@ -767,7 +641,7 @@ defineExpose({
   color: var(--text-color-weak);
 }
 
-.tab-content .tab-item {
+.sub-tab-content .sub-tab-item {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -775,15 +649,20 @@ defineExpose({
   width: 119px;
   height: 40px;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.tab-selected {
+.sub-tab-content .sub-tab-item:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.sub-tab-item-selected {
   color: var(--text-color);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   background-color: var(--base-bg-color);
 }
 
-.content-box {
+.content-area {
   padding: 30px 50px;
 }
 </style>

@@ -146,7 +146,6 @@ const getPayConfig = async () => {
       saveObject.oauth2InfoId = res.oauth2InfoId || ''
       saveObject.cashoutParams = typeof res.cashoutParams === 'string' ? JSON.parse(res.cashoutParams || '{}') : res.cashoutParams || {}
       const parsedIfParams = typeof res.ifParams === 'string' ? JSON.parse(res.ifParams || '{}') : res.ifParams || {}
-      Object.keys(ifParams).forEach(key => delete ifParams[key])
       Object.assign(ifParams, parsedIfParams)
     }
 
@@ -223,6 +222,7 @@ const onSubmit = async () => {
     await submitRequest(JSON.stringify(ifParamsCopy))
   } catch (error) {
     console.error('保存支付配置失败:', error)
+    throw error
   }
 }
 
@@ -257,17 +257,17 @@ const hasPermission = (permCode) => {
   return true
 }
 
-onMounted(() => {
-  getPayConfig()
-})
-
 watch(
   () => props.ifDefine,
   () => {
     getPayConfig()
   },
-  { immediate: false }
+  { immediate: true }
 )
+
+defineExpose({
+  onSubmit
+})
 </script>
 
 <style scoped>

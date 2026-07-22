@@ -195,39 +195,34 @@ const ifParams = reactive({
   alipayRootCert: ''
 })
 
-const validatePrivateKey = (_rule, value, callback) => {
+const validatePrivateKey = async (_rule, value) => {
   if (isAdd.value && !value) {
-    callback(new Error('请输入应用私钥'))
+    throw new Error('请输入应用私钥')
   }
-  callback()
 }
 
-const validateAlipayPublicKey = (_rule, _value, callback) => {
+const validateAlipayPublicKey = async (_rule, _value) => {
   if (ifParams.useCert === 0 && isAdd.value && !ifParams.alipayPublicKey) {
-    callback(new Error('请输入支付宝公钥'))
+    throw new Error('请输入支付宝公钥')
   }
-  callback()
 }
 
-const validateAppPublicCert = (_rule, _value, callback) => {
+const validateAppPublicCert = async (_rule, _value) => {
   if (ifParams.useCert === 1 && !ifParams.appPublicCert) {
-    callback(new Error('请上传应用公钥证书（.crt格式）'))
+    throw new Error('请上传应用公钥证书（.crt格式）')
   }
-  callback()
 }
 
-const validateAlipayPublicCert = (_rule, _value, callback) => {
+const validateAlipayPublicCert = async (_rule, _value) => {
   if (ifParams.useCert === 1 && !ifParams.alipayPublicCert) {
-    callback(new Error('请上传支付宝公钥证书（.crt格式）'))
+    throw new Error('请上传支付宝公钥证书（.crt格式）')
   }
-  callback()
 }
 
-const validateAlipayRootCert = (_rule, _value, callback) => {
+const validateAlipayRootCert = async (_rule, _value) => {
   if (ifParams.useCert === 1 && !ifParams.alipayRootCert) {
-    callback(new Error('请上传支付宝根证书（.crt格式）'))
+    throw new Error('请上传支付宝根证书（.crt格式）')
   }
-  callback()
 }
 
 const getPayConfig = async () => {
@@ -246,7 +241,6 @@ const getPayConfig = async () => {
       saveObject.oauth2InfoId = res.oauth2InfoId || ''
       saveObject.cashoutParams = typeof res.cashoutParams === 'string' ? JSON.parse(res.cashoutParams || '{}') : res.cashoutParams || {}
       const parsedIfParams = typeof res.ifParams === 'string' ? JSON.parse(res.ifParams || '{}') : res.ifParams || {}
-      Object.keys(ifParams).forEach(key => delete ifParams[key])
       Object.assign(ifParams, parsedIfParams)
 
       ifParams.privateKey_ph = ifParams.privateKey || '请输入'
@@ -286,6 +280,7 @@ const onSubmit = async () => {
     await submitRequest(JSON.stringify(ifParamsCopy))
   } catch (error) {
     console.error('保存支付配置失败:', error)
+    throw error
   }
 }
 
@@ -328,6 +323,10 @@ const hasPermission = (permCode) => {
 
 onMounted(() => {
   getPayConfig()
+})
+
+defineExpose({
+  onSubmit
 })
 </script>
 

@@ -59,10 +59,17 @@ const reset = () => {
   }
 }
 
+const onSubmit = async () => {
+  if (appConfigCommonPageRef.value && appConfigCommonPageRef.value.onSubmit) {
+    await appConfigCommonPageRef.value.onSubmit()
+  }
+}
+
 // Expose methods
 defineExpose({
   getConfig,
-  reset
+  reset,
+  onSubmit
 })
 </script>
 

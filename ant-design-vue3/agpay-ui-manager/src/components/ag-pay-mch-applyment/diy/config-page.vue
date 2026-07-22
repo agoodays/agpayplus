@@ -201,7 +201,8 @@ watch(
 // Expose methods
 defineExpose({
   getConfig,
-  reset
+  reset,
+  onSubmit
 })
 </script>
 

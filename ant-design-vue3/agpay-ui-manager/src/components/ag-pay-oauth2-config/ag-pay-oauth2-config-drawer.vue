@@ -69,7 +69,7 @@
       </a-tab-pane>
     </a-tabs>
     <template #footer>
-      <div class="drawer-footer">
+      <div class="ag-drawer-footer">
         <slot name="footer">
           <a-space>
             <a-button @click="handleClose">
@@ -256,10 +256,4 @@ const onSubmit = async () => {
 }
 </script>
 
-<style scoped>
-.drawer-footer {
-  text-align: right;
-  padding: 10px 16px;
-  /* border-top: 1px solid #f0f0f0; */
-}
-</style>
+<style scoped></style>

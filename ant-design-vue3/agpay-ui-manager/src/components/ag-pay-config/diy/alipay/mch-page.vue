@@ -199,53 +199,46 @@ const ifParams = reactive({
   appAuthToken: ''
 })
 
-const validateAppId = (_rule, value, callback) => {
+const validateAppId = async (_rule, value) => {
   if (mchType.value === 1 && !value) {
-    callback(new Error('请输入应用AppID'))
+    throw new Error('请输入应用AppID')
   }
-  callback()
 }
 
-const validatePrivateKey = (_rule, value, callback) => {
+const validatePrivateKey = async (_rule, value) => {
   if (mchType.value === 1 && isAdd.value && !value) {
-    callback(new Error('请输入应用私钥'))
+    throw new Error('请输入应用私钥')
   }
-  callback()
 }
 
-const validateAlipayPublicKey = (_rule, _value, callback) => {
+const validateAlipayPublicKey = async (_rule, _value) => {
   if (mchType.value === 1 && isAdd.value && ifParams.useCert === 0 && !ifParams.alipayPublicKey) {
-    callback(new Error('请输入支付宝公钥'))
+    throw new Error('请输入支付宝公钥')
   }
-  callback()
 }
 
-const validateAppPublicCert = (_rule, _value, callback) => {
+const validateAppPublicCert = async (_rule, _value) => {
   if (mchType.value === 1 && ifParams.useCert === 1 && !ifParams.appPublicCert) {
-    callback(new Error('请上传应用公钥证书（.crt格式）'))
+    throw new Error('请上传应用公钥证书（.crt格式）')
   }
-  callback()
 }
 
-const validateAlipayPublicCert = (_rule, _value, callback) => {
+const validateAlipayPublicCert = async (_rule, _value) => {
   if (mchType.value === 1 && ifParams.useCert === 1 && !ifParams.alipayPublicCert) {
-    callback(new Error('请上传支付宝公钥证书（.crt格式）'))
+    throw new Error('请上传支付宝公钥证书（.crt格式）')
   }
-  callback()
 }
 
-const validateAlipayRootCert = (_rule, _value, callback) => {
+const validateAlipayRootCert = async (_rule, _value) => {
   if (mchType.value === 1 && ifParams.useCert === 1 && !ifParams.alipayRootCert) {
-    callback(new Error('请上传支付宝根证书（.crt格式）'))
+    throw new Error('请上传支付宝根证书（.crt格式）')
   }
-  callback()
 }
 
-const validateAppAuthToken = (_rule, value, callback) => {
+const validateAppAuthToken = async (_rule, value) => {
   if (mchType.value === 2 && !value) {
-    callback(new Error('请输入子商户app_auth_token'))
+    throw new Error('请输入子商户app_auth_token')
   }
-  callback()
 }
 
 const getPayConfig = async () => {
@@ -264,7 +257,6 @@ const getPayConfig = async () => {
       saveObject.oauth2InfoId = res.oauth2InfoId || ''
       saveObject.cashoutParams = typeof res.cashoutParams === 'string' ? JSON.parse(res.cashoutParams || '{}') : res.cashoutParams || {}
       const parsedIfParams = typeof res.ifParams === 'string' ? JSON.parse(res.ifParams || '{}') : res.ifParams || {}
-      Object.keys(ifParams).forEach(key => delete ifParams[key])
       Object.assign(ifParams, parsedIfParams)
 
       ifParams.privateKey_ph = ifParams.privateKey || '请输入'
@@ -304,6 +296,7 @@ const onSubmit = async () => {
     await submitRequest(JSON.stringify(ifParamsCopy))
   } catch (error) {
     console.error('保存支付配置失败:', error)
+    throw error
   }
 }
 
@@ -345,6 +338,10 @@ const hasPermission = (permCode) => {
 
 onMounted(() => {
   getPayConfig()
+})
+
+defineExpose({
+  onSubmit
 })
 </script>
 
