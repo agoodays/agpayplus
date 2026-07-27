@@ -73,7 +73,7 @@
           <component :is="isExpanded ? icons.UpOutlined : icons.DownOutlined" />
         </div>
       </div>
-      <div class="content-area">
+      <div v-if="activeChannelCode" class="content-area">
         <template v-if="activeSubTab === CONFIG_TAB_CODES.PARAMS">
           <slot name="params-content" :channel-code="activeChannelCode">
             <component
@@ -575,7 +575,7 @@ defineExpose({
 }
 
 .sub-tab-wrapper .expand-toggle {
-  width: 80px;
+  width: 90px;
   height: 36px;
   cursor: pointer;
   -webkit-user-select: none;
@@ -585,7 +585,7 @@ defineExpose({
   border-radius: 5px;
   background: var(--base-bg-color);
   border: 1px solid var(--border-color);
-  border-top: none;
+  /* border-top: none; */
   position: absolute;
   top: 50%;
   left: 50%;
@@ -612,7 +612,7 @@ defineExpose({
   z-index: 10;
   width: 10px;
   height: 18px;
-  background-color: var(--base-bg-color);
+  /* background-color: var(--base-bg-color); */
 }
 
 .sub-tab-wrapper .expand-toggle:after {
@@ -652,8 +652,9 @@ defineExpose({
   transition: all 0.2s ease;
 }
 
+/* 组件样式示例（直接消费全局变量） */
 .sub-tab-content .sub-tab-item:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: var(--hover-bg-color);
 }
 
 .sub-tab-item-selected {

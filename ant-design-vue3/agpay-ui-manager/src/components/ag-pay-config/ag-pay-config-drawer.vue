@@ -4,7 +4,7 @@
     title="支付配置"
     :drawer-style="{ overflow: 'hidden' }"
     :body-style="{ padding: '0px', overflowY: 'auto' }"
-    width="90%"
+    width="80%"
     @close="handleClose"
   >
     <ag-pay-config-panel

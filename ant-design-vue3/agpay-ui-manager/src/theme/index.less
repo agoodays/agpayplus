@@ -33,24 +33,24 @@
  * - 与 app-config.js 中的配置保持一致
  */
 :root {
-  // 主色
+  /* 主色 */
   --primary-color: #1677ff;
   --primary-color-hover: rgba(22, 119, 255, 0.08);
   --primary-color-weak: rgba(22, 119, 255, 0.06);
 
-  // 状态颜色
+  /* 状态颜色 */
   --success-color: #52c41a;
   --warning-color: #faad14;
   --error-color: #ff4d4f;
   --info-color: var(--primary-color);
 
-  // 布局
+  /* 布局 */
   --border-radius: 6px;
   --border-radius-lg: 8px;
   --side-menu-width: 260px;
   --page-width: 100%;
 
-  // 背景色
+  /* 背景色 */
   --base-bg-color: #fff;
   --layout-bg: #f5f5f5;
   --layout-surface: #f8f8f8;
@@ -62,23 +62,23 @@
   --surface-subtle: rgba(0, 0, 0, 0.02);
   --surface-light: rgba(0, 0, 0, 0.04);
   --surface-lighter: rgba(0, 0, 0, 0.06);
-  --hover-bg-color: #dadada;
+  --hover-bg-color: rgba(0, 0, 0, 0.04); /* 新增：亮色模式悬停背景 */
 
-  // 文字颜色
+  /* 文字颜色 */
   --text-color: rgba(0, 0, 0, 0.85);
   --text-color-weak: rgba(0, 0, 0, 0.45);
-  --text-color-muted: #00000073;
+  --text-color-muted: rgba(0, 0, 0, 0.45); /* 修复：统一为 rgba 格式 */
   --text-color-secondary: #b3b3b3;
   --text-muted: rgba(0, 0, 0, 0.2);
   --text-on-dark: rgba(255, 255, 255, 0.87);
   --text-on-primary: #fff;
 
-  // 边框和阴影
+  /* 边框和阴影 */
   --border-color: #e7eaf3;
   --border-dashed: rgba(0, 0, 0, 0.15);
   --shadow-color: rgba(0, 0, 0, 0.1);
 
-  // Ant Design 主色
+  /* Ant Design 主色联动 */
   --ant-primary-color: var(--primary-color);
   --ant-primary-color-hover: var(--primary-color-hover);
   --ant-primary-color-active: var(--primary-color);
@@ -86,7 +86,7 @@
   --ant-primary-1: var(--primary-color-weak);
   --ant-primary-2: var(--primary-color-hover);
 
-  // 暗色主题相关变量
+  /* 暗色主题相关变量（预定义） */
   --dark-base-bg-color: #141414;
   --dark-layout-bg: #141414;
   --dark-layout-surface: #1f1f1f;
@@ -94,6 +94,7 @@
   --dark-surface-subtle: rgba(255, 255, 255, 0.06);
   --dark-surface-light: rgba(255, 255, 255, 0.12);
   --dark-surface-lighter: rgba(255, 255, 255, 0.16);
+  --dark-hover-bg-color: rgba(255, 255, 255, 0.08); /* 新增：暗色模式悬停背景 */
   --dark-text-color: rgba(255, 255, 255, 0.88);
   --dark-text-color-weak: rgba(255, 255, 255, 0.65);
   --dark-text-color-muted: rgba(255, 255, 255, 0.45);
@@ -116,13 +117,14 @@
   --surface-subtle: var(--dark-surface-subtle);
   --surface-light: var(--dark-surface-light);
   --surface-lighter: var(--dark-surface-lighter);
+  --hover-bg-color: var(--dark-hover-bg-color); /* 覆盖悬停背景 */
   --text-color: var(--dark-text-color);
   --text-color-weak: var(--dark-text-color-weak);
   --text-color-muted: var(--dark-text-color-muted);
   --border-color: var(--dark-border-color);
   --shadow-color: var(--dark-shadow-color);
 
-  // Ant Design 暗色主题变量
+  /* Ant Design 暗色主题变量 */
   --ant-primary-color: var(--primary-color);
   --ant-primary-color-hover: var(--primary-color-hover);
   --ant-primary-color-active: var(--primary-color);

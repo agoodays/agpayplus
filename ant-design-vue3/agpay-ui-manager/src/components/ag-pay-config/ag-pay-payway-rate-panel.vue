@@ -99,14 +99,9 @@
                       {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                     </a-divider>
                     
-                    <div
-                      class="level-list"
-                      v-for="(levelItem, levelKey) in levelModeItem.levelList"
-                      :key="levelKey"
-                      :style="{ marginTop: levelKey > 0 ? '15px': 0 }"
-                    >
-                      <div class="level-item-amount" style="min-width: 138px;">
-                        <div class="level-item-label" v-if="levelKey === 0">
+                    <div class="level-section">
+                      <div class="level-row-header">
+                        <div class="level-col amount-col">
                           <span>价格区间：</span>
                           <a-popover placement="top">
                             <template #content>
@@ -115,57 +110,71 @@
                             <QuestionCircleOutlined />
                           </a-popover>
                         </div>
-                        <div v-if="rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'UNIONPAY'" style="height: 32px; line-height: 32px;">
-                          金额 {{ levelItem.minAmount > 0 ? `> ${levelItem.minAmount}` : `<= ${levelItem.maxAmount}` }} 元：
-                        </div>
-                        <div v-else class="amount-input-group">
-                          <a-input-number
-                            :min="0"
-                            :precision="2"
-                            addon-after="~"
-                            @change="(e) => onAmountInput(payWayItem.wayCode, 'min', levelItem.id, e)"
-                            v-model:value="levelItem.minAmount"
-                            :disabled="!!readonlyFeeTypes.length || configMode === 'agentSelf'"/>
-                          <a-input-number
-                            :min="0"
-                            :precision="2"
-                            addon-after="元"
-                            @change="(e) => onAmountInput(payWayItem.wayCode, 'max', levelItem.id, e)"
-                            v-model:value="levelItem.maxAmount"
-                            :disabled="!!readonlyFeeTypes.length || configMode === 'agentSelf'"/>
-                        </div>
-                      </div>
-                      
-                      <div 
-                        class="level-item-fee" 
-                        v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
-                        :key="feeTypeKey"
-                      >
-                        <div class="level-item-label" v-if="levelKey === 0">{{ getFeeTypeName(feeType) }}费率：</div>
-                        <a-input-number
-                          :min="0"
-                          :step="0.01"
-                          :precision="6"
-                          addon-after="%"
-                          :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
-                          :value="rateConfig[feeType][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]
-                            ?.find(f => f.bankCardType === levelModeItem.bankCardType)?.levelList[levelKey]?.feeRate"
-                          @change="(e) => updateFeeRate(feeType, payWayItem.wayCode, levelModeItem.bankCardType, levelKey, e)"/>
-                      </div>
-                      
-                      <div v-if="rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'NORMAL'" class="level-item-actions">
-                        <div class="level-item-label" v-if="levelKey === 0" style="height: 21px;"><span></span></div>
-                        <a-popconfirm
-                          title="确定要删除该阶梯费率吗？"
-                          ok-text="确定"
-                          cancel-text="取消"
-                          @confirm="deleteLevelItem(payWayItem.wayCode, levelItem.id)"
+                        <div 
+                          v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                          :key="feeTypeKey"
+                          class="level-col fee-col"
                         >
-                          <a-button v-if="!readonlyFeeTypes.length" type="link" danger @click.stop>
-                            <template #icon><DeleteOutlined /></template>
-                            删除
-                          </a-button>
-                        </a-popconfirm>
+                          <span>{{ getFeeTypeName(feeType) }}费率：</span>
+                        </div>
+                        <div class="level-col action-col"></div>
+                      </div>
+                      
+                      <div
+                        v-for="(levelItem, levelKey) in levelModeItem.levelList"
+                        :key="levelKey"
+                        class="level-row"
+                      >
+                        <div class="level-col amount-col">
+                          <div v-if="rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'UNIONPAY'" class="unionpay-amount">
+                            金额 {{ levelItem.minAmount > 0 ? `> ${levelItem.minAmount}` : `<= ${levelItem.maxAmount}` }} 元
+                          </div>
+                          <div v-else class="amount-input-group">
+                            <a-input-number
+                              :min="0"
+                              :precision="2"
+                              addon-after="~"
+                              @change="(e) => onAmountInput(payWayItem.wayCode, 'min', levelItem.id, e)"
+                              v-model:value="levelItem.minAmount"
+                              :disabled="!!readonlyFeeTypes.length || configMode === 'agentSelf'"/>
+                            <a-input-number
+                              :min="0"
+                              :precision="2"
+                              addon-after="元"
+                              @change="(e) => onAmountInput(payWayItem.wayCode, 'max', levelItem.id, e)"
+                              v-model:value="levelItem.maxAmount"
+                              :disabled="!!readonlyFeeTypes.length || configMode === 'agentSelf'"/>
+                          </div>
+                        </div>
+                        
+                        <div 
+                          v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                          :key="feeTypeKey"
+                          class="level-col fee-col"
+                        >
+                          <a-input-number
+                            :min="0"
+                            :step="0.01"
+                            :precision="6"
+                            addon-after="%"
+                            :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
+                            :value="rateConfig[feeType][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]
+                              ?.find(f => f.bankCardType === levelModeItem.bankCardType)?.levelList[levelKey]?.feeRate"
+                            @change="(e) => updateFeeRate(feeType, payWayItem.wayCode, levelModeItem.bankCardType, levelKey, e)"/>
+                        </div>
+                        
+                        <div class="level-col action-col">
+                          <a-popconfirm
+                            title="确定要删除该阶梯费率吗？"
+                            ok-text="确定"
+                            cancel-text="取消"
+                            @confirm="deleteLevelItem(payWayItem.wayCode, levelItem.id)"
+                          >
+                            <a-button v-if="!readonlyFeeTypes.length && rateConfig.mainFee[payWayItem.wayCode]?.levelMode === 'NORMAL'" type="link" danger>
+                              删除
+                            </a-button>
+                          </a-popconfirm>
+                        </div>
                       </div>
                     </div>
                     
@@ -188,45 +197,52 @@
                             {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                           </a-divider>
                           
-                          <div class="fee-config-row">
-                            <div class="fee-config-label">
-                              <div class="fee-config-title">价格类型：</div>
-                              <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
+                          <div class="advanced-config-content">
+                            <div class="advanced-row">
+                              <div class="advanced-label">价格类型：</div>
+                              <div 
+                                v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                                :key="feeTypeKey"
+                                class="advanced-item"
+                              >
+                                <span>{{ getFeeTypeName(feeType) }}费用：</span>
+                              </div>
                             </div>
-                            <div 
-                              class="fee-config-item" 
-                              v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
-                              :key="feeTypeKey"
-                            >
-                              <div class="fee-config-title">{{ getFeeTypeName(feeType) }}费用：</div>
-                              <a-input-number
-                                :min="0"
-                                :precision="2"
-                                addon-before="保底"
-                                addon-after="元"
-                                :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
-                                :value="rateConfig[feeType][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]?.[levelModeKey]?.minFee"
-                                @change="(e) => updateMinFee(feeType, payWayItem.wayCode, levelModeKey, e)"/>
+                            
+                            <div class="advanced-row">
+                              <div class="advanced-label">保底费用：</div>
+                              <div 
+                                v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                                :key="feeTypeKey"
+                                class="advanced-item"
+                              >
+                                <a-input-number
+                                  :min="0"
+                                  :precision="2"
+                                  addon-before="保底"
+                                  addon-after="元"
+                                  :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
+                                  :value="rateConfig[feeType][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]?.[levelModeKey]?.minFee"
+                                  @change="(e) => updateMinFee(feeType, payWayItem.wayCode, levelModeKey, e)"/>
+                              </div>
                             </div>
-                          </div>
-                          
-                          <div class="fee-config-row" style="margin-top: 15px;">
-                            <div class="fee-config-label">
-                              <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
-                            </div>
-                            <div 
-                              class="fee-config-item" 
-                              v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
-                              :key="feeTypeKey"
-                            >
-                              <a-input-number
-                                :min="0"
-                                :precision="2"
-                                addon-before="封顶"
-                                addon-after="元"
-                                :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
-                                :value="rateConfig[feeType][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]?.[levelModeKey]?.maxFee"
-                                @change="(e) => updateMaxFee(feeType, payWayItem.wayCode, levelModeKey, e)"/>
+                            
+                            <div class="advanced-row">
+                              <div class="advanced-label">封顶费用：</div>
+                              <div 
+                                v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                                :key="feeTypeKey"
+                                class="advanced-item"
+                              >
+                                <a-input-number
+                                  :min="0"
+                                  :precision="2"
+                                  addon-before="封顶"
+                                  addon-after="元"
+                                  :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
+                                  :value="rateConfig[feeType][payWayItem.wayCode]?.[rateConfig.mainFee[payWayItem.wayCode]?.levelMode]?.[levelModeKey]?.maxFee"
+                                  @change="(e) => updateMaxFee(feeType, payWayItem.wayCode, levelModeKey, e)"/>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -235,20 +251,30 @@
                   </div>
                 </template>
                 
-                <div v-else class="simple-fee-list">
-                  <div 
-                    class="simple-fee-item" 
-                    v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
-                    :key="feeTypeKey"
-                  >
-                    <div class="simple-fee-label">{{ getFeeTypeName(feeType) }}费率：</div>
-                    <a-input-number
-                      :min="0"
-                      :step="0.01"
-                      :precision="6"
-                      addon-after="%"
-                      :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
-                      v-model:value="rateConfig[feeType][payWayItem.wayCode].feeRate"/>
+                <div v-else class="level-section">
+                  <div class="level-row-header">
+                    <div 
+                      v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                      :key="feeTypeKey"
+                      class="level-col fee-col"
+                    >
+                      <span>{{ getFeeTypeName(feeType) }}费率：</span>
+                    </div>
+                  </div>
+                  <div class="level-row">
+                    <div 
+                      v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                      :key="feeTypeKey"
+                      class="level-col fee-col"
+                    >
+                      <a-input-number
+                        :min="0"
+                        :step="0.01"
+                        :precision="6"
+                        addon-after="%"
+                        :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
+                        v-model:value="rateConfig[feeType][payWayItem.wayCode].feeRate"/>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -324,14 +350,9 @@
                     {{ levelModeItem.bankCardType === 'DEBIT' ? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                   </a-divider>
                   
-                  <div
-                    class="level-list"
-                    v-for="(levelItem, levelKey) in levelModeItem.levelList"
-                    :key="levelKey"
-                    :style="{ marginTop: levelKey > 0 ? '15px': 0 }"
-                  >
-                    <div class="level-item-amount" style="min-width: 138px;">
-                      <div class="level-item-label" v-if="levelKey === 0">
+                  <div class="level-section">
+                    <div class="level-row-header">
+                      <div class="level-col amount-col">
                         <span>价格区间：</span>
                         <a-popover placement="top">
                           <template #content>
@@ -340,57 +361,71 @@
                           <QuestionCircleOutlined />
                         </a-popover>
                       </div>
-                      <div v-if="feeGroup.mainFee?.levelMode === 'UNIONPAY'" style="height: 32px; line-height: 32px;">
-                        金额 {{ levelItem.minAmount > 0 ? `> ${levelItem.minAmount}` : `<= ${levelItem.maxAmount}` }} 元：
-                      </div>
-                      <div v-else class="amount-input-group">
-                        <a-input-number
-                          :min="0"
-                          :precision="2"
-                          addon-after="~"
-                          @change="(e) => onAmountInput(null, 'min', levelItem.id, e, feeGroup)"
-                          v-model:value="levelItem.minAmount"
-                          :disabled="!!readonlyFeeTypes.length || configMode === 'agentSelf'"/>
-                        <a-input-number
-                          :min="0"
-                          :precision="2"
-                          addon-after="元"
-                          @change="(e) => onAmountInput(null, 'max', levelItem.id, e, feeGroup)"
-                          v-model:value="levelItem.maxAmount"
-                          :disabled="!!readonlyFeeTypes.length || configMode === 'agentSelf'"/>
-                      </div>
-                    </div>
-                    
-                    <div 
-                      class="level-item-fee" 
-                      v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
-                      :key="feeTypeKey"
-                    >
-                      <div class="level-item-label" v-if="levelKey === 0">{{ getFeeTypeName(feeType) }}费率：</div>
-                      <a-input-number
-                        :min="0"
-                        :step="0.01"
-                        :precision="6"
-                        addon-after="%"
-                        :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
-                        :value="feeGroup[feeType]?.[feeGroup.mainFee?.levelMode]
-                          ?.find(f => f.bankCardType === levelModeItem.bankCardType)?.levelList[levelKey]?.feeRate"
-                        @change="(e) => updateGroupFeeRate(feeType, feeGroup, levelModeItem.bankCardType, levelKey, e)"/>
-                    </div>
-                    
-                    <div v-if="feeGroup.mainFee?.levelMode === 'NORMAL'" class="level-item-actions">
-                      <div class="level-item-label" v-if="levelKey === 0" style="height: 21px;"><span></span></div>
-                      <a-popconfirm
-                        title="确定要删除该阶梯费率吗？"
-                        ok-text="确定"
-                        cancel-text="取消"
-                        @confirm="deleteLevelItem(null, levelItem.id, feeGroup)"
+                      <div 
+                        v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                        :key="feeTypeKey"
+                        class="level-col fee-col"
                       >
-                        <a-button v-if="!readonlyFeeTypes.length" type="link" danger @click.stop>
-                          <template #icon><DeleteOutlined /></template>
-                          删除
-                        </a-button>
-                      </a-popconfirm>
+                        <span>{{ getFeeTypeName(feeType) }}费率：</span>
+                      </div>
+                      <div class="level-col action-col"></div>
+                    </div>
+                    
+                    <div
+                      v-for="(levelItem, levelKey) in levelModeItem.levelList"
+                      :key="levelKey"
+                      class="level-row"
+                    >
+                      <div class="level-col amount-col">
+                        <div v-if="feeGroup.mainFee?.levelMode === 'UNIONPAY'" class="unionpay-amount">
+                          金额 {{ levelItem.minAmount > 0 ? `> ${levelItem.minAmount}` : `<= ${levelItem.maxAmount}` }} 元
+                        </div>
+                        <div v-else class="amount-input-group">
+                          <a-input-number
+                            :min="0"
+                            :precision="2"
+                            addon-after="~"
+                            @change="(e) => onAmountInput(null, 'min', levelItem.id, e, feeGroup)"
+                            v-model:value="levelItem.minAmount"
+                            :disabled="!!readonlyFeeTypes.length || configMode === 'agentSelf'"/>
+                          <a-input-number
+                            :min="0"
+                            :precision="2"
+                            addon-after="元"
+                            @change="(e) => onAmountInput(null, 'max', levelItem.id, e, feeGroup)"
+                            v-model:value="levelItem.maxAmount"
+                            :disabled="!!readonlyFeeTypes.length || configMode === 'agentSelf'"/>
+                        </div>
+                      </div>
+                      
+                      <div 
+                        v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                        :key="feeTypeKey"
+                        class="level-col fee-col"
+                      >
+                        <a-input-number
+                          :min="0"
+                          :step="0.01"
+                          :precision="6"
+                          addon-after="%"
+                          :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
+                          :value="feeGroup[feeType]?.[feeGroup.mainFee?.levelMode]
+                            ?.find(f => f.bankCardType === levelModeItem.bankCardType)?.levelList[levelKey]?.feeRate"
+                          @change="(e) => updateGroupFeeRate(feeType, feeGroup, levelModeItem.bankCardType, levelKey, e)"/>
+                      </div>
+                      
+                      <div class="level-col action-col">
+                        <a-popconfirm
+                          title="确定要删除该阶梯费率吗？"
+                          ok-text="确定"
+                          cancel-text="取消"
+                          @confirm="deleteLevelItem(null, levelItem.id, feeGroup)"
+                        >
+                          <a-button v-if="!readonlyFeeTypes.length && feeGroup.mainFee?.levelMode === 'NORMAL'" type="link" danger>
+                            删除
+                          </a-button>
+                        </a-popconfirm>
+                      </div>
                     </div>
                   </div>
                   
@@ -413,45 +448,52 @@
                           {{ levelModeItem.bankCardType === 'DEBIT'? '借记卡（储蓄卡）' : '贷记卡（信用卡）' }}
                         </a-divider>
                         
-                        <div class="fee-config-row">
-                          <div class="fee-config-label">
-                            <div class="fee-config-title">价格类型：</div>
-                            <div style="height: 30px; line-height: 30px;min-width: 75px;">保底费用：</div>
+                        <div class="advanced-config-content">
+                          <div class="advanced-row">
+                            <div class="advanced-label">价格类型：</div>
+                            <div 
+                              v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                              :key="feeTypeKey"
+                              class="advanced-item"
+                            >
+                              <span>{{ getFeeTypeName(feeType) }}费用：</span>
+                            </div>
                           </div>
-                          <div 
-                            class="fee-config-item" 
-                            v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
-                            :key="feeTypeKey"
-                          >
-                            <div class="fee-config-title">{{ getFeeTypeName(feeType) }}费用：</div>
-                            <a-input-number
-                              :min="0"
-                              :precision="2"
-                              addon-before="保底"
-                              addon-after="元"
-                              :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
-                              :value="feeGroup[feeType]?.[feeGroup.mainFee?.levelMode]?.[levelModeKey]?.minFee"
-                              @change="(e) => updateGroupMinFee(feeType, feeGroup, levelModeKey, e)"/>
+                          
+                          <div class="advanced-row">
+                            <div class="advanced-label">保底费用：</div>
+                            <div 
+                              v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                              :key="feeTypeKey"
+                              class="advanced-item"
+                            >
+                              <a-input-number
+                                :min="0"
+                                :precision="2"
+                                addon-before="保底"
+                                addon-after="元"
+                                :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
+                                :value="feeGroup[feeType]?.[feeGroup.mainFee?.levelMode]?.[levelModeKey]?.minFee"
+                                @change="(e) => updateGroupMinFee(feeType, feeGroup, levelModeKey, e)"/>
+                            </div>
                           </div>
-                        </div>
-                        
-                        <div class="fee-config-row" style="margin-top: 15px;">
-                          <div class="fee-config-label">
-                            <div style="height: 30px; line-height: 30px;min-width: 75px;">封顶费用：</div>
-                          </div>
-                          <div 
-                            class="fee-config-item" 
-                            v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
-                            :key="feeTypeKey"
-                          >
-                            <a-input-number
-                              :min="0"
-                              :precision="2"
-                              addon-before="封顶"
-                              addon-after="元"
-                              :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
-                              :value="feeGroup[feeType]?.[feeGroup.mainFee?.levelMode]?.[levelModeKey]?.maxFee"
-                              @change="(e) => updateGroupMaxFee(feeType, feeGroup, levelModeKey, e)"/>
+                          
+                          <div class="advanced-row">
+                            <div class="advanced-label">封顶费用：</div>
+                            <div 
+                              v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                              :key="feeTypeKey"
+                              class="advanced-item"
+                            >
+                              <a-input-number
+                                :min="0"
+                                :precision="2"
+                                addon-before="封顶"
+                                addon-after="元"
+                                :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
+                                :value="feeGroup[feeType]?.[feeGroup.mainFee?.levelMode]?.[levelModeKey]?.maxFee"
+                                @change="(e) => updateGroupMaxFee(feeType, feeGroup, levelModeKey, e)"/>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -460,21 +502,31 @@
                 </div>
               </template>
               
-              <div v-else class="simple-fee-list">
-                <div 
-                  class="simple-fee-item" 
-                  v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
-                  :key="feeTypeKey"
-                >
-                  <div class="simple-fee-label">{{ getFeeTypeName(feeType) }}费率：</div>
-                  <a-input-number
-                    :min="0"
-                    :step="0.01"
-                    :precision="6"
-                    addon-after="%"
-                    :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
-                    :value="feeGroup[feeType]?.feeRate"
-                    @change="(e) => updateGroupSingleFeeRate(feeType, feeGroup, e)"/>
+              <div v-else class="level-section">
+                <div class="level-row-header">
+                  <div 
+                    v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                    :key="feeTypeKey"
+                    class="level-col fee-col"
+                  >
+                    <span>{{ getFeeTypeName(feeType) }}费率：</span>
+                  </div>
+                </div>
+                <div class="level-row">
+                  <div 
+                    v-for="(feeType, feeTypeKey) in readonlyFeeTypes.concat(editableFeeTypes)" 
+                    :key="feeTypeKey"
+                    class="level-col fee-col"
+                  >
+                    <a-input-number
+                      :min="0"
+                      :step="0.01"
+                      :precision="6"
+                      addon-after="%"
+                      :disabled="feeType.startsWith('readonly') || (configMode === 'agentSelf' && feeType === 'mainFee')"
+                      :value="feeGroup[feeType]?.feeRate"
+                      @change="(e) => updateGroupSingleFeeRate(feeType, feeGroup, e)"/>
+                  </div>
                 </div>
               </div>
             </div>
@@ -510,8 +562,6 @@ const props = defineProps({
   configMode: { type: String, default: '' },
   callbackFunc: { type: Function, default: () => ({}) }
 })
-
-const emit = defineEmits(['dirty-change'])
 
 const rateConfigState = useRateConfig(props)
 
@@ -633,99 +683,98 @@ defineExpose({
   margin-bottom: 16px;
 }
 
-.level-list {
+.level-section {
   display: flex;
+  flex-direction: column;
+}
+.level-row-header,
+.level-row {
+  display: grid;
+  /* 默认值，防止没传列数时出错 */
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  padding: 8px 0;
+  /* 确保不换行 */
+  flex-wrap: nowrap;
   align-items: center;
-  flex-flow: row wrap;
+  justify-content: start;
+}
+.level-row-header {
+  border-bottom: 1px solid var(--border-color);
 }
 
-.level-item-amount {
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
+.level-row {
 }
 
-.level-item-label {
-  margin-right: 10px;
+.level-col {
+  display: flex;
+  align-items: center;
+}
+
+.amount-col {
+  display: flex;
+  align-items: center;
+}
+
+.fee-col {
+  display: flex;
+  align-items: center;
+}
+
+.action-col {
+  display: flex;
+  align-items: center;
+  /* justify-content: flex-end; */
+}
+
+.unionpay-amount {
+  height: 32px;
+  line-height: 32px;
 }
 
 .amount-input-group {
   display: flex;
-  gap: 0px;
+  gap: 0;
 }
 
-.level-item-fee {
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-}
-
-.level-item-actions {
-  display: flex;
-  align-items: center;
+.amount-input-group :deep(.ant-input-number) {
+  width: 90px;
 }
 
 .add-level-btn {
-  margin-top: 30px;
+  margin-top: 20px;
   display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-around;
+  justify-content: center;
 }
 
 .advanced-config {
   margin-top: 20px;
 }
 
-.fee-config-row {
+.advanced-config-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.advanced-row {
+  display: grid;
+  grid-template-columns: minmax(80px, 100px) repeat(3, minmax(120px, 1fr));
+  gap: 10px;
+  padding: 8px 0;
+  align-items: center;
+}
+
+.advanced-label {
   display: flex;
   align-items: center;
 }
 
-.fee-config-label {
+.advanced-item {
   display: flex;
   align-items: center;
-  margin-right: 20px;
-}
-
-.fee-config-title {
-  margin-right: 10px;
-}
-
-.fee-config-item {
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-}
-
-.simple-fee-list {
-  display: flex;
-  align-items: center;
-  flex-flow: row wrap;
-}
-
-.simple-fee-item {
-  display: flex;
-  align-items: center;
-  margin-right: 20px;
-}
-
-.simple-fee-label {
-  margin-right: 10px;
 }
 
 .save-advanced-config {
   margin-top: 20px;
-}
-
-:deep(.ant-alert) {
-  margin-bottom: 20px;
-}
-
-:deep(.ant-collapse) {
-  margin-top: 20px;
-}
-
-:deep(.ant-divider) {
-  margin: 16px 0;
 }
 </style>

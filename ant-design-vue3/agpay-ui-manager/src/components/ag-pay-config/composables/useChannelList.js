@@ -66,34 +66,44 @@ export function useChannelList(configMode, infoId, customConfig = {}, onChannelA
       channelList.value = [...originalChannelList.value]
     }
   }
-
   const refreshChannelList = async () => {
     isLoading.value = true
     try {
       const params = {
         configMode: configMode.value,
         infoId: infoId.value,
-        ...searchForm.value
+        // ...searchForm.value        
+        ifName: searchForm.value.channelName,
+        ifCode: searchForm.value.channelCode
       }
       const resData = await payConfigApi.queryPayConfigIfCodes(params)
       
       originalChannelList.value = [...resData]
       channelList.value = resData
       
-      if (!config.keepSelectionOnSearch) {
+      // 1. 【核心】如果查询结果为空，无论配置如何，都必须强制清空选中状态
+      if (resData.length === 0) {
+        activeChannelCode.value = null
+      } 
+      // 2. 如果配置了搜索后不保留选中状态，也进行清除
+      else if (!config.keepSelectionOnSearch) {
         activeChannelCode.value = null
       }
-      
+
+      // 3. 如果列表有数据，且当前没有选中项，且配置了自动选中第一项
       if (resData.length > 0 && !activeChannelCode.value && config.autoSelectFirst) {
         activeChannelCode.value = resData[0].ifCode
-        onChannelAutoSelect(resData[0].ifCode)
       }
     } catch (error) {
       console.error('刷新支付接口代码列表失败:', error)
       channelList.value = []
       originalChannelList.value = []
+      // 异常兜底：列表被清空，同步清除选中状态
+      activeChannelCode.value = null
     } finally {
       isLoading.value = false
+      // 统一在 finally 中通知父组件，确保父子组件状态绝对同步
+      onChannelAutoSelect(activeChannelCode.value)
     }
   }
 
