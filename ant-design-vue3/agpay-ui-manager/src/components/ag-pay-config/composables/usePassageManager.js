@@ -1,7 +1,7 @@
-import { ref, reactive, computed } from 'vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
-import { infoBox } from '@/utils/info-box'
 import { getStateInfo, STATE_ENUM } from '@/constants/common-const.js'
+import { infoBox } from '@/utils/info-box'
+import { computed, reactive, ref } from 'vue'
 
 export function usePassageManager(infoId) {
   const passageSearchForm = reactive({})

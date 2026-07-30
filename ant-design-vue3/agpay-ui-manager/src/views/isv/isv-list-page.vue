@@ -57,11 +57,11 @@
         <!-- 操作列 -->
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button type="link" @click="editFunc(record.isvNo)" v-if="hasPermission('ENT_ISV_INFO_EDIT')">修改</a-button>
-            <a-button type="link" @click="payOauth2ConfigFunc(record.isvNo)" v-if="hasPermission('ENT_ISV_OAUTH2_CONFIG_VIEW')">Oauth2配置</a-button>
-            <a-button type="link" @click="payConfigFunc(record.isvNo)" v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')">支付配置</a-button>
-            <a-button type="link" @click="showPayIfConfigList(record.isvNo)" v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')">支付配置(新)</a-button>
-            <a-button type="link" @click="delFunc(record.isvNo)" danger v-if="hasPermission('ENT_ISV_INFO_DEL')">删除</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_INFO_EDIT')" type="link" @click="editFunc(record.isvNo)">修改</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_OAUTH2_CONFIG_VIEW')" type="link" @click="payOauth2ConfigFunc(record.isvNo)">Oauth2配置</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payConfigFunc(record.isvNo)">支付配置</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payIfConfigFunc(record.isvNo)">支付配置(新)</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_INFO_DEL')" type="link" @click="delFunc(record.isvNo)" danger>删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -87,15 +87,15 @@
  * 功能：展示服务商列表、搜索、新增、编辑、配置管理、删除等操作
  */
 import { isvApi } from '@/api/business/isv/isv-api'
-import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions, AgPayConfigDrawer, AgPayOauth2ConfigDrawer } from '@/components'
+import { AgInput, AgPayConfigDrawer, AgPayOauth2ConfigDrawer, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getStateInfo, getStateOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AddOrEdit from './add-or-edit.vue'
 import IsvPayIfConfigList from './isv-pay-if-config-list.vue'
-import { getStateOptions, getStateInfo } from '@/constants/common-const'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
@@ -197,7 +197,7 @@ const payOauth2ConfigFunc = (recordId) => {
  * 打开支付接口配置列表
  * @param {string} recordId - 服务商ID
  */
-const showPayIfConfigList = (recordId) => {
+const payIfConfigFunc = (recordId) => {
   currentRecordId.value = recordId
   isvPayIfConfigListOpen.value = true
 }

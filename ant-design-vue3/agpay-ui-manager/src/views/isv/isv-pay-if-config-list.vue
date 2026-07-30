@@ -44,16 +44,16 @@
  * ISV支付接口配置列表组件
  * 功能：展示ISV支付接口配置卡片列表，支持填写参数配置
  */
-import { LoadingOutlined, RightOutlined } from '@ant-design/icons-vue'
-import { AgDrawer, AgCard } from '@/components'
-import { usePermission } from '@/composables/useCommon'
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
-import { ref, watch, computed } from 'vue'
-import AlipayPayConfig from './custom/alipay-pay-config.vue'
-import WxpayPayConfig from './custom/wxpay-pay-config.vue'
-import JsonPayConfig from './custom/json-pay-config.vue'
+import { AgCard, AgDrawer } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { getStateInfo } from '@/constants/common-const'
+import { LoadingOutlined, RightOutlined } from '@ant-design/icons-vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import AlipayPayConfig from './custom/alipay-pay-config.vue'
+import JsonPayConfig from './custom/json-pay-config.vue'
+import WxpayPayConfig from './custom/wxpay-pay-config.vue'
 
 const { t } = useI18n()
 
@@ -166,9 +166,7 @@ function handleClose() {
 }
 .title {
   font-size: 16px;
-  font-family:
-    PingFang SC,
-    PingFang SC-Bold;
+  font-family: PingFang SC, PingFang SC-Bold;
   font-weight: 700;
   color: var(--text-color);
   letter-spacing: 1px;

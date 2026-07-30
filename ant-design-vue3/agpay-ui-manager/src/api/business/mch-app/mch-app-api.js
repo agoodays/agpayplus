@@ -27,6 +27,9 @@ export const mchAppApi = {
   queryByMchNo(mchNo) {
     return req.list(API_URL_MCH_APP, { pageSize: -1, mchNo })
   },
+  queryCardList(appId) {
+    return req.list(API_URL_MCH_PAYCONFIGS_LIST, { pageSize: -1, appId })
+  },
   getMchPayConfigUnique(infoId, ifCode) {
     return req.get(`${API_URL_MCH_PAYCONFIGS_LIST}/${infoId}/${ifCode}`)
   },
@@ -48,6 +51,9 @@ export const mchAppApi = {
   },
   queryMchPayPassagePage(params) {
     return req.list(API_URL_MCH_PAYPASSAGE_LIST, params)
+  },
+  saveMchPayPassages(data) {
+    return req.add(API_URL_MCH_PAYPASSAGE_LIST, data)
   },
   queryAlipayIsvsubMchAuthUrl(mchAppId) {
     return req.get(`/api/mch/payConfigs/alipayIsvsubMchAuthUrls/${mchAppId}`)

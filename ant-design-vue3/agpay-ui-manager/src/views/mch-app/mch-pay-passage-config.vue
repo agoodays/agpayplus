@@ -53,11 +53,11 @@
           zIndex: 1
         }"
       >
-        <a-button :style="{ marginRight: '8px' }" @click="onClose">
+        <a-button :style="{ marginRight: '8px' }" @click="handleClose">
           <template #icon><CloseOutlined /></template>
           取消
         </a-button>
-        <a-button type="primary" @click="handleOkFunc">
+        <a-button v-if="hasPermission('ENT_MCH_PAY_PASSAGE_ADD')" type="primary" @click="handleOkFunc">
           <template #icon><CheckOutlined /></template>
           保存
         </a-button>
@@ -71,11 +71,12 @@
  * 商户支付通道配置组件
  * 功能：配置商户应用的支付通道和费率
  */
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
-import { AgDrawer } from '@/components'
-import { ref, watch } from 'vue'
-import { message } from 'ant-design-vue'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
+import { AgDrawer } from '@/components'
+import { usePermission } from '@/composables/useCommon'
+import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { ref, watch } from 'vue'
 
 /** Props 定义 */
 const props = defineProps({
@@ -98,6 +99,7 @@ const emit = defineEmits(['update:open', 'success'])
 
 /** 本地打开状态 */
 const localOpen = ref(false)
+const { hasPermission } = usePermission()
 
 const cardList = ref([])
 
@@ -181,7 +183,7 @@ const handleOkFunc = async () => {
   if (hasError) return
 
   try {
-    await mchAppApi.queryMchPayPassagePage({ reqParams: JSON.stringify(reqParams) })
+    await mchAppApi.saveMchPayPassages({ reqParams: JSON.stringify(reqParams) })
     message.success('保存成功')
     localOpen.value = false
     emit('success')
@@ -200,21 +202,19 @@ const handleClose = () => {
 .ag-card-content {
   width: 100%;
   position: relative;
-  background-color: #fff;
+  background-color: var(--base-bg-color);
   border-radius: 6px;
-  overflow:hidden;
-  height: 300px;
-  border: 1px solid #e8e8e8;
+  overflow: hidden;
 }
 .ag-card-ops {
   width: 100%;
   height: 50px;
-  background-color: #fff;
+  background-color: var(--base-bg-color);
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  border-top: 1px solid #e8e8e8;
+  border-top: 1px solid var(--border-color);
   position: absolute;
   bottom: 0;
 }
@@ -224,22 +224,20 @@ const handleClose = () => {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  height: 125px;
 }
 .ag-card-content-body {
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: space-around;
   align-items: center;
-  height: 125px;
 }
 .title {
   font-size: 16px;
-  font-family: PingFang SC, PingFang SC-Bold;
+  font-family:
+    PingFang SC,
+    PingFang SC-Bold;
   font-weight: 700;
-  color: #1a1a1a;
+  color: var(--text-color);
   letter-spacing: 1px;
-  height: 62px;
-  line-height: 62px;
 }
 </style>

@@ -19,7 +19,7 @@
       :is-all-columns-visible="isAllColumnsVisible"
       :is-some-columns-visible="isSomeColumnsVisible"
       :selected-row-keys="state.selectedRowKeys"
-      :row-selection-enabled="!!rowSelection"
+      :row-selection-enabled="rowSelectionEnabled"
       @update:auto-refresh-enabled="handleAutoRefreshEnabledChange"
       @update:show-statistics="handleShowStatisticsChange"
       @update:column-settings-open="handleColumnSettingsOpenChange"
@@ -74,7 +74,7 @@
     </a-table>
 
     <!-- 批量操作提示 -->
-    <div v-if="state.selectedRowKeys.length > 0" class="batch-operation-bar">
+    <div v-if="rowSelectionEnabled && state.selectedRowKeys.length > 0" class="batch-operation-bar">
       <span class="batch-count">已选择 {{ state.selectedRowKeys.length }} 条记录</span>
       <slot name="batch-actions" :keys="state.selectedRowKeys"></slot>
     </div>
@@ -101,6 +101,7 @@ const props = defineProps({
   pagination: { type: [Object, Boolean], default: null },
   rowKey: { type: [String, Function], default: 'id' },
   rowSelection: { type: Object, default: null },
+  rowSelectionEnabled: { type: Boolean, default: false },
   scrollX: { type: Number, default: 500 },
   
   // 行点击事件
@@ -243,7 +244,6 @@ const displayColumns = computed(() => {
 // 行选择配置
 const computedRowSelection = computed(() => {
   if (!props.rowSelection) return null
-
   return {
     ...props.rowSelection,
     selectedRowKeys: state.selectedRowKeys,

@@ -48,12 +48,12 @@
  * 支付接口定义列表页面组件
  * 功能：展示支付接口定义卡片列表，支持新增、编辑、删除操作
  */
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
-import { reactive, ref } from 'vue'
-import { message } from 'ant-design-vue'
 import { AgCard } from '@/components'
 import { usePermission } from '@/composables/useCommon'
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { reactive, ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 
 // 权限检查

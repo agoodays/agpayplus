@@ -114,13 +114,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { message } from 'ant-design-vue'
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
-import { upload } from '@/lib/ag-axios'
-import BasePage from '../base-page.vue'
 import { AgUpload } from '@/components'
+import { upload } from '@/lib/ag-axios'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { onMounted, reactive, ref } from 'vue'
+import BasePage from '../base-page.vue'
 
 const props = defineProps({
   infoId: {
@@ -345,9 +345,4 @@ defineExpose({
 })
 </script>
 
-<style scoped>
-.drawer-btn-center {
-  position: fixed;
-  width: 90%;
-}
-</style>
+<style scoped></style>

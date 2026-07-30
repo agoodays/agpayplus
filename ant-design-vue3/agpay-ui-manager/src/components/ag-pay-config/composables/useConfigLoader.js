@@ -10,10 +10,10 @@ const DEFAULT_COMPONENT_ROUTES = {
 }
 
 const DEFAULT_APP_CONFIG_ROUTES = {
-  ysfpay: '../ag-pay-mch-applyment/diy/ysfpay/app-config.vue',
-  lespay: '../ag-pay-mch-applyment/diy/lespay/app-config.vue',
-  sxfpay: '../ag-pay-mch-applyment/diy/sxfpay/app-config.vue',
-  shengpay: '../ag-pay-mch-applyment/diy/shengpay/app-config.vue'
+  ysfpay: '../../ag-pay-mch-applyment/diy/ysfpay/app-config.vue',
+  lespay: '../../ag-pay-mch-applyment/diy/lespay/app-config.vue',
+  sxfpay: '../../ag-pay-mch-applyment/diy/sxfpay/app-config.vue',
+  shengpay: '../../ag-pay-mch-applyment/diy/shengpay/app-config.vue'
 }
 
 export function useConfigLoader(activeChannelCode, activeSubTab, configMode, channelList, customRoutes = {}) {

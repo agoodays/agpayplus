@@ -87,46 +87,27 @@
         </template>
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_MCH_APP_EDIT')" type="link" size="small" @click="handleEdit(record)">
-              修改
-            </a-button>
-            <a-button
-              v-if="hasPermission('ENT_MCH_OAUTH2_CONFIG_VIEW')"
-              type="link"
-              size="small"
-              @click="handleOauth2Config(record)"
-            >
-              Oauth2配置
-            </a-button>
-            <a-button
-              v-if="hasPermission('ENT_MCH_PAY_CONFIG_LIST')"
-              type="link"
-              size="small"
-              @click="handlePayConfig(record)"
-            >
-              支付配置
-            </a-button>
-            <a-button
-              v-if="hasPermission('ENT_MCH_APP_DEL')"
-              type="link"
-              size="small"
-              danger
-              @click="delFunc(record.appId)"
-            >
-              删除
-            </a-button>
+            <a-button v-if="hasPermission('ENT_MCH_APP_EDIT')" type="link" size="small" @click="handleEdit(record)">修改</a-button>
+            <a-button v-if="hasPermission('ENT_MCH_OAUTH2_CONFIG_VIEW')" type="link" size="small" @click="payOauth2ConfigFunc(record)">Oauth2配置</a-button>
+            <a-button v-if="hasPermission('ENT_MCH_PAY_CONFIG_LIST')" type="link" size="small" @click="payConfigFunc(record)">支付配置</a-button>
+            <a-button v-if="hasPermission('ENT_MCH_PAY_CONFIG_LIST')" type="link" size="small" @click="payIfConfigFunc(record.appId)">支付配置(旧版)</a-button>
+            <a-button v-if="hasPermission('ENT_MCH_APP_DEL')" type="link" size="small" danger @click="delFunc(record.appId)">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <add-or-edit
-      v-model:open="modalOpen"
-      :record-id="currentRecordId"
-      :mch-no="currentMchNo"
-      @success="handleModalSuccess"
-    />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" :mch-no="currentMchNo" @success="handleModalSuccess" />
+    
+    <!-- 支付配置抽屉 -->
+    <ag-pay-config v-model:open="payConfigOpen" :info-id="currentRecordId" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="'mgrMch'" :is-isv-sub-mch="isIsvSubMch" />
+
+    <!-- OAuth2配置抽屉 -->
+    <ag-pay-oauth2-config-drawer v-model:open="payOauth2ConfigOpen" :perm-code="'ENT_MCH_OAUTH2_CONFIG_ADD'" :config-mode="'mgrMch'" :info-id="currentRecordId" :is-isv-sub-mch="isIsvSubMch" />
+
+    <!-- 支付参数配置页面组件 -->
+    <mch-pay-if-config-list v-model:open="payIfConfigOpen" :app-id="currentRecordId" />
   </div>
 </template>
 
@@ -136,16 +117,17 @@
  * 功能：展示商户应用列表，支持搜索、新增、编辑、删除、配置等操作
  */
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
-import { AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgPayOauth2ConfigDrawer, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
+import { AgPayConfig } from '@/components/ag-pay-config'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getStateInfo, getStateOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { message } from 'ant-design-vue'
-import { onMounted, ref, computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
-import { getStateOptions, getStateInfo } from '@/constants/common-const'
+import MchPayIfConfigList from './mch-pay-if-config-list.vue'
 
 const { t } = useI18n()
 
@@ -158,6 +140,13 @@ const route = useRoute()
  * 权限检查
  */
 const { hasPermission } = usePermission()
+
+const isIsvSubMch = ref(false)
+
+/** 支付配置抽屉状态 */
+const payConfigOpen = ref(false)
+const payOauth2ConfigOpen = ref(false)
+const payIfConfigOpen = ref(false)
 
 /**
  * 当前商户号
@@ -283,17 +272,32 @@ const delFunc = (recordId) => {
 }
 
 /**
- * Oauth2配置
+ * 打开支付配置抽屉
+ * @param {Object} record - 应用记录
  */
-const handleOauth2Config = () => {
-  message.info(t('mchApp.oauth2ComingSoon'))
+const payConfigFunc = (record) => {
+  currentRecordId.value = record.appId
+  isIsvSubMch.value = record.mchType === 2
+  payConfigOpen.value = true
 }
 
 /**
- * 支付配置
+ * 打开OAuth2配置抽屉
+ * @param {Object} record - 应用记录
  */
-const handlePayConfig = () => {
-  message.info(t('mchApp.payConfigComingSoon'))
+const payOauth2ConfigFunc = (record) => {
+  currentRecordId.value = record.appId
+  isIsvSubMch.value = record.mchType === 2
+  payOauth2ConfigOpen.value = true
+}
+
+/**
+ * 打开支付参数配置页面
+ * @param {String} appId - 应用ID
+ */
+const payIfConfigFunc = (appId) => {
+  currentRecordId.value = appId
+  payIfConfigOpen.value = true
 }
 
 /**

@@ -81,7 +81,7 @@
         @load-complete="loading = false"
       >
         <template #toolbar-left>
-          <a-button type="danger" @click="delFunc">删除</a-button>
+          <a-button type="primary" danger @click="delFunc">删除</a-button>
         </template>
         <template #userNameSlot="{ record }">
           <b>{{ record.userName }}</b>
@@ -112,11 +112,11 @@
  * 系统日志列表页面组件
  * 功能：展示系统操作日志和登录日志，支持搜索、批量删除、查看详情等操作
  */
-import { ref, reactive, computed } from 'vue'
-import { message, Modal } from 'ant-design-vue'
-import { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput, AgSelect } from '@/components'
-import { useModal } from '@/composables/useCommon'
 import { sysApi } from '@/api/business/sys/sys-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { useModal } from '@/composables/useCommon'
+import { message, Modal } from 'ant-design-vue'
+import { computed, reactive, ref } from 'vue'
 import Detail from './detail.vue'
 
 /**

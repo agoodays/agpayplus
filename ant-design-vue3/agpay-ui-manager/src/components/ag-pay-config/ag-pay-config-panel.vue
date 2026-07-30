@@ -123,9 +123,8 @@
       <div class="content-area">
         <slot name="passage-search">
           <ag-search 
-            v-model="passageManager.passageSearchForm" 
-            :search-loading="passageManager.isLoading" 
-            @search="handlePassageSearch" 
+            v-model="passageManager.passageSearchForm"
+            @search="handlePassageSearch"
             @reset="passageManager.handleResetPassageSearch"
           >
             <template #base="{ colSpan }">
@@ -148,10 +147,11 @@
               <ag-table
                 ref="wayTableRef"
                 row-key="wayCode"
+                state-key="way-code-table-columns"
                 :on-load="passageManager.fetchWayTableData"
-                :columns="passageManager.wayTableColumns"
+                :columns="passageManager.wayTableColumns.value"
                 :search-data="passageManager.passageSearchForm"
-                :row-selection="passageManager.wayRowSelection"
+                :row-selection="passageManager.wayRowSelection.value"
               >
                 <template #stateSlot="{ record }">
                   <a-badge
@@ -167,8 +167,9 @@
               <ag-table
                 ref="passageTableRef"
                 row-key="ifCode"
+                state-key="if-code-table-columns"
                 :on-load="passageManager.fetchPassageTableData"
-                :columns="passageManager.passageTableColumns"
+                :columns="passageManager.passageTableColumns.value"
                 :search-data="passageManager.passageSearchForm"
               >
                 <template #ifNameSlot="{ record }">
@@ -236,16 +237,16 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-import { message } from 'ant-design-vue'
-import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
-import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
+import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { ref, watch } from 'vue'
 import AgPayWayRatePanel from './ag-pay-payway-rate-panel.vue'
 import { useChannelList } from './composables/useChannelList'
 import { useConfigLoader } from './composables/useConfigLoader'
-import { useTabConfig } from './composables/useTabConfig'
 import { usePassageManager } from './composables/usePassageManager'
+import { useTabConfig } from './composables/useTabConfig'
 
 const icons = { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined }
 
@@ -408,11 +409,6 @@ defineExpose({
 :deep(.ant-table-thead > tr > th),
 :deep(.ant-table-tbody > tr > td) {
   padding: 8px 8px;
-}
-
-.drawer-btn-center {
-  position: fixed;
-  width: 90%;
 }
 
 .btn-center {
@@ -665,5 +661,10 @@ defineExpose({
 
 .content-area {
   padding: 30px 50px;
+}
+
+.ag-search{
+  margin-bottom: 0;
+  padding: 0;
 }
 </style>

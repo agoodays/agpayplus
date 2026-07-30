@@ -6,7 +6,7 @@
       <!-- 批量选择 -->
       <div v-if="rowSelectionEnabled" class="batch-selection-group">
         <a-checkbox 
-          :checked="isAllSelected" 
+          v-model:checked="isAllSelected" 
           :indeterminate="isIndeterminate"
           @change="handleSelectAllChange"
         >
@@ -109,16 +109,16 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
 import {
-    BarChartOutlined,
-    CheckOutlined,
-    CloseCircleOutlined,
-    ColumnHeightOutlined,
-    DownloadOutlined,
-    SettingOutlined,
-    SyncOutlined,
+  BarChartOutlined,
+  CheckOutlined,
+  CloseCircleOutlined,
+  ColumnHeightOutlined,
+  DownloadOutlined,
+  SettingOutlined,
+  SyncOutlined,
 } from '@ant-design/icons-vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AgTableColumnSettingsPanel from './column-settings-panel.vue'
 
