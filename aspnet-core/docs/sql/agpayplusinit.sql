@@ -1130,7 +1130,7 @@ VALUES ('ENT_C_MAIN', '主页', 'home', '/main', 'MainPage', 'ML', 0, 1,  'ROOT'
 INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
 VALUES ('ENT_MCH', '商户管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '30', 'MGR', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchListPage', 'ML', 0, 1,  'ENT_MCH', '10', 'MGR', NOW(), NOW());
+    VALUES ('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchPage', 'ML', 0, 1,  'ENT_MCH', '10', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_MCH_LIST', '页面：商户列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1196,7 +1196,7 @@ VALUES ('ENT_MCH', '商户管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT',
 INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
 VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '35', 'MGR', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1, 'ENT_AGENT', '10', 'MGR', NOW(), NOW());
+    VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentPage', 'ML', 0, 1, 'ENT_AGENT', '10', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_AGENT_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1218,7 +1218,7 @@ VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'R
 INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
 VALUES ('ENT_ISV', '服务商管理', 'block', '', 'RouteView', 'ML', 0, 1,  'ROOT', '40', 'MGR', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_ISV_INFO', '服务商列表', 'profile', '/isv', 'IsvListPage', 'ML', 0, 1,  'ENT_ISV', '10', 'MGR', NOW(), NOW());
+    VALUES ('ENT_ISV_INFO', '服务商列表', 'profile', '/isv', 'IsvPage', 'ML', 0, 1,  'ENT_ISV', '10', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_ISV_LIST', '页面：服务商列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ISV_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1258,7 +1258,7 @@ VALUES ('ENT_PROFIT', '佣金管理', 'wallet', '', 'RouteView', 'ML', 0, 1,  'R
 INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
 VALUES ('ENT_ORDER', '订单管理', 'transaction', '', 'RouteView', 'ML', 0, 1,  'ROOT', '50', 'MGR', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_PAY_ORDER', '支付订单', 'account-book', '/pay', 'PayOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '10', 'MGR', NOW(), NOW());
+    VALUES ('ENT_PAY_ORDER', '支付订单', 'account-book', '/pay', 'PayOrderPage', 'ML', 0, 1,  'ENT_ORDER', '10', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_ORDER_LIST', '页面：订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1268,19 +1268,19 @@ VALUES ('ENT_ORDER', '订单管理', 'transaction', '', 'RouteView', 'ML', 0, 1,
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_PAY_ORDER_SEARCH_PAY_WAY', '筛选项：支付方式', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MGR', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '20', 'MGR', NOW(), NOW());
+    VALUES ('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderPage', 'ML', 0, 1,  'ENT_ORDER', '20', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_REFUND_LIST', '页面：退款订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_REFUND_ORDER', '0', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_REFUND_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_REFUND_ORDER', '0', 'MGR', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '25', 'MGR', NOW(), NOW());
+    VALUES ('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderPage', 'ML', 0, 1,  'ENT_ORDER', '25', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MGR', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_MCH_NOTIFY', '商户通知', 'notification', '/notify', 'MchNotifyListPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MGR', NOW(), NOW());
+    VALUES ('ENT_MCH_NOTIFY', '商户通知', 'notification', '/notify', 'MchNotifyPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_NOTIFY_LIST', '页面：商户通知列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_NOTIFY', '0', 'MGR', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1531,7 +1531,7 @@ VALUES ('ENT_AGENT_ACCOUNT_CENTER', '账户中心', 'wallet', '', 'RouteView', '
 INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
 VALUES ('ENT_MCH', '商户管理', 'shop', '', 'RouteView', 'ML', 0, 1, 'ROOT', '30', 'AGENT', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchListPage', 'ML', 0, 1, 'ENT_MCH', 10, 'AGENT', NOW(), NOW());
+    VALUES ('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchPage', 'ML', 0, 1, 'ENT_MCH', 10, 'AGENT', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_MCH_LIST', '页面：商户列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_MCH_INFO', 0, 'AGENT', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1591,7 +1591,7 @@ VALUES ('ENT_MCH', '商户管理', 'shop', '', 'RouteView', 'ML', 0, 1, 'ROOT', 
 INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
 VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1, 'ROOT', '35', 'AGENT', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentListPage', 'ML', 0, 1, 'ENT_AGENT', 10, 'AGENT', NOW(), NOW());
+    VALUES ('ENT_AGENT_INFO', '代理商列表', 'profile', '/agent', 'AgentPage', 'ML', 0, 1, 'ENT_AGENT', 10, 'AGENT', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_AGENT_LIST', '页面：代理商列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_AGENT_INFO', 0, 'AGENT', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1613,7 +1613,7 @@ VALUES ('ENT_AGENT', '代理商管理', 'shop', '', 'RouteView', 'ML', 0, 1, 'RO
 INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
 VALUES ('ENT_ORDER', '订单管理', 'transaction', '', 'RouteView', 'ML', 0, 1, 'ROOT', '50', 'AGENT', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_PAY_ORDER', '支付订单', 'account-book', '/pay', 'PayOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 10, 'AGENT', NOW(), NOW());
+    VALUES ('ENT_PAY_ORDER', '支付订单', 'account-book', '/pay', 'PayOrderPage', 'ML', 0, 1, 'ENT_ORDER', 10, 'AGENT', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_ORDER_LIST', '页面：订单列表', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1623,7 +1623,7 @@ VALUES ('ENT_ORDER', '订单管理', 'transaction', '', 'RouteView', 'ML', 0, 1,
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_PAY_ORDER_SEARCH_PAY_WAY', '筛选项：支付方式', 'no-icon', '', '', 'PB', 0, 1, 'ENT_PAY_ORDER', 0, 'AGENT', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderListPage', 'ML', 0, 1, 'ENT_ORDER', 20, 'AGENT', NOW(), NOW());
+    VALUES ('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderPage', 'ML', 0, 1, 'ENT_ORDER', 20, 'AGENT', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_REFUND_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1, 'ENT_REFUND_ORDER', 0, 'AGENT', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1820,7 +1820,7 @@ VALUES ('ENT_MCH_MBR', '会员中心', 'team', '', 'RouteView', 'ML', 0, 1, 'ROO
 INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
 VALUES ('ENT_ORDER', '订单中心', 'transaction', '', 'RouteView', 'ML', 0, 1,  'ROOT', '20', 'MCH', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_PAY_ORDER', '订单管理', 'account-book', '/pay', 'PayOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '10', 'MCH', NOW(), NOW());
+    VALUES ('ENT_PAY_ORDER', '订单管理', 'account-book', '/pay', 'PayOrderPage', 'ML', 0, 1,  'ENT_ORDER', '10', 'MCH', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_ORDER_LIST', '页面：订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MCH', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
@@ -1830,13 +1830,13 @@ VALUES ('ENT_ORDER', '订单中心', 'transaction', '', 'RouteView', 'ML', 0, 1,
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_PAY_ORDER_REFUND', '按钮：订单退款', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MCH', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_REFUND_ORDER', '退款记录', 'exception', '/refund', 'RefundOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '20', 'MCH', NOW(), NOW());
+    VALUES ('ENT_REFUND_ORDER', '退款记录', 'exception', '/refund', 'RefundOrderPage', 'ML', 0, 1,  'ENT_ORDER', '20', 'MCH', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_REFUND_LIST', '页面：退款订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_REFUND_ORDER', '0', 'MCH', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_REFUND_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_REFUND_ORDER', '0', 'MCH', NOW(), NOW());
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
-    VALUES ('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MCH', NOW(), NOW());
+    VALUES ('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MCH', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
         VALUES ('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MCH', NOW(), NOW());
         INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 

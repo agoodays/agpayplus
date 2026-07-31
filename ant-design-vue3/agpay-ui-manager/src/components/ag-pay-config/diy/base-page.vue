@@ -1,20 +1,14 @@
 <template>
-  <a-form v-bind="formItemLayout" ref="infoForm" :model="formData">
+  <a-form ref="infoForm" layout="vertical" :model="formData">
     <a-row :gutter="24">
       <a-col :span="8">
         <a-form-item label="状态" :name="'state'" :rules="[{ required: true, message: '请选择状态', trigger: 'change' }]">
-          <a-radio-group v-model:value="formData.state">
-            <a-radio :value="1">启用</a-radio>
-            <a-radio :value="0">停用</a-radio>
-          </a-radio-group>
+          <a-radio-group v-model:value="formData.state" :options="stateOptions" />
         </a-form-item>
       </a-col>
       <a-col :span="8" v-if="formData.isSupportApplyment && formData.infoType !== 'MCH_APP'">
         <a-form-item label="是否开启进件" :name="'isOpenApplyment'" :rules="[{ required: formData.isSupportApplyment, message: '请选择是否开启进件', trigger: 'change' }]">
-          <a-radio-group v-model:value="formData.isOpenApplyment">
-            <a-radio :value="1">开启</a-radio>
-            <a-radio :value="0">关闭</a-radio>
-          </a-radio-group>
+          <a-radio-group v-model:value="formData.isOpenApplyment" :options="openStatusOptions" />
         </a-form-item>
       </a-col>
       <a-col :span="8" v-if="formData.infoType === 'ISV'">
@@ -27,18 +21,12 @@
     <a-row :gutter="24" v-if="formData.infoType === 'MCH_APP' && !!formData.isSupportCashout">
       <a-col :span="6">
         <a-form-item label="自动提现（支付成功立刻提现）" :name="'cashoutParams.isOpenMchOrderCashout'" :rules="[{ required: true, message: '请选择自动提现（支付成功立刻提现）', trigger: 'change' }]">
-          <a-radio-group v-model:value="formData.cashoutParams.isOpenMchOrderCashout">
-            <a-radio :value="1">开启</a-radio>
-            <a-radio :value="0">关闭</a-radio>
-          </a-radio-group>
+          <a-radio-group v-model:value="formData.cashoutParams.isOpenMchOrderCashout" :options="openStatusOptions" />
         </a-form-item>
       </a-col>
       <a-col :span="6">
         <a-form-item label="自动提现（定时任务）" :name="'cashoutParams.isOpenMchTaskCashout'" :rules="[{ required: true, message: '请选择自动提现（定时任务）', trigger: 'change' }]">
-          <a-radio-group v-model:value="formData.cashoutParams.isOpenMchTaskCashout">
-            <a-radio :value="1">开启</a-radio>
-            <a-radio :value="0">关闭</a-radio>
-          </a-radio-group>
+          <a-radio-group v-model:value="formData.cashoutParams.isOpenMchTaskCashout" :options="openStatusOptions" />
         </a-form-item>
       </a-col>
       <a-col :span="6">
@@ -59,18 +47,12 @@
     <a-row :gutter="24" v-if="formData.infoType !== 'MCH_APP'">
       <a-col :span="8" v-if="formData.isSupportCashout">
         <a-form-item label="是否开启提现" :name="'isOpenCashout'" :rules="[{ required: formData.isSupportCashout, message: '请选择是否开启提现', trigger: 'change' }]">
-          <a-radio-group v-model:value="formData.isOpenCashout">
-            <a-radio :value="1">开启</a-radio>
-            <a-radio :value="0">关闭</a-radio>
-          </a-radio-group>
+          <a-radio-group v-model:value="formData.isOpenCashout" :options="openStatusOptions" />
         </a-form-item>
       </a-col>
       <a-col :span="8" v-if="formData.isSupportCheckBill">
         <a-form-item label="是否开启对账" :name="'isOpenCheckBill'" :rules="[{ required: formData.isSupportCheckBill, message: '请选择是否开启对账', trigger: 'change' }]">
-          <a-radio-group v-model:value="formData.isOpenCheckBill">
-            <a-radio :value="1">开启</a-radio>
-            <a-radio :value="0">关闭</a-radio>
-          </a-radio-group>
+          <a-radio-group v-model:value="formData.isOpenCheckBill" :options="openStatusOptions" />
         </a-form-item>
       </a-col>
     </a-row>
@@ -106,7 +88,7 @@
     </a-row>
     <a-row :gutter="24">
       <a-col :span="24">
-        <a-form-item :name="'remark'">
+        <a-form-item label="备注" :name="'remark'">
           <a-textarea v-model:value="formData.remark" placeholder="请输入备注" />
         </a-form-item>
       </a-col>
@@ -115,19 +97,15 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { getOpenStatusOptions, getStateOptions } from '@/constants/common-const'
 import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 6 }
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 18 }
-  }
-}
+const { t } = useI18n()
+
+const stateOptions = computed(() => getStateOptions(t))
+const openStatusOptions = computed(() => getOpenStatusOptions(t))
 
 defineProps({
   formData: {

@@ -14,7 +14,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.sysType"
+                v-model="searchData.sysType"
                 label="系统类型"
                 placeholder="选择系统菜单"
                 allow-clear
@@ -43,19 +43,17 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
-        state-key="ent_table_columns"
+        state-key="ent"
         :columns="tableColumns"
-        :show-auto-refresh="true"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
         :pagination="false"
-        :scroll-x="1450"
       >
         <!-- 状态列自定义渲染 -->
         <template #stateSlot="{ record }">
           <ag-state-switch
             :state="record.state"
-            :show-switch-type="hasPermission('ENT_UR_ROLE_ENT_EDIT')"
+            :show-switch="hasPermission('ENT_UR_ROLE_ENT_EDIT')"
             :on-change="(state) => updateState(record.entId, state)"
           />
         </template>
@@ -94,7 +92,6 @@ import { entApi } from '@/api/business/ent/ent-api'
 import { AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { ref } from 'vue'
 import { message } from 'ant-design-vue'
 import AddOrEdit from './add-or-edit.vue'
 import SetEntMatchRule from './set-ent-match-rule.vue'
@@ -127,9 +124,9 @@ searchData.sysType = 'MGR'
 const tableColumns = [
   { key: 'entId', dataIndex: 'entId', title: '资源权限ID', width: 380 },
   { key: 'entName', dataIndex: 'entName', title: '资源名称', width: 200 },
-  { key: 'menuIcon', dataIndex: 'menuIcon', title: '图标' },
-  { key: 'menuUri', dataIndex: 'menuUri', title: '路径' },
-  { key: 'componentName', dataIndex: 'componentName', title: '组件名称' },
+  { key: 'menuIcon', dataIndex: 'menuIcon', title: '图标', width: 100 },
+  { key: 'menuUri', dataIndex: 'menuUri', title: '路径', width: 200 },
+  { key: 'componentName', dataIndex: 'componentName', title: '组件名称', width: 200 },
   { key: 'entType', dataIndex: 'entType', title: '类型', width: 60 },
   { key: 'state', title: '状态', align: 'center', width: 100, customRender: 'stateSlot' },
   { key: 'entSort', dataIndex: 'entSort', title: '排序', width: 60 },

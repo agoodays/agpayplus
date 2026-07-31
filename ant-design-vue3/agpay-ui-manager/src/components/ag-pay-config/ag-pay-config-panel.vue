@@ -77,8 +77,8 @@
         <template v-if="activeSubTab === CONFIG_TAB_CODES.PARAMS">
           <slot name="params-content" :channel-code="activeChannelCode">
             <component
-              :is="configLoader.currentConfigComponent.value"
               ref="configComponentRef"
+              :is="configLoader.currentConfigComponent.value"
               :info-id="currentInfoId"
               :info-type="currentInfoType"
               :if-define="configLoader.currentChannelDefine.value"
@@ -107,8 +107,8 @@
         <template v-if="activeSubTab === CONFIG_TAB_CODES.CHANNEL_CONFIG">
           <slot name="channel-config-content" :channel-code="activeChannelCode">
             <component
-              :is="configLoader.currentAppConfigComponent"
               ref="appConfigComponentRef"
+              :is="configLoader.currentAppConfigComponent.value"
               :if-code="activeChannelCode"
             />
           </slot>
@@ -147,7 +147,7 @@
               <ag-table
                 ref="wayTableRef"
                 row-key="wayCode"
-                state-key="way-code-table-columns"
+                state-key="pay_config_way_code"
                 :on-load="passageManager.fetchWayTableData"
                 :columns="passageManager.wayTableColumns.value"
                 :search-data="passageManager.passageSearchForm"
@@ -167,7 +167,7 @@
               <ag-table
                 ref="passageTableRef"
                 row-key="ifCode"
-                state-key="if-code-table-columns"
+                state-key="pay_config_if_code"
                 :on-load="passageManager.fetchPassageTableData"
                 :columns="passageManager.passageTableColumns.value"
                 :search-data="passageManager.passageSearchForm"
@@ -222,7 +222,7 @@
                 <template #stateSlot="{ record }">
                   <ag-table-actions
                     :state="record.state"
-                    :show-switch-type="true"
+                    :show-switch="true"
                     :on-change="(state) => handlePassageStateUpdate(record, state)"
                   />
                 </template>
@@ -310,23 +310,28 @@ const resetState = () => {
   configLoader.clearConfigComponent()
 }
 
-watch(() => props.configMode, (val) => {
-  configModeRef.value = val
-})
+watch(
+  [() => props.configMode, () => props.infoId, () => props.isIsvSubMch],
+  async ([configModeVal, infoIdVal, isIsvSubMch]) => {
+    configModeRef.value = configModeVal
 
-watch([() => props.infoId, () => props.isIsvSubMch], async ([infoIdVal, isIsvSubMch]) => {
-  if (infoIdVal) {
+    if (!infoIdVal) {
+      return
+    }
+
     currentInfoId.value = infoIdVal
     infoIdRef.value = infoIdVal
-    currentInfoType.value = tabConfig.getInfoTypeByConfigMode(props.configMode)
+    currentInfoType.value = tabConfig.getInfoTypeByConfigMode(configModeVal)
     tabConfig.initTabConfig(isIsvSubMch)
     resetState()
     await channelList.refreshChannelList()
+
     if (currentInfoType.value === 'AGENT') {
       await fetchDiyConfigList()
     }
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 const fetchDiyConfigList = async () => {
   try {

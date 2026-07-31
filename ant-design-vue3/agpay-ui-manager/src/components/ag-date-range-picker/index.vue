@@ -30,13 +30,13 @@
 
       <a-range-picker
         ref="rangePickerRef"
+        style="width: 100%"
         :value="dateRange"
         :format="displayFormat"
         :show-time="showTimeConfig"
         :size="size"
         :picker="picker"
         :disabled="disabled"
-        style="width: 100%"
         @change="handleDateInputChange"
         @focus="onFocus"
         @blur="onBlur"
@@ -65,13 +65,13 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
-import dayjs from 'dayjs'
-import weekOfYear from 'dayjs/plugin/weekOfYear'
-import quarterOfYear from 'dayjs/plugin/quarterOfYear'
-import { SyncOutlined, LeftCircleOutlined } from '@ant-design/icons-vue'
 import { useFloatLabel } from '@/composables/useFloatLabel'
+import { LeftCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
 import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
+import dayjs from 'dayjs'
+import quarterOfYear from 'dayjs/plugin/quarterOfYear'
+import weekOfYear from 'dayjs/plugin/weekOfYear'
+import { computed, nextTick, ref, watch } from 'vue'
 
 // 启用 dayjs 插件
 dayjs.extend(weekOfYear)

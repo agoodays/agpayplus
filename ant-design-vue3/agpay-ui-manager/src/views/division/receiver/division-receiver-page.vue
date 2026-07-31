@@ -68,7 +68,7 @@
       <ag-table
         ref="tableRef"
         row-key="receiverId"
-        state-key="division_receiver_table_columns"
+        state-key="division_receiver"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
@@ -148,15 +148,15 @@
  * 分账收款账户列表页面组件
  * 功能：展示分账收款账户列表，支持搜索、新增、编辑、查看详情等操作
  */
-import { PlusOutlined } from '@ant-design/icons-vue'
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
 import { AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { onMounted, ref } from 'vue'
+import Detail from './detail.vue'
 import ReceiverAdd from './receiver-add.vue'
 import ReceiverEdit from './receiver-edit.vue'
-import Detail from './detail.vue'
 
 /** 权限检查 */
 const { hasPermission } = usePermission()

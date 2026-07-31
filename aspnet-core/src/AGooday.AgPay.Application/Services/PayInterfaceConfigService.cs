@@ -144,7 +144,7 @@ namespace AGooday.AgPay.Application.Services
         {
             bool isApplyment = configMode.EndsWith("Applyment", StringComparison.OrdinalIgnoreCase);
             // 支付定义列表
-            var defineList = _payInterfaceDefineRepository.GetAllAsNoTracking()
+            var defineQuery = _payInterfaceDefineRepository.GetAllAsNoTracking()
                 .Where(w => w.State.Equals(CS.YES))
                 .WhereIf(isApplyment, w => w.IsSupportApplyment.Equals(CS.YES) && w.IsOpenApplyment.Equals(CS.YES))
                 .WhereIfNotEmpty(ifName, w => w.IfName.Contains(ifName))
@@ -158,7 +158,7 @@ namespace AGooday.AgPay.Application.Services
             switch (infoType)
             {
                 case CS.INFO_TYPE.ISV:
-                    defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES));
+                    defineQuery = defineQuery.Where(w => w.IsIsvMode.Equals(CS.YES));
                     break;
                 case CS.INFO_TYPE.MCH:
                 case CS.INFO_TYPE.MCH_APP:
@@ -177,7 +177,7 @@ namespace AGooday.AgPay.Application.Services
                     {
                         throw new BizException("商户不存在");
                     }
-                    defineList = defineList.Where(w => ((mchInfo.Type.Equals(CS.MCH_TYPE_NORMAL) && w.IsMchMode.Equals(CS.YES))// 支持普通商户模式
+                    defineQuery = defineQuery.Where(w => ((mchInfo.Type.Equals(CS.MCH_TYPE_NORMAL) && w.IsMchMode.Equals(CS.YES))// 支持普通商户模式
                     || (mchInfo.Type.Equals(CS.MCH_TYPE_ISVSUB) && w.IsIsvMode.Equals(CS.YES)))// 支持服务商模式
                     );
 
@@ -203,7 +203,7 @@ namespace AGooday.AgPay.Application.Services
                             isvPayConfigMap.Add(config.IfCode, config);
                         }
                     }
-                    var results = (await defineList.Where(w => mchInfo.Type != CS.MCH_TYPE_ISVSUB || (mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.ContainsKey(w.IfCode)))
+                    var results = (await defineQuery.Where(w => mchInfo.Type != CS.MCH_TYPE_ISVSUB || (mchInfo.Type == CS.MCH_TYPE_ISVSUB && isvPayConfigMap.Keys.Contains(w.IfCode)))
                         .ToListAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper))
                         .Select(s =>
                         {
@@ -226,12 +226,12 @@ namespace AGooday.AgPay.Application.Services
                         ifCodes = GetAgentIfCodes(agentInfo, isApplyment);
                         isvConfigList = isvConfigList.Where(s => ifCodes.Contains(s.IfCode));
                     }
-                    defineList = defineList.Where(w => w.IsIsvMode.Equals(CS.YES) && isvConfigList.Select(s => s.IfCode).Contains(w.IfCode));
+                    defineQuery = defineQuery.Where(w => w.IsIsvMode.Equals(CS.YES) && isvConfigList.Select(s => s.IfCode).Contains(w.IfCode));
                     break;
                 default:
                     break;
             }
-            var result = (await defineList.ToListAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper)).Select(s =>
+            var result = (await defineQuery.ToListAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper)).Select(s =>
             {
                 s.AddExt("ifConfigState", configList.Any(a => a.IfCode.Equals(s.IfCode) && a.State.Equals(CS.YES)) ? CS.YES : null);
                 return s;
@@ -344,7 +344,7 @@ namespace AGooday.AgPay.Application.Services
                 .ToListAsync();
 
             // 执行主查询
-            var defineList = await defineQuery.Where(define => mchInfo.Type != CS.MCH_TYPE_ISVSUB || isvPayConfigMap.ContainsKey(define.IfCode))
+            var defineList = await defineQuery.Where(define => mchInfo.Type != CS.MCH_TYPE_ISVSUB || isvPayConfigMap.Keys.Contains(define.IfCode))
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync<PayInterfaceDefine, PayInterfaceDefineDto>(_mapper);
 

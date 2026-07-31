@@ -56,7 +56,7 @@
       <ag-table
         ref="tableRef"
         row-key="wayCode"
-        state-key="pay_way_table_columns"
+        state-key="pay_way"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
@@ -99,11 +99,11 @@
  * 支付方式列表页面组件
  * 功能：展示支付方式列表，支持搜索、新增、编辑、删除操作
  */
-import { PlusOutlined } from '@ant-design/icons-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import AddOrEdit from './add-or-edit.vue'
 
 /** 权限检查 */

@@ -369,12 +369,12 @@
   </div>
 </template>
 <script>
+import { API_URL_REFUND_ORDER_LIST, req } from '@/api/manage'
+import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
-import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_REFUND_ORDER_LIST, req } from '@/api/manage'
+import AgTextUp from '@/components/AgTextUp/AgTextUp'; // 文字上移组件
 import moment from 'moment'
 
 // eslint-disable-next-line no-unused-vars

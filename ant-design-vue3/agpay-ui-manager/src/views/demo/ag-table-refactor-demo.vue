@@ -38,6 +38,7 @@
     <!-- 表格 -->
     <ag-table
       ref="tableRef"
+      state-key="order_list_table"
       :columns="columns"
       :search-data="tableSearchParams"
       :on-load="loadTable"
@@ -47,7 +48,6 @@
       :enable-statistics="true"
       :show-download="true"
       :enable-auto-refresh="false"
-      state-key="order-list-table"
       @change="handleTableChange"
       @reload="handleTableReload"
       @statistics-loaded="handleStatsLoaded"

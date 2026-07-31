@@ -1,5 +1,5 @@
-import { ref, computed, watch } from 'vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
+import { computed, ref, watch } from 'vue'
 
 const DEFAULT_CONFIG = {
   collapsedHeight: '110px',
@@ -118,12 +118,6 @@ export function useChannelList(configMode, infoId, customConfig = {}, onChannelA
     }
     refreshChannelList()
   }
-
-  watch([configMode, infoId], () => {
-    if (configMode.value && infoId.value) {
-      refreshChannelList()
-    }
-  }, { immediate: false })
 
   watch(isExpanded, (newVal) => {
     if (newVal && config.sortSelectedFirstOnCollapse) {

@@ -6,7 +6,7 @@
         <a-col v-bind="colSpan">
           <a-form-item label="">
             <ag-date-range-picker
-              v-model:value="searchData.queryDateRange"
+              v-model="searchData.queryDateRange"
               label="创建时间"
               placeholder="请选择创建时间" />
           </a-form-item>
@@ -14,7 +14,7 @@
         <a-col v-bind="colSpan">
           <a-form-item label="">
             <ag-select
-              v-model:value="searchData.wayType"
+              v-model="searchData.wayType"
               label="支付类型"
               placeholder="请选择支付类型"
               allow-clear
@@ -35,7 +35,7 @@
     <ag-table
       ref="tableRef"
       row-key="wayType"
-      state-key="way_type_count_table_columns"
+      state-key="way_type_count"
       :columns="tableColumns"
       :loading="loading"
       :on-load="reqTableDataFunc"
@@ -209,6 +209,9 @@
   </a-card>
 </template>
 <script setup>
+import { statisticApi } from '@/api/business/statistic/statistic-api'
+import { AgDateRangePicker, AgSearch, AgTable } from '@/components'
+import { downloadFile } from '@/lib/ag-axios'
 import {
   DollarOutlined,
   InfoCircleOutlined,
@@ -217,10 +220,7 @@ import {
   UndoOutlined,
   WalletOutlined
 } from '@ant-design/icons-vue'
-import { statisticApi } from '@/api/business/statistic/statistic-api'
-import { AgDateRangePicker, AgSearch, AgTable } from '@/components'
 import { onMounted, reactive, ref } from 'vue'
-import { downloadFile } from '@/lib/ag-axios'
 
 // 定义组件属性
 const props = defineProps({

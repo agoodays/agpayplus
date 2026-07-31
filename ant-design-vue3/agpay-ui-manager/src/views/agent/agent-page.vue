@@ -62,7 +62,7 @@
       <ag-table
         ref="tableRef"
         row-key="agentNo"
-        state-key="agent_list_table_columns"
+        state-key="agent"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
@@ -119,12 +119,12 @@ import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/componen
 import AgPayConfig from '@/components/ag-pay-config'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getStateInfo, getStateOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
-import { getStateOptions, getStateInfo } from '@/constants/common-const'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

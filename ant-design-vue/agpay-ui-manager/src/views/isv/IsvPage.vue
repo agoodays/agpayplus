@@ -62,13 +62,13 @@
   </div>
 </template>
 <script>
-import AgSearchForm from '@/components/AgSearch/AgSearchForm'
-import AgTable from '@/components/AgTable/AgTable'
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
-import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import { API_URL_ISV_LIST, req } from '@/api/manage'
 import AgPayConfigDrawer from '@/components/AgPayConfig/AgPayConfigDrawer'
 import AgPayOauth2ConfigDrawer from '@/components/AgPayOauth2Config/AgPayOauth2ConfigDrawer'
-import { API_URL_ISV_LIST, req } from '@/api/manage'
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgTextUp from '@/components/AgTextUp/AgTextUp'; // 文字上移组件
 import InfoAddOrEdit from './AddOrEdit'
 import IsvPayIfConfigList from './IsvPayIfConfigList'
 
@@ -82,7 +82,7 @@ const tableColumns = [
 ]
 
 export default {
-  name: 'IsvListPage',
+  name: 'IsvPage',
   components: {
     AgSearchForm,
     AgTable,

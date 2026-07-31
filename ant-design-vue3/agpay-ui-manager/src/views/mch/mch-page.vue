@@ -53,7 +53,7 @@
       <ag-table
         ref="tableRef"
         row-key="mchNo"
-        state-key="mch_list_table_columns"
+        state-key="mch"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
@@ -114,14 +114,14 @@ import { mchApi } from '@/api/business/mch/mch-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getStateInfo, getStateOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
 import MchConfig from './mch-config.vue'
-import { getStateOptions, getStateInfo } from '@/constants/common-const'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

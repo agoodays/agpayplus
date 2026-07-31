@@ -1,34 +1,52 @@
 <template>
   <div>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
-            <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
-            <ag-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName"/>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="商户状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">禁用</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-              </a-select>
-            </a-form-item>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.type" placeholder="商户类型" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="1">普通商户</a-select-option>
-                <a-select-option value="2">特约商户</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="false"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <ag-text-up :placeholder="'商户号'" :msg="searchData.mchNo" v-model="searchData.mchNo"/>
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.agentNo"
+              :api="searchAgent"
+              valueField="agentNo"
+              labelField="agentName"
+              placeholder="代理商号（搜索代理商名称）"
+            />
+          </a-form-item>
+          <!-- <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/> -->
+          <a-form-item label="" class="table-head-layout">
+            <ag-select
+              v-model="searchData.isvNo"
+              :api="searchIsv"
+              valueField="isvNo"
+              labelField="isvName"
+              placeholder="服务商号（搜索服务商名称）"
+            />
+          </a-form-item>
+          <ag-text-up :placeholder="'商户名称'" :msg="searchData.mchName" v-model="searchData.mchName"/>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="商户状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">禁用</a-select-option>
+              <a-select-option value="1">启用</a-select-option>
+            </a-select>
+          </a-form-item>
+          <a-form-item label="" class="table-head-layout">
+            <a-select v-model="searchData.type" placeholder="商户类型" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="1">普通商户</a-select-option>
+              <a-select-option value="2">特约商户</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -60,6 +78,8 @@
           <AgTableColumns>
             <a-button type="link" v-if="$access('ENT_MCH_INFO_EDIT')" @click="editFunc(record.mchNo)">修改</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_APP_CONFIG')" @click="mchAppConfig(record.mchNo)">应用配置</a-button>
+            <a-button type="link" v-if="$access('ENT_MCH_CONFIG_PAGE')" @click="mchConfigFunc(record.mchNo)">高级功能配置</a-button>
+            <a-button type="link" v-if="$access('ENT_DEVICE_QRC_LIST')" @click="mchQRC(record.mchNo)">码牌管理</a-button>
             <a-button type="link" v-if="$access('ENT_MCH_INFO_DEL')" style="color: red" @click="delFunc(record.mchNo)">删除</a-button>
           </AgTableColumns>
         </template>
@@ -69,15 +89,20 @@
     <InfoAddOrEdit ref="infoAddOrEdit" :callbackFunc="searchFunc"/>
     <!-- 新增页面组件  -->
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
+    <!-- 新增页面组件  -->
+    <MchConfig ref="mchConfig" :callbackFunc="searchFunc"/>
   </div>
 </template>
 <script>
+import { API_URL_AGENT_LIST, API_URL_ISV_LIST, API_URL_MCH_LIST, req, reqLoad } from '@/api/manage'
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
+import AgSelect from '@/components/AgSelect/AgSelect'
 import AgTable from '@/components/AgTable/AgTable'
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_MCH_LIST, req, reqLoad } from '@/api/manage'
+import AgTextUp from '@/components/AgTextUp/AgTextUp'; // 文字上移组件
 import InfoAddOrEdit from './AddOrEdit'
 import InfoDetail from './Detail'
+import MchConfig from './MchConfig'
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [
@@ -93,19 +118,31 @@ const tableColumns = [
 ]
 
 export default {
-  name: 'MchListPage',
-  components: { AgTable, AgTableColumns, InfoAddOrEdit, InfoDetail, AgTextUp },
+  name: 'MchPage',
+  components: { AgSearchForm, AgTable, AgTableColumns, AgSelect, InfoAddOrEdit, InfoDetail, MchConfig, AgTextUp },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
-      searchData: {},
-      value: "''"
+      searchData: {}
     }
   },
   mounted () {
   },
   methods: {
+    searchAgent (params) {
+      return req.list(API_URL_AGENT_LIST, params)
+    },
+    searchIsv (params) {
+      return req.list(API_URL_ISV_LIST, params)
+    },
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)
@@ -126,6 +163,9 @@ export default {
     detailFunc: function (recordId) { // 商户详情页
       this.$refs.infoDetail.show(recordId)
     },
+    mchConfigFunc: function (recordId) { // 商户配置页
+      this.$refs.mchConfig.show(recordId)
+    },
     // 删除商户
     delFunc: function (recordId) {
       const that = this
@@ -139,6 +179,12 @@ export default {
     mchAppConfig: function (recordId) { // 应用配置
       this.$router.push({
         path: '/apps',
+        query: { mchNo: recordId }
+      })
+    },
+    mchQRC: function (recordId) { // 码牌管理
+      this.$router.push({
+        path: '/qrc',
         query: { mchNo: recordId }
       })
     }

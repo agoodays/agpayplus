@@ -33,7 +33,7 @@
     <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <a-form-item label="退款金额" name="refundAmount">
         <a-input-number
-          v-model:value="saveObject.refundAmount"
+          v-model="saveObject.refundAmount"
           :precision="2"
           :step="0.01"
           :min="0.01"
@@ -50,7 +50,7 @@
 
       <a-form-item label="退款原因" name="refundReason">
         <a-textarea
-          v-model:value="saveObject.refundReason"
+          v-model="saveObject.refundReason"
           :rows="3"
           placeholder="请输入退款原因，最长不超过256个字符"
           :maxlength="256"
@@ -64,7 +64,7 @@
 <script setup>
 import { orderApi } from '@/api/business/order/order-api'
 import { message, Modal } from 'ant-design-vue'
-import { nextTick, reactive, ref, watch, computed } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 
 /**
  * 组件属性定义
@@ -135,9 +135,9 @@ const rules = {
   refundAmount: [
     { required: true, message: '请输入金额', trigger: 'blur' },
     {
-      validator: (rule, value, callback) => {
+      validator: (rule, value) => {
         if (value < 0.01 || value > nowRefundAmount.value) {
-          return Promise.reject('退款金额不能小于0.01，或者大于可退金额')
+          return Promise.reject(new Error('退款金额不能小于0.01，或者大于可退金额'))
         }
         return Promise.resolve()
       },

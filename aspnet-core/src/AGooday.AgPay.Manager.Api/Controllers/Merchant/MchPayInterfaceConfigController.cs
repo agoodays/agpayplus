@@ -65,7 +65,7 @@ namespace AGooday.AgPay.Manager.Api.Controllers.Merchant
         /// <summary>
         /// 根据 appId、接口类型 获取应用参数配置
         /// </summary>
-        /// <param name="isvNo"></param>
+        /// <param name="appId"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet, Route("{appId}/{ifCode}"), NoLog]

@@ -9,13 +9,7 @@
     @confirm="handleConfirm"
     @close="handleClose"
   >
-    <a-form
-      ref="infoForm"
-      :model="saveObject"
-      layout="vertical"
-      :rules="rules"
-      style="padding-bottom:50px"
-    >
+    <a-form ref="infoForm" layout="vertical" style="padding-bottom:50px" :model="saveObject" :rules="rules">
       <a-row justify="space-between" type="flex">
         <a-col :span="10">
           <a-form-item label="用户登录名" name="loginUsername">
@@ -163,13 +157,13 @@
  * 系统用户新增/编辑抽屉组件
  * 功能：支持新增和修改系统用户，包含用户基本信息、密码设置、角色分配等
  */
-import { CheckOutlined, CloseOutlined, FileSyncOutlined } from '@ant-design/icons-vue'
-import { AgDrawer } from '@/components'
 import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
-import { Base64 } from '@/lib/encrypt'
-import { onMounted, reactive, ref, watch, computed } from 'vue'
-import { message } from 'ant-design-vue'
+import { AgDrawer } from '@/components'
 import { getFlagOptions, getStateOptions } from '@/constants/common-const'
+import { Base64 } from '@/lib/encrypt'
+import { FileSyncOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -181,7 +175,7 @@ const flagOptions = computed(() => getFlagOptions(t))
 /** 组件属性定义 */
 const props = defineProps({
   open: { type: Boolean, default: false },
-  recordId: { type: String, default: '' },
+  recordId: { type: [String, Number], default: '' },
   sysType: { type: String, default: 'MGR' },
   belongInfoId: { type: String, default: '' }
 })
@@ -243,11 +237,11 @@ const passwordRules = reactive({
 /** 表单验证规则 */
 const rules = reactive({
   realname: [{ required: true, message: '请输入用户姓名', trigger: 'blur' }],
-  userType: [{ required: true, validator: (rule, value, callback) => {
+  userType: [{ required: true, validator: (rule, value) => {
     if (isAdd.value && !value) {
-      callback(new Error('请选择用户类型'))
+      return Promise.reject(new Error('请选择用户类型'))
     }
-    callback()
+    return Promise.resolve()
   }, trigger: 'blur' }],
   telphone: [{ required: true, pattern: /^[1][0-9]{10}$/, message: '请输入正确的手机号码', trigger: 'blur' }],
   userNo: [{ required: true, message: '请输入编号', trigger: 'blur' }],
@@ -255,38 +249,35 @@ const rules = reactive({
   newPwd: [{
     required: true,
     trigger: 'blur',
-    validator: (rule, value, callBack) => {
+    validator: (rule, value) => {
       if (!newPwd.value) {
-        callBack('请输入新密码')
-        return
+        return Promise.reject(new Error('请输入新密码'))
       }
       if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
         const regex = new RegExp(passwordRules.regexpRules)
         const isMatch = regex.test(newPwd.value)
         if (!isMatch) {
-          callBack(passwordRules.errTips)
+          return Promise.reject(new Error(passwordRules.errTips))
         }
       }
-      callBack()
+      return Promise.resolve()
     }
   }],
   confirmPwd: [{
     required: true,
     trigger: 'blur',
-    validator: (rule, value, callBack) => {
+    validator: (rule, value) => {
       if (!sysPassword.confirmPwd) {
-        callBack('请输入确认新密码')
-        return
+        return Promise.reject(new Error('请输入确认新密码'))
       }
       if (!!passwordRules.regexpRules && !!passwordRules.errTips) {
         const regex = new RegExp(passwordRules.regexpRules)
         const isMatch = regex.test(sysPassword.confirmPwd)
         if (!isMatch) {
-          callBack(passwordRules.errTips)
+          return Promise.reject(new Error(passwordRules.errTips))
         }
       }
-      newPwd.value === sysPassword.confirmPwd ? callBack() : callBack('新密码与确认密码不一致')
-      callBack()
+      return newPwd.value === sysPassword.confirmPwd ? Promise.resolve() : Promise.reject(new Error('新密码与确认密码不一致'))
     }
   }]
 })

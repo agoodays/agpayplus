@@ -7,7 +7,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker 
-                v-model:value="searchData.queryDateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间"
                 allow-clear />
@@ -54,7 +54,7 @@
       <ag-table
         ref="tableRef"
         row-key="qrcId"
-        state-key="qr_code_table_columns"
+        state-key="qr_code"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
@@ -93,7 +93,7 @@
         <template #stateSlot="{ record }">
           <ag-state-switch
             :state="record.state"
-            :show-switch-type="hasPermission('ENT_DEVICE_QRC_EDIT')"
+            :show-switch="hasPermission('ENT_DEVICE_QRC_EDIT')"
             :on-change="(state) => updateState(record.qrcId, state)"
           />
         </template>
@@ -122,18 +122,18 @@
  * 二维码列表页面组件
  * 功能：展示二维码列表，支持搜索、生成、预览、编辑、绑定、解绑、删除等操作
  */
-import { ExclamationCircleOutlined, PlusOutlined, QrcodeOutlined } from '@ant-design/icons-vue'
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgSelectInfinite, AgStateSwitch, AgTable, AgTableActions } from '@/components'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { onMounted, reactive, ref, computed } from 'vue'
+import { getStateInfo, getStateOptions } from '@/constants/common-const'
+import { viewerApi } from '@/utils/viewer-api'
+import { ExclamationCircleOutlined, PlusOutlined, QrcodeOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
 import Bind from './bind.vue'
-import { message } from 'ant-design-vue'
-import { viewerApi } from '@/utils/viewer-api'
-import { getStateOptions, getStateInfo } from '@/constants/common-const'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

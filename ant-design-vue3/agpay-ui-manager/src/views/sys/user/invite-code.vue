@@ -3,20 +3,21 @@
     <div>
       <span>邀请码：{{ inviteCode }}</span>
       <a-button type="link" @click="copyFunc(inviteCode,'邀请码已复制')">
-            <template #icon><CopyOutlined /></template>
-          </a-button>
+        <template #icon><CopyOutlined /></template>
+      </a-button>
     </div>
     <div>
       <div>
         <span>商户注册链接：{{ mchRegisterUrl }}</span>
         <a-button type="link" @click="copyFunc(mchRegisterUrl)">
-            <template #icon><CopyOutlined /></template>
-          </a-button>
+          <template #icon><CopyOutlined /></template>
+        </a-button>
       </div>
       <div>
         <span>商户注册二维码：</span>
-        <div style="padding-left: 100px">
-          <vue-qr :text="mchRegisterUrl"/>
+        <!-- 修改点：添加居中样式类 -->
+        <div class="qrcode-wrapper">
+          <a-qrcode :value="mchRegisterUrl" />
         </div>
       </div>
     </div>
@@ -24,13 +25,14 @@
       <div>
         <span>代理商注册链接：{{ agentRegisterUrl }}</span>
         <a-button type="link" @click="copyFunc(agentRegisterUrl)">
-            <template #icon><CopyOutlined /></template>
-          </a-button>
+          <template #icon><CopyOutlined /></template>
+        </a-button>
       </div>
       <div>
         <span>代理商注册二维码：</span>
-        <div style="padding-left: 100px">
-          <vue-qr :text="agentRegisterUrl"/>
+        <!-- 修改点：添加居中样式类 -->
+        <div class="qrcode-wrapper">
+          <a-qrcode :value="agentRegisterUrl" />
         </div>
       </div>
     </div>
@@ -43,9 +45,8 @@
  * 功能：展示用户邀请码、注册链接和二维码
  */
 import { CopyOutlined } from '@ant-design/icons-vue'
-import { ref, watch } from 'vue'
-import VueQr from 'vue-qr'
 import { message } from 'ant-design-vue'
+import { ref, watch } from 'vue'
 
 /**
  * 组件属性定义
@@ -77,19 +78,25 @@ const mchRegisterUrl = ref('')
 const agentRegisterUrl = ref('')
 
 /**
- * 复制文本到剪贴板
+ * 复制文本到剪贴板（已升级为现代剪贴板 API）
  * @param {string} text - 要复制的文本
  * @param {string} msg - 复制成功提示信息
  * @returns {void}
  */
-const copyFunc = (text, msg) => {
-  const el = document.createElement('input')
-  el.setAttribute('value', text)
-  document.body.appendChild(el)
-  el.select()
-  document.execCommand('copy')
-  document.body.removeChild(el)
-  message.success(msg || '复制成功')
+const copyFunc = async (text, msg) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    message.success(msg || '复制成功')
+  } catch (err) {
+    // 降级兼容方案
+    const el = document.createElement('input')
+    el.setAttribute('value', text)
+    document.body.appendChild(el)
+    el.select()
+    document.execCommand('copy')
+    document.body.removeChild(el)
+    message.success(msg || '复制成功')
+  }
 }
 
 /**
@@ -121,7 +128,15 @@ watch(() => props.open, (newVal) => {
 </script>
 
 <style scoped>
-  .ant-modal-body div{
-    padding: 2px 0;
-  }
+.ant-modal-body div {
+  padding: 2px 0;
+}
+
+/* 新增：二维码居中样式 */
+.qrcode-wrapper {
+  display: flex;
+  justify-content: center; /* 水平居中 */
+  align-items: center;     /* 垂直居中（可选） */
+  padding: 10px 0;         /* 增加一点上下间距，视觉上更舒适 */
+}
 </style>

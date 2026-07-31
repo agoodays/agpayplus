@@ -76,11 +76,11 @@
 <script setup>
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { AgDrawer, AgUpload } from '@/components'
+import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
 import { upload } from '@/lib/ag-axios'
 import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { message } from 'ant-design-vue'
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -106,8 +106,6 @@ const emit = defineEmits(['update:open', 'success'])
 
 const infoForm = ref(null)
 const mchParamForm = ref(null)
-const loading = ref(false)
-const localOpen = ref(false)
 const mchType = ref(null)
 const action = ref(upload.cert)
 const mchParams = ref([])
@@ -127,21 +125,6 @@ const rules = {
 }
 
 const ifParamsRules = ref({})
-
-watch(
-	() => props.open,
-	(val) => {
-		localOpen.value = val
-		if (val && props.appId && props.record.ifCode) {
-			resetForm()
-			getMchPayConfig(props.record)
-		}
-	}
-)
-
-watch(localOpen, (val) => {
-	emit('update:open', val)
-})
 
 const resetForm = () => {
 	mchType.value = props.record.mchType
@@ -165,6 +148,7 @@ const resetForm = () => {
 
 const getMchPayConfig = async (record) => {
 	try {
+		resetForm()
 		const res = await mchAppApi.getMchPayConfigUnique(saveObject.infoId, saveObject.ifCode)
 		if (res && res.ifParams) {
 			Object.assign(saveObject, res)
@@ -212,51 +196,52 @@ const getMchPayConfig = async (record) => {
 	}
 }
 
-const handleSubmit = async () => {
-	try {
-		await infoForm.value.validate()
-		await mchParamForm.value.validate()
-
-		loading.value = true
-		const reqParams = {
-			infoId: saveObject.infoId,
-			ifCode: saveObject.ifCode,
-			state: saveObject.state,
-			remark: saveObject.remark
-		}
-
-		if (Object.keys(ifParams).length === 0) {
-			message.error('参数不能为空！')
-			return
-		}
-
+const { localOpen, loading, submit, uploadSuccess: handleUploadSuccess, handleClose: closeDrawer } = usePayConfigDrawer({
+	props,
+	emit,
+	infoForm,
+	paramForm: mchParamForm,
+	saveObject,
+	ifParams,
+	initialSaveObject: () => ({
+		infoId: props.appId,
+		ifCode: props.record.ifCode,
+		state: props.record.ifConfigState === 0 ? 0 : 1,
+		remark: ''
+	}),
+	initialIfParams: () => ({}),
+	loadConfig: async () => {
+		await getMchPayConfig(props.record)
+	},
+	buildSubmitPayload: ({ saveObject: currentSaveObject, ifParams: currentIfParams }) => {
+		const submitParams = { ...currentIfParams }
 		Object.keys(mchParams.value).forEach((key) => {
 			const item = mchParams.value[key]
-			if (item.star === '1' && ifParams[item.name] === '') {
-				ifParams[item.name] = undefined
+			if (item.star === '1' && submitParams[item.name] === '') {
+				submitParams[item.name] = undefined
 			}
-			if (ifParams[item.name + '_ph'] !== undefined) {
-				delete ifParams[item.name + '_ph']
+			if (submitParams[item.name + '_ph'] !== undefined) {
+				delete submitParams[item.name + '_ph']
 			}
 		})
 
-		reqParams.ifParams = JSON.stringify(ifParams)
+		return {
+			infoId: currentSaveObject.infoId,
+			ifCode: currentSaveObject.ifCode,
+			state: currentSaveObject.state,
+			remark: currentSaveObject.remark,
+			ifParams: JSON.stringify(submitParams)
+		}
+	},
+	saveConfig: async (reqParams) => {
 		await mchAppApi.addMchPayConfig(reqParams)
+	},
+	shouldInit: (propsData) => Boolean(propsData.appId && propsData.record?.ifCode)
+})
 
-		message.success('保存成功')
-		localOpen.value = false
-		emit('success')
-	} catch (error) {
-		console.error('提交失败:', error)
-	} finally {
-		loading.value = false
-	}
-}
-
-const uploadSuccess = (name, fileList) => {
-	const [firstItem] = fileList
-	ifParams[name] = firstItem?.url
-}
+const handleSubmit = submit
+const uploadSuccess = handleUploadSuccess
+const handleClose = closeDrawer
 
 const generateRules = () => {
 	const generatedRules = {}
@@ -273,10 +258,6 @@ const generateRules = () => {
 		}
 	})
 	ifParamsRules.value = generatedRules
-}
-
-const handleClose = () => {
-	localOpen.value = false
 }
 </script>
 

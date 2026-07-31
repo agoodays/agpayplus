@@ -67,6 +67,7 @@
 
     <ag-table
       ref="tableRef"
+      state-key="demo_search_table_columns"
       :columns="tableColumns"
       :on-load="reqTableDataFunc"
       :on-load-statistics="reqTableCountFunc"
@@ -76,7 +77,6 @@
       :show-auto-refresh="true"
       :show-toolbar="true"
       :search-data="searchForm"
-      state-key="demo_search_table_columns"
     >
       <template #actions="{ record }">
         <ag-table-actions :max-show-num="3">
@@ -94,17 +94,17 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
-import { message } from 'ant-design-vue'
 import {
-  AgSearch,
-  AgTable,
-  AgInput,
-  AgSelect,
   AgDateRangePicker,
-  AgTableActions,
-  AgInputNumberRange
+  AgInput,
+  AgInputNumberRange,
+  AgSearch,
+  AgSelect,
+  AgTable,
+  AgTableActions
 } from '@/components'
+import { message } from 'ant-design-vue'
+import { reactive, ref } from 'vue'
 
 // 搜索参数
 const searchForm = reactive({

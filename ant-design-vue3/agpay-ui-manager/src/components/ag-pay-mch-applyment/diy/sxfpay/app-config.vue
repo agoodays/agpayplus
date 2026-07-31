@@ -1,6 +1,6 @@
 <template>
   <div>
-    <AppConfigCommonPage
+    <app-config-common-page
       ref="appConfigCommonPageRef"
       :info-id="infoId"
       :info-type="infoType"

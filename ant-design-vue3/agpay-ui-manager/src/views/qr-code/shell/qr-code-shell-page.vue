@@ -33,7 +33,7 @@
         <ag-table
           ref="tableRef"
           row-key="id"
-          state-key="qr_code_shell_table_columns"
+          state-key="qr_code_shell"
           :on-load="loadTableData"
           :columns="tableColumns"
           :search-data="searchData"
@@ -119,14 +119,14 @@
 </template>
 
 <script setup>
-import { AppstoreOutlined, BarsOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
 import { AgCard, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
+import { viewerApi } from '@/utils/viewer-api'
+import { AppstoreOutlined, BarsOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
 import { computed, reactive, ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
-import { message } from 'ant-design-vue'
-import { viewerApi } from '@/utils/viewer-api'
 
 /**
  * 权限判断函数

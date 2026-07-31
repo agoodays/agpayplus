@@ -2,6 +2,8 @@
   <div class="ag-float-container" :class="{ 'is-focused': isFocused, 'is-open': isOpen }">
     <a-select
       ref="selectRef"
+      style="width: 100%"
+      v-on="eventHandlers"
       :value="selectValue"
       :placeholder="floatPlaceholder"
       :disabled="disabled"
@@ -13,8 +15,6 @@
       :size="size"
       :max-tag-count="maxTagCount"
       :max-tag-placeholder="maxTagPlaceholder"
-      style="width: 100%"
-      v-on="eventHandlers"
       @change="handleSelectChange"
     >
       <template v-if="$slots.default" #default>
@@ -30,8 +30,8 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, useSlots } from 'vue'
 import { useFloatLabel } from '@/composables/useFloatLabel'
+import { computed, ref, useSlots, watch } from 'vue'
 
 const props = defineProps({
   modelValue: {

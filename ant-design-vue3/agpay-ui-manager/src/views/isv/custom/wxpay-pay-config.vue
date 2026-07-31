@@ -144,13 +144,13 @@
  * 服务商微信支付配置组件
  * 功能：配置服务商微信支付相关参数
  */
-import { AgDrawer, AgUpload } from '@/components'
-import { LoadingOutlined, UploadOutlined, CloseOutlined, CheckOutlined } from '@ant-design/icons-vue'
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
+import { AgDrawer, AgUpload } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { message } from 'ant-design-vue'
-import { computed, ref, watch } from 'vue'
+import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
+import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -184,54 +184,10 @@ const emit = defineEmits(['update:open', 'success'])
 
 const infoForm = ref(null)
 const isvParamForm = ref(null)
-const loading = ref(false)
-const localOpen = ref(false)
 const isAdd = ref(true)
 const action = isvPayConfigApi.certUploadAction
 const saveObject = ref({})
 const ifParams = ref({ apiVersion: 'V2' })
-
-/** 监听 open 属性变化 */
-watch(
-  () => props.open,
-  async (val) => {
-    localOpen.value = val
-    if (val && props.isvNo && props.record.ifCode) {
-      await initForm()
-    }
-  }
-)
-
-/** 监听本地 open 变化，同步 emit */
-watch(localOpen, (val) => {
-  emit('update:open', val)
-})
-
-/** 初始化表单 */
-async function initForm() {
-  infoForm.value?.resetFields?.()
-  isvParamForm.value?.resetFields?.()
-
-  saveObject.value = {
-    infoId: props.isvNo,
-    ifCode: props.record.ifCode,
-    state: props.record.ifConfigState === 0 ? 0 : 1
-  }
-
-  ifParams.value = {
-    apiVersion: 'V2',
-    appSecret: '',
-    appSecret_ph: '请输入',
-    key: '',
-    key_ph: '请输入',
-    apiV3Key: '',
-    apiV3Key_ph: '请输入',
-    serialNo: '',
-    serialNo_ph: '请输入'
-  }
-
-  await getIsvPayConfig()
-}
 
 const rules = {
   ifRate: [
@@ -250,84 +206,70 @@ const ifParamsRules = computed(() => ({
   appSecret: [
     {
       trigger: 'blur',
-      validator: (_rule, value, callback) => {
+      validator: async (_rule, value) => {
         if (isAdd.value && !value) {
-          callback(new Error('请输入应用AppSecret'))
-          return
+          throw new Error('请输入应用AppSecret')
         }
-        callback()
       }
     }
   ],
   key: [
     {
       trigger: 'blur',
-      validator: (_rule, value, callback) => {
+      validator: async (_rule, value) => {
         if (ifParams.value.apiVersion === 'V2' && isAdd.value && !value) {
-          callback(new Error('请输入API密钥'))
-          return
+          throw new Error('请输入API密钥')
         }
-        callback()
       }
     }
   ],
   apiV3Key: [
     {
       trigger: 'blur',
-      validator: (_rule, value, callback) => {
+      validator: async (_rule, value) => {
         if (ifParams.value.apiVersion === 'V3' && isAdd.value && !value) {
-          callback(new Error('请输入API V3秘钥'))
-          return
+          throw new Error('请输入API V3秘钥')
         }
-        callback()
       }
     }
   ],
   serialNo: [
     {
       trigger: 'blur',
-      validator: (_rule, value, callback) => {
+      validator: async (_rule, value) => {
         if (ifParams.value.apiVersion === 'V3' && isAdd.value && !value) {
-          callback(new Error('请输入序列号'))
-          return
+          throw new Error('请输入序列号')
         }
-        callback()
       }
     }
   ],
   cert: [
     {
       trigger: 'blur',
-      validator: (_rule, value, callback) => {
+      validator: async (_rule, value) => {
         if (ifParams.value.apiVersion === 'V3' && isAdd.value && !value) {
-          callback(new Error('请上传API证书(apiclient_cert.p12)'))
-          return
+          throw new Error('请上传API证书(apiclient_cert.p12)')
         }
-        callback()
       }
     }
   ],
   apiClientCert: [
     {
       trigger: 'blur',
-      validator: (_rule, value, callback) => {
+      validator: async (_rule, value) => {
         if (ifParams.value.apiVersion === 'V3' && isAdd.value && !value) {
-          callback(new Error('请上传证书文件(apiclient_cert.pem)'))
-          return
+          throw new Error('请上传证书文件(apiclient_cert.pem)')
         }
-        callback()
       }
     }
   ],
   apiClientKey: [
     {
       trigger: 'blur',
-      validator: (_rule, value, callback) => {
+      validator: async (_rule, value) => {
         if (ifParams.value.apiVersion === 'V3' && !value) {
-          callback(new Error('请上传私钥文件(apiclient_key.pem)'))
-          return
+          throw new Error('请上传私钥文件(apiclient_key.pem)')
         }
-        callback()
       }
     }
   ]
@@ -365,76 +307,58 @@ async function getIsvPayConfig() {
   isAdd.value = true
 }
 
-async function validateForm(formRef) {
-  if (!formRef.value?.validate) {
-    return true
-  }
-  try {
-    await formRef.value.validate()
-    return true
-  } catch {
-    return false
-  }
-}
-
-function clearEmptyKey(key) {
-  if (!ifParams.value[key]) {
-    ifParams.value[key] = undefined
-  }
-  ifParams.value[key + '_ph'] = undefined
-}
-
-/**
- * 确认提交
- */
-async function handleConfirm() {
-  const valid = await validateForm(infoForm)
-  const valid2 = await validateForm(isvParamForm)
-  if (!valid || !valid2) return
-
-  loading.value = true
-  try {
-    if (Object.keys(ifParams.value).length === 0) {
-      message.error('参数不能为空！')
-      return
+const { localOpen, loading, submit, uploadSuccess: handleUploadSuccess, handleClose: closeDrawer } = usePayConfigDrawer({
+  props,
+  emit,
+  infoForm,
+  paramForm: isvParamForm,
+  saveObject,
+  ifParams,
+  isAdd,
+  initialSaveObject: () => ({
+    infoId: props.isvNo,
+    ifCode: props.record.ifCode,
+    state: props.record.ifConfigState === 0 ? 0 : 1,
+    remark: ''
+  }),
+  initialIfParams: () => ({
+    apiVersion: 'V2',
+    appSecret: '',
+    appSecret_ph: '请输入',
+    key: '',
+    key_ph: '请输入',
+    apiV3Key: '',
+    apiV3Key_ph: '请输入',
+    serialNo: '',
+    serialNo_ph: '请输入'
+  }),
+  loadConfig: async () => {
+    await getIsvPayConfig()
+  },
+  buildSubmitPayload: ({ saveObject: currentSaveObject, ifParams: currentIfParams }) => {
+    const submitParams = { ...currentIfParams }
+    submitParams.appSecret = submitParams.appSecret || undefined
+    submitParams.key = submitParams.key || undefined
+    submitParams.apiV3Key = submitParams.apiV3Key || undefined
+    submitParams.serialNo = submitParams.serialNo || undefined
+    return {
+      infoId: currentSaveObject.infoId,
+      ifCode: currentSaveObject.ifCode,
+      ifRate: currentSaveObject.ifRate,
+      state: currentSaveObject.state,
+      remark: currentSaveObject.remark,
+      ifParams: JSON.stringify(submitParams)
     }
-
-    clearEmptyKey('appSecret')
-    clearEmptyKey('key')
-    clearEmptyKey('apiV3Key')
-    clearEmptyKey('serialNo')
-
-    const reqParams = {
-      infoId: saveObject.value.infoId,
-      ifCode: saveObject.value.ifCode,
-      ifRate: saveObject.value.ifRate,
-      state: saveObject.value.state,
-      remark: saveObject.value.remark,
-      ifParams: JSON.stringify(ifParams.value)
-    }
-
+  },
+  saveConfig: async (reqParams) => {
     await isvPayConfigApi.save(reqParams)
-    message.success('保存成功')
-    localOpen.value = false
-    emit('success')
-  } finally {
-    loading.value = false
-  }
-}
+  },
+  clearEmptyKeys: ['appSecret', 'key', 'apiV3Key', 'serialNo'],
+  shouldInit: (propsData) => Boolean(propsData.isvNo && propsData.record?.ifCode)
+})
 
-/**
- * 上传成功回调
- * @param {string} name - 字段名
- * @param {Array} fileList - 文件列表
- */
-function uploadSuccess(name, fileList) {
-  const [firstItem] = fileList
-  ifParams.value[name] = firstItem?.url
-}
-
-/** 处理关闭 */
-function handleClose() {
-  localOpen.value = false
-}
+const handleConfirm = submit
+const uploadSuccess = handleUploadSuccess
+const handleClose = closeDrawer
 </script>
 <style lang="less" scoped></style>

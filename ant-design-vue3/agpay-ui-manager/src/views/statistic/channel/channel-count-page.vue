@@ -8,7 +8,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.queryDateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间" />
             </a-form-item>
@@ -30,7 +30,7 @@
       <ag-table
         ref="tableRef"
         row-key="ifCode"
-        state-key="channel_count_table_columns"
+        state-key="channel_count"
         :on-load="reqTableDataFunc"
         :on-download="reqDownloadDataFunc"
         :columns="tableColumns"
@@ -204,6 +204,9 @@
   </div>
 </template>
 <script setup>
+import { statisticApi } from '@/api/business/statistic/statistic-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
+import { downloadFile } from '@/lib/ag-axios'
 import {
   DollarOutlined,
   InfoCircleOutlined,
@@ -212,11 +215,8 @@ import {
   UndoOutlined,
   WalletOutlined
 } from '@ant-design/icons-vue'
-const icons = { InfoCircleOutlined }
-import { statisticApi } from '@/api/business/statistic/statistic-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
 import { reactive, ref } from 'vue'
-import { downloadFile } from '@/lib/ag-axios'
+const icons = { InfoCircleOutlined }
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [

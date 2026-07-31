@@ -11,11 +11,11 @@
       :suffix="suffix"
       :type="type"
       :size="size"
+      :auto-complete="'off'"
       @focus="handleFocus"
       @blur="handleBlur"
       @change="handleInputChange"
       @press-enter="handlePressEnter"
-      :auto-complete="'off'"
     >
       <template v-if="$slots.prefix" #prefix>
         <slot name="prefix"></slot>
@@ -33,8 +33,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useFloatLabel } from '@/composables/useFloatLabel'
+import { ref } from 'vue'
 
 const props = defineProps({
   modelValue: {

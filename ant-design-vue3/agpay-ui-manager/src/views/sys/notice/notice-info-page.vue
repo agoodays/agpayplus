@@ -7,7 +7,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.queryDateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间" />
             </a-form-item>
@@ -28,7 +28,7 @@
       <ag-table
         ref="tableRef"
         row-key="articleId"
-        state-key="notice_list_table_columns"
+        state-key="notice"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
@@ -59,11 +59,11 @@
  * 公告列表页面组件
  * 功能：展示公告列表，支持搜索、新增、编辑、查看详情、删除等操作
  */
-import { PlusOutlined } from '@ant-design/icons-vue'
 import { noticeApi } from '@/api/business/notice/notice-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'

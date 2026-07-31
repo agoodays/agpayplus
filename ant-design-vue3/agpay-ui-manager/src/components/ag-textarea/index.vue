@@ -13,7 +13,7 @@
       @focus="handleFocus"
       @blur="handleBlur"
       @change="handleInputChange"
-        @press-enter="handlePressEnter"
+      @press-enter="handlePressEnter"
     />
 
     <label class="ag-float-label" :class="labelClass">
@@ -24,8 +24,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useFloatLabel } from '@/composables/useFloatLabel'
+import { ref } from 'vue'
 
 const props = defineProps({
   modelValue: {

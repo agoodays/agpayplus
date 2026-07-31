@@ -14,7 +14,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.dateRange"
+                v-model="searchData.dateRange"
                 label="创建时间"
                 placeholder="请选择创建时间"
                 allow-clear
@@ -44,7 +44,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.state"
+                v-model="searchData.state"
                 label="支付状态"
                 placeholder="请选择状态"
                 allow-clear
@@ -67,7 +67,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.notifyState"
+                v-model="searchData.notifyState"
                 label="回调状态"
                 placeholder="请选择状态"
                 allow-clear
@@ -102,7 +102,7 @@
       <ag-table
         ref="tableRef"
         row-key="payOrderId"
-        state-key="pay_order_table_columns"
+        state-key="pay_order"
         :columns="tableColumns"
         :show-auto-refresh="true"
         :on-load="loadData"
@@ -369,12 +369,12 @@ import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
 import {
-    CopyOutlined,
-    DollarOutlined,
-    InfoCircleOutlined,
-    TransactionOutlined,
-    UndoOutlined,
-    WalletOutlined
+  CopyOutlined,
+  DollarOutlined,
+  InfoCircleOutlined,
+  TransactionOutlined,
+  UndoOutlined,
+  WalletOutlined
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { reactive, ref } from 'vue'

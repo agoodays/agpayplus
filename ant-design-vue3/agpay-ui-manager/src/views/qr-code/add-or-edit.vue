@@ -127,13 +127,13 @@
  * 二维码新增/编辑组件
  * 功能：支持二维码的新增和编辑操作，包含批次号、创建数量、状态、固定金额等配置
  */
-import { AgDrawer } from '@/components'
-import { QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
-import { message } from 'ant-design-vue'
-import { ref, watch, computed } from 'vue'
-import { viewerApi } from '@/utils/viewer-api'
+import { AgDrawer } from '@/components'
 import { getStateOptions } from '@/constants/common-const'
+import { viewerApi } from '@/utils/viewer-api'
+import { QuestionCircleOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -220,12 +220,11 @@ const rules = {
   addNum: [
     { required: true, message: '请输入创建数量', trigger: 'blur' },
     {
-      validator: (_rule, value, callback) => {
+      validator: (_rule, value) => {
         if (value < 1 || value > 500) {
-          callback('数量请介于1-500之间')
-          return
+          return Promise.reject(new Error('数量请介于1-500之间'))
         }
-        callback()
+        return Promise.resolve()
       },
       trigger: 'blur'
     }

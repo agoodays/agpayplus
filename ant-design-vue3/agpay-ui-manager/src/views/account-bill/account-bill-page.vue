@@ -2,49 +2,46 @@
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+      <ag-search v-model="searchData" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.queryDateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间" />
-              />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.infoType"
+                v-model="searchData.infoType"
                 label="角色类型"
                 placeholder="请选择角色类型"
                 allow-clear
                 :options="[
                   { value: 'PLATFORM', label: '运营平台' },
                   { value: 'AGENT', label: '代理商' }
-                ]"
-              />
+                ]" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.infoType"
+                v-model="searchData.infoType"
                 label="角色类型"
                 placeholder="请选择角色类型"
                 allow-clear
                 :options="[
                   { value: 'PLATFORM', label: '运营平台' },
                   { value: 'AGENT', label: '代理商' }
-                ]"
-              />
+                ]" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.bizType"
+                v-model="searchData.bizType"
                 label="业务类型"
                 placeholder="请选择业务类型"
                 allow-clear
@@ -53,22 +50,20 @@
                   { value: '2', label: '提现支出' },
                   { value: '3', label: '佣金支出' },
                   { value: '4', label: '充值收入' }
-                ]"
-              />
+                ]" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.accountType"
+                v-model="searchData.accountType"
                 label="账户类型"
                 placeholder="请选择账户类型"
                 allow-clear
                 :options="[
                   { value: '1', label: '钱包账户' },
                   { value: '2', label: '用途账户' }
-                ]"
-              />
+                ]" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -93,7 +88,7 @@
       <ag-table
         ref="tableRef"
         row-key="id"
-        state-key="account_bill_table_columns"
+        state-key="account_bill"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"

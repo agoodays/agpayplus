@@ -76,7 +76,7 @@
           </a-form-model-item>
         </a-col>
         <a-col span="24">
-          <a-form-model-item label="APIv3密钥" prop="apiV3Key">
+          <a-form-model-item label="APIv3秘钥" prop="apiV3Key">
             <a-input v-model="ifParams.apiV3Key" :placeholder="ifParams.apiV3Key_ph" type="textarea" />
           </a-form-model-item>
         </a-col>

@@ -97,7 +97,7 @@
       </template>
       <ag-table
         row-key="rowKey"
-        state-key="division_receiver_acc_table_columns"
+        state-key="division_receiver_acc"
         :columns="accTableColumns"
         :data="receiverTableData.filter((item) => item.ifCode == 'wxpay')"
         :pagination="false"
@@ -254,8 +254,8 @@
       </ag-table>
     </a-card>
 
-    <InfoAddOrEdit ref="infoAddOrEdit" :callback-func="getReceiverGroup" />
-    <ChannelUserModal ref="channelUserModal" @change-channel-user-id="changeChannelUserIdFunc" />
+    <add-or-edit ref="infoAddOrEdit" :callback-func="getReceiverGroup" />
+    <channel-user ref="channelUserModal" @change-channel-user-id="changeChannelUserIdFunc" />
   </ag-drawer>
 </template>
 
@@ -266,10 +266,9 @@
  */
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
 import { AgDrawer, AgSelectInfinite, AgTable } from '@/components'
-import { ChannelUserModal } from '@/components/channel-user'
-import { genRowKey } from '@/utils/util'
-import { ref, watch } from 'vue'
+import { ChannelUser } from '@/components/channel-user'
 import { usePermission } from '@/composables/useCommon'
+import { genRowKey } from '@/utils/util'
 import {
   AlipayCircleOutlined,
   CheckCircleOutlined,
@@ -282,7 +281,8 @@ import {
   WechatOutlined
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import InfoAddOrEdit from '../group/add-or-edit.vue'
+import { ref, watch } from 'vue'
+import AddOrEdit from '../group/add-or-edit.vue'
 
 const { hasPermission } = usePermission()
 

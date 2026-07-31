@@ -51,7 +51,7 @@
       <ag-table
         ref="tableRef"
         row-key="storeId"
-        state-key="mch_store_table_columns"
+        state-key="mch_store"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"

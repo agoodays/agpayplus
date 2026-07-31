@@ -1,5 +1,5 @@
-import { shallowRef, computed } from 'vue'
 import { message } from 'ant-design-vue'
+import { computed, shallowRef } from 'vue'
 
 const DEFAULT_COMPONENT_ROUTES = {
   CONFIG_PAGE: '../diy/config-page.vue',
@@ -83,6 +83,7 @@ export function useConfigLoader(activeChannelCode, activeSubTab, configMode, cha
       }
       case 'channelConfigTab': {
         try {
+          console.log(componentPath)
           const componentPath = getAppConfigComponentPath(activeChannelCode.value)
           if (!componentPath) {
             throw new Error('当前渠道不支持参数配置')

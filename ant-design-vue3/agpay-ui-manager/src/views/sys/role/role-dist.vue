@@ -2,7 +2,7 @@
   <div style="padding-bottom: 50px">
     <p v-if="hasEnt">请选择权限：</p>
     <!-- 树状结构 -->
-    <a-tree v-model="checkedKeys" :tree-data="treeData" :replace-fields="replaceFields" :checkable="true" />
+    <a-tree v-model="checkedKeys" :tree-data="treeData" :field-names="fieldNames" :checkable="true" />
   </div>
 </template>
 
@@ -21,7 +21,7 @@ const { hasPermission } = usePermission()
 const hasEnt = hasPermission('ENT_UR_ROLE_DIST')
 const recordId = ref(null)
 const treeData = ref([])
-const replaceFields = { key: 'entId', title: 'entName' }
+const fieldNames = ref({ key: 'entId', title: 'entName' })
 const checkedKeys = ref([])
 const allEntList = reactive({})
 

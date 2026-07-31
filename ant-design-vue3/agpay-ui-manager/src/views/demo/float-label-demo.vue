@@ -25,7 +25,7 @@
       <!-- 完整表单示例 -->
       <a-card title="完整表单示例 - 综合展示">
         <div class="form-demo">
-          <a-form ref="formRef" :model="completeForm" :rules="rules" layout="vertical">
+          <a-form ref="formRef" layout="vertical" :model="completeForm" :rules="rules">
             <a-row :gutter="16">
               <a-col :span="8">
                 <a-form-item name="username">
@@ -790,18 +790,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
-import { message } from 'ant-design-vue'
-import { UserOutlined, MailOutlined, SearchOutlined } from '@ant-design/icons-vue'
 import {
-  AgCard,
+  AgDateRangePicker,
   AgInput,
   AgInputNumber,
   AgInputNumberRange,
-  AgDateRangePicker,
-  AgTextarea,
-  AgSelect
+  AgSelect,
+  AgTextarea
 } from '@/components'
+import { MailOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, reactive, ref } from 'vue'
 
 // ag-date-range-picker 示例数据（新版）
 const agDate1 = ref('')

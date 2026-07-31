@@ -59,8 +59,8 @@
       <a-tab-pane v-for="item in tabData" :key="item.code" :tab="item.name">        
         <a-card style="padding: 30px">
           <component
-            :is="currentComponent"
             ref="currentComponentRef"
+            :is="currentComponent"
             :config-mode="configMode"
             :form-data="ifParams"
             @update-if-params="handleUpdateIfParams"
@@ -92,11 +92,11 @@
  * Oauth2配置抽屉组件
  * 功能：配置微信/支付宝Oauth2参数
  */
-import { CheckOutlined, CloseOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
-const icons = { CheckOutlined, CloseOutlined, PlusOutlined, QuestionCircleOutlined }
-import { ref, nextTick, markRaw, watch } from 'vue'
-import { message } from 'ant-design-vue'
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
+import { CheckOutlined, CloseOutlined, PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { markRaw, nextTick, ref, watch } from 'vue'
+const icons = { CheckOutlined, CloseOutlined, PlusOutlined, QuestionCircleOutlined }
 
 /** Props 定义 */
 const props = defineProps({

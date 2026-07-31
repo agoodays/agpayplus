@@ -39,7 +39,7 @@
       <ag-table
         ref="tableRef"
         row-key="teamId"
-        state-key="team_list_table_columns"
+        state-key="team"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
@@ -74,15 +74,16 @@
  * 用户团队列表页面组件
  * 功能：展示用户团队列表，支持搜索、新增、编辑、删除操作
  */
-import { PlusOutlined } from '@ant-design/icons-vue'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { STAT_RANGE_TYPE_ENUM, SYS_TYPE_ENUM, getSysTypeOptions } from '@/constants/common-const'
+import { PlusOutlined } from '@ant-design/icons-vue'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
-import { STAT_RANGE_TYPE_ENUM, SYS_TYPE_ENUM, getSysTypeOptions } from '@/constants/common-const'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

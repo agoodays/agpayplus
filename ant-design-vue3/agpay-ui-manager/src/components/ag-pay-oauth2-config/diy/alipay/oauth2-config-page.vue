@@ -1,5 +1,5 @@
 ﻿<template>
-  <a-form ref="infoForm" :model="ifParams" layout="vertical" :rules="rules">
+  <a-form ref="infoForm" layout="vertical" :model="ifParams" :rules="rules">
     <a-row :gutter="24">
       <a-collapse v-model="activeKey" accordion :bordered="false">
         <a-collapse-panel key="1" :header="configMode === 'mgrIsv' ? '服务商三方应用参数配置' : '商户应用参数配置'">
@@ -255,11 +255,11 @@
 </template>
 
 <script setup>
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-const icons = { LoadingOutlined, UploadOutlined }
-import { reactive, computed, ref } from 'vue'
 import AgUpload from '@/components/ag-upload'
 import { upload } from '@/lib/ag-axios'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { computed, reactive, ref } from 'vue'
+const icons = { LoadingOutlined, UploadOutlined }
 
 const props = defineProps({
   configMode: { type: String, default: null },

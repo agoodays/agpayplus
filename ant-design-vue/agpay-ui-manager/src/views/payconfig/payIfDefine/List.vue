@@ -38,9 +38,9 @@
 </template>
 
 <script>
-import AgCard from '@/components/AgCard/AgCard'
-import { API_URL_IFDEFINES_LIST, req } from '@/api/manage'
-import PayIfDefineAddOrEdit from './AddOrEdit'
+import { API_URL_IFDEFINES_LIST, req } from '@/api/manage';
+import AgCard from '@/components/AgCard/AgCard';
+import PayIfDefineAddOrEdit from './AddOrEdit';
 
 export default {
   name: 'IfDefinePage',

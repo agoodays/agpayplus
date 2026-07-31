@@ -88,12 +88,12 @@
  * 服务商 JSON 动态渲染支付配置组件
  * 功能：根据后端返回的配置定义动态渲染表单
  */
-import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { AgDrawer, AgUpload } from '@/components'
 import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
-import { message } from 'ant-design-vue'
-import { ref, watch, computed } from 'vue'
+import { AgDrawer, AgUpload } from '@/components'
+import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
+import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -121,9 +121,7 @@ const emit = defineEmits(['update:open', 'success'])
 
 const infoForm = ref(null)
 const isvParamForm = ref(null)
-const loading = ref(false)
 const action = isvPayConfigApi.certUploadAction
-const localOpen = ref(false)
 const isvParams = ref([])
 const saveObject = ref({})
 const ifParams = ref({})
@@ -196,7 +194,7 @@ function generateRules() {
   ifParamsRules.value = rulesMap
 }
 
-async function initForm() {
+async function loadConfigData() {
   infoForm.value?.resetFields?.()
   isvParamForm.value?.resetFields?.()
 
@@ -237,53 +235,25 @@ async function initForm() {
   generateRules()
 }
 
-watch(
-  () => props.open,
-  async (val) => {
-    localOpen.value = val
-    if (val && props.isvNo && props.record.ifCode) {
-      await initForm()
-    }
-  }
-)
-
-watch(localOpen, (val) => {
-  emit('update:open', val)
-})
-
-async function validateForm(formRef) {
-  if (!formRef.value?.validate) {
-    return true
-  }
-  try {
-    await formRef.value.validate()
-    return true
-  } catch {
-    return false
-  }
-}
-
-async function onSubmit() {
-  const valid = await validateForm(infoForm)
-  const valid2 = await validateForm(isvParamForm)
-  if (!valid || !valid2) return
-
-  loading.value = true
-  try {
-    const reqParams = {
-      infoId: saveObject.value.infoId,
-      ifCode: saveObject.value.ifCode,
-      ifRate: saveObject.value.ifRate,
-      state: saveObject.value.state,
-      remark: saveObject.value.remark
-    }
-
-    if (Object.keys(ifParams.value).length === 0) {
-      message.error('参数不能为空！')
-      return
-    }
-
-    const submitParams = { ...ifParams.value }
+const { localOpen, loading, submit, uploadSuccess: handleUploadSuccess, handleClose: closeDrawer } = usePayConfigDrawer({
+  props,
+  emit,
+  infoForm,
+  paramForm: isvParamForm,
+  saveObject,
+  ifParams,
+  initialSaveObject: () => ({
+    infoId: props.isvNo,
+    ifCode: props.record.ifCode,
+    state: props.record.ifConfigState === 0 ? 0 : 1,
+    remark: ''
+  }),
+  initialIfParams: () => ({}),
+  loadConfig: async () => {
+    await loadConfigData()
+  },
+  buildSubmitPayload: ({ saveObject: currentSaveObject, ifParams: currentIfParams }) => {
+    const submitParams = { ...currentIfParams }
     isvParams.value.forEach((item) => {
       if (item.star === '1' && submitParams[item.name] === '') {
         submitParams[item.name] = undefined
@@ -291,22 +261,22 @@ async function onSubmit() {
       submitParams[item.name + '_ph'] = undefined
     })
 
-    reqParams.ifParams = JSON.stringify(submitParams)
+    return {
+      infoId: currentSaveObject.infoId,
+      ifCode: currentSaveObject.ifCode,
+      ifRate: currentSaveObject.ifRate,
+      state: currentSaveObject.state,
+      remark: currentSaveObject.remark,
+      ifParams: JSON.stringify(submitParams)
+    }
+  },
+  saveConfig: async (reqParams) => {
     await isvPayConfigApi.save(reqParams)
-    message.success('保存成功')
-    localOpen.value = false
-    emit('success')
-  } finally {
-    loading.value = false
-  }
-}
+  },
+  shouldInit: (propsData) => Boolean(propsData.isvNo && propsData.record?.ifCode)
+})
 
-function uploadSuccess(name, fileList) {
-  const [firstItem] = fileList
-  ifParams.value[name] = firstItem?.url
-}
-
-function handleClose() {
-  localOpen.value = false
-}
+const onSubmit = submit
+const uploadSuccess = handleUploadSuccess
+const handleClose = closeDrawer
 </script>

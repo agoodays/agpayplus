@@ -59,6 +59,17 @@ export const FLAG_ENUM = {
   YES: { value: 1, descKey: 'common.yes', color: 'green' }
 }
 
+export const OPEN_STATUS_ENUM = {
+  OPEN: { value: 1, descKey: 'common.open', color: 'green' },   // 开启显示绿色
+  CLOSED: { value: 0, descKey: 'common.closed', color: 'volcano' } // 关闭显示红色
+}
+
+// 是否支持状态枚举（如：支持对账、支持退款等）
+export const SUPPORT_STATUS_ENUM = {
+  SUPPORT: { value: 1, descKey: 'common.support', color: 'green' },      // 支持
+  NOT_SUPPORT: { value: 0, descKey: 'common.notSupport', color: 'volcano' } // 不支持
+}
+
 export const AGENT_TYPE_ENUM = {
   INDIVIDUAL: { value: 1, descKey: 'common.agentType.individual', labelKey: 'common.label.legalPerson' },
   ENTERPRISE: { value: 2, descKey: 'common.agentType.enterprise', labelKey: 'common.label.contactPerson' }
@@ -105,6 +116,8 @@ export const getStatRangeTypeOptions = (t) => generateOptions(STAT_RANGE_TYPE_EN
 export const getSysTypeOptions = (t) => generateOptions(SYS_TYPE_ENUM, t)
 export const getStateOptions = (t) => generateOptions(STATE_ENUM, t)
 export const getFlagOptions = (t) => generateOptions(FLAG_ENUM, t)
+export const getOpenStatusOptions = (t) => generateOptions(OPEN_STATUS_ENUM, t)
+export const getSupportStatusOptions = (t) => generateOptions(SUPPORT_STATUS_ENUM, t)
 export const getAgentTypeOptions = (t) => generateOptions(AGENT_TYPE_ENUM, t)
 export const getSettAccountTypeOptions = (t) => generateOptions(SETT_ACCOUNT_TYPE_ENUM, t)
 export const getMchTypeOptions = (t) => generateOptions(MCH_TYPE_ENUM, t)
@@ -150,6 +163,8 @@ export const getEnumInfo = (enumObj, value, t) => {
 
 export const getFlagInfo = (flag, t) => getEnumInfo(FLAG_ENUM, flag, t)
 export const getStateInfo = (state, t) => getEnumInfo(STATE_ENUM, state, t)
+export const getOpenStatusInfo = (openState, t) => getEnumInfo(OPEN_STATUS_ENUM, openState, t)
+export const getSupportStatusInfo = (supportState, t) => getEnumInfo(SUPPORT_STATUS_ENUM, supportState, t)
 export const getAgentTypeInfo = (type, t) => getEnumInfo(AGENT_TYPE_ENUM, type, t)
 export const getSettAccountTypeInfo = (type, t) => getEnumInfo(SETT_ACCOUNT_TYPE_ENUM, type, t)
 export const getMchTypeInfo = (type, t) => getEnumInfo(MCH_TYPE_ENUM, type, t)

@@ -116,6 +116,10 @@ export default {
     loadDataFailed: '加载数据失败',
     yes: "是",
     no: "否",
+    open: "开启",
+    closed: "关闭",
+    support: "支持",
+    notSupport: "不支持",
     state: {
       disabled: "禁用",
       enabled: "启用"

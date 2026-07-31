@@ -48,7 +48,7 @@
         <ag-table
           ref="tableRef"
           row-key="wayCode"
-          state-key="mch_pay_if_config_list_table_columns"
+          state-key="mch_pay_if_config"
           :on-load="reqTableDataFunc"
           :columns="tableColumns"
           :search-data="searchData"

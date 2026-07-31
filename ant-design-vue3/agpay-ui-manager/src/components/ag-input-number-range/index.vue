@@ -3,6 +3,7 @@
     <div class="range-inputs">
       <a-input-number
         ref="minInputRef"
+        class="min-input"
         :value="minValue"
         :placeholder="floatPlaceholder ? placeholder[0] : ''"
         :disabled="disabled"
@@ -11,7 +12,6 @@
         :step="step"
         :precision="precision"
         :size="size"
-        class="min-input"
         @focus="handleFocus"
         @blur="handleBlur"
         @change="handleMinInputChange"
@@ -21,6 +21,7 @@
 
       <a-input-number
         ref="maxInputRef"
+        class="max-input"
         :value="maxValue"
         :placeholder="floatPlaceholder ? placeholder[1] : ''"
         :disabled="disabled"
@@ -29,7 +30,6 @@
         :step="step"
         :precision="precision"
         :size="size"
-        class="max-input"
         @focus="handleFocus"
         @blur="handleBlur"
         @change="handleMaxInputChange"
@@ -44,9 +44,9 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
 import { useFloatLabel } from '@/composables/useFloatLabel'
 import '@/styles/float-label.less'
+import { ref, watch } from 'vue'
 
 /**
  * AgInputNumberRange - 数字范围输入框

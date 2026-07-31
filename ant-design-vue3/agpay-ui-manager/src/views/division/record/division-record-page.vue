@@ -7,7 +7,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.queryDateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间" />
             </a-form-item>
@@ -83,7 +83,7 @@
       <ag-table
         ref="tableRef"
         row-key="recordId"
-        state-key="division_record_table_columns"
+        state-key="division_record"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
@@ -166,9 +166,9 @@ import { divisionRecordApi } from '@/api/business/division/division-record-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { onMounted, ref } from 'vue'
-import { message } from 'ant-design-vue'
 import { infoBox } from '@/utils/info-box'
+import { message } from 'ant-design-vue'
+import { onMounted, ref } from 'vue'
 import Detail from './detail.vue'
 
 /** 权限检查 */

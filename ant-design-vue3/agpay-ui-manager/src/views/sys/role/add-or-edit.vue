@@ -6,7 +6,7 @@
     :mask-closable="false"
     @close="handleClose"
     :show-confirm="true"
-    :confirm-loading="confirmLoading"
+    :confirm-loading="loading"
     @confirm="handleConfirm"
   >
     <a-form ref="infoForm" :model="saveObject" :label-col="{ span: 4 }" :rules="rules">
@@ -16,18 +16,7 @@
     </a-form>
 
     <!-- 角色权限分配 -->
-    <RoleDist ref="roleDist" />
-
-    <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" @click="isShow = false">
-        <template #icon><CloseOutlined /></template>
-        取消
-      </a-button>
-      <a-button type="primary" :loading="confirmLoading" @click="handleOkFunc">
-        <template #icon><CheckOutlined /></template>
-        保存
-      </a-button>
-    </div>
+    <role-dist ref="roleDist" />
   </ag-drawer>
 </template>
 
@@ -36,9 +25,8 @@
  * 角色新增/编辑组件
  * 功能：新增或编辑角色配置，分配角色权限
  */
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
-import { AgDrawer } from '@/components'
 import { roleApi } from '@/api/business/role/role-api'
+import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
 import { nextTick, ref, watch } from 'vue'
 import RoleDist from './role-dist.vue'
@@ -65,7 +53,7 @@ const emit = defineEmits(['update:open', 'success'])
 const infoForm = ref(null)
 const roleDist = ref(null)
 
-const confirmLoading = ref(false)
+const loading = ref(false)
 const isAdd = ref(true)
 const localOpen = ref(false)
 const saveObject = ref({})
@@ -94,7 +82,7 @@ watch(localOpen, (val) => {
 const initForm = async () => {
   isAdd.value = !props.recordId
   saveObject.value = {}
-  confirmLoading.value = false
+  loading.value = false
 
   infoForm.value?.resetFields?.()
 
@@ -118,11 +106,11 @@ const validateForm = async () => {
   }
 }
 
-const handleOkFunc = async () => {
+const handleConfirm = async () => {
   const valid = await validateForm()
   if (!valid) return
 
-  confirmLoading.value = true
+  loading.value = true
 
   try {
     const selectedEntIdList = roleDist.value?.getSelectedEntIdList?.() || []
@@ -139,7 +127,7 @@ const handleOkFunc = async () => {
     localOpen.value = false
     emit('success')
   } finally {
-    confirmLoading.value = false
+    loading.value = false
   }
 }
 

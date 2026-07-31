@@ -103,10 +103,7 @@
                       <span><InfoCircleOutlined /></span>
                     </a-popover>
                   </template>
-                  <a-radio-group v-model:value="divisionConfig.overrideAutoFlag">
-                    <a-radio :value="1">开启</a-radio>
-                    <a-radio :value="0">关闭</a-radio>
-                  </a-radio-group>
+                  <a-radio-group v-model:value="divisionConfig.overrideAutoFlag" :options="openStatusOptions"/>
                 </a-form-item>
                 <a-form-item v-if="divisionConfig.overrideAutoFlag === 1" class="division" label="金额限制">
                   <a-divider orientation="left">全局自动分账规则</a-divider>
@@ -195,18 +192,19 @@
 </template>
 
 <script setup>
-import { AgDrawer } from '@/components'
 import { mchApi } from '@/api/business/mch/mch-api'
+import { AgDrawer } from '@/components'
+import { getOpenStatusOptions, getStateOptions } from '@/constants/common-const'
 import { InfoCircleOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { ref, computed, watch } from 'vue'
-import { getStateOptions } from '@/constants/common-const'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 // 获取翻译后的下拉选项
 const stateOptions = computed(() => getStateOptions(t))
+const openStatusOptions = computed(() => getOpenStatusOptions(t))
 
 const props = defineProps({
   open: {

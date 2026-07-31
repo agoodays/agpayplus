@@ -2,7 +2,7 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+      <ag-search v-model="searchData" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -11,11 +11,7 @@
                 label="所属系统"
                 placeholder="请选择所属系统"
                 allow-clear
-                :options="[
-                  { value: 'MGR', label: '运营平台' },
-                  { value: 'AGENT', label: '代理商' },
-                  { value: 'MCH', label: '商户' }
-                ]"
+                :options="sysTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -41,7 +37,7 @@
       <ag-table
         ref="tableRef"
         row-key="roleId"
-        state-key="role_table_columns"
+        state-key="role"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
@@ -84,9 +80,14 @@ import { roleApi } from '@/api/business/role/role-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getSysTypeOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AddOrEdit from './add-or-edit.vue'
+
+const { t } = useI18n()
+const sysTypeOptions = computed(() => getSysTypeOptions(t))
 
 /** 权限检查 */
 const { hasPermission } = usePermission()

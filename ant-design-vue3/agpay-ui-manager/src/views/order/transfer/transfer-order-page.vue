@@ -13,7 +13,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.dateRange"
+                v-model="searchData.dateRange"
                 label="创建时间"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -34,7 +34,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.mchNo"
+                v-model="searchData.mchNo"
                 label="商户号"
                 placeholder="商户号（搜索商户名称）"
                 allow-clear
@@ -79,7 +79,7 @@
       <ag-table
         ref="tableRef"
         row-key="transferId"
-        state-key="transfer_order_table_columns"
+        state-key="transfer_order"
         :columns="tableColumns"
         :show-auto-refresh="true"
         :on-load="reqTableDataFunc"
@@ -210,12 +210,11 @@
  * 功能：展示转账订单列表，支持搜索、查看详情、导出、统计等操作
  */
 import { orderApi } from '@/api/business/order/order-api'
-import { basicApi } from '@/api/system/basic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
-import { reactive, ref, computed } from 'vue'
 import { CopyOutlined, DollarOutlined, TransactionOutlined, WalletOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { computed, reactive, ref } from 'vue'
 import DetailDrawer from './detail-drawer.vue'
 
 // 弹窗控制

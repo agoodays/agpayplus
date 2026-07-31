@@ -9,12 +9,7 @@
     :confirm-loading="loading"
     @confirm="handleConfirm"
   >
-    <a-form
-      ref="infoForm"
-      :model="saveObject"
-      layout="vertical"
-      :rules="rules"
-    >
+    <a-form ref="infoForm" layout="vertical" :model="saveObject" :rules="rules">
       <!-- 基本信息 -->
       <a-row :gutter="16">
         <a-col :span="10">
@@ -392,25 +387,25 @@
 import { agentApi } from '@/api/business/agent/agent-api'
 import { isvApi } from '@/api/business/isv/isv-api'
 import { basicApi } from '@/api/system/basic-api'
-import { AgDrawer, AgSelect, AgSelectInfinite, AgUpload, AgInput, AgTextarea } from '@/components'
+import { AgDrawer, AgInput, AgSelect, AgSelectInfinite, AgTextarea, AgUpload } from '@/components'
+import {
+  AGENT_TYPE_ENUM,
+  CASH_OUT_FEE_TYPE_ENUM,
+  FLAG_ENUM,
+  getAgentTypeInfo,
+  getAgentTypeOptions,
+  getFlagOptions,
+  getSettAccountTypeInfo,
+  getSettAccountTypeOptions,
+  getStateOptions,
+  SETT_ACCOUNT_TYPE_ENUM,
+  STATE_ENUM
+} from '@/constants/common-const'
 import { upload } from '@/lib/ag-axios'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
 import { computed, reactive, ref, watch } from 'vue'
-import {
-  STATE_ENUM,
-  FLAG_ENUM,
-  AGENT_TYPE_ENUM,
-  SETT_ACCOUNT_TYPE_ENUM,
-  CASH_OUT_FEE_TYPE_ENUM,
-  getStateOptions,
-  getFlagOptions,
-  getAgentTypeOptions,
-  getSettAccountTypeOptions,
-  getAgentTypeInfo,
-  getSettAccountTypeInfo
-} from '@/constants/common-const'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <BasePage ref="infoFormRef" :form-data="saveObject" :diy-list="diyList" />
+    <base-page ref="infoFormRef" :form-data="saveObject" :diy-list="diyList" />
     <a-divider orientation="left" v-if="saveObject.infoType !== 'AGENT'">
       <a-tag color="#FF4B33">
         {{ saveObject.ifCode }} 商户参数配置

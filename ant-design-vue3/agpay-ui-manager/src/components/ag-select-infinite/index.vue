@@ -2,6 +2,8 @@
   <div class="ag-float-container" :class="{ 'is-focused': isFocused }">
     <a-select
       ref="selectRef"
+      style="width: 100%"
+      v-on="eventHandlers"
       :value="selectValue"
       :placeholder="floatPlaceholder"
       :disabled="disabled"
@@ -12,8 +14,6 @@
       :size="size"
       :loading="loading"
       :not-found-content="notFoundContent"
-      style="width: 100%"
-      v-on="eventHandlers"
       @popup-scroll="handlePopupScroll"
       @change="handleSelectChange"
     >
@@ -63,9 +63,9 @@
  * 5. 支持浮动标签（float label）
  * 6. 兼容 modelValue 和 value 两种绑定方式
  */
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useFloatLabel } from '@/composables/useFloatLabel'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

@@ -151,11 +151,11 @@
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { AgDrawer, AgUpload } from '@/components'
 import { usePermission } from '@/composables/useCommon'
+import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
 import { upload } from '@/lib/ag-axios'
 import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { message } from 'ant-design-vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -182,8 +182,6 @@ const emit = defineEmits(['update:open', 'success'])
 
 const infoForm = ref(null)
 const mchParamForm = ref(null)
-const localOpen = ref(false)
-const loading = ref(false)
 const isAdd = ref(true)
 const mchType = ref(1)
 const action = upload.cert
@@ -273,20 +271,6 @@ const ifParamsRules = computed(() => ({
 	]
 }))
 
-watch(
-	() => props.open,
-	async (val) => {
-		localOpen.value = val
-		if (val && props.appId && props.record.ifCode) {
-			await initForm()
-		}
-	}
-)
-
-watch(localOpen, (val) => {
-	emit('update:open', val)
-})
-
 function parseJsonObject(rawValue) {
 	if (!rawValue) return {}
 	try {
@@ -295,41 +279,6 @@ function parseJsonObject(rawValue) {
 	} catch {
 		return {}
 	}
-}
-
-async function initForm() {
-	infoForm.value?.resetFields?.()
-	mchParamForm.value?.resetFields?.()
-
-	mchType.value = props.record.mchType || 1
-
-	saveObject.value = {
-		infoId: props.appId,
-		ifCode: props.record.ifCode,
-		state: props.record.ifConfigState === 0 ? 0 : 1,
-		remark: ''
-	}
-
-	if (mchType.value === 1) {
-		ifParams.value = {
-			sandbox: 0,
-			signType: 'RSA2',
-			useCert: 0,
-			privateKey: '',
-			privateKey_ph: '请输入',
-			alipayPublicKey: '',
-			alipayPublicKey_ph: '请输入',
-			appPublicCert: '',
-			alipayPublicCert: '',
-			alipayRootCert: ''
-		}
-	} else {
-		ifParams.value = {
-			appAuthToken: ''
-		}
-	}
-
-	await getMchPayConfig()
 }
 
 async function getMchPayConfig() {
@@ -354,67 +303,68 @@ async function getMchPayConfig() {
 	isAdd.value = true
 }
 
-async function validateForm(formRef) {
-	if (!formRef.value?.validate) {
-		return true
-	}
-	try {
-		await formRef.value.validate()
-		return true
-	} catch {
-		return false
-	}
-}
-
-function clearEmptyKey(key) {
-	if (!ifParams.value[key]) {
-		ifParams.value[key] = undefined
-	}
-	ifParams.value[`${key}_ph`] = undefined
-}
-
-async function handleSubmit() {
-	const valid1 = await validateForm(infoForm)
-	const valid2 = await validateForm(mchParamForm)
-	if (!valid1 || !valid2) return
-
-	loading.value = true
-	try {
-		if (!Object.keys(ifParams.value).length) {
-			message.error('参数不能为空！')
-			return
+const { localOpen, loading, submit, uploadSuccess: handleUploadSuccess, handleClose: closeDrawer } = usePayConfigDrawer({
+	props,
+	emit,
+	infoForm,
+	paramForm: mchParamForm,
+	saveObject,
+	ifParams,
+	isAdd,
+	initialSaveObject: () => {
+		mchType.value = props.record.mchType || 1
+		return {
+			infoId: props.appId,
+			ifCode: props.record.ifCode,
+			state: props.record.ifConfigState === 0 ? 0 : 1,
+			remark: ''
 		}
-
+	},
+	initialIfParams: () => {
 		if (mchType.value === 1) {
-			clearEmptyKey('privateKey')
-			clearEmptyKey('alipayPublicKey')
+			return {
+				sandbox: 0,
+				signType: 'RSA2',
+				useCert: 0,
+				privateKey: '',
+				privateKey_ph: '请输入',
+				alipayPublicKey: '',
+				alipayPublicKey_ph: '请输入',
+				appPublicCert: '',
+				alipayPublicCert: '',
+				alipayRootCert: ''
+			}
 		}
-
-		const reqParams = {
-			infoId: saveObject.value.infoId,
-			ifCode: saveObject.value.ifCode,
-			state: saveObject.value.state,
-			remark: saveObject.value.remark,
-			ifParams: JSON.stringify(ifParams.value)
+		return {
+			appAuthToken: ''
 		}
-
+	},
+	loadConfig: async () => {
+		await getMchPayConfig()
+	},
+	buildSubmitPayload: ({ saveObject: currentSaveObject, ifParams: currentIfParams }) => {
+		if (mchType.value === 1) {
+			currentIfParams.privateKey = currentIfParams.privateKey || undefined
+			currentIfParams.alipayPublicKey = currentIfParams.alipayPublicKey || undefined
+		}
+		return {
+			infoId: currentSaveObject.infoId,
+			ifCode: currentSaveObject.ifCode,
+			state: currentSaveObject.state,
+			remark: currentSaveObject.remark,
+			ifParams: JSON.stringify(currentIfParams)
+		}
+	},
+	saveConfig: async (reqParams) => {
 		await mchAppApi.addMchPayConfig(reqParams)
-		message.success('保存成功')
-		localOpen.value = false
-		emit('success')
-	} finally {
-		loading.value = false
-	}
-}
+	},
+	clearEmptyKeys: ['privateKey', 'alipayPublicKey'],
+	shouldInit: (propsData) => Boolean(propsData.appId && propsData.record?.ifCode)
+})
 
-function uploadSuccess(name, fileList) {
-	const [firstItem] = fileList
-	ifParams.value[name] = firstItem?.url
-}
-
-function handleClose() {
-	localOpen.value = false
-}
+const handleConfirm = submit
+const uploadSuccess = handleUploadSuccess
+const handleClose = closeDrawer
 </script>
 
 <style lang="less" scoped></style>

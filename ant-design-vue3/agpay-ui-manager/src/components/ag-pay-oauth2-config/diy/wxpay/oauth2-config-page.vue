@@ -1,5 +1,5 @@
 <template>
-  <a-form ref="infoForm" :model="ifParams" layout="vertical" :rules="rules">
+  <a-form ref="infoForm" layout="vertical" :model="ifParams" :rules="rules">
     <a-row :gutter="24">
       <a-col span="12">
         <a-form-item label="服务商的公众号AppId" name="appId">
@@ -78,7 +78,7 @@
 </template>
 
 <script setup>
-import { reactive, computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 
 const props = defineProps({
   configMode: { type: String, default: null },

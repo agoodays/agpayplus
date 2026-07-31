@@ -32,7 +32,7 @@
       <ag-table
         ref="tableRef"
         row-key="isvNo"
-        state-key="isv_list_table_columns"
+        state-key="isv"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"
@@ -60,7 +60,7 @@
             <a-button v-if="hasPermission('ENT_ISV_INFO_EDIT')" type="link" @click="editFunc(record.isvNo)">修改</a-button>
             <a-button v-if="hasPermission('ENT_ISV_OAUTH2_CONFIG_VIEW')" type="link" @click="payOauth2ConfigFunc(record.isvNo)">Oauth2配置</a-button>
             <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payConfigFunc(record.isvNo)">支付配置</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payIfConfigFunc(record.isvNo)">支付配置(新)</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payIfConfigFunc(record.isvNo)">支付配置(旧版)</a-button>
             <a-button v-if="hasPermission('ENT_ISV_INFO_DEL')" type="link" @click="delFunc(record.isvNo)" danger>删除</a-button>
           </ag-table-actions>
         </template>

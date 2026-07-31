@@ -1,28 +1,30 @@
 <template>
   <div>
     <a-card>
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline" class="table-head-ground">
-          <div class="table-layer">
-            <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo"/>
-            <ag-text-up :placeholder="'代理商名称'" :msg="searchData.agentName" v-model="searchData.agentName"/>
-            <ag-text-up :placeholder="'代理商登录名'" :msg="searchData.loginUsername" v-model="searchData.loginUsername"/>
-            <ag-text-up :placeholder="'手机号'" :msg="searchData.contactTel" v-model="searchData.contactTel"/>
-            <a-form-item label="" class="table-head-layout">
-              <a-select v-model="searchData.state" placeholder="代理商状态" default-value="">
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="0">禁用</a-select-option>
-                <a-select-option value="1">启用</a-select-option>
-              </a-select>
-            </a-form-item>
-            <span class="table-page-search-submitButtons" style="flex-grow: 0; flex-shrink: 0;">
-              <a-button type="primary" icon="search" @click="queryFunc" :loading="btnLoading">查询</a-button>
-              <a-button style="margin-left: 8px" icon="reload" @click="() => this.searchData = {}">重置</a-button>
-            </span>
-          </div>
-        </a-form>
-      </div>
-      <div class="split-line"/>
+      <AgSearchForm
+        :searchData="searchData"
+        :openIsShowMore="true"
+        :isShowMore="isShowMore"
+        :btnLoading="btnLoading"
+        @update-search-data="handleSearchFormData"
+        @set-is-show-more="setIsShowMore"
+        @query-func="queryFunc">
+        <template slot="formItem">
+          <ag-text-up :placeholder="'代理商号'" :msg="searchData.agentNo" v-model="searchData.agentNo"/>
+          <ag-text-up :placeholder="'上级代理商号'" :msg="searchData.pid" v-model="searchData.pid"/>
+          <ag-text-up :placeholder="'服务商号'" :msg="searchData.isvNo" v-model="searchData.isvNo"/>
+          <ag-text-up :placeholder="'代理商名称'" :msg="searchData.agentName" v-model="searchData.agentName"/>
+          <ag-text-up :placeholder="'代理商登录名'" :msg="searchData.loginUsername" v-model="searchData.loginUsername"/>
+          <ag-text-up v-if="isShowMore" :placeholder="'手机号'" :msg="searchData.contactTel" v-model="searchData.contactTel"/>
+          <a-form-item v-if="isShowMore" label="" class="table-head-layout">
+            <a-select v-model="searchData.state" placeholder="代理商状态" default-value="">
+              <a-select-option value="">全部</a-select-option>
+              <a-select-option value="0">禁用</a-select-option>
+              <a-select-option value="1">启用</a-select-option>
+            </a-select>
+          </a-form-item>
+        </template>
+      </AgSearchForm>
       <!-- 列表渲染 -->
       <AgTable
         @btnLoadClose="btnLoading=false"
@@ -59,16 +61,17 @@
     <!-- 新增页面组件  -->
     <InfoDetail ref="infoDetail" :callbackFunc="searchFunc"/>
     <!-- 支付配置组件  -->
-    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'agentSubagent'" />
+    <AgPayConfigDrawer ref="payConfig" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'mgrAgent'" />
   </div>
 </template>
 
 <script>
-import AgTable from '@/components/AgTable/AgTable'
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
-import AgTableColumns from '@/components/AgTable/AgTableColumns'
-    import AgPayConfigDrawer from '@/components/AgPayConfig/AgPayConfigDrawer'
 import { API_URL_AGENT_LIST, req, reqLoad } from '@/api/manage'
+import AgPayConfigDrawer from '@/components/AgPayConfig/AgPayConfigDrawer'
+import AgSearchForm from '@/components/AgSearch/AgSearchForm'
+import AgTable from '@/components/AgTable/AgTable'
+import AgTableColumns from '@/components/AgTable/AgTableColumns'
+import AgTextUp from '@/components/AgTextUp/AgTextUp'; // 文字上移组件
 import InfoAddOrEdit from './AddOrEdit'
 import InfoDetail from './Detail'
 
@@ -77,17 +80,23 @@ const tableColumns = [
   { key: 'agentName', title: '代理商名称', width: 160, fixed: 'left', ellipsis: true, scopedSlots: { customRender: 'agentNameSlot' } },
   { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
   { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
-  { key: 'mchCount', dataIndex: 'mchCount', title: '商户数量', width: 110 },
+  { key: 'level', dataIndex: 'level', title: '等级', width: 70 },
+  { key: 'pid', dataIndex: 'pid', title: '上级代理', width: 140 },
+  { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
+  { key: 'auditProfitAmount', dataIndex: 'auditProfitAmount', title: '在途佣金', width: 100 },
+  { key: 'balanceAmount', dataIndex: 'balanceAmount', title: '钱包余额', width: 100 },
+  { key: 'unAmount', dataIndex: 'unAmount', title: '不可用金额', width: 110 },
   { key: 'state', title: '状态', width: 100, scopedSlots: { customRender: 'stateSlot' } },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
   { key: 'op', title: '操作', width: 160, fixed: 'right', align: 'center', scopedSlots: { customRender: 'opSlot' } }
 ]
 
 export default {
-  name: 'AgentListPage',
-  components: { AgTextUp, AgTable, AgTableColumns, AgPayConfigDrawer, InfoAddOrEdit, InfoDetail },
+  name: 'AgentPage',
+  components: { AgSearchForm, AgTable, AgTextUp, AgTableColumns, AgPayConfigDrawer, InfoAddOrEdit, InfoDetail },
   data () {
     return {
+      isShowMore: false,
       btnLoading: false,
       tableColumns: tableColumns,
       searchData: {},
@@ -97,6 +106,12 @@ export default {
   mounted () {
   },
   methods: {
+    handleSearchFormData (searchData) {
+      this.searchData = searchData
+    },
+    setIsShowMore (isShowMore) {
+      this.isShowMore = isShowMore
+    },
     queryFunc () {
       this.btnLoading = true
       this.$refs.infoTable.refTable(true)
@@ -135,5 +150,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

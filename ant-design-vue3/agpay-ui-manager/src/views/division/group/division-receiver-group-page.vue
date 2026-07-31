@@ -48,7 +48,7 @@
       <ag-table
         ref="tableRef"
         row-key="receiverGroupId"
-        state-key="division_receiver_group_table_columns"
+        state-key="division_receiver_group"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
@@ -82,7 +82,7 @@
  * 功能：展示分账接收方分组列表，支持搜索、新增、编辑、删除操作
  */
 import { divisionGroupApi } from '@/api/business/division/division-group-api'
-import { AgInput, AgSearch, AgSelectInfinite, AgSelect, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { PlusOutlined } from '@ant-design/icons-vue'

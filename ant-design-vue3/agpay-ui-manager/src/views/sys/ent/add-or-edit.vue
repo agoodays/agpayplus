@@ -82,9 +82,9 @@
  * 功能：新增/编辑资源权限信息，配置匹配规则
  */
 import { entApi } from '@/api/business/ent/ent-api'
-import { message } from 'ant-design-vue'
-import { ref, watch } from 'vue'
 import { getFlagOptions, getSysTypeOptions, getUserTypeOptions } from '@/constants/common-const'
+import { message } from 'ant-design-vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

@@ -17,9 +17,9 @@
         </div>
         <div class="content-box">
           <component
-            :is="configComponent"
             v-if="currentIfCode"
             ref="configComponentRef"
+            :is="configComponent"
             :info-id="infoId"
             :info-type="infoType"
             :if-define="ifDefine"
@@ -34,7 +34,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, shallowRef } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 
 const props = defineProps({
   infoId: {

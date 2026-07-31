@@ -327,9 +327,9 @@ async function handleSubmit() {
     <a-card title="编辑文章">
       <a-form
         ref="formRef"
+        layout="vertical"
         :model="article"
         :rules="rules"
-        layout="vertical"
       >
         <a-form-item label="标题" name="title">
           <a-input 

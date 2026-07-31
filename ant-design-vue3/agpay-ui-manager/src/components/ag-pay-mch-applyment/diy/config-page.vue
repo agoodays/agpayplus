@@ -2,7 +2,7 @@
   <div>
     <div v-if="showCard" class="card">
       <div class="content-box">
-        <a-form v-bind="formItemLayout" ref="infoForm" :model="saveObject">
+        <a-form ref="infoForm" :model="saveObject">
           <a-row :gutter="24">
             <a-col v-for="(item, key) in formItems" :key="key" :span="item.span || 6" class="form-item">
               <a-form-item :label="item.label" :required="item.required" :rules="item.rules" :name="item.key">
@@ -69,10 +69,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
-import { message } from 'ant-design-vue'
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgUpload } from '@/components'
+import { message } from 'ant-design-vue'
+import { reactive, ref, watch } from 'vue'
 
 const props = defineProps({
   infoId: {
@@ -107,18 +107,6 @@ const loading = ref(false)
 const infoForm = ref(null)
 const saveObject = reactive({})
 const formItems = ref([])
-
-// Layout
-const formItemLayout = {
-  labelCol: {
-    xs: { span: 24 },
-    sm: { span: 6 }
-  },
-  wrapperCol: {
-    xs: { span: 24 },
-    sm: { span: 18 }
-  }
-}
 
 /**
  * 获取支付配置数据

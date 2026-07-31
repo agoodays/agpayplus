@@ -7,7 +7,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.queryDateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间" />
             </a-form-item>
@@ -46,7 +46,7 @@
       <ag-table
         ref="tableRef"
         row-key="mchNo"
-        state-key="mch_count_table_columns"
+        state-key="mch_count"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :on-download="reqDownloadDataFunc"
@@ -233,6 +233,10 @@
  * 商户交易统计页面组件
  * 功能：展示商户交易统计数据，支持搜索、导出和查看详情
  */
+import { statisticApi } from '@/api/business/statistic/statistic-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
+import { useModal, usePermission } from '@/composables/useCommon'
+import { downloadFile } from '@/lib/ag-axios'
 import {
   DollarOutlined,
   InfoCircleOutlined,
@@ -241,15 +245,11 @@ import {
   UndoOutlined,
   WalletOutlined
 } from '@ant-design/icons-vue'
-import { statisticApi } from '@/api/business/statistic/statistic-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
-import { useModal, usePermission } from '@/composables/useCommon'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Detail from './detail.vue'
-import { downloadFile } from '@/lib/ag-axios'
 
 const icons = { InfoCircleOutlined }
 

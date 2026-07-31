@@ -11,11 +11,7 @@
                 label="所属系统"
                 placeholder="请选择所属系统"
                 allow-clear
-                :options="[
-                  { value: 'MGR', label: '运营平台' },
-                  { value: 'AGENT', label: '代理商' },
-                  { value: 'MCH', label: '商户' }
-                ]"
+                :options="sysTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -52,7 +48,7 @@
       <ag-table
         ref="tableRef"
         row-key="sysUserId"
-        state-key="sys_user_table_columns"
+        state-key="sys_user"
         :on-load="reqTableDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
@@ -111,7 +107,7 @@
         <template #stateSlot="{ record }">
           <ag-state-switch
             :state="record.state"
-            :show-switch-type="hasPermission('ENT_UR_USER_EDIT')"
+            :show-switch="hasPermission('ENT_UR_USER_EDIT')"
             :on-change="(state) => updateState(record.sysUserId, state)"
           />
         </template>
@@ -170,24 +166,25 @@
  * 系统用户列表页面组件
  * 功能：展示系统用户列表、搜索、新增、编辑、删除、状态切换、分配角色等操作
  */
-import { CopyOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
 import { AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { ref, computed } from 'vue'
-import { message } from 'ant-design-vue'
+import { getStateInfo, getStateOptions, getSysTypeOptions } from '@/constants/common-const'
 import { infoBox } from '@/utils/info-box'
+import { CopyOutlined, InfoCircleOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AddOrEdit from './add-or-edit.vue'
 import InviteCode from './invite-code.vue'
 import RoleDist from './role-dist.vue'
-import { getStateOptions, getStateInfo } from '@/constants/common-const'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 // 获取翻译后的下拉选项
 const stateOptions = computed(() => getStateOptions(t))
+const sysTypeOptions = computed(() => getSysTypeOptions(t))
 
 /** 权限检查 */
 const { hasPermission } = usePermission()

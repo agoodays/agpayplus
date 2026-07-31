@@ -31,9 +31,9 @@ export const asyncRouteDefine = {
   'PayTestPage': { defaultPath: '/paytest', component: () => import ('@/views/payTest/PayTest') }, // 支付测试
   'MchTransferPage': { defaultPath: '/doTransfer', component: () => import ('@/views/transfer/MchTransferPage') }, // 转账
 
-  'PayOrderListPage': { defaultPath: '/payOrder', component: () => import('@/views/order/pay/PayOrderList') }, // 支付订单列表
-  'RefundOrderListPage': { defaultPath: '/refundOrder', component: () => import('@/views/order/refund/RefundOrderList') }, // 退款订单列表
-  'TransferOrderListPage': { defaultPath: '/transferOrder', component: () => import('@/views/order/transfer/TransferOrderList') }, // 转账订单
+  'PayOrderPage': { defaultPath: '/payOrder', component: () => import('@/views/order/pay/PayOrderPage') }, // 支付订单列表
+  'RefundOrderPage': { defaultPath: '/refundOrder', component: () => import('@/views/order/refund/RefundOrderPage') }, // 退款订单列表
+  'TransferOrderPage': { defaultPath: '/transferOrder', component: () => import('@/views/order/transfer/TransferOrderPage') }, // 转账订单
 
   'DivisionReceiverGroupPage': { defaultPath: '/divisionReceiverGroup', component: () => import('@/views/division/group/DivisionReceiverGroupPage') }, // 分账账号组管理
   'DivisionReceiverPage': { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/DivisionReceiverPage') }, // 分账账号管理

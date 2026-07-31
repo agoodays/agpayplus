@@ -16,7 +16,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.dateRange"
+                v-model="searchData.dateRange"
                 label="创建时间"
                 placeholder="请选择创建时间"
                 allow-clear
@@ -44,7 +44,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.state"
+                v-model="searchData.state"
                 label="通知状态"
                 placeholder="请选择状态"
                 allow-clear
@@ -72,7 +72,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.orderType"
+                v-model="searchData.orderType"
                 label="订单类型"
                 placeholder="请选择订单类型"
                 allow-clear
@@ -90,7 +90,7 @@
       <ag-table
         ref="tableRef"
         row-key="notifyId"
-        state-key="mch_notify_table_columns"
+        state-key="mch_notify"
         :columns="tableColumns"
         :show-auto-refresh="true"
         :on-load="reqTableDataFunc"
@@ -133,11 +133,11 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
-import { AgSearch, AgTable, AgTableActions, AgDateRangePicker, AgInput, AgSelect } from '@/components'
 import { orderApi } from '@/api/business/order/order-api'
-import { useModal, usePermission } from '@/composables/useCommon'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
 import { message } from 'ant-design-vue'
+import { reactive, ref } from 'vue'
 import DetailDrawer from './detail-drawer.vue'
 
 /**

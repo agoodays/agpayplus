@@ -116,6 +116,10 @@ export default {
     loadDataFailed: 'Failed to load data',    
     yes: "Yes",
     no: "No",
+    open: "Open",
+    closed: "Closed",
+    support: "Support",
+    notSupport: "Not Support",
     state: {
       disabled: "Disabled",
       enabled: "Enabled"

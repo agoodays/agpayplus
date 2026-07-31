@@ -501,7 +501,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_C_MAIN', '主页', 'home', '/main', 'M
 
 -- 商户管理
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH', '商户管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT', '30', 'MGR', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchListPage', 'ML', 0, 1,  'ENT_MCH', '10', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_INFO', '商户列表', 'profile', '/mch', 'MchPage', 'ML', 0, 1,  'ENT_MCH', '10', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_MCH_LIST', '页面：商户列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_MCH_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_MCH_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_INFO', '0', 'MGR', NOW(), NOW());
@@ -525,7 +525,7 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH', '商户管理', 'shop', '', 'Rou
 
 -- 服务商管理
 INSERT INTO t_sys_entitlement VALUES('ENT_ISV', '服务商管理', 'block', '', 'RouteView', 'ML', 0, 1,  'ROOT', '40', 'MGR', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_ISV_INFO', '服务商列表', 'profile', '/isv', 'IsvListPage', 'ML', 0, 1,  'ENT_ISV', '10', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_ISV_INFO', '服务商列表', 'profile', '/isv', 'IsvPage', 'ML', 0, 1,  'ENT_ISV', '10', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_ISV_LIST', '页面：服务商列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ISV_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_ISV_INFO_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ISV_INFO', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_ISV_INFO_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_ISV_INFO', '0', 'MGR', NOW(), NOW());
@@ -537,18 +537,18 @@ INSERT INTO t_sys_entitlement VALUES('ENT_ISV', '服务商管理', 'block', '', 
 
 -- 订单管理
 INSERT INTO t_sys_entitlement VALUES('ENT_ORDER', '订单管理', 'transaction', '', 'RouteView', 'ML', 0, 1,  'ROOT', '50', 'MGR', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER', '支付订单', 'account-book', '/pay', 'PayOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '10', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER', '支付订单', 'account-book', '/pay', 'PayOrderPage', 'ML', 0, 1,  'ENT_ORDER', '10', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_ORDER_LIST', '页面：订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER_REFUND', '按钮：订单退款', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER_SEARCH_PAY_WAY', '筛选项：支付方式', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MGR', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '20', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_REFUND_ORDER', '退款订单', 'exception', '/refund', 'RefundOrderPage', 'ML', 0, 1,  'ENT_ORDER', '20', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_REFUND_LIST', '页面：退款订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_REFUND_ORDER', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_REFUND_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_REFUND_ORDER', '0', 'MGR', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '25', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderPage', 'ML', 0, 1,  'ENT_ORDER', '25', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MGR', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_NOTIFY', '商户通知', 'notification', '/notify', 'MchNotifyListPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MGR', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_MCH_NOTIFY', '商户通知', 'notification', '/notify', 'MchNotifyPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_NOTIFY_LIST', '页面：商户通知列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_NOTIFY', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_MCH_NOTIFY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_NOTIFY', '0', 'MGR', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_MCH_NOTIFY_RESEND', '按钮：重发通知', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_NOTIFY', '0', 'MGR', NOW(), NOW());
@@ -658,15 +658,15 @@ INSERT INTO t_sys_entitlement VALUES('ENT_MCH_CENTER', '商户中心', 'team', '
 
 -- 【商户系统】 订单管理
 INSERT INTO t_sys_entitlement VALUES('ENT_ORDER', '订单中心', 'transaction', '', 'RouteView', 'ML', 0, 1,  'ROOT', '20', 'MCH', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER', '订单管理', 'account-book', '/pay', 'PayOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '10', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER', '订单管理', 'account-book', '/pay', 'PayOrderPage', 'ML', 0, 1,  'ENT_ORDER', '10', 'MCH', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_ORDER_LIST', '页面：订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MCH', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MCH', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER_SEARCH_PAY_WAY', '筛选项：支付方式', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MCH', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_PAY_ORDER_REFUND', '按钮：订单退款', 'no-icon', '', '', 'PB', 0, 1,  'ENT_PAY_ORDER', '0', 'MCH', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_REFUND_ORDER', '退款记录', 'exception', '/refund', 'RefundOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '20', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_REFUND_ORDER', '退款记录', 'exception', '/refund', 'RefundOrderPage', 'ML', 0, 1,  'ENT_ORDER', '20', 'MCH', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_REFUND_LIST', '页面：退款订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_REFUND_ORDER', '0', 'MCH', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_REFUND_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_REFUND_ORDER', '0', 'MCH', NOW(), NOW());
-    INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MCH', NOW(), NOW());
+    INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MCH', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MCH', NOW(), NOW());
         INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MCH', NOW(), NOW());
 

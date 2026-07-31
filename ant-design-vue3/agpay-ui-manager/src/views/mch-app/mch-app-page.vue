@@ -61,7 +61,8 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
-        state-key="mch_app_table_columns"
+        row-key="appId"
+        state-key="mch_app"
         :columns="tableColumns"
         :on-load="reqTableDataFunc"
         :search-data="searchData"

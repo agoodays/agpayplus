@@ -1,5 +1,5 @@
 <template>
-  <a-form ref="infoForm" :model="ifParams" layout="vertical" :rules="rules">
+  <a-form ref="infoForm" layout="vertical" :model="ifParams" :rules="rules">
     <a-row :gutter="24">
       <a-col span="24">
         <a-form-item label="特约商户小程序支付跳转的选择" name="isUseSubmchAccount">
@@ -148,11 +148,11 @@
 </template>
 
 <script setup>
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-const icons = { LoadingOutlined, UploadOutlined }
-import { reactive, ref } from 'vue'
 import AgUpload from '@/components/ag-upload'
 import { upload } from '@/lib/ag-axios'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { reactive, ref } from 'vue'
+const icons = { LoadingOutlined, UploadOutlined }
 
 const props = defineProps({
   configMode: { type: String, default: null },

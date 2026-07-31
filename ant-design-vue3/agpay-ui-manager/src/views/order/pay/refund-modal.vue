@@ -33,7 +33,7 @@
 
       <a-form-item :label="t('refund.refundAmount')" name="refundAmount">
         <a-input-number
-          v-model:value="saveObject.refundAmount"
+          v-model="saveObject.refundAmount"
           :min="0.01"
           :max="payOrder?.amount / 100"
           :precision="2"

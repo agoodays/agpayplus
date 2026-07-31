@@ -1,5 +1,5 @@
 <template>
-  <a-form ref="infoForm" :model="formData" layout="vertical">
+  <a-form ref="infoForm" layout="vertical" :model="formData">
     <a-row justify="space-between" type="flex">
       <a-col :span="24">
         <a-divider orientation="left">

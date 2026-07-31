@@ -561,14 +561,14 @@
   </div>
 </template>
 <script>
-import RefundModal from './RefundModal' // 退款弹出框
+import { API_URL_PAY_ORDER_LIST, API_URL_PAYWAYS_LIST, req } from '@/api/manage'
 import AgDateRangePicker from '@/components/AgDateRangePicker/AgDateRangePicker'
-import AgTextUp from '@/components/AgTextUp/AgTextUp' // 文字上移组件
 import AgSearchForm from '@/components/AgSearch/AgSearchForm'
 import AgTable from '@/components/AgTable/AgTable'
 import AgTableColumns from '@/components/AgTable/AgTableColumns'
-import { API_URL_PAY_ORDER_LIST, API_URL_PAYWAYS_LIST, req } from '@/api/manage'
+import AgTextUp from '@/components/AgTextUp/AgTextUp'; // 文字上移组件
 import moment from 'moment'
+import RefundModal from './RefundModal'; // 退款弹出框
 
 // eslint-disable-next-line no-unused-vars
 const tableColumns = [

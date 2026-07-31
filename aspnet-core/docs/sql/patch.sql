@@ -82,10 +82,10 @@ CREATE TABLE `t_transfer_order` (
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='转账订单表';
 
 -- 菜单项
-INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '25', 'MGR', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderPage', 'ML', 0, 1,  'ENT_ORDER', '25', 'MGR', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MGR', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MGR', NOW(), NOW());
-INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderListPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MCH', NOW(), NOW());
+INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER', '转账订单', 'property-safety', '/transfer', 'TransferOrderPage', 'ML', 0, 1,  'ENT_ORDER', '30', 'MCH', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER_LIST', '页面：转账订单列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MCH', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_TRANSFER_ORDER_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_TRANSFER_ORDER', '0', 'MCH', NOW(), NOW());
 INSERT INTO t_sys_entitlement VALUES('ENT_MCH_TRANSFER', '转账', 'property-safety', '/doTransfer', 'MchTransferPage', 'ML', 0, 1,  'ENT_MCH_CENTER', '30', 'MCH', NOW(), NOW());

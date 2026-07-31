@@ -7,7 +7,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-select
-                v-model:value="searchData.queryDateType"
+                v-model="searchData.queryDateType"
                 label="查询类型"
                 placeholder="请选择查询类型"
                 allow-clear
@@ -71,7 +71,7 @@
       <ag-table
         ref="tableRef"
         row-key="groupDate"
-        state-key="transaction_count_table_columns"
+        state-key="transaction_count"
         :columns="tableColumns"
         :loading="loading"
         :on-load="reqTableDataFunc"
@@ -256,6 +256,10 @@
  * 交易统计页面组件
  * 功能：展示交易统计数据，支持日报/月报/年报查询，支持导出和查看详情
  */
+import { statisticApi } from '@/api/business/statistic/statistic-api'
+import { AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
+import { downloadFile } from '@/lib/ag-axios'
 import {
   DollarOutlined,
   InfoCircleOutlined,
@@ -265,15 +269,11 @@ import {
   UndoOutlined,
   WalletOutlined
 } from '@ant-design/icons-vue'
-import { statisticApi } from '@/api/business/statistic/statistic-api'
-import { AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
-import { usePermission } from '@/composables/useCommon'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
+import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import quarterOfYear from 'dayjs/plugin/quarterOfYear'
-import { downloadFile } from '@/lib/ag-axios'
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 

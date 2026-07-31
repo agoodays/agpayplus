@@ -2,6 +2,7 @@
   <div class="ag-float-container" :class="{ 'is-focused': isFocused }">
     <a-input-number
       ref="inputRef"
+      style="width: 100%"
       :value="inputValue"
       :placeholder="floatPlaceholder"
       :disabled="disabled"
@@ -11,7 +12,6 @@
       :precision="precision"
       :controls="controls"
       :size="size"
-      style="width: 100%"
       @focus="handleFocus"
       @blur="handleBlur"
       @change="handleInputChange"
@@ -26,8 +26,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import { useFloatLabel } from '@/composables/useFloatLabel'
+import { ref } from 'vue'
 
 /**
  * AgFloatInputNumber - 浮动标签数字输入框

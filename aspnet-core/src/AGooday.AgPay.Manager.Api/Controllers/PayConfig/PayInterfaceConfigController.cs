@@ -69,7 +69,8 @@ namespace AGooday.AgPay.Manager.Api.Controllers.PayConfig
         /// <summary>
         /// 获取商户参数配置
         /// </summary>
-        /// <param name="isvNo"></param>
+        /// <param name="configMode"></param>
+        /// <param name="infoId"></param>
         /// <param name="ifCode"></param>
         /// <returns></returns>
         [HttpGet, Route("interfaceSavedConfigs"), NoLog]

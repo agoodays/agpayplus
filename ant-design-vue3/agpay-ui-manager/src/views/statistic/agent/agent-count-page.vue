@@ -7,7 +7,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model:value="searchData.queryDateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间" />
             </a-form-item>
@@ -34,7 +34,7 @@
       <ag-table
         ref="tableRef"
         row-key="agentNo"
-        state-key="agent_count_table_columns"
+        state-key="agent_count"
         :on-load="reqTableDataFunc"
         :on-download="reqDownloadDataFunc"
         :columns="tableColumns"
@@ -218,6 +218,10 @@
  * 代理商交易统计页面组件
  * 功能：展示代理商交易统计数据，支持搜索、导出和查看商户统计详情
  */
+import { statisticApi } from '@/api/business/statistic/statistic-api'
+import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { usePermission } from '@/composables/useCommon'
+import { downloadFile } from '@/lib/ag-axios'
 import {
   DollarOutlined,
   InfoCircleOutlined,
@@ -226,12 +230,8 @@ import {
   UndoOutlined,
   WalletOutlined
 } from '@ant-design/icons-vue'
-import { statisticApi } from '@/api/business/statistic/statistic-api'
-import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
-import { usePermission } from '@/composables/useCommon'
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { downloadFile } from '@/lib/ag-axios'
 
 const icons = { InfoCircleOutlined }
 

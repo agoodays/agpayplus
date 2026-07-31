@@ -249,10 +249,7 @@
                       </a-col>
                       <a-col :span="10" :offset="1">
                         <a-form-item label="使用状态">
-                          <a-radio-group v-model:value="ocrConfig.ocrState">
-                            <a-radio :value="1">开启</a-radio>
-                            <a-radio :value="0">关闭</a-radio>
-                          </a-radio-group>
+                          <a-radio-group v-model:value="ocrConfig.ocrState" :options="openStatusOptions" />
                         </a-form-item>
                       </a-col>
                     </a-row>
@@ -446,8 +443,7 @@
                             v-model:value="item.configVal"
                             :type="item.type === 'text' ? 'text' : 'textarea'"
                             :placeholder="item.configValDesen ? item.configValDesen : '请填写'"
-                            autocomplete="off"
-                          />
+                            autocomplete="off" />
                         </a-form-item>
                       </a-col>
                     </a-row>
@@ -507,12 +503,18 @@
  * 系统配置管理页面组件
  * 功能：管理系统的各种配置项，包括域名管理、文章管理、高级配置（短信/OCR/存储/地图）、安全配置等
  */
-import { CheckCircleOutlined, FireOutlined } from '@ant-design/icons-vue'
 import { sysConfigApi } from '@/api/business/sys/sys-config-api'
 import { AgEditor } from '@/components'
-import { message } from 'ant-design-vue'
-import { onMounted, reactive, ref } from 'vue'
+import { getOpenStatusOptions } from '@/constants/common-const'
 import { infoBox } from '@/utils/info-box'
+import { CheckCircleOutlined, FireOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+
+const openStatusOptions = computed(() => getOpenStatusOptions(t))
 
 const icons = { CheckCircleOutlined, FireOutlined }
 
