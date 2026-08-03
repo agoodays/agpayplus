@@ -111,10 +111,19 @@ export function useTableData({ props, state, emit, t }) {
     }
 
     const pagination = paginationConfig.value
+    const sortParams = state.sorter?.field
+      ? {
+          sortField: state.sorter.field,
+          sortOrder: state.sorter.order,
+        }
+      : {}
+
     const params = {
       pageNumber: goToFirst ? 1 : pagination?.current || 1,
       pageSize: pagination?.pageSize || 10,
       ...props.searchData,
+      ...sortParams,
+      filters: state.filters || {},
     }
 
     const requestId = latestLoadRequestId.value + 1
@@ -316,16 +325,12 @@ export function useTableData({ props, state, emit, t }) {
       ...props.searchData,
     }
 
-    const promise = props.onDownload(params)
-
-    if (promise && typeof promise.then === 'function') {
-      try {
-        await promise
-        message.success(t('agTable.exportTriggered'))
-      } catch (err) {
-        const msg = (err && err.msg) || t('agTable.exportFailed')
-        message.error(msg)
-      }
+    try {
+      await props.onDownload(params)
+      message.success(t('agTable.exportTriggered'))
+    } catch (err) {
+      const msg = (err && err.msg) || t('agTable.exportFailed')
+      message.error(msg)
     }
   }
 
@@ -348,9 +353,50 @@ export function useTableData({ props, state, emit, t }) {
     state.pagination.pageSize = pageSize
   }
 
-  function handleTableChange(pagination, filters, sorter) {
+  function normalizeSorter(sorter) {
+    const rawSorter = Array.isArray(sorter) ? sorter[0] : sorter
+    if (!rawSorter) {
+      return {
+        field: '',
+        order: null,
+        columnKey: '',
+        raw: sorter,
+      }
+    }
+
+    return {
+      field: rawSorter.field || rawSorter.columnKey || '',
+      order: rawSorter.order || null,
+      columnKey: rawSorter.columnKey || rawSorter.field || '',
+      raw: sorter,
+    }
+  }
+
+  function handleTableChange(pagination, filters, sorter, extra) {
+    const normalizedSorter = normalizeSorter(sorter)
+
+    state.filters = filters || {}
+    state.sorter = {
+      field: normalizedSorter.field,
+      order: normalizedSorter.order,
+      columnKey: normalizedSorter.columnKey,
+    }
+
+    emit('sort-change', {
+      field: normalizedSorter.field,
+      order: normalizedSorter.order,
+      columnKey: normalizedSorter.columnKey,
+      sorter: normalizedSorter.raw,
+    })
+
     if (isPaginationControlled.value) {
-      emit('change', { pagination, filters, sorter })
+      emit('change', {
+        pagination,
+        filters,
+        sorter: normalizedSorter.raw,
+        normalizedSorter,
+        extra,
+      })
       return
     }
 

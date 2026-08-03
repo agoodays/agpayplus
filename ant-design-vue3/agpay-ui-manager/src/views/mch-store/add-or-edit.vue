@@ -7,7 +7,7 @@
     @close="handleClose"
     :show-confirm="true"
     :confirm-loading="loading"
-    @confirm="handleSubmit"
+    @confirm="handleConfirm"
   >
     <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 商户号（仅新增时显示） -->
@@ -166,15 +166,15 @@
  * 功能：门店信息的新增和编辑，包含地图选址功能
  * 使用高德地图API实现地图选址、地址搜索、地理编码等功能
  */
-import { AgDrawer, AgUpload, AgSelect, AgSelectInfinite } from '@/components'
 import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
 import { basicApi } from '@/api/system/basic-api'
-import { LoadingOutlined, UploadOutlined, PlusOutlined } from '@ant-design/icons-vue'
-import { message } from 'ant-design-vue'
-import { nextTick, onUnmounted, reactive, ref, watch, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import AMapLoader from '@amap/amap-jsapi-loader'
+import { AgDrawer, AgSelectInfinite, AgUpload } from '@/components'
 import { upload } from '@/lib/ag-axios'
+import AMapLoader from '@amap/amap-jsapi-loader'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { computed, nextTick, onUnmounted, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 /** 图标集合 */
 const icons = { LoadingOutlined, UploadOutlined }
 
@@ -480,7 +480,7 @@ const handleCancelPreview = () => {
 /**
  * 提交表单
  */
-const handleSubmit = async () => {
+const handleConfirm = async () => {
   try {
 
     await infoForm.value.validate()

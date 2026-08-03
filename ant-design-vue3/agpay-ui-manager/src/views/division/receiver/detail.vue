@@ -5,8 +5,6 @@
     :closable="true"
     v-model:open="localOpen"
     title="详情"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     @close="handleClose"
   >
     <a-spin :spinning="loading">

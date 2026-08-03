@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -28,15 +28,16 @@
       ref="tableRef"
       row-key="storeId"
       state-key="store_count"
-      :columns="tableColumns"
+      v-model:columns="tableColumns"
       :on-load="reqTableDataFunc"
       :on-download="reqDownloadDataFunc"
       :search-data="searchData"
       :initial-statistics="countInitData"
       :show-download="true"
       :enable-statistics="true"
+      @sort-change="handleSortChange"
     >
-      <template #dataStatisticsSlot="{ countData: statistics }">
+      <template #statistics="{ data: statistics }">
         <div class="data-statistics">
           <div class="statistics-list">
             <div class="item item-primary">
@@ -115,87 +116,80 @@
         </div>
       </template>
 
-      <template #payAmountTitle="{ record }">
+      <template #payAmountTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="支付成功的交易总金额，包含退款金额和未退款金额">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #amountTitle="{ record }">
+      <template #amountTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="扣除手续费后实际到账金额">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #feeTitle="{ record }">
+      <template #feeTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="交易手续费，平台实际收取">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #refundFeeTitle="{ record }">
+      <template #refundFeeTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="退款手续费，平台实际收取">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #refundCountTitle="{ record }">
+      <template #refundCountTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="实际退款笔数，同一笔交易多次退款只计算一次">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #roundTitle="{ record }">
+      <template #roundTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="交易成功总笔数占总订单数的百分比">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
 
-      <template #payAmountSlot="{ record }"
-        ><b style="color: rgb(21, 184, 108)">¥{{ (record.payAmount / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义插槽 -->
-      <template #amountSlot="{ record }"
-        ><b style="color: rgb(21, 184, 108)">¥{{ ((record.payAmount - record.fee) / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义插槽 -->
-      <template #feeSlot="{ record }"
-        ><b style="color: rgb(255, 104, 72)">¥{{ (record.fee / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义插槽 -->
-      <template #refundAmountSlot="{ record }"
-        ><b style="color: rgb(255, 104, 72)">¥{{ (record.refundAmount / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义插槽 -->
-      <template #refundFeeSlot="{ record }"
-        ><b style="color: rgb(21, 184, 108)">¥{{ (record.refundFee / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义插槽 -->
-      <template #refundCountSlot="{ record }"
-        ><b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b></template
-      >
-      <!-- 自定义插槽 -->
-      <template #countSlot="{ record }"
-        ><b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b></template
-      >
-      <!-- 自定义插槽 -->
-      <template #roundSlot="{ record }"
-        ><b style="color: rgb(255, 136, 0)">{{ (record.round * 100).toFixed(2) }}%</b></template
-      >
-      <!-- 自定义插槽 -->
+      <!-- 自定义渲染 -->
+      <template #payAmountSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ (record.payAmount / 100).toFixed(2) }}</b>
+      </template>
+      <template #amountSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ ((record.payAmount - record.fee) / 100).toFixed(2) }}</b>
+      </template>
+      <template #feeSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">¥{{ (record.fee / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundAmountSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">¥{{ (record.refundAmount / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundFeeSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ (record.refundFee / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundCountSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b>
+      </template>
+      <template #countSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b>
+      </template>
+      <template #roundSlot="{ record }">
+        <b style="color: rgb(255, 136, 0)">{{ (record.round * 100).toFixed(2) }}%</b>
+      </template>
     </ag-table>
   </a-card>
 </template>
@@ -213,19 +207,20 @@ import {
 } from '@ant-design/icons-vue'
 import { reactive, ref } from 'vue'
 
-// eslint-disable-next-line no-unused-vars
-const tableColumns = [
+const icons = { InfoCircleOutlined }
+
+const tableColumns = ref([
   { key: 'storeName', dataIndex: 'storeName', title: '门店名称', width: 100, ellipsis: true },
   { key: 'storeId', dataIndex: 'storeId', title: '门店ID', width: 140 },
-  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot' },
-  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot' },
-  { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot' },
+  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot', titleSlot: 'payAmountTitle' },
+  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot', titleSlot: 'amountTitle' },
+  { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot', titleSlot: 'feeTitle' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
-  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot' },
-  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot' },
+  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot', titleSlot: 'refundFeeTitle' },
+  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot', titleSlot: 'refundCountTitle' },
   { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
-  { key: 'round', width: 110, title: '成功率', customRender: 'roundSlot' }
-]
+  { key: 'round', width: 110, title: '成功率', customRender: 'roundSlot', titleSlot: 'roundTitle' }
+])
 
 const props = defineProps({
   mchNo: { type: String, default: '' },
@@ -233,7 +228,10 @@ const props = defineProps({
 })
 
 const tableRef = ref(null)
-const loading = ref(false)
+const sortState = reactive({
+  field: '',
+  order: null
+})
 
 const defaultSearchData = {
   method: 'store',
@@ -255,14 +253,24 @@ const countInitData = {
   round: 0.0
 }
 
-const reqTableDataFunc = (params) => statisticApi.queryOrderStatistic(params)
+const reqTableDataFunc = async (params) => {
+  return await statisticApi.queryOrderStatistic({
+    ...params,
+    sortField: sortState.field || params.sortField || '',
+    sortOrder: sortState.order || params.sortOrder || null
+  })
+}
+
+const handleSortChange = ({ field, order }) => {
+  sortState.field = field || ''
+  sortState.order = order || null
+}
 
 const reqDownloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '门店交易统计.xlsx')
 }
 
 const searchFunc = () => {
-  loading.value = true
   tableRef.value?.reload()
 }
 </script>

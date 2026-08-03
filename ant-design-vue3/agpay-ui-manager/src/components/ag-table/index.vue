@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="ag-table">
     <!-- 工具栏 -->
     <ag-table-toolbar
@@ -56,6 +56,7 @@
 
     <!-- 数据表格 -->
     <a-table
+      :components="tableComponents"
       :columns="displayColumns"
       :data-source="tableData.records"
       :loading="computedLoading"
@@ -66,7 +67,7 @@
       :scroll="{ x: scrollX }"
       :virtual="{ scroll: true, itemHeight: getRowHeight() }"
       :summary="summaryFunc"
-      @change="handleTableChange"
+      @change="handleTableChangeEvent"
       @row-click="handleRowClick"
       @row-dblclick="handleRowDoubleClick"
     >
@@ -83,7 +84,7 @@
 
 <script setup>
 import { message } from 'ant-design-vue'
-import { computed, onMounted, reactive, ref, useSlots, watch } from 'vue'
+import { computed, defineComponent, h, onBeforeUnmount, onMounted, reactive, ref, useSlots, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AgTableStatisticsPanel from './table-statistics-panel.vue'
 import AgTableToolbar from './table-toolbar.vue'
@@ -91,6 +92,130 @@ import { useTableAutoRefresh } from './use-table-auto-refresh.js'
 import { useTableColumns } from './use-table-columns.js'
 import { useTableData } from './use-table-data.js'
 import { useTablePreferences } from './use-table-preferences.js'
+
+/**
+ * 统一列宽值格式，保证传给表头单元格的是浏览器可识别的宽度值。
+ * @param {number|string|undefined} width 列宽
+ * @returns {string|undefined}
+ */
+function normalizeWidth(width) {
+  if (width === undefined || width === null || width === '') {
+    return undefined
+  }
+
+  if (typeof width === 'number') {
+    return `${width}px`
+  }
+
+  return String(width);
+}
+
+/**
+ * 可伸缩表头单元组件。
+ * 通过 a-table 的 components.header.cell 注入，用于在 th 上挂载拖拽手柄。
+ */
+const ResizableHeaderCell = defineComponent({
+  name: 'AgResizableHeaderCell',
+  inheritAttrs: false,
+  props: {
+    width: {
+      type: Number,
+      default: undefined,
+    },
+    minWidth: {
+      type: Number,
+      default: 80,
+    },
+    maxWidth: {
+      type: Number,
+      default: 1400,
+    },
+    resizable: {
+      type: Boolean,
+      default: true,
+    },
+    onResizeColumn: {
+      type: Function,
+      default: null,
+    },
+  },
+  setup(props, { attrs, slots }) {
+    const resizing = ref(false)
+    const startX = ref(0)
+    const startWidth = ref(0)
+
+    function cleanupListeners() {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+      resizing.value = false
+    }
+
+    function onMouseMove(event) {
+      if (!props.resizable || !resizing.value) {
+        return
+      }
+
+      const deltaX = event.clientX - startX.value
+      const nextWidth = Math.max(props.minWidth, Math.min(props.maxWidth, startWidth.value + deltaX))
+      props.onResizeColumn?.(Math.round(nextWidth))
+    }
+
+    function onMouseUp() {
+      cleanupListeners()
+    }
+    
+    function onResizeStart(event) {
+      if (!props.resizable) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      resizing.value = true;
+      startX.value = event.clientX;
+      
+      // 安全地获取初始宽度，兼容 '200px' 这种字符串格式
+      const parsedWidth = parseFloat(props.width);
+      startWidth.value = !isNaN(parsedWidth) 
+        ? parsedWidth 
+        : (event.currentTarget?.parentElement?.offsetWidth || props.minWidth);
+
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    onBeforeUnmount(() => {
+      cleanupListeners()
+    })
+
+    return () => {
+      const widthStyle = normalizeWidth(props.width)
+      const mergedStyle = [attrs.style, widthStyle ? { width: widthStyle, minWidth: widthStyle } : null]
+      const className = [attrs.class, 'ag-resizable-th', { 'ag-resizable-th--resizing': resizing.value }]
+
+      return h(
+        'th',
+        {
+          ...attrs,
+          class: className,
+          style: mergedStyle,
+        },
+        [
+          slots.default?.(),
+          props.resizable
+            ? h('span', {
+                class: 'ag-resizable-handle',
+                onMousedown: onResizeStart,
+              })
+            : null,
+        ]
+      )
+    }
+  },
+})
 
 // ==================== Props ====================
 const props = defineProps({
@@ -103,8 +228,11 @@ const props = defineProps({
   rowSelection: { type: Object, default: null },
   rowSelectionEnabled: { type: Boolean, default: false },
   scrollX: { type: Number, default: 500 },
-  
+
   // 行点击事件
+  columnResizable: { type: Boolean, default: true },
+  columnMinWidth: { type: Number, default: 80 },
+  columnMaxWidth: { type: Number, default: 1400 },
   rowClick: { type: Function, default: null },
   rowDoubleClick: { type: Function, default: null },
 
@@ -143,13 +271,16 @@ const props = defineProps({
 })
 
 const emit = defineEmits([
-  'load-complete', 
-  'change', 
-  'reload', 
+  'load-complete',
+  'change',
+  'reload',
   'statistics-loaded',
   'row-click',
   'row-dblclick',
-  'selection-change'
+  'selection-change',
+  'sort-change',
+  'update:columns',
+  'column-width-change',
 ])
 const { t } = useI18n()
 
@@ -165,7 +296,9 @@ const state = reactive({
   showStatistics: false,
   autoRefreshTimerId: null,
   selectedRowKeys: [],
-  selectedRows: []
+  selectedRows: [],
+  sorter: { field: '', order: null },
+  filters: {},
 })
 
 // 内部分页状态（由 state 管理，便于统一持久化/观察）
@@ -175,11 +308,26 @@ state.pagination = reactive({
   pageSize: 10,
   showSizeChanger: true,
   showQuickJumper: true,
-  showTotal: (total) => t('agTable.totalItems', { total })
+  showTotal: (total) => t('agTable.totalItems', { total }),
 })
 
 const columnSettingsOpen = ref(false)
 const dragKey = ref(null)
+const slots = useSlots()
+const hasStatisticsSlot = !!slots.statistics
+
+// 仅在启用列宽拖拽时注入自定义表头单元，避免影响普通表格渲染链路。
+const tableComponents = computed(() => {
+  if (!props.columnResizable) {
+    return undefined
+  }
+
+  return {
+    header: {
+      cell: ResizableHeaderCell,
+    },
+  }
+})
 
 const {
   computedLoading,
@@ -197,89 +345,9 @@ const {
   t,
 })
 
-const slots = useSlots()
-const hasStatisticsSlot = !!slots.statistics
-
 const { loadDensitySetting, handleDensityChange } = useTablePreferences({
   props,
   state,
-})
-
-// 显示的列（使用缓存优化）
-const displayColumns = computed(() => {
-  if (!state.allColumns.length) return []
-
-  return state.allColumns
-    .filter((col) => state.visibleColumns.includes(col.key))
-    .map((col) => {
-      const c = {
-        ...col,
-        width: state.columnWidths[col.key] || col.width,
-        fixed: state.columnFixed[col.key] || col.fixed
-      }
-
-      // 处理自定义渲染
-      if (c.customRender) {
-        if (typeof c.customRender === 'string') {
-          const slotName = c.customRender
-          if (!c._customRenderCache) {
-            c._customRenderCache = ({ text, record, index }) => {
-              const slot = slots[slotName]
-              return slot ? slot({ text, record, index }) : text
-            }
-          }
-          c.customRender = c._customRenderCache
-        } else if (typeof c.customRender === 'function') {
-          if (!c._customRenderCache) {
-            c._customRenderCache = c.customRender
-          }
-          c.customRender = c._customRenderCache
-        }
-      }
-
-      return c
-    })
-})
-
-// 行选择配置
-const computedRowSelection = computed(() => {
-  if (!props.rowSelection) return null
-  return {
-    ...props.rowSelection,
-    selectedRowKeys: state.selectedRowKeys,
-    onChange: handleSelectionChange,
-    onSelect: handleSelect,
-    onSelectAll: handleSelectAll
-  }
-})
-
-// 根据密度计算行高
-function getRowHeight() {
-  const heightMap = {
-    small: 40,
-    middle: 54,
-    large: 68
-  }
-  return heightMap[state.density] || 54
-}
-
-// 汇总函数
-function summaryFunc({ columns, data }) {
-  if (!props.summary) return null
-  return props.summary({ columns, data })
-}
-
-// 列相关状态与行为
-const {
-  autoRefreshEnabled,
-  startAutoRefresh,
-  stopAutoRefresh,
-  handleAutoRefreshEnabledChange,
-  initAutoRefresh,
-} = useTableAutoRefresh({
-  props,
-  state,
-  reload,
 })
 
 const {
@@ -301,11 +369,188 @@ const {
   state,
   dragKey,
   loadDensitySetting,
+  emit,
   onResetSuccess: () => message.success(t('agTable.resetToDefaultSuccess')),
 })
 
-// ==================== 表格事件 ====================
+// 在最终渲染前统一组装列配置：列显隐、持久化宽度、表头插槽、单元格插槽、拖拽能力。
+const displayColumns = computed(() => {
+  if (!state.allColumns.length) {
+    return []
+  }
 
+  return state.allColumns
+    .filter((column) => state.visibleColumns.includes(column.key))
+    .map((column) => {
+      const currentColumn = {
+        ...column,
+        width: state.columnWidths[column.key] ?? column.width,
+        fixed: state.columnFixed[column.key] ?? column.fixed,
+      }
+
+      const titleSlotName = resolveColumnTitleSlotName(currentColumn)
+      if (titleSlotName && slots[titleSlotName]) {
+        const sourceTitle = currentColumn.title
+        // 将 titleSlot / slots.title 映射为 Ant Table 可执行的 title render 函数。
+        currentColumn.title = () => slots[titleSlotName]({
+          record: sourceTitle,
+          column: currentColumn,
+          title: sourceTitle,
+        })
+      }
+
+      if (typeof currentColumn.customRender === 'string') {
+        const slotName = currentColumn.customRender
+        currentColumn.customRender = ({ text, record, index }) => {
+          const slot = slots[slotName]
+          return slot ? slot({ text, record, index }) : text
+        }
+      }
+
+      if (typeof currentColumn.customRender === 'function') {
+        const renderFunc = currentColumn.customRender
+        currentColumn.customRender = (scope) => renderFunc(scope)
+      }
+
+      const resizableConfig = buildResizableHeaderCellConfig(currentColumn)
+      if (resizableConfig) {
+        const originCustomHeaderCell = currentColumn.customHeaderCell
+        const originOnHeaderCell = currentColumn.onHeaderCell
+        // Ant Design Vue 优先通过 customHeaderCell 给表头 th 透传属性，同时兼容已有 onHeaderCell 用法。
+        currentColumn.customHeaderCell = (targetColumn) => {
+          const customHeaderCellConfig =
+            typeof originCustomHeaderCell === 'function' ? originCustomHeaderCell(targetColumn) : {}
+          const onHeaderCellConfig = typeof originOnHeaderCell === 'function' ? originOnHeaderCell(targetColumn) : {}
+
+          return {
+            ...onHeaderCellConfig,
+            ...customHeaderCellConfig,
+            ...resizableConfig,
+          }
+        }
+      }
+
+      return currentColumn
+    })
+})
+
+const computedRowSelection = computed(() => {
+  if (!props.rowSelection) return null
+  return {
+    ...props.rowSelection,
+    selectedRowKeys: state.selectedRowKeys,
+    onChange: handleSelectionChange,
+    onSelect: handleSelect,
+    onSelectAll: handleSelectAll,
+  }
+})
+
+/**
+ * 从列配置中解析表头插槽名称。
+ * @param {Record<string, any>} column 列配置
+ * @returns {string|undefined}
+ */
+function resolveColumnTitleSlotName(column) {
+  if (typeof column.titleSlot === 'string' && column.titleSlot.length > 0) {
+    return column.titleSlot
+  }
+
+  if (typeof column?.slots?.title === 'string' && column.slots.title.length > 0) {
+    return column.slots.title
+  }
+
+  return undefined
+}
+
+/**
+ * 构建可伸缩表头单元格参数。
+ * @param {Record<string, any>} column 列配置
+ * @returns {Record<string, any>|null}
+ */
+function buildResizableHeaderCellConfig(column) {
+  if (!props.columnResizable || column.resizable === false || !column.key) {
+    return null
+  }
+
+  return {
+    width: column.width,
+    minWidth: Number(column.minWidth || props.columnMinWidth),
+    maxWidth: Number(column.maxWidth || props.columnMaxWidth),
+    resizable: true,
+    onResizeColumn: (nextWidth) => handleColumnResize(column.key, nextWidth),
+  }
+}
+
+/**
+ * 处理列宽变化，并将最新列配置同步给父组件。
+ * @param {string} columnKey 列 key
+ * @param {number} width 最新宽度
+ */
+function handleColumnResize(columnKey, width) {
+  const safeWidth = Math.max(props.columnMinWidth, Math.round(Number(width) || props.columnMinWidth))
+  setColumnWidth(columnKey, safeWidth)
+
+  // 同步内部列状态，确保列设置面板、表格渲染和持久化使用同一份宽度数据。
+  const nextColumns = state.allColumns.map((column) => {
+    if (column.key !== columnKey) {
+      return column
+    }
+
+    return {
+      ...column,
+      width: safeWidth,
+    }
+  })
+
+  state.allColumns = nextColumns
+  emit('update:columns', nextColumns)
+  emit('column-width-change', {
+    key: columnKey,
+    width: safeWidth,
+    columns: nextColumns,
+  })
+}
+
+/**
+ * 根据当前密度获取表格行高。
+ * @returns {number}
+ */
+function getRowHeight() {
+  const heightMap = {
+    small: 40,
+    middle: 54,
+    large: 68,
+  }
+  return heightMap[state.density] || 54
+}
+
+/**
+ * 构建表格汇总行。
+ * @param {{columns:Array, data:Array}} payload 汇总参数
+ * @returns {any}
+ */
+function summaryFunc({ columns, data }) {
+  if (!props.summary) return null
+  return props.summary({ columns, data })
+}
+
+/**
+ * 处理表格分页、筛选和排序变化。
+ * @param {Record<string, any>} pagination 分页参数
+ * @param {Record<string, any>} filters 筛选参数
+ * @param {Record<string, any>|Array<Record<string, any>>} sorter 排序参数
+ * @param {Record<string, any>} extra Ant Table 附加参数
+ */
+function handleTableChangeEvent(pagination, filters, sorter, extra) {
+  // 排序、分页、筛选统一收敛到 useTableData，保持受控/非受控模式行为一致。
+  handleTableChange(pagination, filters, sorter, extra)
+}
+
+/**
+ * 处理行点击事件。
+ * @param {Record<string, any>} record 当前行数据
+ * @param {Event} event 原生事件
+ */
 function handleRowClick(record, event) {
   if (props.rowClick) {
     props.rowClick(record, event)
@@ -313,6 +558,11 @@ function handleRowClick(record, event) {
   emit('row-click', record, event)
 }
 
+/**
+ * 处理行双击事件。
+ * @param {Record<string, any>} record 当前行数据
+ * @param {Event} event 原生事件
+ */
 function handleRowDoubleClick(record, event) {
   if (props.rowDoubleClick) {
     props.rowDoubleClick(record, event)
@@ -320,27 +570,42 @@ function handleRowDoubleClick(record, event) {
   emit('row-dblclick', record, event)
 }
 
+/**
+ * 处理行选择状态变化。
+ * @param {Array<string|number>} selectedRowKeys 已选行 key
+ * @param {Array<Record<string, any>>} selectedRows 已选行数据
+ */
 function handleSelectionChange(selectedRowKeys, selectedRows) {
   state.selectedRowKeys = selectedRowKeys
   state.selectedRows = selectedRows
   emit('selection-change', { selectedRowKeys, selectedRows })
 }
 
+/**
+ * 透传单行选择回调。
+ */
 function handleSelect(record, selected, selectedRows) {
   if (props.rowSelection?.onSelect) {
     props.rowSelection.onSelect(record, selected, selectedRows)
   }
 }
 
+/**
+ * 透传全选回调。
+ */
 function handleSelectAll(selected, selectedRows, changeRows) {
   if (props.rowSelection?.onSelectAll) {
     props.rowSelection.onSelectAll(selected, selectedRows, changeRows)
   }
 }
 
+/**
+ * 在工具栏中执行当前页全选或清空选择。
+ * @param {boolean} checked 是否全选
+ */
 function handleSelectAllRows(checked) {
   if (checked) {
-    const keys = tableData.value.records.map(record => 
+    const keys = tableData.value.records.map((record) =>
       typeof props.rowKey === 'function' ? props.rowKey(record) : record[props.rowKey]
     )
     state.selectedRowKeys = keys
@@ -349,32 +614,44 @@ function handleSelectAllRows(checked) {
     state.selectedRowKeys = []
     state.selectedRows = []
   }
-  emit('selection-change', { 
-    selectedRowKeys: state.selectedRowKeys, 
-    selectedRows: state.selectedRows 
+
+  emit('selection-change', {
+    selectedRowKeys: state.selectedRowKeys,
+    selectedRows: state.selectedRows,
   })
 }
 
+/**
+ * 清空所有已选行。
+ */
 function handleClearSelection() {
   state.selectedRowKeys = []
   state.selectedRows = []
   emit('selection-change', { selectedRowKeys: [], selectedRows: [] })
 }
 
-function handleShowStatisticsChange(val) {
-  state.showStatistics = !!val
+/**
+ * 切换统计面板显示状态。
+ * @param {boolean} value 是否显示
+ */
+function handleShowStatisticsChange(value) {
+  state.showStatistics = !!value
 }
 
-function handleColumnSettingsOpenChange(val) {
-  columnSettingsOpen.value = !!val
+/**
+ * 切换列设置面板显示状态。
+ * @param {boolean} value 是否显示
+ */
+function handleColumnSettingsOpenChange(value) {
+  columnSettingsOpen.value = !!value
 }
 
 // ==================== 监听器 ====================
 
 watch(
   () => state.showStatistics,
-  (val) => {
-    if (val && props.enableStatistics && !hasStatisticsSlot) {
+  (value) => {
+    if (value && props.enableStatistics && !hasStatisticsSlot) {
       reloadStatistics()
     }
   },
@@ -397,7 +674,17 @@ onMounted(() => {
   initAutoRefresh()
 })
 
-// ==================== 暴露方法 ====================
+const {
+  autoRefreshEnabled,
+  startAutoRefresh,
+  stopAutoRefresh,
+  handleAutoRefreshEnabledChange,
+  initAutoRefresh,
+} = useTableAutoRefresh({
+  props,
+  state,
+  reload,
+})
 
 defineExpose({
   reload,
@@ -416,7 +703,7 @@ defineExpose({
     } else if (!selected && index > -1) {
       state.selectedRowKeys.splice(index, 1)
     }
-  }
+  },
 })
 </script>
 
@@ -442,5 +729,27 @@ defineExpose({
   font-size: 14px;
   font-weight: 500;
   color: var(--primary-color);
+}
+
+:deep(.ag-resizable-th) {
+  position: relative;
+}
+
+:deep(.ag-resizable-th .ag-resizable-handle) {
+  position: absolute;
+  top: 0;
+  right: -4px;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 2;
+}
+
+:deep(.ag-resizable-th .ag-resizable-handle:hover) {
+  background: color-mix(in srgb, var(--primary-color) 25%, transparent);
+}
+
+:deep(.ag-resizable-th--resizing .ag-resizable-handle) {
+  background: color-mix(in srgb, var(--primary-color) 35%, transparent);
 }
 </style>

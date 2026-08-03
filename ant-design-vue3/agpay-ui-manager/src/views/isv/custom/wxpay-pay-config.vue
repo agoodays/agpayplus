@@ -1,13 +1,14 @@
 <template>
   <ag-drawer
+    v-model:open="localOpen"
     title="填写参数"
     width="40%"
     :closable="true"
     :mask-closable="false"
-    v-model:open="localOpen"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
+    :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')"
+    :confirm-loading="loading"
     @close="handleClose"
+    @confirm="handleConfirm"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
@@ -126,16 +127,6 @@
         </a-col>
       </a-row>
     </a-form>
-    <div class="drawer-btn-center" v-if="hasPermission('ENT_MCH_PAY_CONFIG_ADD')">
-      <a-button :style="{ marginRight: '8px' }" @click="handleClose">
-        <template #icon><CloseOutlined /></template>
-        取消
-      </a-button>
-      <a-button type="primary" :loading="loading" @click="handleConfirm">
-        <template #icon><CheckOutlined /></template>
-        保存
-      </a-button>
-    </div>
   </ag-drawer>
 </template>
 
@@ -149,7 +140,7 @@ import { AgDrawer, AgUpload } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
-import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -4,10 +4,11 @@
     width="40%"
     :closable="true"
     v-model:open="localOpen"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     :mask-closable="false"
+    :show-confirm="true"
+    :confirm-loading="loading"
     @close="handleClose"
+    @confirm="handleConfirm"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
@@ -70,16 +71,6 @@
         </a-col>
       </a-row>
     </a-form>
-    <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" @click="handleClose">
-        <template #icon><CloseOutlined /></template>
-        取消
-      </a-button>
-      <a-button type="primary" :loading="loading" @click="onSubmit">
-        <template #icon><CheckOutlined /></template>
-        保存
-      </a-button>
-    </div>
   </ag-drawer>
 </template>
 
@@ -276,7 +267,7 @@ const { localOpen, loading, submit, uploadSuccess: handleUploadSuccess, handleCl
   shouldInit: (propsData) => Boolean(propsData.isvNo && propsData.record?.ifCode)
 })
 
-const onSubmit = submit
+const handleConfirm = submit
 const uploadSuccess = handleUploadSuccess
 const handleClose = closeDrawer
 </script>

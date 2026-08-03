@@ -2,7 +2,7 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -177,8 +177,6 @@ const bindRecordId = ref(null)
 /**
  * 加载状态
  */
-const loading = ref(false)
-
 /**
  * 搜索表单数据
  */

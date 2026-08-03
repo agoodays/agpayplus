@@ -6,8 +6,6 @@
     width="50%"
     :show-footer="false"
     @close="handleClose"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
   >
     <!-- 加载状态 -->
     <a-spin :spinning="loading">

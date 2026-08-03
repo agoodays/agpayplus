@@ -1,15 +1,13 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
+    class="drawer-width"
     :mask-closable="false"
     :title="isAdd ? '新增公告' : '修改公告'"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     :width="drawerWidth"
-    class="drawer-width"
-    @close="handleClose"
     :show-confirm="true"
     :confirm-loading="loading"
+    @close="handleClose"
     @confirm="handleConfirm"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
@@ -49,8 +47,8 @@
  * 公告新增/编辑抽屉组件
  * 功能：公告信息的新增和编辑
  */
-import { AgDrawer, AgEditor } from '@/components'
 import { noticeApi } from '@/api/business/notice/notice-api'
+import { AgDrawer, AgEditor } from '@/components'
 import { message } from 'ant-design-vue'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue'
 

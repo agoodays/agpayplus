@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
+    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -36,14 +36,14 @@
       ref="tableRef"
       row-key="wayType"
       state-key="way_type_count"
-      :columns="tableColumns"
-      :loading="loading"
+      v-model:columns="tableColumns"
       :on-load="reqTableDataFunc"
       :on-download="reqDownloadDataFunc"
       :search-data="searchData"
       :initial-statistics="countInitData"
       :show-download="true"
       :enable-statistics="true"
+      @sort-change="handleSortChange"
     >
       <template #statistics="{ data: statistics }">
         <div class="data-statistics">
@@ -124,87 +124,80 @@
         </div>
       </template>
 
-      <template #payAmountTitle="{ record }">
+      <template #payAmountTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="支付成功的交易总金额，包含退款金额和未退款金额">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #amountTitle="{ record }">
+      <template #amountTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="扣除手续费后实际到账金额">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #feeTitle="{ record }">
+      <template #feeTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="交易手续费，平台实际收取">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #refundFeeTitle="{ record }">
+      <template #refundFeeTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="退款手续费，平台实际收取">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #refundCountTitle="{ record }">
+      <template #refundCountTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="实际退款笔数，同一笔交易多次退款只计算一次">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
-      <template #roundTitle="{ record }">
+      <template #roundTitle="{ title }">
         <div style="display: flex">
-          <span>{{ record }}</span>
+          <span>{{ title }}</span>
           <a-tooltip title="交易成功总笔数占总订单数的百分比">
             <icons.InfoCircleOutlined />
           </a-tooltip>
         </div>
       </template>
 
-      <template #payAmountSlot="{ record }"
-        ><b style="color: rgb(21, 184, 108)">¥{{ (record.payAmount / 100).toFixed(2) }}</b></template
-      >
       <!-- 自定义渲染 -->
-      <template #amountSlot="{ record }"
-        ><b style="color: rgb(21, 184, 108)">¥{{ ((record.payAmount - record.fee) / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义渲染 -->
-      <template #feeSlot="{ record }"
-        ><b style="color: rgb(255, 104, 72)">¥{{ (record.fee / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义渲染 -->
-      <template #refundAmountSlot="{ record }"
-        ><b style="color: rgb(255, 104, 72)">¥{{ (record.refundAmount / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义渲染 -->
-      <template #refundFeeSlot="{ record }"
-        ><b style="color: rgb(21, 184, 108)">¥{{ (record.refundFee / 100).toFixed(2) }}</b></template
-      >
-      <!-- 自定义渲染 -->
-      <template #refundCountSlot="{ record }"
-        ><b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b></template
-      >
-      <!-- 自定义渲染 -->
-      <template #countSlot="{ record }"
-        ><b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b></template
-      >
-      <!-- 自定义渲染 -->
-      <template #roundSlot="{ record }"
-        ><b style="color: rgb(255, 136, 0)">{{ (record.round * 100).toFixed(2) }}%</b></template
-      >
-      <!-- 自定义渲染 -->
+      <template #payAmountSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ (record.payAmount / 100).toFixed(2) }}</b>
+      </template>
+      <template #amountSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ ((record.payAmount - record.fee) / 100).toFixed(2) }}</b>
+      </template>
+      <template #feeSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">¥{{ (record.fee / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundAmountSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">¥{{ (record.refundAmount / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundFeeSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ (record.refundFee / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundCountSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b>
+      </template>
+      <template #countSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b>
+      </template>
+      <template #roundSlot="{ record }">
+        <b style="color: rgb(255, 136, 0)">{{ (record.round * 100).toFixed(2) }}%</b>
+      </template>
     </ag-table>
   </a-card>
 </template>
@@ -222,6 +215,8 @@ import {
 } from '@ant-design/icons-vue'
 import { onMounted, reactive, ref } from 'vue'
 
+const icons = { InfoCircleOutlined }
+
 // 定义组件属性
 const props = defineProps({
   mchNo: { type: String, default: '' },
@@ -229,22 +224,25 @@ const props = defineProps({
 })
 
 // 表格列配置
-const tableColumns = [
+const tableColumns = ref([
   { key: 'wayTypeName', dataIndex: 'wayTypeName', title: '支付类型名称', width: 140, ellipsis: true },
   { key: 'wayType', dataIndex: 'wayType', title: '支付类型编码', width: 140 },
-  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot' },
-  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot' },
-  { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot' },
+  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot', titleSlot: 'payAmountTitle' },
+  { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot', titleSlot: 'amountTitle' },
+  { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot', titleSlot: 'feeTitle' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
-  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot' },
-  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot' },
+  { key: 'refundFee', title: '退款手续费', width: 125, customRender: 'refundFeeSlot', titleSlot: 'refundFeeTitle' },
+  { key: 'refundCount', title: '退款笔数', width: 110, customRender: 'refundCountSlot', titleSlot: 'refundCountTitle' },
   { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
-  { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot' }
-]
+  { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot', titleSlot: 'roundTitle' }
+])
 
 // 响应式数据
 const tableRef = ref(null)
-const loading = ref(false)
+const sortState = reactive({
+  field: '',
+  order: null
+})
 
 // 默认搜索数据
 const defaultSearchData = {
@@ -279,12 +277,20 @@ const handleSearchFormData = (searchDataParam) => {
 }
 
 const searchFunc = () => {
-  loading.value = true
-  tableRef.value.reload(true)
+  tableRef.value?.reload(true)
 }
 
-const reqTableDataFunc = (params) => {
-  return statisticApi.queryOrderStatistic(params)
+const reqTableDataFunc = async (params) => {
+  return await statisticApi.queryOrderStatistic({
+    ...params,
+    sortField: sortState.field || params.sortField || '',
+    sortOrder: sortState.order || params.sortOrder || null
+  })
+}
+
+const handleSortChange = ({ field, order }) => {
+  sortState.field = field || ''
+  sortState.order = order || null
 }
 
 const reqDownloadDataFunc = async (params) => {

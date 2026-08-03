@@ -1,13 +1,13 @@
 ﻿<template>
   <ag-drawer
     v-model:open="localOpen"
+    width="40%"
     :mask-closable="false"
     :title="isAdd ? '新增服务商' : '修改服务商'"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    width="40%"
+    :show-confirm="true"
+    :confirm-loading="loading"
     @close="handleClose"
-    @submit="handleSubmit"
+    @confirm="handleConfirm"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
@@ -60,9 +60,9 @@
 <script setup>
 import { isvApi } from '@/api/business/isv/isv-api'
 import { AgDrawer } from '@/components'
-import { message } from 'ant-design-vue'
-import { ref, watch, computed } from 'vue'
 import { getStateOptions } from '@/constants/common-const'
+import { message } from 'ant-design-vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -119,7 +119,7 @@ async function initForm(currentRecordId) {
   }
 }
 
-async function handleSubmit() {
+async function handleConfirm() {
   if (loading.value) return
 
   try {

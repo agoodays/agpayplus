@@ -2,8 +2,6 @@
   <ag-drawer
     v-model:open="localOpen"
     title="公告详情"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
     @close="handleClose"
   >
@@ -23,8 +21,8 @@
  * 公告详情抽屉组件
  * 功能：展示公告的详细信息
  */
-import { AgDrawer } from '@/components'
 import { noticeApi } from '@/api/business/notice/notice-api'
+import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 

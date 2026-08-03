@@ -1,232 +1,223 @@
 <template>
-  <div>
-    <a-card :bordered="false">
-      <!-- 搜索表单 -->
-      <ag-search v-model="searchData" :search-loading="loading" @search="searchFunc">
-        <template #base="{ colSpan }">
-          <a-col v-bind="colSpan">
-            <a-form-item label="">
-              <ag-date-range-picker
-                v-model="searchData.queryDateRange"
-                label="创建时间"
-                placeholder="请选择创建时间" />
-            </a-form-item>
-          </a-col>
-          <a-col v-bind="colSpan">
-            <a-form-item label="">
-              <ag-select-infinite
-                v-model="searchData.mchNo"
-                label="商户号"
-                placeholder="请输入商户号"
-                search-field="mchName"
-                :fetch-data="searchMch"
-                :field-names="{ label: 'mchName', value: 'mchNo' }"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col v-bind="colSpan">
-            <a-form-item label="">
-              <ag-input v-model="searchData.mchName" label="商户名称" placeholder="请输入商户名称" />
-            </a-form-item>
-          </a-col>
-          <a-col v-bind="colSpan">
-            <a-form-item label="">
-              <ag-input v-model="searchData.agentNo" label="代理商编号" placeholder="请输入代理商编号" />
-            </a-form-item>
-          </a-col>
-          <a-col v-bind="colSpan">
-            <a-form-item label="">
-              <ag-input v-model="searchData.isvNo" label="服务商编号" placeholder="请输入服务商编号" />
-            </a-form-item>
-          </a-col>
-        </template>
-      </ag-search>
-      
-      <!-- 列表渲染 -->
-      <ag-table
-        ref="tableRef"
-        row-key="mchNo"
-        state-key="mch_count"
-        :columns="tableColumns"
-        :on-load="reqTableDataFunc"
-        :on-download="reqDownloadDataFunc"
-        :search-data="searchData"
-        :initial-statistics="countInitData"
-        :show-download="true"
-        :enable-statistics="true"
-      >
-        <template #dataStatisticsSlot="{ countData: statistics }">
-          <div class="data-statistics">
-            <div class="statistics-list">
-              <div class="item item-primary">
-                <div class="icon-wrapper">
-                  <WalletOutlined />
+  <a-card :bordered="false">
+    <!-- 搜索表单 -->
+    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+      <template #base="{ colSpan }">
+        <a-col v-bind="colSpan">
+          <a-form-item label="">
+            <ag-date-range-picker
+              v-model="searchData.queryDateRange"
+              label="创建时间"
+              placeholder="请选择创建时间" />
+          </a-form-item>
+        </a-col>
+        <a-col v-bind="colSpan">
+          <a-form-item label="">
+            <ag-select-infinite
+              v-model="searchData.mchNo"
+              label="商户号"
+              placeholder="请输入商户号"
+              search-field="mchName"
+              :fetch-data="searchMch"
+              :field-names="{ label: 'mchName', value: 'mchNo' }"
+            />
+          </a-form-item>
+        </a-col>
+        <a-col v-bind="colSpan">
+          <a-form-item label="">
+            <ag-input v-model="searchData.mchName" label="商户名称" placeholder="请输入商户名称" />
+          </a-form-item>
+        </a-col>
+        <a-col v-bind="colSpan">
+          <a-form-item label="">
+            <ag-input v-model="searchData.agentNo" label="代理商编号" placeholder="请输入代理商编号" />
+          </a-form-item>
+        </a-col>
+        <a-col v-bind="colSpan">
+          <a-form-item label="">
+            <ag-input v-model="searchData.isvNo" label="服务商编号" placeholder="请输入服务商编号" />
+          </a-form-item>
+        </a-col>
+      </template>
+    </ag-search>
+    
+    <!-- 列表渲染 -->
+    <ag-table
+      ref="tableRef"
+      row-key="mchNo"
+      state-key="mch_count"
+      :columns="tableColumns"
+      :on-load="reqTableDataFunc"
+      :on-download="reqDownloadDataFunc"
+      :search-data="searchData"
+      :initial-statistics="countInitData"
+      :show-download="true"
+      :enable-statistics="true"
+    >
+      <template #statistics="{ data: statistics }">
+        <div class="data-statistics">
+          <div class="statistics-list">
+            <div class="item item-primary">
+              <div class="icon-wrapper">
+                <WalletOutlined />
+              </div>
+              <div class="content">
+                <div class="title">
+                  总交易金额
+                  <a-tooltip title="支付成功的交易总金额，包含已退款和未退款的交易">
+                    <InfoCircleOutlined class="info-icon" />
+                  </a-tooltip>
                 </div>
-                <div class="content">
-                  <div class="title">
-                    总交易金额
-                    <a-tooltip title="支付成功的交易总金额，包含已退款和未退款的交易">
-                      <InfoCircleOutlined class="info-icon" />
-                    </a-tooltip>
-                  </div>
-                  <div class="amount">
-                    <span class="amount-num">{{ ((statistics?.payAmount || 0) / 100).toFixed(2) }}</span>
-                    <span class="amount-unit">元</span>
-                  </div>
+                <div class="amount">
+                  <span class="amount-num">{{ ((statistics?.payAmount || 0) / 100).toFixed(2) }}</span>
+                  <span class="amount-unit">元</span>
                 </div>
               </div>
-              <div class="item item-transaction">
-                <div class="icon-wrapper">
-                  <TransactionOutlined />
-                </div>
-                <div class="content">
-                  <div class="title">交易笔数</div>
-                  <div class="amount">
-                    <span class="amount-num">{{ (statistics?.payCount || 0) }}</span>
-                    <span class="amount-unit">笔</span>
-                  </div>
+            </div>
+            <div class="item item-transaction">
+              <div class="icon-wrapper">
+                <TransactionOutlined />
+              </div>
+              <div class="content">
+                <div class="title">交易笔数</div>
+                <div class="amount">
+                  <span class="amount-num">{{ (statistics?.payCount || 0) }}</span>
+                  <span class="amount-unit">笔</span>
                 </div>
               </div>
-              <div class="item item-warning">
-                <div class="icon-wrapper">
-                  <DollarOutlined />
-                </div>
-                <div class="content">
-                  <div class="title">手续费金额</div>
-                  <div class="amount">
-                    <span class="amount-num">{{ ((statistics?.fee || 0) / 100).toFixed(2) }}</span>
-                    <span class="amount-unit">元</span>
-                  </div>
+            </div>
+            <div class="item item-warning">
+              <div class="icon-wrapper">
+                <DollarOutlined />
+              </div>
+              <div class="content">
+                <div class="title">手续费金额</div>
+                <div class="amount">
+                  <span class="amount-num">{{ ((statistics?.fee || 0) / 100).toFixed(2) }}</span>
+                  <span class="amount-unit">元</span>
                 </div>
               </div>
-              <div class="item item-error">
-                <div class="icon-wrapper">
-                  <UndoOutlined />
+            </div>
+            <div class="item item-error">
+              <div class="icon-wrapper">
+                <UndoOutlined />
+              </div>
+              <div class="content">
+                <div class="title">退款订单</div>
+                <div class="amount">
+                  <span class="amount-num">{{ ((statistics?.refundAmount || 0) / 100).toFixed(2) }}</span>
+                  <span class="amount-unit">元</span>
                 </div>
-                <div class="content">
-                  <div class="title">退款订单</div>
-                  <div class="amount">
-                    <span class="amount-num">{{ ((statistics?.refundAmount || 0) / 100).toFixed(2) }}</span>
-                    <span class="amount-unit">元</span>
-                  </div>
-                  <div class="detail">
-                    <span>{{ (statistics?.refundCount || 0) }}笔</span>
-                  </div>
+                <div class="detail">
+                  <span>{{ (statistics?.refundCount || 0) }}笔</span>
                 </div>
               </div>
-              <div class="item item-success-rate">
-                <div class="icon-wrapper">
-                  <TrophyOutlined />
+            </div>
+            <div class="item item-success-rate">
+              <div class="icon-wrapper">
+                <TrophyOutlined />
+              </div>
+              <div class="content">
+                <div class="title">
+                  支付成功率
+                  <a-tooltip title="交易成功总笔数占总订单数的百分比">
+                    <InfoCircleOutlined class="info-icon" />
+                  </a-tooltip>
                 </div>
-                <div class="content">
-                  <div class="title">
-                    支付成功率
-                    <a-tooltip title="交易成功总笔数占总订单数的百分比">
-                      <InfoCircleOutlined class="info-icon" />
-                    </a-tooltip>
-                  </div>
-                  <div class="amount">
-                    <span class="amount-num">{{ ((statistics?.round || 0) * 100).toFixed(2) }}%</span>
-                  </div>
+                <div class="amount">
+                  <span class="amount-num">{{ ((statistics?.round || 0) * 100).toFixed(2) }}%</span>
                 </div>
               </div>
             </div>
           </div>
-        </template>
+        </div>
+      </template>
 
-        <template #payAmountTitle="{ record }">
-          <div style="display: flex">
-            <span>{{ record }}</span>
-            <a-tooltip title="支付成功的交易总金额，包含退款金额和未退款金额">
-              <icons.InfoCircleOutlined />
-            </a-tooltip>
-          </div>
-        </template>
-        <template #amountTitle="{ record }">
-          <div style="display: flex">
-            <span>{{ record }}</span>
-            <a-tooltip title="扣除手续费后实际到账金额">
-              <icons.InfoCircleOutlined />
-            </a-tooltip>
-          </div>
-        </template>
-        <template #feeTitle="{ record }">
-          <div style="display: flex">
-            <span>{{ record }}</span>
-            <a-tooltip title="交易手续费，平台实际收取">
-              <icons.InfoCircleOutlined />
-            </a-tooltip>
-          </div>
-        </template>
-        <template #refundFeeTitle="{ record }">
-          <div style="display: flex">
-            <span>{{ record }}</span>
-            <a-tooltip title="退款手续费，平台实际收取">
-              <icons.InfoCircleOutlined />
-            </a-tooltip>
-          </div>
-        </template>
-        <template #refundCountTitle="{ record }">
-          <div style="display: flex">
-            <span>{{ record }}</span>
-            <a-tooltip title="实际退款笔数，同一笔交易多次退款只计算一次">
-              <icons.InfoCircleOutlined />
-            </a-tooltip>
-          </div>
-        </template>
-        <template #roundTitle="{ record }">
-          <div style="display: flex">
-            <span>{{ record }}</span>
-            <a-tooltip title="交易成功总笔数占总订单数的百分比">
-              <icons.InfoCircleOutlined />
-            </a-tooltip>
-          </div>
-        </template>
+      <template #payAmountTitle="{ title }">
+        <div style="display: flex">
+          <span>{{ title }}</span>
+          <a-tooltip title="支付成功的交易总金额，包含退款金额和未退款金额">
+            <icons.InfoCircleOutlined />
+          </a-tooltip>
+        </div>
+      </template>
+      <template #amountTitle="{ title }">
+        <div style="display: flex">
+          <span>{{ title }}</span>
+          <a-tooltip title="扣除手续费后实际到账金额">
+            <icons.InfoCircleOutlined />
+          </a-tooltip>
+        </div>
+      </template>
+      <template #feeTitle="{ title }">
+        <div style="display: flex">
+          <span>{{ title }}</span>
+          <a-tooltip title="交易手续费，平台实际收取">
+            <icons.InfoCircleOutlined />
+          </a-tooltip>
+        </div>
+      </template>
+      <template #refundFeeTitle="{ title }">
+        <div style="display: flex">
+          <span>{{ title }}</span>
+          <a-tooltip title="退款手续费，平台实际收取">
+            <icons.InfoCircleOutlined />
+          </a-tooltip>
+        </div>
+      </template>
+      <template #refundCountTitle="{ title }">
+        <div style="display: flex">
+          <span>{{ title }}</span>
+          <a-tooltip title="实际退款笔数，同一笔交易多次退款只计算一次">
+            <icons.InfoCircleOutlined />
+          </a-tooltip>
+        </div>
+      </template>
+      <template #roundTitle="{ title }">
+        <div style="display: flex">
+          <span>{{ title }}</span>
+          <a-tooltip title="交易成功总笔数占总订单数的百分比">
+            <icons.InfoCircleOutlined />
+          </a-tooltip>
+        </div>
+      </template>
 
-        <template #payAmountSlot="{ record }"
-          ><b style="color: rgb(21, 184, 108)">¥{{ (record.payAmount / 100).toFixed(2) }}</b></template
-        >
-        <!-- 自定义插槽 -->
-        <template #amountSlot="{ record }"
-          ><b style="color: rgb(21, 184, 108)">¥{{ ((record.payAmount - record.fee) / 100).toFixed(2) }}</b></template
-        >
-        <!-- 自定义插槽 -->
-        <template #feeSlot="{ record }"
-          ><b style="color: rgb(255, 104, 72)">¥{{ (record.fee / 100).toFixed(2) }}</b></template
-        >
-        <!-- 自定义插槽 -->
-        <template #refundAmountSlot="{ record }"
-          ><b style="color: rgb(255, 104, 72)">¥{{ (record.refundAmount / 100).toFixed(2) }}</b></template
-        >
-        <!-- 自定义插槽 -->
-        <template #refundFeeSlot="{ record }"
-          ><b style="color: rgb(21, 184, 108)">¥{{ (record.refundFee / 100).toFixed(2) }}</b></template
-        >
-        <!-- 自定义插槽 -->
-        <template #refundCountSlot="{ record }"
-          ><b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b></template
-        >
-        <!-- 自定义插槽 -->
-        <template #countSlot="{ record }"
-          ><b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b></template
-        >
-        <!-- 自定义插槽 -->
-        <template #roundSlot="{ record }"
-          ><b style="color: rgb(255, 136, 0)">{{ (record.round * 100).toFixed(2) }}%</b></template
-        >
+      <!-- 自定义渲染 -->
+      <template #payAmountSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ (record.payAmount / 100).toFixed(2) }}</b>
+      </template>
+      <template #amountSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ ((record.payAmount - record.fee) / 100).toFixed(2) }}</b>
+      </template>
+      <template #feeSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">¥{{ (record.fee / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundAmountSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">¥{{ (record.refundAmount / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundFeeSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">¥{{ (record.refundFee / 100).toFixed(2) }}</b>
+      </template>
+      <template #refundCountSlot="{ record }">
+        <b style="color: rgb(255, 104, 72)">{{ record.refundCount }}</b>
+      </template>
+      <template #countSlot="{ record }">
+        <b style="color: rgb(21, 184, 108)">{{ record.payCount }}/{{ record.allCount }}</b>
+      </template>
+      <template #roundSlot="{ record }">
+        <b style="color: rgb(255, 136, 0)">{{ (record.round * 100).toFixed(2) }}%</b>
+      </template>
 
-        <!-- 自定义插槽 -->
-        <template #opSlot="{ record }">
-          <!-- 操作按钮 -->
-          <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_STATISTIC_MCH_STORE') || hasPermission('ENT_STATISTIC_MCH_WAY_CODE') || hasPermission('ENT_STATISTIC_MCH_WAY_TYPE')" type="link" @click="detailFunc(record.mchNo)">详情</a-button>
-          </ag-table-actions>
-        </template>
-      </ag-table>
-    </a-card>
+      <template #opSlot="{ record }">
+        <!-- 操作按钮 -->
+        <ag-table-actions>
+          <a-button v-if="hasPermission('ENT_STATISTIC_MCH_STORE') || hasPermission('ENT_STATISTIC_MCH_WAY_CODE') || hasPermission('ENT_STATISTIC_MCH_WAY_TYPE')" type="link" @click="detailFunc(record.mchNo)">详情</a-button>
+        </ag-table-actions>
+      </template>
+    </ag-table>
     <!-- 详情抽屉 -->
     <detail v-model:open="detailOpen" :record-id="currentRecordId" :query-date-range="detailQueryDateRange" />
-  </div>
+  </a-card>
 </template>
 <script setup>
 /**
@@ -277,7 +268,6 @@ const tableColumns = [
 const tableRef = ref(null)
 const { open: detailOpen, showModal: showDetail } = useModal()
 const currentRecordId = ref(null)
-const loading = ref(false)
 const route = useRoute()
 
 // 初始化查询参数
@@ -346,9 +336,8 @@ const reqDownloadDataFunc = async (params) => {
 
 // 搜索函数
 const searchFunc = () => {
-  loading.value = true
   detailQueryDateRange.value = searchData.queryDateRange
-  tableRef.value.reload()
+  tableRef.value?.reload()
 }
 
 // 详情函数

@@ -2,11 +2,9 @@
   <ag-drawer
     v-model:open="localOpen"
     :title="'设置权限匹配规则'"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     width="60%"
     class="drawer-width"
-    @close="onClose"
+    @close="handleClose"
   >
     <a-row>
       <a-col span="24">
@@ -55,7 +53,7 @@
       </a-col>
     </a-row>
     <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" @click="onClose">
+      <a-button :style="{ marginRight: '8px' }" @click="handleClose">
         <template #icon><CloseOutlined /></template>
         取消
       </a-button>
@@ -76,12 +74,12 @@
  * 设置权限匹配规则组件
  * 功能：配置系统菜单的权限匹配规则
  */
-import { CheckOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons-vue'
-import { AgDrawer } from '@/components'
 import { entApi } from '@/api/business/ent/ent-api'
+import { AgDrawer } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { ref, watch } from 'vue'
+import { CheckOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { ref, watch } from 'vue'
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
@@ -168,7 +166,7 @@ watch(localOpen, (val) => {
 /**
  * 关闭弹窗
  */
-const onClose = () => {
+const handleClose = () => {
   emit('update:open', false)
 }
 

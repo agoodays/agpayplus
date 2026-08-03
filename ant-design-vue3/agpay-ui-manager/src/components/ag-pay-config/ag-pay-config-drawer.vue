@@ -2,8 +2,6 @@
   <a-drawer
     :open="open"
     title="支付配置"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ padding: '0px', overflowY: 'auto' }"
     width="80%"
     @close="handleClose"
   >
@@ -34,9 +32,9 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { message } from 'ant-design-vue'
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { ref } from 'vue'
 import AgPayConfigPanel from './ag-pay-config-panel.vue'
 
 const props = defineProps({

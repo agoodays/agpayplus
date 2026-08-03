@@ -18,6 +18,9 @@
 - **统计展示**：支持统计面板展示，可自定义统计内容
 - **导出功能**：支持导出按钮回调，自定义导出逻辑
 - **列管理**：列显示/隐藏、排序、宽度与固定列设置
+- **高级表头**：支持 `titleSlot` 与 `slots.title` 的具名表头插槽透传
+- **列宽拖拽**：支持表头拖拽调整列宽，并通过事件回传最新列配置
+- **排序联动**：支持前端排序状态展示与后端排序字段透传
 - **持久化**：列配置本地持久化（`stateKey`）
 - **批量操作**：支持行选择、全选、批量操作栏
 - **汇总行**：支持表格底部汇总行
@@ -30,7 +33,7 @@
 <template>
   <AgTable
     ref="tableRef"
-    :columns="columns"
+    v-model:columns="columns"
     :search-data="searchForm"
     :on-load="loadTable"
     :show-toolbar="true"
@@ -39,8 +42,21 @@
     :enable-statistics="true"
     :on-load-statistics="loadStatistics"
     :on-download="handleExport"
+    :column-resizable="true"
+    :column-min-width="96"
     state-key="order_table_columns"
+    @sort-change="handleSortChange"
+    @column-width-change="handleColumnWidthChange"
   >
+        <template #amountHeader="{ title }">
+          <a-space size="small">
+            <span>{{ title }}</span>
+            <a-tooltip title="支付成功金额，单位分">
+              <InfoCircleOutlined />
+            </a-tooltip>
+          </a-space>
+        </template>
+
     <template #toolbar-left>
       <a-button type="primary" @click="handleAdd">新增</a-button>
     </template>
@@ -63,25 +79,49 @@
 import { reactive, ref } from 'vue'
 import { AgTable } from '@/components'
 import { req } from '@/api/manage'
+import { InfoCircleOutlined } from '@ant-design/icons-vue'
 
 const tableRef = ref(null)
 
 const searchForm = reactive({ orderNo: '', status: '' })
 
-const columns = [
+const columns = ref([
   { title: '订单号', dataIndex: 'orderNo', key: 'orderNo', width: 180 },
-  { title: '金额', dataIndex: 'amount', key: 'amount', width: 120, align: 'right' },
+  {
+    title: '金额',
+    dataIndex: 'amount',
+    key: 'amount',
+    width: 120,
+    align: 'right',
+    sorter: true,
+    titleSlot: 'amountHeader'
+  },
   { title: '状态', dataIndex: 'status', key: 'status', width: 100, customRender: 'status' },
   { title: '创建时间', dataIndex: 'createdAt', key: 'createdAt', width: 180 },
   { title: '操作', key: 'actions', width: 150, fixed: 'right', align: 'center', customRender: 'actions' }
-]
+])
+
+const sortState = reactive({
+  sortField: '',
+  sortOrder: null
+})
 
 async function loadTable(params) {
+  // params 会自动包含 sortField / sortOrder / filters
   const res = await req.list('/order/list', params)
   return {
     total: res?.total || 0,
     records: res?.records || res?.list || []
   }
+}
+
+function handleSortChange({ field, order }) {
+  sortState.sortField = field
+  sortState.sortOrder = order
+}
+
+function handleColumnWidthChange({ columns: nextColumns }) {
+  columns.value = nextColumns
 }
 
 async function loadStatistics(params) {
@@ -119,6 +159,102 @@ function getStatusText(status) {
   return map[status] || '未知'
 }
 </script>
+```
+
+## 📦 高级特性组合示例（titleSlot + sorter + 列拖拽）
+
+```vue
+<template>
+  <AgTable
+    v-model:columns="tableColumns"
+    :search-data="searchData"
+    :on-load="loadTable"
+    :column-resizable="true"
+    @sort-change="handleSortChange"
+    @column-width-change="handleColumnWidthChange"
+  >
+    <template #amountTitle="{ title }">
+      <a-space size="small">
+        <span>{{ title }}</span>
+        <a-tag color="blue">可排序</a-tag>
+      </a-space>
+    </template>
+  </AgTable>
+</template>
+
+<script setup>
+import { reactive, ref } from 'vue'
+
+const searchData = reactive({ keyword: '' })
+
+const tableColumns = ref([
+  { title: '订单号', dataIndex: 'orderNo', key: 'orderNo', width: 180 },
+  {
+    title: '交易金额',
+    dataIndex: 'amount',
+    key: 'amount',
+    width: 140,
+    sorter: true,
+    sortDirections: ['ascend', 'descend'],
+    titleSlot: 'amountTitle'
+  }
+])
+
+async function loadTable(params) {
+  // params: { pageNumber, pageSize, sortField, sortOrder, filters, ...searchData }
+  return { total: 0, records: [] }
+}
+
+function handleSortChange({ field, order }) {
+  console.log('sort:', field, order)
+}
+
+function handleColumnWidthChange({ columns }) {
+  tableColumns.value = columns
+}
+</script>
+```
+
+## 📦 抽屉打开关闭无残留示例
+
+```vue
+<script setup>
+import { reactive, ref, watch } from 'vue'
+
+const drawerOpen = ref(false)
+const detailForm = reactive({
+  orderNo: '',
+  amount: 0,
+  status: ''
+})
+
+function resetDetailForm() {
+  detailForm.orderNo = ''
+  detailForm.amount = 0
+  detailForm.status = ''
+}
+
+function openDrawer(record) {
+  resetDetailForm()
+  Object.assign(detailForm, record)
+  drawerOpen.value = true
+}
+
+watch(
+  () => drawerOpen.value,
+  (open) => {
+    if (!open) {
+      resetDetailForm()
+    }
+  }
+)
+</script>
+
+<template>
+  <a-drawer v-model:open="drawerOpen" destroy-on-close>
+    <!-- 内容 -->
+  </a-drawer>
+</template>
 ```
 
 ## 📦 受控用法（父组件管理）
@@ -258,6 +394,9 @@ function summaryFunc({ columns, data }) {
 | rowKey | 行主键 | `String \| Function` | `'id'` |
 | rowSelection | 选择配置 | `Object` | `null` |
 | scrollX | 横向滚动宽度 | `Number` | `500` |
+| columnResizable | 是否启用列宽拖拽 | `Boolean` | `true` |
+| columnMinWidth | 列最小宽度 | `Number` | `80` |
+| columnMaxWidth | 列最大宽度 | `Number` | `1400` |
 | rowClick | 行单击事件 | `Function` | `null` |
 | rowDoubleClick | 行双击事件 | `Function` | `null` |
 | summary | 汇总行函数 | `Function` | `null` |
@@ -288,6 +427,9 @@ function summaryFunc({ columns, data }) {
 | --- | --- | --- |
 | load-complete | 数据或统计加载流程完成 | - |
 | change | 分页/排序/筛选变化 | `{ pagination, filters, sorter }` |
+| sort-change | 排序变化（标准化） | `{ field, order, columnKey, sorter }` |
+| update:columns | 列配置双向同步 | `columns` |
+| column-width-change | 列宽变化 | `{ key, width, columns }` |
 | reload | 触发重新加载并返回数据结果 | `result` |
 | statistics-loaded | 统计数据加载完成 | `result` |
 | row-click | 行单击 | `(record, event)` |
@@ -303,6 +445,8 @@ function summaryFunc({ columns, data }) {
 | statistics | 自定义统计区域 | `data` |
 | batch-actions | 批量操作区域 | `keys` |
 | `columns[].customRender` 对应同名 slot | 列级自定义渲染 | `{ text, record, index }` |
+| `columns[].titleSlot` 对应同名 slot | 表头自定义渲染 | `{ title, column, record }` |
+| `columns[].slots.title` 对应同名 slot | 表头自定义渲染（兼容写法） | `{ title, column, record }` |
 
 ## 🗂️ 暴露方法
 

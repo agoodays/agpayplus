@@ -143,10 +143,10 @@ const mchConfigRecordId = ref(null)
  */
 const tableColumns = [
   { key: 'mchName', title: '商户名称', width: 200, fixed: 'left', ellipsis: true, customRender: 'mchNameSlot' },
-  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', width: 140 },
-  { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
-  { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
-  { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
+  { key: 'mchNo', dataIndex: 'mchNo', title: '商户号', ellipsis: true, width: 140 },
+  { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', ellipsis: true, width: 140 },
+  { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', ellipsis: true, width: 140 },
+  { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', ellipsis: true, width: 140 },
   { key: 'state', title: '状态', width: 80, customRender: 'stateSlot' },
   { key: 'type', title: '商户类型', width: 100, customRender: 'typeSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },

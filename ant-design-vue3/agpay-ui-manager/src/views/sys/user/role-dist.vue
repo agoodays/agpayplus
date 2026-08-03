@@ -1,13 +1,14 @@
 ﻿<template>
   <ag-drawer
-    :open="localOpen"
     title="分配角色"
+    width="30%"
+    :open="localOpen"
     :mask-closable="true"
-    @close="handleClose"
+    :show-confirm="true"
+    :confirm-loading="loading"
     @update:open="handleUpdateOpen"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    width="30%">
+    @confirm="handleConfirm"
+    @close="handleClose">
     <div>
       <div :style="{ paddingBottom: '20px', borderBottom: '1px solid #E9E9E9' }">
         <a-checkbox
@@ -20,17 +21,6 @@
       <br />
       <a-checkbox-group v-model:value="checkedVal" :options="allRoleList"/>
     </div>
-
-    <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" @click="handleClose">
-        <template #icon><CloseOutlined /></template>
-        取消
-      </a-button>
-      <a-button type="primary" @click="handleConfirm" :loading="confirmLoading">
-        <template #icon><CheckOutlined /></template>
-        保存
-      </a-button>
-    </div>
   </ag-drawer>
 
 </template>
@@ -40,11 +30,10 @@
  * 分配角色抽屉组件
  * 功能：为用户分配角色权限，支持全选和单选
  */
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
-import { AgDrawer } from '@/components'
 import { sysUserApi } from '@/api/business/sys-user/sys-user-api'
-import { ref, watch } from 'vue'
+import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
+import { ref, watch } from 'vue'
 
 /**
  * 组件属性定义

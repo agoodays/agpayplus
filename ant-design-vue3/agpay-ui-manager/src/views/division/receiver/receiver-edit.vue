@@ -4,8 +4,6 @@
     title="修改分账用户信息"
     width="30%"
     :mask-closable="false"
-    :drawer-style="{ overflow: 'hidden' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
     @close="handleClose"
   >
     <a-form

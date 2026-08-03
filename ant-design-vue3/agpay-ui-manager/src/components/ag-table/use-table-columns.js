@@ -1,4 +1,4 @@
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const STORAGE_PREFIX = 'agpay_table_'
 const STORAGE_VERSION = 1
@@ -41,7 +41,9 @@ const storage = {
   },
 }
 
-export function useTableColumns({ props, state, dragKey, loadDensitySetting, onResetSuccess }) {
+export function useTableColumns({ props, state, dragKey, loadDensitySetting, onResetSuccess, emit }) {
+  const initialColumnsSnapshot = ref([])
+
   const isAllColumnsVisible = computed(() => {
     return state.allColumns.length > 0 && state.visibleColumns.length === state.allColumns.length
   })
@@ -53,6 +55,27 @@ export function useTableColumns({ props, state, dragKey, loadDensitySetting, onR
   function getStorageKey(suffix) {
     const base = props.stateKey || location.pathname
     return `${STORAGE_PREFIX}${base}_${suffix}`
+  }
+
+  function cloneColumns(columns) {
+    return (columns || []).map((column) => ({
+      ...column,
+      children: Array.isArray(column.children) ? cloneColumns(column.children) : column.children,
+    }))
+  }
+
+  function getColumnSchemaSignature(columns) {
+    return JSON.stringify(
+      (columns || []).map((column) => ({
+        key: column.key,
+        dataIndex: column.dataIndex,
+        children: Array.isArray(column.children) ? getColumnSchemaSignature(column.children) : null,
+      }))
+    )
+  }
+
+  function syncColumnsToParent(columns) {
+    emit?.('update:columns', cloneColumns(columns))
   }
 
   const saveColumnSettings = debounce(() => {
@@ -94,11 +117,14 @@ export function useTableColumns({ props, state, dragKey, loadDensitySetting, onR
   }
 
   function resetColumnSettings() {
-    state.visibleColumns = props.columns.map((c) => c.key)
+    const restoredColumns = cloneColumns(initialColumnsSnapshot.value.length ? initialColumnsSnapshot.value : props.columns)
+
+    state.visibleColumns = restoredColumns.map((c) => c.key)
     state.columnWidths = {}
     state.columnFixed = {}
-    state.allColumns = [...props.columns]
+    state.allColumns = restoredColumns
     saveColumnSettings()
+    syncColumnsToParent(restoredColumns)
 
     if (typeof onResetSuccess === 'function') {
       onResetSuccess()
@@ -179,8 +205,16 @@ export function useTableColumns({ props, state, dragKey, loadDensitySetting, onR
   watch(
     () => props.columns,
     (val) => {
-      state.allColumns = val || []
-      state.visibleColumns = (val || []).map((c) => c.key)
+      const nextColumns = cloneColumns(val || [])
+      const nextSchemaSignature = getColumnSchemaSignature(nextColumns)
+      const currentSchemaSignature = getColumnSchemaSignature(initialColumnsSnapshot.value)
+
+      if (!initialColumnsSnapshot.value.length || nextSchemaSignature !== currentSchemaSignature) {
+        initialColumnsSnapshot.value = cloneColumns(nextColumns)
+        state.visibleColumns = nextColumns.map((c) => c.key)
+      }
+
+      state.allColumns = nextColumns
     },
     { immediate: true, flush: 'post' }
   )

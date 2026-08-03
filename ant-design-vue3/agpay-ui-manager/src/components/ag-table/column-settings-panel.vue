@@ -156,15 +156,15 @@
 
 <script setup>
 import {
-    CheckOutlined,
-    CloseOutlined,
-    DownOutlined,
-    HolderOutlined,
-    RedoOutlined,
-    SettingOutlined,
-    UpOutlined,
-    VerticalLeftOutlined,
-    VerticalRightOutlined
+  CheckOutlined,
+  CloseOutlined,
+  DownOutlined,
+  HolderOutlined,
+  RedoOutlined,
+  SettingOutlined,
+  UpOutlined,
+  VerticalLeftOutlined,
+  VerticalRightOutlined
 } from '@ant-design/icons-vue'
 import { useI18n } from 'vue-i18n'
 
@@ -233,7 +233,7 @@ function handleColumnItemKeydown(event, col, idx) {
 <style scoped>
 .column-settings {
   width: min(95vw, 560px);
-  max-height: calc(100vh - 350px);
+  max-height: calc(100vh - 600px);
   background: var(--base-bg-color);
   border-radius: 4px;
   box-shadow: 0 2px 8px var(--shadow-color);

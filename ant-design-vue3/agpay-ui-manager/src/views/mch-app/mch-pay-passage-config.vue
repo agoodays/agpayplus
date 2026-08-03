@@ -2,12 +2,12 @@
   <ag-drawer
     v-model:open="localOpen"
     title="配置支付通道"
+    width="40%"
     :closable="true"
     :mask-closable="false"
-    :drawer-style="{ overflow: 'hidden', backgroundColor: '#f0f2f5' }"
-    :body-style="{ paddingBottom: '80px', overflow: 'auto' }"
-    width="40%"
-    @close="handleClose"
+    :show-confirm="hasPermission('ENT_MCH_PAY_PASSAGE_ADD')"
+    @confirm="handleConfirm"
+    @close="handleClose">
   >
     <a-list :data-source="[]" v-if="cardList.length === 0" />
     <div v-else>
@@ -40,28 +40,6 @@
           </div>
         </a-col>
       </a-row>
-      <div
-        :style="{
-          position: 'absolute',
-          right: 0,
-          bottom: 0,
-          width: '100%',
-          borderTop: '1px solid #e9e9e9',
-          padding: '10px 16px',
-          background: '#fff',
-          textAlign: 'center',
-          zIndex: 1
-        }"
-      >
-        <a-button :style="{ marginRight: '8px' }" @click="handleClose">
-          <template #icon><CloseOutlined /></template>
-          取消
-        </a-button>
-        <a-button v-if="hasPermission('ENT_MCH_PAY_PASSAGE_ADD')" type="primary" @click="handleOkFunc">
-          <template #icon><CheckOutlined /></template>
-          保存
-        </a-button>
-      </div>
     </div>
   </ag-drawer>
 </template>
@@ -74,7 +52,6 @@
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { AgDrawer } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
 
@@ -149,7 +126,7 @@ const refCardList = async () => {
 /**
  * 保存支付通道配置
  */
-const handleOkFunc = async () => {
+const handleConfirm = async () => {
   const reqParams = []
   let hasError = false
 

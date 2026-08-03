@@ -25,9 +25,9 @@
  * 商户统计明细组件
  * 功能：展示商户统计的门店、支付方式、支付类型明细
  */
-import { ref, watch } from 'vue'
 import { AgDrawer } from '@/components'
 import { usePermission } from '@/composables/useCommon'
+import { ref, watch } from 'vue'
 import StoreCountPage from './store-count-page.vue'
 import WayCodeCountPage from './way-code-count-page.vue'
 import WayTypeCountPage from './way-type-count-page.vue'

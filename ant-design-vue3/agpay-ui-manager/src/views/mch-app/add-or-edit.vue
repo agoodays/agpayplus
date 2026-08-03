@@ -7,7 +7,7 @@
     @close="handleClose"
     :show-confirm="true"
     :confirm-loading="loading"
-    @confirm="handleSubmit"
+    @confirm="handleConfirm"
   >
     <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 基本信息 -->
@@ -121,14 +121,14 @@
 </template>
 
 <script setup>
-import { AgDrawer } from '@/components'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { basicApi } from '@/api/system/basic-api'
-import { CheckOutlined, CloseOutlined, QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
+import { AgDrawer } from '@/components'
+import { getFlagOptions, getStateOptions } from '@/constants/common-const'
+import { QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getStateOptions, getFlagOptions } from '@/constants/common-const'
 
 const { t } = useI18n()
 
@@ -350,7 +350,7 @@ const handleGenerateSecret = () => {
 /**
  * 提交表单
  */
-const handleSubmit = async () => {
+const handleConfirm = async () => {
   try {
     await infoForm.value.validate()
 
