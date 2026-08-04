@@ -1,9 +1,9 @@
-import axios from 'axios'
-import { message, Modal } from 'ant-design-vue'
+import { AgLoading } from '@/components'
+import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
 import { useUserStore } from '@/store/modules/system/user'
 import { translate } from '@/utils/i18n-util'
-import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
-import { AgLoading } from '@/components'
+import { message, Modal } from 'ant-design-vue'
+import axios from 'axios'
 import _ from 'lodash'
 
 /**
@@ -884,7 +884,7 @@ export const getDownload = async (url, params) => {
  * ```js
  * import { downloadFile } from '@/lib/ag-axios'
  * 
- * const reqDownloadDataFunc = async (params) => {
+ * const downloadDataFunc = async (params) => {
  *   await downloadFile(statisticApi.exportExcel(params), '代理商统计.xlsx')
  * }
  * ```

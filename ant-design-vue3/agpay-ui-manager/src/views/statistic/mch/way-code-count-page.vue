@@ -24,8 +24,8 @@
       row-key="wayCode"
       state-key="way_code_count"
       v-model:columns="tableColumns"
-      :on-load="reqTableDataFunc"
-      :on-download="reqDownloadDataFunc"
+      :on-load="loadDataFunc"
+      :on-download="downloadDataFunc"
       :search-data="searchData"
       :initial-statistics="countInitData"
       :show-download="true"
@@ -263,7 +263,7 @@ const handleSearchFormData = (searchDataParam) => {
 }
 
 // 表格接口方法
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await statisticApi.queryOrderStatistic({
     ...params,
     sortField: sortState.field || params.sortField || '',
@@ -277,11 +277,11 @@ const handleSortChange = ({ field, order }) => {
 }
 
 // 表格计数方法
-const reqTableCountFunc = async (params) => {
+const loadCountFunc = async (params) => {
   return await statisticApi.queryOrderStatisticTotal(params)
 }
 
-const reqDownloadDataFunc = async (params) => {
+const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '支付方式统计.xlsx')
 }
 

@@ -37,8 +37,8 @@
       row-key="wayType"
       state-key="way_type_count"
       v-model:columns="tableColumns"
-      :on-load="reqTableDataFunc"
-      :on-download="reqDownloadDataFunc"
+      :on-load="loadDataFunc"
+      :on-download="downloadDataFunc"
       :search-data="searchData"
       :initial-statistics="countInitData"
       :show-download="true"
@@ -206,12 +206,12 @@ import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgSearch, AgTable } from '@/components'
 import { downloadFile } from '@/lib/ag-axios'
 import {
-  DollarOutlined,
-  InfoCircleOutlined,
-  TransactionOutlined,
-  TrophyOutlined,
-  UndoOutlined,
-  WalletOutlined
+    DollarOutlined,
+    InfoCircleOutlined,
+    TransactionOutlined,
+    TrophyOutlined,
+    UndoOutlined,
+    WalletOutlined
 } from '@ant-design/icons-vue'
 import { onMounted, reactive, ref } from 'vue'
 
@@ -280,7 +280,7 @@ const searchFunc = () => {
   tableRef.value?.reload(true)
 }
 
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await statisticApi.queryOrderStatistic({
     ...params,
     sortField: sortState.field || params.sortField || '',
@@ -293,7 +293,7 @@ const handleSortChange = ({ field, order }) => {
   sortState.order = order || null
 }
 
-const reqDownloadDataFunc = async (params) => {
+const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '支付类型统计.xlsx')
 }
 

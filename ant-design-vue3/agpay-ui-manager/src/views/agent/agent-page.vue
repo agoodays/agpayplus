@@ -64,7 +64,7 @@
         row-key="agentNo"
         state-key="agent"
         :columns="tableColumns"
-        :on-load="reqTableDataFunc"
+        :on-load="loadDataFunc"
         :search-data="searchData"
       >
         <!-- 工具栏 -->
@@ -178,7 +178,7 @@ const {
  * @param {Object} params - 查询参数
  * @returns {Promise} - 查询结果
  */
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await agentApi.queryPage(params)
 }
 

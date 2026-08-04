@@ -30,8 +30,8 @@
       ref="tableRef"
       row-key="isvNo"
       state-key="isv_count"
-      :on-load="reqTableDataFunc"
-      :on-download="reqDownloadDataFunc"
+      :on-load="loadDataFunc"
+      :on-download="downloadDataFunc"
       v-model:columns="tableColumns"
       :search-data="searchData"
       :initial-statistics="countInitData"
@@ -274,7 +274,7 @@ const countInitData = {
   round: 0.0
 }
 
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await statisticApi.queryOrderStatistic({
     ...params,
     sortField: sortState.field || params.sortField || '',
@@ -291,7 +291,7 @@ const handleSortChange = ({ field, order }) => {
  * 导出 Excel
  * @param {Object} params - 导出参数
  */
-const reqDownloadDataFunc = async (params) => {
+const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '服务商交易统计.xlsx')
 }
 

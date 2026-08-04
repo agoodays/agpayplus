@@ -39,7 +39,7 @@
         row-key="roleId"
         state-key="role"
         :columns="tableColumns"
-        :on-load="reqTableDataFunc"
+        :on-load="loadDataFunc"
         :search-data="searchData"
       >
         <template #toolbar-left>
@@ -162,7 +162,7 @@ searchData.sysType = 'MGR'
  * @param {Object} params - 查询参数
  * @returns {Promise<Object>} 表格数据
  */
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await roleApi.queryPage(params)
 }
 

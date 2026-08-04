@@ -30,7 +30,7 @@
         row-key="articleId"
         state-key="notice"
         :columns="tableColumns"
-        :on-load="reqTableDataFunc"
+        :on-load="loadDataFunc"
         :search-data="searchData"
       >
         <template #toolbar-left>
@@ -118,7 +118,7 @@ Object.assign(searchData, defaultSearchData)
  * @param {Object} params - 查询参数
  * @returns {Promise<Object>} 表格数据
  */
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await noticeApi.queryPage(params)
 }
 

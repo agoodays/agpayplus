@@ -93,7 +93,7 @@
         state-key="mch_notify"
         :columns="tableColumns"
         :show-auto-refresh="true"
-        :on-load="reqTableDataFunc"
+        :on-load="loadDataFunc"
         :search-data="searchData"
         :on-download="handleExport"
         :show-download="false"
@@ -185,7 +185,7 @@ const tableColumns = [
  * @param {Object} params - 请求参数
  * @returns {Promise} - 通知列表
  */
-function reqTableDataFunc(params) {
+function loadDataFunc(params) {
   return orderApi.listMchNotify(params)
 }
 

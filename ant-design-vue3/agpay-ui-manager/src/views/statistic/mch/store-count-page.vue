@@ -29,8 +29,8 @@
       row-key="storeId"
       state-key="store_count"
       v-model:columns="tableColumns"
-      :on-load="reqTableDataFunc"
-      :on-download="reqDownloadDataFunc"
+      :on-load="loadDataFunc"
+      :on-download="downloadDataFunc"
       :search-data="searchData"
       :initial-statistics="countInitData"
       :show-download="true"
@@ -253,7 +253,7 @@ const countInitData = {
   round: 0.0
 }
 
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await statisticApi.queryOrderStatistic({
     ...params,
     sortField: sortState.field || params.sortField || '',
@@ -266,7 +266,7 @@ const handleSortChange = ({ field, order }) => {
   sortState.order = order || null
 }
 
-const reqDownloadDataFunc = async (params) => {
+const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '门店交易统计.xlsx')
 }
 

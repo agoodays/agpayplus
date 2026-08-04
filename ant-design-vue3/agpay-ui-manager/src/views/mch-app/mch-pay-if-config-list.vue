@@ -49,7 +49,7 @@
           ref="tableRef"
           row-key="wayCode"
           state-key="mch_pay_if_config"
-          :on-load="reqTableDataFunc"
+          :on-load="loadDataFunc"
           :columns="tableColumns"
           :search-data="searchData"
         >
@@ -225,7 +225,7 @@ const stepChange = (current) => {
  * @param {Object} params - 查询参数
  * @returns {Promise} 查询结果
  */
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await mchAppApi.queryMchPayPassagePage(Object.assign(params, { appId: props.appId }))
 }
 

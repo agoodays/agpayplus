@@ -49,7 +49,7 @@
         ref="tableRef"
         row-key="receiverGroupId"
         state-key="division_receiver_group"
-        :on-load="reqTableDataFunc"
+        :on-load="loadDataFunc"
         :columns="tableColumns"
         :search-data="searchData"
       >
@@ -137,7 +137,7 @@ const searchMch = (params) => divisionGroupApi.listMch(params)
  * @param {Object} params - 查询参数
  * @returns {Promise<Object>} 表格数据
  */
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await divisionGroupApi.queryPage(params)
 }
 

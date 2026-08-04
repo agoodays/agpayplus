@@ -47,8 +47,8 @@
       row-key="mchNo"
       state-key="mch_count"
       :columns="tableColumns"
-      :on-load="reqTableDataFunc"
-      :on-download="reqDownloadDataFunc"
+      :on-load="loadDataFunc"
+      :on-download="downloadDataFunc"
       :search-data="searchData"
       :initial-statistics="countInitData"
       :show-download="true"
@@ -229,12 +229,12 @@ import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgTable, AgTabl
 import { useModal, usePermission } from '@/composables/useCommon'
 import { downloadFile } from '@/lib/ag-axios'
 import {
-  DollarOutlined,
-  InfoCircleOutlined,
-  TransactionOutlined,
-  TrophyOutlined,
-  UndoOutlined,
-  WalletOutlined
+    DollarOutlined,
+    InfoCircleOutlined,
+    TransactionOutlined,
+    TrophyOutlined,
+    UndoOutlined,
+    WalletOutlined
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
@@ -321,16 +321,16 @@ const searchMch = (params) => {
 }
 
 // 表格接口方法
-const reqTableDataFunc = (params) => {
+const loadDataFunc = (params) => {
   return statisticApi.queryOrderStatistic(params)
 }
 
 // 表格计数方法
-const reqTableCountFunc = (params) => {
+const loadCountFunc = (params) => {
   return statisticApi.queryOrderStatisticTotal(params)
 }
 
-const reqDownloadDataFunc = async (params) => {
+const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '商户交易统计.xlsx')
 }
 

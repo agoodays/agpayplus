@@ -73,9 +73,9 @@
       state-key="transaction_count"
       :columns="tableColumns"
       :loading="tableLoading"
-      :on-load="reqTableDataFunc"
-      :on-load-statistics="reqTableCountFunc"
-      :on-download="reqDownloadDataFunc"
+      :on-load="loadDataFunc"
+      :on-load-statistics="loadCountFunc"
+      :on-download="downloadDataFunc"
       :search-data="searchData"
       :initial-statistics="countInitData"
       :show-download="true"
@@ -397,7 +397,7 @@ function initializeSearchData() {
  * @param {Record<string, any>} params 查询参数
  * @returns {Promise<any>}
  */
-async function searchMch(params) {
+const searchMch = async (params) => {
   return await statisticApi.listMch(params)
 }
 
@@ -405,7 +405,7 @@ async function searchMch(params) {
  * 触发表格查询。
  * @returns {Promise<void>}
  */
-async function searchFunc() {
+const searchFunc = async () => {
   searchLoading.value = true
   try {
     await tableRef.value?.reload?.(true)
@@ -420,7 +420,7 @@ async function searchFunc() {
  * 重置搜索条件并重新加载数据。
  * @returns {Promise<void>}
  */
-async function resetFunc() {
+const resetFunc = async () => {
   initializeSearchData()
   await searchFunc()
 }
@@ -430,7 +430,7 @@ async function resetFunc() {
  * @param {Record<string, any>} params 查询参数
  * @returns {Promise<any>}
  */
-async function reqTableDataFunc(params) {
+const loadDataFunc = async (params) => {
   tableLoading.value = true
   try {
     return await statisticApi.queryOrderStatistic(params)
@@ -445,7 +445,7 @@ async function reqTableDataFunc(params) {
  * @param {Record<string, any>} params 查询参数
  * @returns {Promise<any>}
  */
-async function reqTableCountFunc(params) {
+async function loadCountFunc(params) {
   return await statisticApi.queryOrderStatisticTotal(params)
 }
 
@@ -454,7 +454,7 @@ async function reqTableCountFunc(params) {
  * @param {Record<string, any>} params 导出参数
  * @returns {Promise<void>}
  */
-async function reqDownloadDataFunc(params) {
+async function downloadDataFunc(params) {
   await downloadFile(statisticApi.exportExcel(params), '交易报表.xlsx')
 }
 

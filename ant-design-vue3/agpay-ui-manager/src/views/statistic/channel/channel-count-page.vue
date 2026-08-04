@@ -30,8 +30,8 @@
       ref="tableRef"
       row-key="ifCode"
       state-key="channel_count"
-      :on-load="reqTableDataFunc"
-      :on-download="reqDownloadDataFunc"
+      :on-load="loadDataFunc"
+      :on-download="downloadDataFunc"
       v-model:columns="tableColumns"
       :search-data="searchData"
       :initial-statistics="countInitData"
@@ -201,12 +201,12 @@ import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
 import { downloadFile } from '@/lib/ag-axios'
 import {
-  DollarOutlined,
-  InfoCircleOutlined,
-  TransactionOutlined,
-  TrophyOutlined,
-  UndoOutlined,
-  WalletOutlined
+    DollarOutlined,
+    InfoCircleOutlined,
+    TransactionOutlined,
+    TrophyOutlined,
+    UndoOutlined,
+    WalletOutlined
 } from '@ant-design/icons-vue'
 import { reactive, ref } from 'vue'
 const icons = { InfoCircleOutlined }
@@ -249,7 +249,7 @@ const countInitData = {
   round: 0.0
 }
 
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   return await statisticApi.queryOrderStatistic({
     ...params,
     sortField: sortState.field || params.sortField || '',
@@ -262,7 +262,7 @@ const handleSortChange = ({ field, order }) => {
   sortState.order = order || null
 }
 
-const reqDownloadDataFunc = async (params) => {
+const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '通道交易统计.xlsx')
 }
 

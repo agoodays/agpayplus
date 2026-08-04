@@ -69,9 +69,9 @@
       ref="tableRef"
       state-key="demo_search_table_columns"
       :columns="tableColumns"
-      :on-load="reqTableDataFunc"
-      :on-load-statistics="reqTableCountFunc"
-      :on-download="reqDownloadDataFunc"
+      :on-load="loadDataFunc"
+      :on-load-statistics="loadCountFunc"
+      :on-download="downloadDataFunc"
       :enable-statistics="true"
       :show-download="true"
       :show-auto-refresh="true"
@@ -232,7 +232,7 @@ const allData = Array.from({ length: TOTAL }).map((_, i) => {
 })
 
 // 请求表格数据函数
-function reqTableDataFunc(params) {
+function loadDataFunc(params) {
   // params: { pageNumber, pageSize, ... }
   return new Promise((resolve) => {
     const pageNumber = params.pageNumber || 1
@@ -244,7 +244,7 @@ function reqTableDataFunc(params) {
 }
 
 // 请求统计数据
-function reqTableCountFunc(params) {
+function loadCountFunc(params) {
   return new Promise((resolve) => {
     const totalAmount = allData.reduce((s, r) => s + Number(r.amount), 0).toFixed(2)
     const totalFee = allData.reduce((s, r) => s + Number(r.fee), 0).toFixed(2)
@@ -285,7 +285,7 @@ function reqTableCountFunc(params) {
 }
 
 // 模拟导出
-function reqDownloadDataFunc(params) {
+function downloadDataFunc(params) {
   return new Promise((resolve) => {
     setTimeout(() => {
       // 模拟触发导出

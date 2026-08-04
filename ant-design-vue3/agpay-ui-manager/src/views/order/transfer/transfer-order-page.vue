@@ -82,7 +82,7 @@
         state-key="transfer_order"
         :columns="tableColumns"
         :show-auto-refresh="true"
-        :on-load="reqTableDataFunc"
+        :on-load="loadDataFunc"
         :on-load-statistics="loadStatistics"
         :search-data="searchData"
         :on-download="handleExport"
@@ -271,7 +271,7 @@ const tableColumns = [
  * @param {Object} params - 查询参数
  * @returns {Promise<Object>} 表格数据
  */
-const reqTableDataFunc = async (params) => {
+const loadDataFunc = async (params) => {
   const requestParams = {
     pageNumber: params.pageNumber,
     pageSize: params.pageSize
