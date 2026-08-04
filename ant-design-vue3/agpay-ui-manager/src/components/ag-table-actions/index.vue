@@ -1,25 +1,25 @@
 <template>
   <div class="ag-table-action-columns">
-    <template v-if="visibleActions.length <= maxShowNum">
-      <!-- 直接显示所有操作 -->
+    <template v-if="!hasOverflow">
+      <!-- 操作按钮数量不超过阈值：直接全部显示 -->
       <slot></slot>
     </template>
     <template v-else>
-      <!-- 显示前面的操作 + 更多菜单 -->
-      <template v-for="(action, index) in visibleActions" :key="index">
-        <component :is="action" v-if="index < maxShowNum - 1" />
+      <!-- 操作按钮数量超过阈值：显示前 maxShowNum-1 个，其余放入"更多"菜单 -->
+      <template v-for="(action, index) in frontActions" :key="index">
+        <component :is="action" />
       </template>
       <a-dropdown>
         <a-button type="link" size="small">
-          <!-- {{ t('components.more') }} -->
-          <!-- <down-outlined /> -->
-          <EllipsisOutlined :style="{ fontSize: '20px', verticalAlign: 'top' }"/>
+          <EllipsisOutlined :style="{ fontSize: '20px', verticalAlign: 'top' }" />
         </a-button>
         <template #overlay>
           <a-menu>
-            <a-menu-item v-for="(action, index) in moreActions" :key="index">
-              <component :is="action" />
-            </a-menu-item>
+            <template v-for="(action, index) in moreActions" :key="index">
+              <a-menu-item>
+                <component :is="action" />
+              </a-menu-item>
+            </template>
           </a-menu>
         </template>
       </a-dropdown>
@@ -29,17 +29,32 @@
 
 <script setup>
 /**
- * 表格操作按钮容器组件
- * 功能：控制表格行内操作按钮的显示数量，超出部分折叠到"更多"下拉菜单中
+ * AgTableActions - 表格操作按钮容器组件
+ *
+ * 控制表格行内操作按钮的显示数量，超出部分折叠到"更多"下拉菜单中，
+ * 避免操作列过宽影响表格布局。
+ *
+ * 实现原理：
+ * 1. 通过 useSlots 获取默认插槽中的所有子节点
+ * 2. 过滤掉注释节点和纯文本节点，只保留有效的 VNode
+ * 3. 当有效节点数量超过 maxShowNum 时：
+ *    - 直接显示前 maxShowNum - 1 个节点
+ *    - 剩余节点放入 a-dropdown 下拉菜单中
+ * 4. 当有效节点数量不超过 maxShowNum 时，直接显示所有节点
+ *
+ * @example
+ * <AgTableActions :max-show-num="3">
+ *   <a-button type="link" @click="handleView">查看</a-button>
+ *   <a-button type="link" @click="handleEdit">编辑</a-button>
+ *   <a-button type="link" @click="handleDelete">删除</a-button>
+ *   <a-button type="link" @click="handleExport">导出</a-button>
+ * </AgTableActions>
  */
 import { computed, useSlots } from 'vue'
-import { EllipsisOutlined, DownOutlined } from '@ant-design/icons-vue'
-import { useI18n } from 'vue-i18n'
-
-const { t } = useI18n()
+import { EllipsisOutlined } from '@ant-design/icons-vue'
 
 const props = defineProps({
-  /** 最多显示几个操作按钮，超过的放入"更多"菜单 */
+  /** 最多直接显示几个操作按钮，超过的放入"更多"菜单 */
   maxShowNum: {
     type: Number,
     default: 2
@@ -48,28 +63,32 @@ const props = defineProps({
 
 const slots = useSlots()
 
-/** 获取所有有效的操作子节点 */
+/** 获取所有有效的操作子节点（过滤注释和纯文本节点） */
 const visibleActions = computed(() => {
   const defaultSlot = slots.default?.() || []
-  // 过滤出有效的 VNode
   return defaultSlot.filter((vnode) => {
-    // 排除注释节点和纯文本节点
     return vnode.type && typeof vnode.type !== 'symbol'
   })
 })
 
-/** 需要放入"更多"菜单的操作 */
+/** 操作按钮数量是否超过阈值 */
+const hasOverflow = computed(() => visibleActions.value.length > props.maxShowNum)
+
+/** 直接显示的操作按钮（前 maxShowNum - 1 个） */
+const frontActions = computed(() => {
+  if (!hasOverflow.value) return []
+  return visibleActions.value.slice(0, props.maxShowNum - 1)
+})
+
+/** 放入"更多"菜单的操作按钮 */
 const moreActions = computed(() => {
-  if (visibleActions.value.length <= props.maxShowNum) {
-    return []
-  }
+  if (!hasOverflow.value) return []
   return visibleActions.value.slice(props.maxShowNum - 1)
 })
 </script>
 
 <style scoped>
 .ag-table-action-columns {
-  /* display: flex; */
   align-items: center;
   justify-content: flex-start;
   gap: 4px;

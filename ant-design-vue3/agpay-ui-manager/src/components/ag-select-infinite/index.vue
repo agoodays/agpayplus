@@ -32,8 +32,8 @@
       <template #dropdownRender="{ menuNode }">
         <div>
           <component :is="menuNode" />
-          <a-divider v-if="options.length > 0 && (hasMore || loadingMore)" style="margin: 4px 0" />
-          <div v-if="options.length > 0 && (hasMore || loadingMore || !hasMore)" style="padding: 8px; text-align: center; color: #999">
+          <a-divider v-if="options.length > 0" style="margin: 4px 0" />
+          <div v-if="options.length > 0" style="padding: 8px; text-align: center; color: #999">
             <a-spin v-if="loadingMore" size="small" />
             <span v-else-if="hasMore">{{ resolvedLoadMoreText }}</span>
             <span v-else>{{ resolvedNoMoreText }}</span>
@@ -372,6 +372,12 @@ async function loadData(page = 1, keyword = '') {
 }
 
 /**
+ * 下拉框可见区域大约能显示的条数
+ * 当首次加载数据量少于该值时，会自动追加加载一页，避免无法触发滚动加载
+ */
+const VISIBLE_ITEM_THRESHOLD = 8
+
+/**
  * 自动填充下拉框
  * 当首次加载数据量较小时（少于一次可见量），额外加载一次数据
  * 防止 pageSize 较小时无法触发滚动加载的问题
@@ -379,14 +385,9 @@ async function loadData(page = 1, keyword = '') {
 async function fillDropdown() {
   await nextTick()
 
-  const visibleItemCount = 8                     // 下拉框可见区域大约能显示的条数
-  if (hasMore.value && options.value.length < visibleItemCount) {
-    loadingMore.value = true
-    try {
-      await loadData(currentPage.value + 1, searchKeyword.value)
-    } finally {
-      loadingMore.value = false
-    }
+  if (hasMore.value && options.value.length < VISIBLE_ITEM_THRESHOLD) {
+    // loadingMore 状态由 loadData 内部统一管理，无需在此处手动设置
+    await loadData(currentPage.value + 1, searchKeyword.value)
   }
 }
 
@@ -465,8 +466,7 @@ function handleSelectChange(value, option) {
   selectValue.value = value
   const selectedRecord = options.value.find(item => item[props.fieldNames.value] === value)
   handleChange(value, selectedRecord || option)
-  // const selectedRecord = options.value.find(item => item[props.fieldNames.value] === value)
-  emit('select-change', value, selectedRecord || option); // 自定义事件供外部监听
+  emit('select-change', value, selectedRecord || option)
 }
 
 /**

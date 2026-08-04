@@ -33,6 +33,14 @@
 import { computed } from 'vue'
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 
+/** 预设尺寸映射表（提取为常量避免每次 computed 重复创建） */
+const SIZE_PRESETS = {
+  small: '30%',
+  medium: '50%',
+  large: '70%',
+  xlarge: '90%'
+}
+
 const props = defineProps({
   open: {
     type: Boolean,
@@ -94,25 +102,16 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open', 'close', 'confirm'])
 
-// 计算实际宽度
+// 计算实际宽度：size 预设 > widthRatio 比例 > width 固定值
 const computedWidth = computed(() => {
-  // 优先使用 size 预设
   if (props.size) {
-    const sizeMap = {
-      small: '30%',
-      medium: '50%',
-      large: '70%',
-      xlarge: '90%'
-    }
-    return sizeMap[props.size]
+    return SIZE_PRESETS[props.size]
   }
 
-  // 其次使用 widthRatio
   if (props.widthRatio > 0) {
     return `${props.widthRatio * 100}%`
   }
 
-  // 最后使用 width
   return props.width
 })
 

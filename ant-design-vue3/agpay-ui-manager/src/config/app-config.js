@@ -62,7 +62,8 @@ export const defaultLayoutConfig = {
  * */
 export const asyncRouteDefine = {
   CurrentUserInfo: { defaultPath: '/current/userinfo', component: () => import('@/views/current/user-info-page.vue') }, // 用户设置
-  MainPage: { defaultPath: '/main', component: () => import('@/views/main/main-page.vue') },
+  // MainPage: { defaultPath: '/main', component: () => import('@/views/main/main-page.vue') },
+  MainPage: { defaultPath: '/main', component: () => import('@/views/dashboard/analysis-page.vue') },
   // 商户管理
   MchPage: { defaultPath: '/mch', component: () => import('@/views/mch/mch-page.vue') }, // 商户列表
   MchAppPage: { defaultPath: '/apps', component: () => import('@/views/mch-app/mch-app-page.vue') }, // 商户应用列表

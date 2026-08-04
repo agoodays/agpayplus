@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card :bordered="false">
-      <ag-search v-model="searchData" :search-loading="isLoading" @search="searchFunc" @reset="searchFunc">
+      <ag-search v-model="searchData" :search-loading="computedLoading" @search="searchFunc" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -39,7 +39,7 @@
           :search-data="searchData"
         >
           <template #toolbar-left>
-            <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_ADD')" type="primary" @click="handleAdd">
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_ADD')" type="primary" @click="openCreate">
               <plus-outlined /> 新增
             </a-button>
           </template>
@@ -56,8 +56,8 @@
           <template #opSlot="{ record }">
             <ag-table-actions>
               <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_VIEW')" type="link" @click="handlePreview(record.shellImgViewUrl)">预览</a-button>
-              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_EDIT')" type="link" @click="handleEdit(record.id)">编辑</a-button>
-              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_DEL')" type="link" danger @click="handleDelete(record.id)">删除</a-button>
+              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_EDIT')" type="link" @click="openEdit(record.id)">编辑</a-button>
+              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_DEL')" type="link" danger @click="confirmDelete(record.id)">删除</a-button>
             </ag-table-actions>
           </template>
         </ag-table>
@@ -66,7 +66,7 @@
       <template v-else>
         <ag-card
           ref="cardRef"
-          :req-card-list-func="loadCardData"
+          :load-data="loadCardData"
           :search-data="searchData"
           :span="cardConfig.span"
           :height="cardConfig.height"
@@ -74,7 +74,7 @@
           :add-authority="cardConfig.addAuthority"
           :use-pagination="true"
           :page-size="11"
-          @add="handleAdd"
+          @add="openCreate"
         >
           <template #cardContentSlot="{ record }">
             <div class="shell-card-wrapper">
@@ -97,12 +97,12 @@
                 </div>
                 <div class="shell-card-operations">
                   <a-tooltip v-if="hasPermission('ENT_DEVICE_QRC_SHELL_EDIT')" placement="top" title="编辑">
-                    <a-button type="text" @click="handleEdit(record.id)">
+                    <a-button type="text" @click="openEdit(record.id)">
                       <edit-outlined />
                     </a-button>
                   </a-tooltip>
                   <a-tooltip v-if="hasPermission('ENT_DEVICE_QRC_SHELL_DEL')" placement="top" title="删除">
-                    <a-button type="text" danger @click="handleDelete(record.id)">
+                    <a-button type="text" danger @click="confirmDelete(record.id)">
                       <delete-outlined />
                     </a-button>
                   </a-tooltip>
@@ -114,84 +114,78 @@
       </template>
     </a-card>
 
-    <add-or-edit v-model:open="addOrEditOpen" :record-id="editRecordId" @success="searchFunc" />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
   </div>
 </template>
 
 <script setup>
+/**
+ * 码牌模板列表页面
+ * 支持列表视图和卡片视图两种展示模式，可切换。
+ */
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
 import { AgCard, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
 import { viewerApi } from '@/utils/viewer-api'
 import { AppstoreOutlined, BarsOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 import AddOrEdit from './add-or-edit.vue'
 
-/**
- * 权限判断函数
- */
+/** 权限检查 */
 const { hasPermission } = usePermission()
 
 /**
- * 当前视图模式：'list' 列表视图 | 'card' 卡片视图
+ * CRUD 表格页面状态
+ * 复用 tableRef/searchData/modalOpen/currentRecordId/confirmDelete 等
+ * 注：删除后需根据当前视图刷新（list/card），通过 onDeleted 回调处理。
  */
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  currentRecordId,
+  openCreate,
+  openEdit,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: async (recordId) => {
+    await qrcShellApi.delById(recordId)
+    message.success('删除成功')
+  },
+  deleteConfirmTitle: '确认删除？',
+  deleteSuccessMessage: '删除成功',
+  onDeleted: () => refreshList()
+})
+
+/** AgCard 组件引用（卡片视图专用） */
+const cardRef = ref(null)
+
+/** 当前视图模式：'list' 列表视图 | 'card' 卡片视图 */
 const viewMode = ref('card')
 
-/**
- * 表格列配置
- */
+/** 卡片加载状态（独立于表格 loading） */
+const cardLoading = ref(false)
+
+/** 表格列配置 */
 const tableColumns = [
   { key: 'shellImgViewUrl', title: '模板预览图', width: 151, fixed: 'left', customRender: 'shellImgViewUrlSlot' },
   { key: 'shellAlias', dataIndex: 'shellAlias', title: '模板别名' },
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-/**
- * AgTable 组件引用
- */
-const tableRef = ref(null)
-
-/**
- * AgCard 组件引用
- */
-const cardRef = ref(null)
-
-/**
- * 新增/编辑抽屉打开状态
- */
-const addOrEditOpen = ref(false)
-
-/**
- * 编辑记录ID
- */
-const editRecordId = ref(null)
-
-/**
- * 加载状态
- */
-const isLoading = ref(false)
-
-/**
- * 搜索条件
- */
-const searchData = reactive({})
-
-/**
- * AgCard 组件配置参数
- */
-const cardConfig = reactive({
+/** AgCard 组件配置参数 */
+const cardConfig = {
   name: '码牌模版',
   height: 360,
   span: { xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 },
   addAuthority: hasPermission('ENT_DEVICE_QRC_SHELL_ADD')
-})
+}
 
-/**
- * 计算当前加载状态
- */
+/** 计算当前加载状态（兼容表格和卡片两种视图） */
 const computedLoading = computed(() => {
-  return isLoading.value || tableRef.value?.isLoading?.value || false
+  return cardLoading.value || tableRef.value?.isLoading?.value || false
 })
 
 /**
@@ -200,12 +194,7 @@ const computedLoading = computed(() => {
  * @returns {Promise<Object>} 列表数据
  */
 async function loadTableData(params) {
-  isLoading.value = true
-  try {
-    return await qrcShellApi.queryCardList(params)
-  } finally {
-    isLoading.value = false
-  }
+  return await qrcShellApi.queryCardList(params)
 }
 
 /**
@@ -214,11 +203,11 @@ async function loadTableData(params) {
  * @returns {Promise<Object>} 列表数据
  */
 async function loadCardData(params) {
-  isLoading.value = true
+  cardLoading.value = true
   try {
     return await qrcShellApi.queryCardList(params)
   } finally {
-    isLoading.value = false
+    cardLoading.value = false
   }
 }
 
@@ -233,21 +222,24 @@ function switchViewMode(mode) {
 
 /**
  * 刷新列表/卡片
- * @param {boolean} isToFirst - 是否跳转到第一页
+ * @param {boolean} [isToFirst=false] - 是否跳转到第一页
  */
 function refreshList(isToFirst = false) {
   if (viewMode.value === 'list') {
     tableRef.value?.reload()
   } else {
-    cardRef.value?.refreshCardList(isToFirst)
+    cardRef.value?.reload(isToFirst)
   }
 }
 
-/**
- * 搜索功能
- */
+/** 搜索函数 */
 function searchFunc() {
   refreshList(true)
+}
+
+/** 新增/编辑弹窗保存成功后的统一处理 */
+function handleModalSuccess() {
+  searchFunc()
 }
 
 /**
@@ -259,41 +251,6 @@ function handlePreview(url) {
     images: [url],
     options: {
       initialViewIndex: 0
-    }
-  })
-}
-
-/**
- * 新增模板
- */
-function handleAdd() {
-  editRecordId.value = null
-  addOrEditOpen.value = true
-}
-
-/**
- * 编辑模板
- * @param {string|number} recordId - 记录ID
- */
-function handleEdit(recordId) {
-  editRecordId.value = recordId
-  addOrEditOpen.value = true
-}
-
-/**
- * 删除模板
- * @param {string|number} recordId - 记录ID
- */
-async function handleDelete(recordId) {
-  const { infoBox } = await import('@/utils/info-box')
-  infoBox.confirmDanger('确认删除？', '', async () => {
-    try {
-      await qrcShellApi.delById(recordId)
-      message.success('删除成功')
-      refreshList()
-    } catch (error) {
-      console.error('删除模板失败:', error)
-      message.error('删除失败，请重试')
     }
   })
 }

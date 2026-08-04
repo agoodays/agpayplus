@@ -29,6 +29,7 @@ export const useUserStore = defineStore('userStore', {
     paths: [
       'token',
       'realname',
+      'safeWord',
       'userId',
       'avatarUrl',
       'allMenuRouteTree',

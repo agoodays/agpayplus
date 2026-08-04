@@ -23,7 +23,7 @@
 ```vue
 <template>
   <AgCard
-    :req-card-list-func="reqCardListFunc"
+    :load-data="loadData"
     :search-data="searchData"
     :span="span"
     :height="360"
@@ -57,7 +57,7 @@ const span = reactive({
   xs: 1
 })
 
-async function reqCardListFunc(params) {
+async function loadData(params) {
   return await api.queryList(params)
 }
 
@@ -76,7 +76,7 @@ function addFunc() {
 | name | 卡片名称（用于新增卡片显示） | String | '' |
 | addAuthority | 是否显示新增卡片 | Boolean | false |
 | searchData | 搜索条件对象 | Object | `{}` |
-| reqCardListFunc | 数据加载函数，必须返回 Promise | Function | required |
+| loadData | 数据加载函数，必须返回 Promise | Function | required |
 | usePagination | 是否使用分页 | Boolean | false |
 | pageSize | 每页条数 | Number | 10 |
 
@@ -111,7 +111,7 @@ function addFunc() {
 
 ```vue
 <AgCard
-  :req-card-list-func="reqCardListFunc"
+  :load-data="loadData"
   :search-data="searchData"
   :height="300"
   :name="'商品'"
@@ -130,7 +130,7 @@ function addFunc() {
 
 ```vue
 <AgCard
-  :req-card-list-func="reqCardListFunc"
+  :load-data="loadData"
   :search-data="searchData"
   :height="360"
   :name="'用户'"
@@ -155,7 +155,7 @@ function addFunc() {
 
 ```vue
 <AgCard
-  :req-card-list-func="reqCardListFunc"
+  :load-data="loadData"
   :search-data="searchData"
   :height="280"
 >
@@ -176,7 +176,7 @@ function addFunc() {
 
 ```vue
 <AgCard
-  :req-card-list-func="reqCardListFunc"
+  :load-data="loadData"
   :span="{ xxl: 8, xl: 6, lg: 4, md: 3, sm: 2, xs: 1 }"
   :height="240"
 >
@@ -192,7 +192,7 @@ function addFunc() {
 
 ```vue
 <AgCard
-  :req-card-list-func="qrcShellApi.queryCardList"
+  :load-data="qrcShellApi.queryCardList"
   :search-data="searchData"
   :span="{ xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 }"
   :height="360"

@@ -215,6 +215,18 @@ const form = ref({ name: '' })
 
 ---
 
+## 交易统计页约定
+
+针对交易统计报表页面，推荐采用以下状态管理规范：
+
+- 搜索加载状态使用独立 `searchLoading`，仅用于 `AgSearch` 的搜索按钮加载反馈。
+- 表格加载状态使用独立 `tableLoading`，并通过 `AgTable` 的 `loading` 属性绑定。
+- 搜索函数中触发 `searchLoading = true`，在数据请求 `finally` 阶段兜底复位，避免异常导致按钮常驻加载。
+- 提供 `resetFunc`，将 `searchData` 重置到初始值后立即触发一次查询，确保列表数据和统计区域一致刷新。
+- 日期维度切换（日报/月报/年报）时统一同步查询区间，确保导出、统计与表格数据口径一致。
+
+---
+
 ## 🔧 IDE 推荐
 
 ### VSCode

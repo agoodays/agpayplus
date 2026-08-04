@@ -200,7 +200,7 @@
     </a-card>
 
     <!-- 详情抽屉 -->
-    <detail-drawer v-model:open="detailOpen" :transfer-id="currentTransferId" />
+    <detail-drawer v-model:open="detailOpen" :transfer-id="currentRecordId" />
   </div>
 </template>
 
@@ -211,35 +211,39 @@
  */
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { useModal, usePermission } from '@/composables/useCommon'
+import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { CopyOutlined, DollarOutlined, TransactionOutlined, WalletOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 import DetailDrawer from './detail-drawer.vue'
-
-// 弹窗控制
-const { open: detailOpen, showModal: showDetail } = useModal()
 
 // 权限检查
 const { hasPermission } = usePermission()
 
 /**
- * 组件引用
+ * 使用 CRUD 表格页面组合式函数
  */
-const tableRef = ref(null)
-const mchList = ref([])
-const currentTransferId = ref('')
+const {
+  tableRef,
+  searchData,
+  detailOpen,
+  currentRecordId,
+  reloadTable,
+  openDetail
+} = useCrudTablePage()
+
+// 初始化搜索表单默认值
+searchData.dateRange = ''
+searchData.unionOrderId = ''
+searchData.mchNo = ''
+searchData.appId = ''
+searchData.state = ''
 
 /**
- * 搜索表单数据
+ * 额外数据源
  */
-const searchData = reactive({
-  dateRange: '',
-  unionOrderId: '',
-  mchNo: '',
-  appId: '',
-  state: ''
-})
+const mchList = ref([])
 
 /**
  * 商户选项（用于下拉选择）
@@ -336,11 +340,11 @@ const loadStatistics = async (params) => {
 }
 
 /**
- * 搜索回调函数
+ * 搜索回调函数（同时刷新表格和统计）
  */
 function searchFunc() {
-  tableRef.value.reload()
-  tableRef.value.reloadStatistics()
+  reloadTable()
+  tableRef.value?.reloadStatistics()
 }
 
 /**
@@ -379,36 +383,27 @@ const getStateText = (state) => {
  * 查看详情
  * @param {Object} record - 订单记录
  */
-const handleDetail = (record) => {
-  currentTransferId.value = record.transferId
-  showDetail()
+function handleDetail(record) {
+  openDetail(record.transferId)
 }
 
 /**
- * 获取商户列表（用于 ag-select-infinite 组件）
- * @param {Object} params - 查询参数
- * @param {Number} params.pageNumber - 当前页码
- * @param {Number} params.pageSize - 每页数量
- * @param {String} params.keyword - 搜索关键词
- * @returns {Promise<Object>} 返回数据格式：{ records: [], total: 0 }
+ * 搜索商户
+ * @param {string} keyword - 搜索关键词
  */
-const fetchMerchants = async ({ pageNumber, pageSize, keyword }) => {
+async function fetchMerchants(keyword) {
+  if (!keyword) {
+    mchList.value = []
+    return
+  }
   try {
-    const res = await mchStoreApi.queryMchPage({
+    const res = await orderApi.queryMchPage({
       mchName: keyword,
-      pageNumber,
-      pageSize
+      pageSize: 20
     })
-    return {
-      records: res.records || [],
-      total: res.total || 0
-    }
+    mchList.value = res.records || []
   } catch (error) {
-    console.error('获取商户列表失败:', error)
-    return {
-      records: [],
-      total: 0
-    }
+    console.error('搜索商户失败:', error)
   }
 }
 

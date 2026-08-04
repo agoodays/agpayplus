@@ -85,7 +85,7 @@
               :perm-code="permCode"
               :config-mode="configMode"
               :diy-list="diyConfigList"
-              :callback-func="channelList.refreshChannelList"
+              @success="channelList.refreshChannelList"
             />
           </slot>
         </template>
@@ -100,7 +100,7 @@
               :if-code="activeChannelCode"
               :perm-code="permCode"
               :config-mode="configMode"
-              :callback-func="channelList.refreshChannelList"
+              @success="channelList.refreshChannelList"
             />
           </slot>
         </template>
@@ -237,6 +237,11 @@
 </template>
 
 <script setup>
+/**
+ * 支付配置面板组件
+ * 核心逻辑组件，管理渠道列表、标签页切换、子组件加载与数据流转。
+ * 由 ag-pay-config-drawer.vue 包裹使用，也可独立使用。
+ */
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
 import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
@@ -261,16 +266,24 @@ const props = defineProps({
 
 const emit = defineEmits(['channel-change', 'tab-change', 'passage-state-update', 'submit-success'])
 
+/** 当前信息 ID（内部副本，用于传递给子组件） */
 const currentInfoId = ref(null)
+/** 当前信息类型（ISV / AGENT / MCH_APP） */
 const currentInfoType = ref(null)
+/** 自定义配置列表（代理商场景使用） */
 const diyConfigList = ref([])
+/** 配置模式响应式引用（传给 composables） */
 const configModeRef = ref(props.configMode)
+/** 信息 ID 响应式引用（传给 composables） */
 const infoIdRef = ref(props.infoId)
 
+/** 通道列表管理 */
 const channelList = useChannelList(configModeRef, infoIdRef, props.channelListConfig, (channelCode) => {
   emit('channel-change', channelCode)
 })
+/** 标签页配置 */
 const tabConfig = useTabConfig(configModeRef)
+/** 支付通道管理 */
 const passageManager = usePassageManager(infoIdRef)
 
 const {
@@ -289,20 +302,28 @@ const {
   CONFIG_TAB_CODES
 } = tabConfig
 
+/** 配置组件动态加载器 */
 const configLoader = useConfigLoader(activeChannelCode, activeSubTab, configModeRef, channelList.channelList)
 
+// 渠道切换时加载对应的配置组件
 watch(activeChannelCode, (channelCode) => {
   if (channelCode) {
     configLoader.loadConfigComponent(activeSubTab.value)
   }
 })
 
+/** 参数配置子组件引用 */
 const configComponentRef = ref(null)
+/** 费率配置子组件引用 */
 const rateConfigComponentRef = ref(null)
+/** 渠道配置子组件引用 */
 const appConfigComponentRef = ref(null)
+/** 支付方式表格引用 */
 const wayTableRef = ref(null)
+/** 通道表格引用 */
 const passageTableRef = ref(null)
 
+/** 重置面板状态（标签页、选中、通道、配置组件） */
 const resetState = () => {
   tabConfig.resetTabs()
   channelList.resetSelection()
@@ -310,6 +331,7 @@ const resetState = () => {
   configLoader.clearConfigComponent()
 }
 
+// 监听 props 变化自动初始化
 watch(
   [() => props.configMode, () => props.infoId, () => props.isIsvSubMch],
   async ([configModeVal, infoIdVal, isIsvSubMch]) => {
@@ -333,6 +355,9 @@ watch(
   { immediate: true }
 )
 
+/**
+ * 获取自定义配置列表（代理商场景）
+ */
 const fetchDiyConfigList = async () => {
   try {
     const res = await payOauth2Api.queryDiyList({ configMode: props.configMode, infoId: currentInfoId.value })
@@ -343,21 +368,38 @@ const fetchDiyConfigList = async () => {
   }
 }
 
+/**
+ * 选中渠道
+ * @param {string} channelCode - 渠道编码
+ */
 const handleChannelSelect = (channelCode) => {
   channelList.selectChannel(channelCode)
   emit('channel-change', channelCode)
 }
 
+/**
+ * 切换子标签页
+ * @param {string} tabCode - 标签页编码
+ */
 const handleSubTabSelect = (tabCode) => {
   tabConfig.selectSubTab(tabCode)
   configLoader.loadConfigComponent(tabCode)
   emit('tab-change', tabCode)
 }
 
+/**
+ * 刷新支付方式表格
+ * @param {boolean} [isToFirst=false] - 是否跳转到第一页
+ */
 const handlePassageSearch = (isToFirst = false) => {
   wayTableRef.value?.reload(isToFirst)
 }
 
+/**
+ * 切换通道启用 / 停用状态
+ * @param {Object} record - 通道记录
+ * @param {number} state - 目标状态码
+ */
 const handlePassageStateUpdate = async (record, state) => {
   try {
     await passageManager.handlePassageStateUpdate(record, state)
@@ -370,6 +412,9 @@ const handlePassageStateUpdate = async (record, state) => {
   }
 }
 
+/**
+ * 统一提交保存（协调参数配置、渠道配置、费率配置）
+ */
 const handleSubmit = async () => {
   if (activeSubTab.value === CONFIG_TAB_CODES.PARAMS && configComponentRef.value) {
     await configComponentRef.value.onSubmit()
@@ -384,8 +429,11 @@ const handleSubmit = async () => {
 }
 
 defineExpose({
+  /** 重置面板状态 */
   reset: resetState,
-  refIfCodeList: channelList.refreshChannelList,
+  /** 刷新通道列表 */
+  refreshChannelList: channelList.refreshChannelList,
+  /** 提交保存 */
   onSubmit: handleSubmit,
   channelList,
   tabConfig,

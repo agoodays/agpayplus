@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import AgTableActions from '@/components/ag-table-actions'
+import { AgTableActions } from '@/components'
 
 const handleView = () => { /* ... */ }
 const handleEdit = () => { /* ... */ }
@@ -48,8 +48,7 @@ const handleExport = () => { /* ... */ }
 </template>
 
 <script setup>
-import AgTableActions from '@/components/ag-table-actions'
-import AgTableAction from '@/components/ag-table-action'
+import { AgTableActions, AgTableAction } from '@/components'
 </script>
 ```
 

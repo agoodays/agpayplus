@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import AgTableAction from '@/components/ag-table-action'
+import { AgTableAction } from '@/components'
 
 const handleView = (record) => {
   console.log('查看:', record)
@@ -53,7 +53,7 @@ const handleDelete = (record) => {
 </template>
 
 <script setup>
-import AgTableAction from '@/components/ag-table-action'
+import { AgTableAction } from '@/components'
 
 const moreActions = [
   { label: '详情', value: 'detail' },

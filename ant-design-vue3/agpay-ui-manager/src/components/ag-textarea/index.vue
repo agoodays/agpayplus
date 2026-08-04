@@ -24,15 +24,21 @@
 </template>
 
 <script setup>
+/**
+ * AgTextarea - 浮动标签文本域
+ *
+ * 基于 a-textarea 封装，支持浮动标签动画。
+ *
+ * @example
+ * <a-form-item name="remark" label="备注">
+ *   <AgTextarea v-model="form.remark" :rows="4" :maxlength="200" show-count />
+ * </a-form-item>
+ */
 import { useFloatLabel } from '@/composables/useFloatLabel'
 import { ref } from 'vue'
 
 const props = defineProps({
   modelValue: {
-    type: String,
-    default: undefined
-  },
-  value: {
     type: String,
     default: undefined
   },
@@ -72,14 +78,14 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  // 浮动标签配置
+  /** 浮动标签配置 */
   floatOptions: {
     type: Object,
     default: () => ({})
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'pressEnter'])
+const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'pressEnter'])
 
 const textareaRef = ref()
 

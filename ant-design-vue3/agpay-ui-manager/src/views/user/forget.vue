@@ -60,12 +60,12 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { message, notification } from 'ant-design-vue'
-import { useI18n } from 'vue-i18n'
+import { basicApi } from '@/api/system/basic-api'
 import { loginApi } from '@/api/system/login-api'
-import { timeFix } from '@/utils/time-util.js'
+import { message, notification } from 'ant-design-vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
@@ -95,7 +95,7 @@ let timer = null
  */
 const fetchPasswordRules = async () => {
   try {
-    const res = await loginApi.getPwdRulesRegexp()
+    const res = await basicApi.getPwdRulesRegexp()
     if (res) {
       passwordRules.regexpRules = res.regexpRules
       passwordRules.errTips = res.errTips

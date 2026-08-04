@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="ag-card-list">
     <a-row :gutter="[24, 24]">
       <!-- 新增卡片 -->
       <a-col
@@ -14,8 +14,8 @@
       >
         <div class="ag-card-add" :style="{ height: height + 'px' }">
           <div class="ag-card-add-top">
-            <img src="~@/assets/svg/add-icon.svg" alt="add-icon" class="ag-card-add-icon" />
-            <img src="~@/assets/svg/add-icon-hover.svg" alt="add-icon" class="ag-card-add-icon-hover" />
+            <img src="@/assets/svg/add-icon.svg" alt="add-icon" class="ag-card-add-icon" />
+            <img src="@/assets/svg/add-icon-hover.svg" alt="add-icon" class="ag-card-add-icon-hover" />
           </div>
           <div class="ag-card-add-text">新增{{ name }}</div>
         </div>
@@ -23,8 +23,8 @@
 
       <!-- 数据卡片 -->
       <a-col
-        v-for="(item, key) in cardDataList"
-        :key="key"
+        v-for="item in cardDataList"
+        :key="item.id"
         :xxl="24 / span.xxl"
         :xl="24 / span.xl"
         :lg="24 / span.lg"
@@ -52,23 +52,68 @@
 
 <script setup>
 /**
- * 卡片列表组件
- * 功能：以卡片形式展示数据，支持新增卡片入口、分页、响应式布局
+ * AgCard - 卡片列表组件
+ *
+ * 功能：
+ * - 以卡片形式展示数据，支持新增卡片入口、分页、响应式布局
+ * - 通过 loadData 异步加载数据
+ * - 支持搜索条件透传和分页
+ *
+ * @example
+ * <AgCard
+ *   :search-data="searchData"
+ *   :load-data="loadData"
+ *   :use-pagination="true"
+ *   :page-size="12"
+ *   :span="{ xxl: 6, xl: 4, lg: 3, md: 2, sm: 1, xs: 1 }"
+ *   add-authority
+ *   name="商户"
+ *   @add="handleAdd"
+ * />
  */
 import { ref, onMounted } from 'vue'
 
 const props = defineProps({
+  /** 响应式栅格配置，每个值表示一行显示的卡片数 */
   span: {
     type: Object,
     default: () => ({ xxl: 6, xl: 4, lg: 4, md: 3, sm: 2, xs: 1 })
   },
-  height: { type: Number, default: 200 },
-  name: { type: String, default: '' },
-  addAuthority: { type: Boolean, default: false },
-  searchData: { type: Object, default: () => ({}) },
-  reqCardListFunc: { type: Function, required: true },
-  usePagination: { type: Boolean, default: false },
-  pageSize: { type: Number, default: 10 }
+  /** 卡片高度（px） */
+  height: {
+    type: Number,
+    default: 200
+  },
+  /** 新增卡片的业务名称（用于"新增xxx"文案） */
+  name: {
+    type: String,
+    default: ''
+  },
+  /** 是否显示新增卡片入口 */
+  addAuthority: {
+    type: Boolean,
+    default: false
+  },
+  /** 搜索条件，变化后会透传给 loadData */
+  searchData: {
+    type: Object,
+    default: () => ({})
+  },
+  /** 数据加载函数，接收 params，返回 { records, total } 或数组 */
+  loadData: {
+    type: Function,
+    required: true
+  },
+  /** 是否启用分页 */
+  usePagination: {
+    type: Boolean,
+    default: false
+  },
+  /** 每页条数 */
+  pageSize: {
+    type: Number,
+    default: 10
+  }
 })
 
 const emit = defineEmits(['add', 'loadComplete'])
@@ -80,9 +125,10 @@ const paginationInfo = ref({ current: 1, pageSize: props.pageSize, total: 0 })
 
 /**
  * 刷新卡片列表数据
- * @param {boolean} isToFirst - 是否回到第一页
+ * @param {boolean} [isToFirst=false] - 是否回到第一页
+ * @returns {Promise<void>}
  */
-const refreshCardList = async (isToFirst = false) => {
+async function reload(isToFirst = false) {
   if (props.usePagination && isToFirst) {
     paginationInfo.value.current = 1
   }
@@ -97,21 +143,13 @@ const refreshCardList = async (isToFirst = false) => {
     }
   }
 
-  if (typeof props.reqCardListFunc !== 'function') {
-    console.error('AgCard: reqCardListFunc 不是一个函数')
-    cardDataList.value = []
-    paginationInfo.value.total = 0
-    emit('loadComplete')
-    return
-  }
-
   try {
-    const res = await props.reqCardListFunc(params)
+    const res = await props.loadData(params)
     if (props.usePagination) {
-      cardDataList.value = res.records || []
-      paginationInfo.value.total = res.total || 0
+      cardDataList.value = res?.records || []
+      paginationInfo.value.total = res?.total || 0
     } else {
-      cardDataList.value = Array.isArray(res) ? res : res.records || []
+      cardDataList.value = Array.isArray(res) ? res : res?.records || []
       paginationInfo.value.total = cardDataList.value.length
     }
   } catch (err) {
@@ -123,17 +161,21 @@ const refreshCardList = async (isToFirst = false) => {
   }
 }
 
-const handlePageChange = (page) => {
+/**
+ * 分页变化处理
+ * @param {number} page - 新页码
+ */
+function handlePageChange(page) {
   paginationInfo.value.current = page
-  refreshCardList()
+  reload()
 }
 
 defineExpose({
-  refreshCardList
+  reload
 })
 
 onMounted(() => {
-  refreshCardList()
+  reload()
 })
 </script>
 

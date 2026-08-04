@@ -53,7 +53,7 @@ const theme = ref('dark')
 |------|------|--------|------|
 | prefixCls | String | 'ant-pro-global-header-index-action' | CSS类名前缀 |
 | isMobile | Boolean | false | 是否移动端 |
-| topMenu | Boolean | true | 是否顶部菜单模式 |
+| topMenu | Boolean | (required) | 是否顶部菜单模式 |
 | theme | String | dark | 主题（dark/light） |
 
 ## 功能特性
@@ -65,7 +65,8 @@ const theme = ref('dark')
 
 ## 注意事项
 
-1. 用户信息从 Pinia 的 userStore 中获取
+1. 用户信息从 Pinia 的 userStore 中获取（头像、用户名）
 2. 退出登录使用 `infoBox.confirmPrimary` 确认弹窗
 3. 权限检查使用 `usePermission` composable
-4. 当前用户名称默认为 'dd'，实际项目中应从 userStore 获取
+4. RightContent 仅负责布局样式，不向 AvatarDropdown 传递任何 props
+5. AvatarDropdown 自行从 userStore 获取用户信息，无 props

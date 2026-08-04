@@ -87,7 +87,7 @@ watch(
     localOpen.value = val
     if (val && props.appId && props.wayCode) {
       cardList.value = []
-      refCardList()
+      reloadCardList()
     }
   }
 )
@@ -100,7 +100,7 @@ watch(localOpen, (val) => {
 /**
  * 加载支付通道卡片列表
  */
-const refCardList = async () => {
+const reloadCardList = async () => {
   const resData = await mchAppApi.getAvailablePayInterfaceList(props.appId, props.wayCode)
   if (!resData.records || resData.records.length === 0) {
     cardList.value = []

@@ -7,14 +7,14 @@
     <template #overlay>
       <a-menu class="ant-pro-drop-down menu" :selected-keys="[]">
         <a-menu-item v-if="hasPermission('ENT_C_USERINFO')" key="settings" @click="handleToSettings">
-          <icons.SettingOutlined />
+          <setting-outlined />
           账户设置
         </a-menu-item>
 
         <a-menu-divider />
 
         <a-menu-item key="logout" @click="handleLogout">
-          <icons.LogoutOutlined />
+          <logout-outlined />
           退出登录
         </a-menu-item>
       </a-menu>
@@ -28,7 +28,6 @@
  * 功能：展示当前用户信息，提供账户设置和退出登录入口
  */
 import { LogoutOutlined, SettingOutlined } from '@ant-design/icons-vue'
-const icons = { LogoutOutlined, SettingOutlined }
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { infoBox } from '@/utils/info-box'
@@ -40,27 +39,23 @@ const router = useRouter()
 const { hasPermission } = usePermission()
 
 /** 当前用户名称 */
-const currentUserName = computed(() => {
-  return userStore.userInfo?.userName || ''
-})
+const currentUserName = computed(() => userStore.userInfo?.userName || '')
 
 /** 用户头像地址 */
-const greetImg = computed(() => {
-  return userStore.userInfo?.avatarImgPath || ''
-})
+const greetImg = computed(() => userStore.userInfo?.avatarImgPath || '')
 
 /**
  * 跳转到账户设置页面
  */
-const handleToSettings = () => {
+function handleToSettings() {
   router.push({ name: 'ENT_C_USERINFO' })
 }
 
 /**
  * 处理退出登录
  */
-const handleLogout = () => {
-  infoBox.confirmPrimary('是否退出登录？', `你好${currentUserName.value}确认退出登录吗？`, async () => {
+function handleLogout() {
+  infoBox.confirmPrimary('是否退出登录？', `你好${currentUserName.value}，确认退出登录吗？`, async () => {
     await userStore.logout()
     router.push({ name: 'login' })
   })

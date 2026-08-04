@@ -1,7 +1,7 @@
-﻿<template>
+<template>
   <a-form ref="infoForm" layout="vertical" :model="ifParams" :rules="rules">
     <a-row :gutter="24">
-      <a-collapse v-model="activeKey" accordion :bordered="false">
+      <a-collapse v-model:activeKey="activeKey" accordion :bordered="false">
         <a-collapse-panel key="1" :header="configMode === 'mgrIsv' ? '服务商三方应用参数配置' : '商户应用参数配置'">
           <a-col span="24">
             <a-form-item label="环境配置" name="sandbox">
@@ -255,54 +255,68 @@
 </template>
 
 <script setup>
-import AgUpload from '@/components/ag-upload'
+/**
+ * 支付宝 Oauth2 配置页面（普通商户模式）
+ *
+ * 配置支付宝应用参数，分两个折叠面板：
+ * 1. 主应用参数：环境 / PID / appId / 私钥 / 公钥 / 签名方式 / 证书 / 三种证书上传
+ * 2. 小程序参数（liteParams）：与主应用参数结构一致，用于小程序静态码场景
+ *
+ * 通过 `useOauth2Form` composable 管理表单数据与提交逻辑，
+ * 敏感字段（privateKey / alipayPublicKey 及 liteParams 对应字段）以占位符形式提示已配置过。
+ */
+import { AgUpload } from '@/components'
 import { upload } from '@/lib/ag-axios'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useOauth2Form } from '../composables/useOauth2Form'
+
 const icons = { LoadingOutlined, UploadOutlined }
 
 const props = defineProps({
+  /** 配置模式（如 mgrIsv、mgrMch） */
   configMode: { type: String, default: null },
+  /** 后端返回的初始表单数据 */
   formData: { type: Object, default: () => ({ liteParams: {} }) }
 })
 
 const emit = defineEmits(['update-if-params'])
 
-const formDataRef = reactive({ ...props.formData })
-formDataRef.liteParams = formDataRef.liteParams || {}
+const {
+  infoForm,
+  ifParams,
+  updateIfParams,
+  updateIfParamsLiteParams,
+  uploadSuccess,
+  uploadSuccessLiteParams,
+  getSubmitParams,
+  validate,
+  resetFields
+} = useOauth2Form(props, emit, {
+  hasLiteParams: true,
+  placeholders: [
+    { key: 'privateKey', placeholder: '请输入应用私钥' },
+    { key: 'alipayPublicKey', placeholder: '请输入支付宝公钥' }
+  ],
+  liteParamsPlaceholders: [
+    { key: 'privateKey', placeholder: '请输入应用私钥' },
+    { key: 'alipayPublicKey', placeholder: '请输入支付宝公钥' }
+  ],
+  clearKeys: ['privateKey', 'alipayPublicKey'],
+  clearLiteParamsKeys: ['privateKey', 'alipayPublicKey']
+})
 
-formDataRef.privateKey_ph = formDataRef.privateKey ? formDataRef.privateKey : '请输入应用私钥'
-if (formDataRef.privateKey) {
-  formDataRef.privateKey = ''
-}
-
-formDataRef.alipayPublicKey_ph = formDataRef.alipayPublicKey
-  ? formDataRef.alipayPublicKey
-  : '请输入支付宝公钥'
-if (formDataRef.alipayPublicKey) {
-  formDataRef.alipayPublicKey = ''
-}
-
-formDataRef.liteParams.privateKey_ph = formDataRef.liteParams.privateKey
-  ? formDataRef.liteParams.privateKey
-  : '请输入应用私钥'
-if (formDataRef.liteParams.privateKey) {
-  formDataRef.liteParams.privateKey = ''
-}
-
-formDataRef.liteParams.alipayPublicKey_ph = formDataRef.liteParams.alipayPublicKey
-  ? formDataRef.liteParams.alipayPublicKey
-  : '请输入支付宝公钥'
-if (formDataRef.liteParams.alipayPublicKey) {
-  formDataRef.liteParams.alipayPublicKey = ''
-}
-
-emit('update-if-params', { ...formDataRef })
-
-const ifParams = reactive({ ...formDataRef })
+/** 证书上传地址 */
 const action = upload.cert
+/** 折叠面板当前激活 key */
 const activeKey = ref(1)
 
+/**
+ * 表单校验规则
+ *
+ * 敏感字段（privateKey / alipayPublicKey）在初始化后会被清空，
+ * 因此始终必填，由用户重新输入或保持原值。
+ */
 const rules = computed(() => {
   const result = {
     sandbox: [{ required: true, trigger: 'blur', message: '请选择环境' }],
@@ -311,78 +325,16 @@ const rules = computed(() => {
     signType: [{ required: true, trigger: 'blur', message: '请选择接口签名方式' }],
     useCert: [{ required: true, trigger: 'blur', message: '请选择是否使用证书' }]
   }
-  if (!formDataRef.privateKey) {
+  if (!ifParams.privateKey) {
     result.privateKey = [{ required: true, trigger: 'blur', message: '请输入应用私钥' }]
   }
-  if (!formDataRef.alipayPublicKey) {
+  if (!ifParams.alipayPublicKey) {
     result.alipayPublicKey = [{ required: true, trigger: 'blur', message: '请输入支付宝公钥' }]
   }
   return result
 })
 
-const infoForm = ref(null)
-
-const uploadSuccess = (name, fileList) => {
-  const [firstItem] = fileList
-  ifParams[name] = firstItem?.url
-  updateIfParams(name, firstItem?.url)
-}
-
-const updateIfParams = (key, value) => {
-  emit('update-if-params', {
-    ...ifParams,
-    [key]: value
-  })
-}
-
-const uploadSuccessLiteParams = (name, fileList) => {
-  const [firstItem] = fileList
-  ifParams.liteParams[name] = firstItem?.url
-  updateIfParamsLiteParams(name, firstItem?.url)
-}
-
-const updateIfParamsLiteParams = (key, value) => {
-  emit('update-if-params', {
-    ...ifParams,
-    liteParams: {
-      ...ifParams.liteParams,
-      [key]: value
-    }
-  })
-}
-
-const handleStarParams = () => {
-  const params = JSON.parse(JSON.stringify(ifParams) || '{}')
-  clearEmptyKey(params, 'privateKey')
-  clearEmptyKey(params, 'alipayPublicKey')
-  clearEmptyKey(params.liteParams, 'privateKey')
-  clearEmptyKey(params.liteParams, 'alipayPublicKey')
-  return params
-}
-
-const clearEmptyKey = (obj, key) => {
-  if (!obj[key]) {
-    obj[key] = undefined
-  }
-  obj[key + '_ph'] = undefined
-}
-
-const validate = async (callback) => {
-  try {
-    await infoForm.value.validate()
-    callback?.(true)
-    return true
-  } catch {
-    callback?.(false)
-    return false
-  }
-}
-
-const resetFields = () => {
-  infoForm.value?.resetFields?.()
-}
-
-defineExpose({ validate, resetFields, handleStarParams })
+defineExpose({ validate, resetFields, getSubmitParams })
 </script>
 
 <style scoped></style>

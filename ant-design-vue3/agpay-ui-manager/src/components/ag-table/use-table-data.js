@@ -1,13 +1,11 @@
 import { message } from 'ant-design-vue'
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 
 export function useTableData({ props, state, emit, t }) {
   const internalData = ref([])
   const localLoading = ref(false)
   const latestLoadRequestId = ref(0)
   const latestStatisticsRequestId = ref(0)
-
-  const isLoading = ref(false)
 
   function safeCallHook(hook, payload) {
     if (typeof hook !== 'function') return undefined
@@ -70,11 +68,11 @@ export function useTableData({ props, state, emit, t }) {
 
   const isPaginationControlled = computed(() => typeof props.pagination === 'object' && props.pagination !== null)
 
+  /** 综合外部 loading 与内部加载状态的最终 loading 值 */
   const computedLoading = computed(() => props.loading || localLoading.value)
 
-  watch(computedLoading, (val) => {
-    isLoading.value = val
-  }, { immediate: true })
+  /** 对外暴露的 loading 状态（与 computedLoading 同步） */
+  const isLoading = computedLoading
 
   const tableData = computed(() => ({
     records: props.data && props.data.length ? props.data : internalData.value,

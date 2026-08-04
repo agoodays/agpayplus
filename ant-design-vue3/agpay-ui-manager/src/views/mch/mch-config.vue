@@ -192,6 +192,10 @@
 </template>
 
 <script setup>
+/**
+ * 商户配置抽屉组件
+ * 功能：展示并编辑商户的应用配置、支付配置、结算配置等扩展信息
+ */
 import { mchApi } from '@/api/business/mch/mch-api'
 import { AgDrawer } from '@/components'
 import { getOpenStatusOptions, getStateOptions } from '@/constants/common-const'

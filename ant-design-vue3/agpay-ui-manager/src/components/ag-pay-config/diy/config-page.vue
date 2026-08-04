@@ -75,10 +75,6 @@ const props = defineProps({
   diyList: {
     type: Array,
     default: () => []
-  },
-  callbackFunc: {
-    type: Function,
-    default: () => {}
   }
 })
 
@@ -243,7 +239,6 @@ const submitRequest = async (ifParamsData = '{}') => {
   }
 
   await payConfigApi.saveOrUpdatePayInterfaceConfig(reqParams)
-  props.callbackFunc()
   emit('success')
 }
 

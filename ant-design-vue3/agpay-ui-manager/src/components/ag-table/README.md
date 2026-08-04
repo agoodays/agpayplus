@@ -101,7 +101,7 @@ const columns = ref([
   { title: '操作', key: 'actions', width: 150, fixed: 'right', align: 'center', customRender: 'actions' }
 ])
 
-const sortState = reactive({
+const f = reactive({
   sortField: '',
   sortOrder: null
 })
@@ -420,6 +420,7 @@ function summaryFunc({ columns, data }) {
 | searchData | 查询参数 | `Object` | `null` |
 | initialStatistics | 初始统计数据 | `Object \| Array` | `null` |
 | stateKey | 列设置持久化键 | `String` | `''` |
+| rowSelectionEnabled | 启用工具栏批量选择 | `Boolean` | `false` |
 
 ## 📤 Events
 
@@ -457,6 +458,7 @@ function summaryFunc({ columns, data }) {
 | resetColumnSettings | 重置列设置 | - |
 | startAutoRefresh | 开始自动刷新 | - |
 | stopAutoRefresh | 停止自动刷新 | - |
+| isLoading | 当前加载状态（只读 ComputedRef） | - |
 | getSelectedRowKeys | 获取选中行 key | - |
 | getSelectedRows | 获取选中行数据 | - |
 | clearSelection | 清除选择 | - |
@@ -467,7 +469,7 @@ function summaryFunc({ columns, data }) {
 - **新页面优先采用非受控模式**，减少重复分页与请求样板代码。
 - **使用 `stateKey`** 区分不同页面列配置，避免互相覆盖。
 - **`customRender` 建议与业务字段同名**，提升可维护性。
-- **批量操作通过 `batch-actions` 插槽** 实现，组件自动管理选中状态。
+- **批量操作通过 `batch-actions` 插槽** 实现，组件自动管理选中状态；工具栏全选 checkbox 由组件根据当前页数据自动计算 `checked` / `indeterminate` 状态。
 - **汇总行通过 `summary` prop** 实现，支持自定义汇总逻辑。
 
 ## 🔄 并发与钩子说明

@@ -62,7 +62,7 @@ const handleChannelUserId = ({ channelUserId, extObject }) => {
 ## 功能特性
 
 1. **WebSocket连接**：使用 ReconnectingWebSocket 实现自动重连
-2. **二维码展示**：使用 vue-qr 组件生成二维码
+2. **二维码展示**：使用 a-qrcode 组件生成二维码
 3. **扫码监听**：实时监听扫码结果，成功后自动关闭弹窗
 4. **扩展对象传递**：支持传递扩展对象，扫码成功后原样返回
 
@@ -71,4 +71,4 @@ const handleChannelUserId = ({ channelUserId, extObject }) => {
 1. 需要后端提供二维码获取接口和WebSocket服务
 2. 每次调用showModal前会关闭之前的WebSocket连接
 3. WebSocket地址通过 `basicApi.getWebSocketPrefix()` 获取
-4. 依赖 `vue-qr` 和 `reconnectingwebsocket` 包
+4. 依赖 `a-qrcode` 和 `reconnectingwebsocket` 包

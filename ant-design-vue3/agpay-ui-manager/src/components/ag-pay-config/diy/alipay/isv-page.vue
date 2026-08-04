@@ -144,12 +144,10 @@ const props = defineProps({
   diyList: {
     type: Array,
     default: () => []
-  },
-  callbackFunc: {
-    type: Function,
-    default: () => {}
   }
 })
+
+const emit = defineEmits(['success'])
 
 const isAdd = ref(true)
 const infoFormRef = ref(null)
@@ -302,7 +300,7 @@ const submitRequest = async (ifParamsData = '{}') => {
   }
 
   await payConfigApi.saveOrUpdatePayInterfaceConfig(reqParams)
-  props.callbackFunc()
+  emit('success')
 }
 
 const clearEmptyKey = (ifParams, key) => {

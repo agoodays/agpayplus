@@ -9,7 +9,7 @@
         :search-loading="tableRef?.isLoading?.value || false"
         :reset-exclude="['dateRange']"
         @search="searchFunc"
-        @reset="searchFunc"
+        @reset="resetFunc"
       >
         <!-- 基础搜索条件 -->
         <template #base="{ colSpan }">
@@ -128,49 +128,46 @@
     </a-card>
 
     <!-- 通知详情抽屉 -->
-    <detail-drawer v-model:open="detailOpen" :notify-id="currentNotifyId" />
+    <detail-drawer v-model:open="detailOpen" :notify-id="currentRecordId" />
   </div>
 </template>
 
 <script setup>
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
 import { message } from 'ant-design-vue'
-import { reactive, ref } from 'vue'
 import DetailDrawer from './detail-drawer.vue'
 
 /**
- * 用户权限检查函数
+ * 商户通知列表页面
+ * 仅包含详情查看和重发通知，无新增/编辑/删除操作。
  */
+
+/** 用户权限检查 */
 const { hasPermission } = usePermission()
 
 /**
- * 表格引用
+ * CRUD 表格页面状态
+ * 注：本页面无新增/编辑/删除，仅使用 tableRef/searchData/detailOpen 等部分能力。
  */
-const tableRef = ref()
+const { tableRef, searchData, detailOpen, currentRecordId, reloadTable, openDetail } = useCrudTablePage()
 
-/**
- * 详情抽屉状态
- */
-const detailOpen = ref(false)
-const currentNotifyId = ref('')
-
-/**
- * 搜索数据
- */
-const searchData = reactive({
+/** 搜索数据默认值（用于 resetFunc 恢复） */
+const defaultSearchData = {
   dateRange: 'today',
   orderId: '',
   mchOrderNo: '',
   state: '',
   isvNo: '',
   orderType: ''
-})
+}
 
-/**
- * 表格列定义
- */
+// 初始化 searchData 默认值
+Object.assign(searchData, defaultSearchData)
+
+/** 表格列定义 */
 const tableColumns = [
   { key: 'orderId', dataIndex: 'orderId', title: '订单ID', width: 210, fixed: 'left' },
   { key: 'mchOrderNo', dataIndex: 'mchOrderNo', title: '商户订单号', width: 200 },
@@ -197,67 +194,47 @@ function handleExport(params) {
   orderApi.exportMchNotify(params)
 }
 
-/**
- * 搜索函数
- */
+/** 搜索函数 */
 function searchFunc() {
   tableRef.value?.refresh()
 }
 
 /**
- * 获取通知状态颜色
- * @param {number} state - 状态码
- * @returns {string} - 颜色
+ * 重置搜索条件为默认值并刷新表格
+ * dateRange 默认值为 'today'，需手动恢复
  */
+function resetFunc() {
+  Object.assign(searchData, defaultSearchData)
+  reloadTable()
+}
+
+/** 通知状态颜色映射 */
+const STATE_COLOR_MAP = { 1: 'orange', 2: 'green', 3: 'volcano' }
+/** 通知状态文本映射 */
+const STATE_TEXT_MAP = { 1: '通知中', 2: '通知成功', 3: '通知失败' }
+/** 订单类型颜色映射 */
+const ORDER_TYPE_COLOR_MAP = { 1: 'green', 2: 'volcano', 3: 'blue' }
+/** 订单类型文本映射 */
+const ORDER_TYPE_TEXT_MAP = { 1: '支付', 2: '退款', 3: '转账' }
+
+/** 获取通知状态颜色 */
 function getStateColor(state) {
-  const colorMap = {
-    1: 'orange',
-    2: 'green',
-    3: 'volcano'
-  }
-  return colorMap[state] || 'default'
+  return STATE_COLOR_MAP[state] || 'default'
 }
 
-/**
- * 获取通知状态文本
- * @param {number} state - 状态码
- * @returns {string} - 文本
- */
+/** 获取通知状态文本 */
 function getStateText(state) {
-  const textMap = {
-    1: '通知中',
-    2: '通知成功',
-    3: '通知失败'
-  }
-  return textMap[state] || '未知'
+  return STATE_TEXT_MAP[state] || '未知'
 }
 
-/**
- * 获取订单类型颜色
- * @param {number} type - 类型码
- * @returns {string} - 颜色
- */
+/** 获取订单类型颜色 */
 function getOrderTypeColor(type) {
-  const colorMap = {
-    1: 'green',
-    2: 'volcano',
-    3: 'blue'
-  }
-  return colorMap[type] || 'orange'
+  return ORDER_TYPE_COLOR_MAP[type] || 'orange'
 }
 
-/**
- * 获取订单类型文本
- * @param {number} type - 类型码
- * @returns {string} - 文本
- */
+/** 获取订单类型文本 */
 function getOrderTypeText(type) {
-  const textMap = {
-    1: '支付',
-    2: '退款',
-    3: '转账'
-  }
-  return textMap[type] || '未知'
+  return ORDER_TYPE_TEXT_MAP[type] || '未知'
 }
 
 /**
@@ -265,8 +242,7 @@ function getOrderTypeText(type) {
  * @param {Object} record - 通知记录
  */
 function handleDetail(record) {
-  currentNotifyId.value = record.notifyId
-  showDetail()
+  openDetail(record.notifyId)
 }
 
 /**

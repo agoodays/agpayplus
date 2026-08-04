@@ -1,12 +1,16 @@
 <template>
   <div :class="wrpCls">
-    <avatar-dropdown :menu="showMenu" :current-user="currentUser" :class="prefixCls" />
+    <avatar-dropdown :class="prefixCls" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import AvatarDropdown from './avatar-dropdown'
+/**
+ * 全局头部 - 右侧操作区容器
+ * 功能：根据主题和布局模式渲染右侧容器样式，内嵌用户头像下拉菜单
+ */
+import { computed } from 'vue'
+import AvatarDropdown from './avatar-dropdown.vue'
 
 const props = defineProps({
   prefixCls: {
@@ -27,19 +31,9 @@ const props = defineProps({
   }
 })
 
-const showMenu = ref(true)
-const currentUser = ref({})
-
-const wrpCls = computed(() => {
-  return {
-    'ant-pro-global-header-index-right': true,
-    [`ant-pro-global-header-index-${props.isMobile || !props.topMenu ? 'light' : props.theme}`]: true
-  }
-})
-
-onMounted(() => {
-  currentUser.value = {
-    name: 'dd'
-  }
-})
+/** 容器样式类（根据主题/布局动态切换） */
+const wrpCls = computed(() => ({
+  'ant-pro-global-header-index-right': true,
+  [`ant-pro-global-header-index-${props.isMobile || !props.topMenu ? 'light' : props.theme}`]: true
+}))
 </script>

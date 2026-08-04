@@ -32,6 +32,10 @@
 </template>
 
 <script setup>
+/**
+ * 支付配置抽屉组件
+ * 以抽屉形式包裹 AgPayConfigPanel，统一处理保存按钮、loading 状态与成功提示。
+ */
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { ref } from 'vue'
@@ -48,33 +52,51 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open', 'success', 'channel-change', 'tab-change', 'passage-state-update'])
 
+/** 配置面板引用 */
 const payConfigRef = ref(null)
+/** 保存按钮 loading 状态 */
 const btnLoading = ref(false)
+/** 是否已选中渠道（控制保存按钮显隐） */
 const hasSelectedChannel = ref(false)
 
+/** 关闭抽屉 */
 const handleClose = () => {
   emit('update:open', false)
 }
 
+/**
+ * 渠道切换处理
+ * @param {string} channelCode - 渠道编码
+ */
 const handleChannelChange = (channelCode) => {
   hasSelectedChannel.value = !!channelCode
   emit('channel-change', channelCode)
 }
 
+/**
+ * 标签页切换处理
+ * @param {string} tabCode - 标签页编码
+ */
 const handleTabChange = (tabCode) => {
   emit('tab-change', tabCode)
 }
 
+/**
+ * 通道状态更新处理
+ * @param {Object} data - 通道状态数据
+ */
 const handlePassageStateUpdate = (data) => {
   emit('passage-state-update', data)
 }
 
+/** 保存成功处理：提示 + 关闭 + 通知父组件 */
 const handleSubmitSuccess = () => {
   message.success('保存成功')
   handleClose()
   emit('success')
 }
 
+/** 提交保存 */
 const onSubmit = async () => {
   btnLoading.value = true
   try {

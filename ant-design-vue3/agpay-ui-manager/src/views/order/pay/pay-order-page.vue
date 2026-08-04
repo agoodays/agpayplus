@@ -340,7 +340,7 @@
 
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" @click="handleDetail(record)">详情{{ record.state }}{{ record.refundState }}</a-button>
+            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" @click="handleDetail(record)">详情</a-button>
             <a-button
               type="link"
               style="color: red"
@@ -352,7 +352,7 @@
     </a-card>
 
     <!-- 详情抽屉 -->
-    <detail-drawer v-model:open="detailOpen" :pay-order-id="currentPayOrderId" />
+    <detail-drawer v-model:open="detailOpen" :pay-order-id="currentRecordId" />
 
     <!-- 退款弹窗 -->
     <refund-modal v-model:open="refundOpen" :pay-order="currentPayOrder" @success="handleRefundSuccess" />
@@ -368,6 +368,7 @@
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import {
   CopyOutlined,
   DollarOutlined,
@@ -377,7 +378,7 @@ import {
   WalletOutlined
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DetailDrawer from './detail-drawer.vue'
 import RefundModal from './refund-modal.vue'
@@ -385,35 +386,39 @@ import RefundModal from './refund-modal.vue'
 // 国际化
 const { t } = useI18n()
 
-// 弹窗控制
-const { open: detailOpen, showModal: showDetail } = useModal()
-const { open: refundOpen, showModal: showRefund } = useModal()
-
 // 权限检查
 const { hasPermission } = usePermission()
 
 /**
- * 组件引用
+ * 使用 CRUD 表格页面组合式函数
  */
-const tableRef = ref(null)
-const currentPayOrderId = ref('')
-const currentPayOrder = ref(null)
-const statistics = ref(null)
-const detailVisible = ref(false)
+const {
+  tableRef,
+  searchData,
+  detailOpen,
+  currentRecordId,
+  reloadTable,
+  openDetail
+} = useCrudTablePage()
+
+// 初始化搜索表单默认值
+searchData.dateRange = ''
+searchData.payOrderId = ''
+searchData.mchOrderNo = ''
+searchData.channelOrderNo = ''
+searchData.state = ''
+searchData.notifyState = ''
+searchData.appId = ''
+searchData.storeId = ''
+
+// 退款弹窗控制
+const { open: refundOpen, showModal: showRefund } = useModal()
 
 /**
- * 搜索表单数据
+ * 组件引用 / 额外状态
  */
-const searchData = reactive({
-  dateRange: '',
-  payOrderId: '',
-  mchOrderNo: '',
-  channelOrderNo: '',
-  state: '',
-  notifyState: '',
-  appId: '',
-  storeId: ''
-})
+const currentPayOrder = ref(null)
+const detailVisible = ref(false)
 
 /**
  * 构建请求参数
@@ -484,17 +489,18 @@ const loadStatistics = async (params) => {
 }
 
 /**
- * 搜索回调函数
+ * 搜索回调函数（同时刷新表格和统计）
  */
-const searchFunc = () => {
-  refresh()
+function searchFunc() {
+  reloadTable()
+  tableRef.value?.reloadStatistics()
 }
 
 /**
  * 刷新表格数据和统计信息
  */
-const refresh = () => {
-  tableRef.value?.reload()
+function refresh() {
+  reloadTable()
   tableRef.value?.reloadStatistics()
 }
 
@@ -538,16 +544,15 @@ const getStateText = (state) => {
  * 查看详情
  * @param {Object} record - 订单记录
  */
-const handleDetail = (record) => {
-  currentPayOrderId.value = record.payOrderId
-  showDetail()
+function handleDetail(record) {
+  openDetail(record.payOrderId)
 }
 
 /**
  * 退款
  * @param {Object} record - 订单记录
  */
-const handleRefund = (record) => {
+function handleRefund(record) {
   currentPayOrder.value = record
   showRefund()
 }
@@ -555,7 +560,7 @@ const handleRefund = (record) => {
 /**
  * 退款成功回调
  */
-const handleRefundSuccess = () => {
+function handleRefundSuccess() {
   refresh()
 }
 

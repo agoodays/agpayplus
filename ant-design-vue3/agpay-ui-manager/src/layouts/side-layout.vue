@@ -373,12 +373,12 @@ const handleReload = () => {
 
 // 个人中心
 const handleUserCenter = () => {
-  router.push({ path: '/current/userinfo' })
+  router.push({ path: '/current/userinfo' }) // router.push({ name: 'ENT_C_USERINFO' })
 }
 
 // 账户设置
 const handleSetting = () => {
-  router.push({ path: '/current/modifyPwd' })
+  router.push({ path: '/current/userinfo', query: { tab: 'security', sub: 'password' } })
 }
 
 // 语言切换

@@ -1,4 +1,4 @@
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 
 const STORAGE_PREFIX = 'agpay_table_'
 const STORAGE_VERSION = 1
@@ -6,13 +6,29 @@ const DEBOUNCE_DELAY = 500
 
 function debounce(fn, delay) {
   let timer = null
-  return function (...args) {
+  function debounced(...args) {
     if (timer) clearTimeout(timer)
     timer = setTimeout(() => {
       fn.apply(this, args)
       timer = null
     }, delay)
   }
+  /** 取消尚未执行的 debounce 调用 */
+  debounced.cancel = () => {
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+    }
+  }
+  /** 立即执行尚未执行的 debounce 调用 */
+  debounced.flush = (...args) => {
+    if (timer) {
+      clearTimeout(timer)
+      timer = null
+      fn.apply(this, args)
+    }
+  }
+  return debounced
 }
 
 function safeJSONParse(str, def = null) {
@@ -89,6 +105,11 @@ export function useTableColumns({ props, state, dragKey, loadDensitySetting, onR
     }
     storage.set(key, JSON.stringify(payload))
   }, DEBOUNCE_DELAY)
+
+  // 组件卸载时，立即 flush 尚未保存的列设置，避免丢失用户调整
+  onBeforeUnmount(() => {
+    saveColumnSettings.flush()
+  })
 
   function loadColumnSettings() {
     const key = getStorageKey('columns')

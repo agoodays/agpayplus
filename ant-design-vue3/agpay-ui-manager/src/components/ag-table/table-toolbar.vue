@@ -5,8 +5,8 @@
       
       <!-- 批量选择 -->
       <div v-if="rowSelectionEnabled" class="batch-selection-group">
-        <a-checkbox 
-          v-model:checked="isAllSelected" 
+        <a-checkbox
+          :checked="isAllSelected"
           :indeterminate="isIndeterminate"
           @change="handleSelectAllChange"
         >
@@ -118,7 +118,6 @@ import {
   SettingOutlined,
   SyncOutlined,
 } from '@ant-design/icons-vue'
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AgTableColumnSettingsPanel from './column-settings-panel.vue'
 
@@ -138,10 +137,14 @@ const props = defineProps({
   dragKey: { type: String, default: null },
   isAllColumnsVisible: { type: Boolean, default: false },
   isSomeColumnsVisible: { type: Boolean, default: false },
-  
+
   // 批量选择相关
   selectedRowKeys: { type: Array, default: () => [] },
-  rowSelectionEnabled: { type: Boolean, default: false }
+  rowSelectionEnabled: { type: Boolean, default: false },
+  /** 当前页是否全选（由父组件计算后传入） */
+  isAllSelected: { type: Boolean, default: false },
+  /** 当前页是否部分选中（由父组件计算后传入） */
+  isIndeterminate: { type: Boolean, default: false }
 })
 
 const emit = defineEmits([
@@ -165,16 +168,6 @@ const emit = defineEmits([
 ])
 
 const { t } = useI18n()
-
-// 是否全选
-const isAllSelected = computed(() => {
-  return props.selectedRowKeys.length > 0
-})
-
-// 是否部分选中
-const isIndeterminate = computed(() => {
-  return props.selectedRowKeys.length > 0
-})
 
 function handleAutoRefreshChange(checked) {
   emit('update:autoRefreshEnabled', checked)

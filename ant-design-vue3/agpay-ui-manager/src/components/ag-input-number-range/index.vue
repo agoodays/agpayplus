@@ -45,7 +45,6 @@
 
 <script setup>
 import { useFloatLabel } from '@/composables/useFloatLabel'
-import '@/styles/float-label.less'
 import { ref, watch } from 'vue'
 
 /**

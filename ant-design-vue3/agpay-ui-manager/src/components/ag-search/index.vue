@@ -14,10 +14,10 @@
           <slot :col-span="colSpan" />
         </template>
 
-        <a-col :col-span="colSpan" class="search-buttons">
+        <a-col v-bind="colSpan" class="search-buttons">
           <a-form-item>
             <a-space>
-              <a-button type="primary" :loading="searchLoading" @click="onSearch">
+              <a-button type="primary" :loading="computedSearchLoading" @click="onSearch">
                 <search-outlined />
                 {{ searchText }}
               </a-button>
@@ -107,7 +107,8 @@ const showHistory = ref(false)
 const searchHistory = ref([])
 let debounceTimer = null
 
-const searchLoading = computed(() => {
+/** 综合兼容 loading / searchLoading 的最终加载状态 */
+const computedSearchLoading = computed(() => {
   if (props.loading !== undefined) return props.loading
   return props.searchLoading
 })
@@ -123,7 +124,6 @@ const expandText = computed(() => textOrFallback('common.expand', '展开'))
 const collapseText = computed(() => textOrFallback('common.collapse', '收起'))
 
 defineExpose({
-  colSpan: props.colSpan,
   onSearch,
   onReset
 })
@@ -241,11 +241,9 @@ function onSearch() {
 
 function onReset() {
   const resetValue = getResetValue()
-  
+
   if (resetValue === '__AG_SEARCH_DEFAULT__') {
-    Object.keys(model.value).forEach((key) => {
-      delete model.value[key]
-    })
+    // 恢复为默认值：直接 Object.assign 覆盖即可，无需先 delete 所有 key
     Object.assign(model.value, props.defaultModelValue)
   } else {
     const keys = Object.keys(model.value)
@@ -255,7 +253,7 @@ function onReset() {
       model.value[key] = Array.isArray(resetValue) ? [] : resetValue
     })
   }
-  
+
   emit('reset', model.value)
   emit('update:modelValue', model.value)
 }
@@ -265,26 +263,26 @@ function toggleCollapsed() {
   emit('collapse-change', collapsed.value)
 }
 
-onMounted(() => {
-  loadSearchHistory()
-  
-  const handleKeydown = (e) => {
-    if (e.key === 'Enter' && !e.ctrlKey && !e.metaKey) {
-      const activeElement = document.activeElement
-      if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
-        onSearch()
-      }
+/** 全局回车搜索处理器（仅当焦点在 input/textarea 时触发） */
+function handleEnterSearch(event) {
+  if (event.key === 'Enter' && !event.ctrlKey && !event.metaKey) {
+    const activeElement = document.activeElement
+    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+      onSearch()
     }
   }
-  
-  document.addEventListener('keydown', handleKeydown)
-  
-  onUnmounted(() => {
-    document.removeEventListener('keydown', handleKeydown)
-    if (debounceTimer) {
-      clearTimeout(debounceTimer)
-    }
-  })
+}
+
+onMounted(() => {
+  loadSearchHistory()
+  document.addEventListener('keydown', handleEnterSearch)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', handleEnterSearch)
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
 })
 </script>
 

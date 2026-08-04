@@ -38,7 +38,6 @@
     "vue-clipboard3": "^2.0.0",
     "vue-cropper": "^1.0.6",
     "vue-i18n": "^9.9.1",
-    "vue-qr": "^4.0.9",
     "vue-router": "^4.3.2"
   },
   "devDependencies": {

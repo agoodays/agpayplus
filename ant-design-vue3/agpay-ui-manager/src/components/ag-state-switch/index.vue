@@ -21,51 +21,79 @@
 </template>
 
 <script setup>
+/**
+ * AgStateSwitch - 状态切换/展示组件
+ *
+ * 双模式：
+ * 1. Switch 模式（showSwitch=true）：可交互开关，支持异步确认
+ * 2. Badge 模式（showSwitch=false）：只读状态展示
+ *
+ * 异步确认模式说明：
+ * Switch 模式下，onChange 作为 prop 传入是为了支持"异步确认"场景。
+ * 子组件需要等待父组件的异步操作（如 API 请求）完成后再决定是否真正更新状态，
+ * 若操作失败则自动回滚。Vue 3 的 emit 不支持返回 Promise，因此采用 prop 回调。
+ *
+ * @example
+ * // Switch 模式 - 异步确认
+ * <AgStateSwitch
+ *   v-model:state="record.state"
+ *   show-switch
+ *   :on-change="handleStateChange"
+ * />
+ *
+ * // Badge 模式 - 只读展示
+ * <AgStateSwitch :state="record.state" />
+ */
 import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
 import { ref, watch } from 'vue'
 
 const props = defineProps({
-  // 状态值：0=停用/禁用，1=启用/激活，其他=未知
+  /** 状态值：0=停用/禁用，1=启用/激活，其他=未知 */
   state: {
     type: Number,
     default: -1
   },
-  // 是否显示为 Switch 开关
+  /** 是否显示为 Switch 开关（false 时为 Badge 只读模式） */
   showSwitch: {
     type: Boolean,
     default: false
   },
-  // 是否禁用（仅 Switch 模式有效）
+  /** 是否禁用（仅 Switch 模式有效） */
   disabled: {
     type: Boolean,
     default: false
   },
-  // 激活状态文本
+  /** 激活状态文本（Badge 模式） */
   activeText: {
     type: String,
     default: '启用'
   },
-  // 停用状态文本
+  /** 停用状态文本（Badge 模式） */
   inactiveText: {
     type: String,
     default: '停用'
   },
-  // 未知状态文本
+  /** 未知状态文本（Badge 模式） */
   unknownText: {
     type: String,
     default: '未知'
   },
-  // Switch 选中时的文本
+  /** Switch 选中时的文本 */
   checkedText: {
     type: String,
     default: ''
   },
-  // Switch 未选中时的文本
+  /** Switch 未选中时的文本 */
   uncheckedText: {
     type: String,
     default: ''
   },
-  // 切换回调（返回 Promise）
+  /**
+   * 切换回调（仅 Switch 模式生效）
+   * 异步确认模式：返回 Promise，reject 时自动回滚状态
+   * @param {number} newState - 新状态值（1 或 0）
+   * @returns {Promise<void>}
+   */
   onChange: {
     type: Function,
     default: () => () => Promise.resolve()
@@ -74,8 +102,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update:state', 'change'])
 
-// 本地状态
+/** 本地选中状态（仅 Switch 模式使用） */
 const localChecked = ref(props.state === 1)
+/** 加载状态（异步确认期间） */
 const loading = ref(false)
 
 /**
@@ -84,7 +113,7 @@ const loading = ref(false)
  */
 const formItemContext = useInjectFormItemContext()
 
-// 监听外部状态变化
+// 监听外部状态变化，同步本地选中状态
 watch(
   () => props.state,
   (val) => {
@@ -92,19 +121,22 @@ watch(
   }
 )
 
-// 处理切换
+/**
+ * 处理 Switch 切换
+ * 异步确认流程：调用 onChange → 成功则提交状态 → 失败则回滚
+ * @param {boolean} checked - 新的选中状态
+ */
 async function handleChange(checked) {
   loading.value = true
 
   try {
-    // 调用父组件传入的 onChange 回调
+    // 调用父组件传入的 onChange 回调，等待异步操作完成
     await props.onChange(checked ? 1 : 0)
 
     // 成功后更新状态
     emit('update:state', checked ? 1 : 0)
     emit('change', checked ? 1 : 0)
     // 如果组件在 a-form-item 内，自动触发表单验证状态更新
-    // 确保 formItemContext 和 onFieldChange 方法存在
     if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
       formItemContext.onFieldChange()
     }

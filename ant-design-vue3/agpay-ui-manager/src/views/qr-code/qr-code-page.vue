@@ -2,11 +2,11 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-date-range-picker 
+              <ag-date-range-picker
                 v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间"
@@ -49,7 +49,7 @@
           </a-col>
         </template>
       </ag-search>
-      
+
       <!-- 列表渲染 -->
       <ag-table
         ref="tableRef"
@@ -60,7 +60,7 @@
         :search-data="searchData"
       >
         <template #toolbar-left>
-          <a-button v-if="hasPermission('ENT_DEVICE_QRC_ADD')" type="primary" @click="addFunc">
+          <a-button v-if="hasPermission('ENT_DEVICE_QRC_ADD')" type="primary" @click="openCreate">
             <plus-outlined /> 新增
           </a-button>
         </template>
@@ -104,16 +104,16 @@
           <!-- 操作按钮 -->
           <ag-table-actions>
             <a-button v-if="hasPermission('ENT_DEVICE_QRC_VIEW')" type="link" @click="onPreview(record.qrcId)">预览</a-button>
-            <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT')" type="link" @click="editFunc(record.qrcId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT')" type="link" @click="openEdit(record.qrcId)">编辑</a-button>
             <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT')" type="link" @click="bindFunc(record.qrcId)">绑定</a-button>
             <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT') && record.bindState === 1" type="link" @click="unbindFunc(record.qrcId)">解绑</a-button>
-            <a-button v-if="hasPermission('ENT_DEVICE_QRC_DEL')" type="link" style="color: red" @click="delFunc(record.qrcId)">删除</a-button>
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_DEL')" type="link" style="color: red" @click="confirmDelete(record.qrcId)">删除</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
     <!-- 新增/编辑页面弹窗  -->
-    <add-or-edit v-model:open="addOrEditOpen" :record-id="editRecordId" @success="searchFunc" />
+    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
     <bind v-model:open="bindOpen" :record-id="bindRecordId" @success="searchFunc" />
   </div>
 </template>
@@ -124,30 +124,52 @@
  */
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgStateSwitch, AgTable, AgTableActions } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
-import { getStateInfo, getStateOptions } from '@/constants/common-const'
+import { getStateInfo } from '@/constants/common-const'
 import { viewerApi } from '@/utils/viewer-api'
 import { ExclamationCircleOutlined, PlusOutlined, QrcodeOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, onMounted, reactive, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
 import Bind from './bind.vue'
 
-const { t } = useI18n()
-
-// 获取翻译后的下拉选项
-const stateOptions = computed(() => getStateOptions(t))
-
 const icons = { ExclamationCircleOutlined, QrcodeOutlined }
 
-// 权限检查
+/** 权限检查 */
 const { hasPermission } = usePermission()
 
+/** 路由实例 */
+const route = useRoute()
+
 /**
- * 表格列配置
+ * CRUD 表格页面状态
+ * 复用 tableRef/searchData/modalOpen/currentRecordId/confirmDelete 等
  */
+const {
+  tableRef,
+  searchData,
+  modalOpen,
+  currentRecordId,
+  reloadTable,
+  openCreate,
+  openEdit,
+  confirmDelete
+} = useCrudTablePage({
+  deleteAction: async (qrcId) => {
+    await qrcApi.delById(qrcId)
+    message.success('删除成功')
+  },
+  deleteConfirmTitle: '确定删除吗'
+})
+
+// 在 ag-table 子组件挂载前同步设置路由参数，确保首次加载即带上 mchNo
+if (route.query.mchNo) {
+  searchData.mchNo = route.query.mchNo
+}
+
+/** 表格列配置 */
 const tableColumns = [
   { key: 'qrcId', fixed: 'left', title: '二维码ID', width: 180, customRender: 'qrcIdSlot' },
   { key: 'batchId', dataIndex: 'batchId', title: '批次号', width: 135 },
@@ -160,71 +182,52 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-/**
- * 路由实例
- */
-const route = useRoute()
-
-/**
- * 组件引用
- */
-const tableRef = ref(null)
-const addOrEditOpen = ref(false)
-const editRecordId = ref(null)
+/** 绑定弹窗独立状态（不属于标准 CRUD） */
 const bindOpen = ref(false)
 const bindRecordId = ref(null)
-
-/**
- * 加载状态
- */
-/**
- * 搜索表单数据
- */
-const searchData = reactive({})
 
 /**
  * 搜索代理商
  * @param {Object} params - 搜索参数
  * @returns {Promise<Object>} 代理商列表
  */
-const searchAgent = (params) => qrcApi.searchAgent(params)
+function searchAgent(params) {
+  return qrcApi.searchAgent(params)
+}
 
 /**
  * 搜索商户
  * @param {Object} params - 搜索参数
  * @returns {Promise<Object>} 商户列表
  */
-const searchMch = (params) => qrcApi.searchMch(params)
+function searchMch(params) {
+  return qrcApi.searchMch(params)
+}
 
 /**
  * 请求表格数据函数
  * @param {Object} params - 查询参数
  * @returns {Promise<Object>} 表格数据
  */
-const loadDataFunc = async (params) => {
+async function loadDataFunc(params) {
   return await qrcApi.queryPage(params)
 }
 
-/**
- * 刷新表格数据
- */
-const reloadTable = () => {
-  tableRef.value?.reload()
+/** 搜索函数 */
+function searchFunc() {
+  tableRef.value?.refresh()
 }
 
-/**
- * 搜索函数
- * @param {boolean} isToFirst - 是否跳转到第一页
- */
-const searchFunc = (isToFirst = false) => {
-  tableRef.value?.reload(isToFirst)
+/** 新增/编辑弹窗保存成功后的统一处理 */
+function handleModalSuccess() {
+  searchFunc()
 }
 
 /**
  * 预览二维码
  * @param {string} recordId - 二维码ID
  */
-const onPreview = async (recordId) => {
+async function onPreview(recordId) {
   try {
     const res = await qrcApi.viewQrc(recordId)
     viewerApi({
@@ -239,46 +242,12 @@ const onPreview = async (recordId) => {
 }
 
 /**
- * 生成二维码
- */
-const addFunc = () => {
-  editRecordId.value = null
-  addOrEditOpen.value = true
-}
-
-/**
- * 编辑二维码
- * @param {string} qrcId - 二维码ID
- */
-const editFunc = (qrcId) => {
-  editRecordId.value = qrcId
-  addOrEditOpen.value = true
-}
-
-/**
  * 绑定二维码
  * @param {string} qrcId - 二维码ID
  */
-const bindFunc = (qrcId) => {
+function bindFunc(qrcId) {
   bindRecordId.value = qrcId
   bindOpen.value = true
-}
-
-/**
- * 删除二维码
- * @param {string} qrcId - 二维码ID
- */
-const delFunc = async (qrcId) => {
-  const { infoBox } = await import('@/utils/info-box')
-  infoBox.confirmDanger('确定删除吗', '', async () => {
-    try {
-      await qrcApi.delById(qrcId)
-      message.success('删除成功')
-      reloadTable()
-    } catch (error) {
-      console.error('删除二维码失败:', error)
-    }
-  })
 }
 
 /**
@@ -286,7 +255,7 @@ const delFunc = async (qrcId) => {
  * @param {string} recordId - 二维码ID
  * @returns {Promise} 操作结果
  */
-const unbindFunc = async (recordId) => {
+async function unbindFunc(recordId) {
   const { infoBox } = await import('@/utils/info-box')
   return new Promise((resolve, reject) => {
     infoBox.confirmDanger('确认解绑', '解绑后商户将无法使用该二维码', async () => {
@@ -309,7 +278,7 @@ const unbindFunc = async (recordId) => {
  * @param {number} state - 状态值
  * @returns {Promise} 操作结果
  */
-const updateState = async (recordId, state) => {
+async function updateState(recordId, state) {
   const { infoBox } = await import('@/utils/info-box')
   const stateInfo = getStateInfo(state)
   const title = `确认[${stateInfo.desc}]该二维码？`
@@ -328,11 +297,11 @@ const updateState = async (recordId, state) => {
   })
 }
 
-/**
- * 组件挂载时初始化
- */
+/** 组件挂载时初始化（从路由 query 带入商户号） */
 onMounted(() => {
-  searchData.mchNo = route.query.mchNo
-  searchFunc()
+  if (route.query.mchNo) {
+    searchData.mchNo = route.query.mchNo
+  }
 })
 </script>
+

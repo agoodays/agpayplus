@@ -3,7 +3,7 @@
     <a-card :bordered="false">
       <ag-card
         ref="cardRef"
-        :req-card-list-func="reqCardListFunc"
+        :load-data="loadData"
         :span="agpayCard.span"
         :height="agpayCard.height"
         :name="agpayCard.name"
@@ -84,15 +84,15 @@ const agpayCard = reactive({
  * 请求支付接口定义数据
  * @returns {Promise<Object>} 支付接口定义列表
  */
-const reqCardListFunc = async () => {
+const loadData = async () => {
   return await payConfigApi.queryIfDefineList()
 }
 
 /**
  * 刷新卡片列表
  */
-const refCardList = () => {
-  cardRef.value?.refreshCardList()
+const reloadCardList = () => {
+  cardRef.value?.reload()
 }
 
 /**
@@ -117,7 +117,7 @@ function handleEdit(ifCode) {
  * 操作成功回调
  */
 const handleSuccess = () => {
-  refCardList()
+  reloadCardList()
 }
 
 /**
@@ -130,7 +130,7 @@ const del = async (ifCode) => {
     try {
       await payConfigApi.delIfDefineById(ifCode)
       message.success('删除成功！')
-      refCardList()
+      reloadCardList()
     } catch (error) {
       console.error('删除支付接口定义失败:', error)
     }

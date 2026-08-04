@@ -145,18 +145,18 @@ let routesInitialized = false
 // ==================== 静态路由 ====================
 
 const routes = [
-  {
-    path: '/main',
-    component: AgLayout,
-    children: [
-      {
-        path: '',
-        name: 'MainFallback',
-        component: () => import('@/views/main/main-page.vue'),
-        meta: { title: '首页' }
-      }
-    ]
-  },
+  // {
+  //   path: '/main',
+  //   component: AgLayout,
+  //   children: [
+  //     {
+  //       path: '',
+  //       name: 'MainFallback',
+  //       component: () => import('@/views/main/main-page.vue'),
+  //       meta: { title: '首页' }
+  //     }
+  //   ]
+  // },
   {
     path: '/',
     name: '用户',

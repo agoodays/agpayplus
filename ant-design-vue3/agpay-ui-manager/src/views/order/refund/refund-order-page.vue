@@ -282,7 +282,7 @@
     </a-card>
 
     <!-- 详情抽屉 -->
-    <refund-detail-drawer v-model:open="detailOpen" :refund-order-id="currentRefundOrderId" />
+    <refund-detail-drawer v-model:open="detailOpen" :refund-order-id="currentRecordId" />
   </div>
 </template>
 
@@ -292,41 +292,45 @@
  * 功能：展示退款订单列表，支持搜索、查看详情、导出、统计等操作
  */
 import { orderApi } from '@/api/business/order/order-api'
-import { basicApi } from '@/api/system/basic-api'
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { useModal, usePermission } from '@/composables/useCommon'
+import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { CopyOutlined, DollarOutlined, TransactionOutlined, UndoOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import RefundDetailDrawer from './refund-detail-drawer.vue'
-
-// 弹窗控制
-const { open: detailOpen, showModal: showDetail } = useModal()
 
 // 权限检查
 const { hasPermission } = usePermission()
 
 /**
- * 组件引用
+ * 使用 CRUD 表格页面组合式函数
  */
-const tableRef = ref(null)
-const mchList = ref([])
-const ifDefineList = ref([])
-const currentRefundOrderId = ref('')
+const {
+  tableRef,
+  searchData,
+  detailOpen,
+  currentRecordId,
+  reloadTable,
+  openDetail
+} = useCrudTablePage()
+
+// 初始化搜索表单默认值
+searchData.dateRange = ''
+searchData.unionOrderId = ''
+searchData.mchNo = ''
+searchData.appId = ''
+searchData.isvNo = ''
+searchData.state = ''
+searchData.ifCode = ''
+searchData.mchType = ''
 
 /**
- * 搜索表单数据
+ * 额外数据源 / 状态
  */
-const searchData = reactive({
-  dateRange: '',
-  unionOrderId: '',
-  mchNo: '',
-  appId: '',
-  isvNo: '',
-  state: '',
-  ifCode: '',
-  mchType: ''
-})
+const mchList = ref([])
+const ifDefineList = ref([])
 
 /**
  * 商户选项（用于下拉选择）
@@ -462,14 +466,14 @@ const loadStatistics = async (params) => {
  * 搜索商户
  * @param {string} keyword - 搜索关键词
  */
-const handleSearchMch = async (keyword) => {
+async function handleSearchMch(keyword) {
   if (!keyword) {
     mchList.value = []
     return
   }
 
   try {
-    const res = await basicApi.queryMchPage({
+    const res = await orderApi.queryMchPage({
       mchName: keyword,
       pageSize: 20
     })
@@ -482,9 +486,9 @@ const handleSearchMch = async (keyword) => {
 /**
  * 请求支付接口定义数据
  */
-const initIfDefineList = async () => {
+async function initIfDefineList() {
   try {
-    const res = await basicApi.queryIfDefineList({ state: 1 })
+    const res = await payConfigApi.queryIfDefineList({ state: 1 })
     ifDefineList.value = res || []
   } catch (error) {
     console.error('加载支付接口定义失败:', error)
@@ -492,11 +496,11 @@ const initIfDefineList = async () => {
 }
 
 /**
- * 搜索回调函数
+ * 搜索回调函数（同时刷新表格和统计）
  */
 function searchFunc() {
-  tableRef.value.reload()
-  tableRef.value.reloadStatistics()
+  reloadTable()
+  tableRef.value?.reloadStatistics()
 }
 
 /**
@@ -535,9 +539,8 @@ const getStateText = (state) => {
  * 查看详情
  * @param {Object} record - 订单记录
  */
-const handleDetail = (record) => {
-  currentRefundOrderId.value = record.refundOrderId
-  showDetail()
+function handleDetail(record) {
+  openDetail(record.refundOrderId)
 }
 
 /**

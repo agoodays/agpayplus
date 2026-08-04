@@ -148,29 +148,35 @@
 
 <script setup>
 import { currentApi } from '@/api/business/current/current-api'
+import { basicApi } from '@/api/system/basic-api'
 import { loginApi } from '@/api/system/login-api'
+import { AgUpload } from '@/components'
 import { useUserStore } from '@/store/modules/system/user'
+import { infoBox } from '@/utils/info-box'
 import { CheckCircleOutlined, SafetyCertificateOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
 import { onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import { AgUpload } from '@/components'
-import { infoBox } from '@/utils/info-box'
+import { useRoute, useRouter } from 'vue-router'
+const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const { t } = useI18n()
 
-  const activeTab = ref('basic')
-  const securityTab = ref('password')
+/** 合法的 Tab key 集合 */
+const VALID_TABS = ['basic', 'security']
+const VALID_SUB_TABS = ['password', 'safeWord']
 
-  const basicLoading = ref(false)
-  const passwordLoading = ref(false)
-  const safeWordLoading = ref(false)
+const activeTab = ref(VALID_TABS.includes(route.query.tab) ? route.query.tab : 'basic')
+const securityTab = ref(VALID_SUB_TABS.includes(route.query.sub) ? route.query.sub : 'password')
 
-  const basicFormRef = ref()
-  const passwordFormRef = ref()
+const basicLoading = ref(false)
+const passwordLoading = ref(false)
+const safeWordLoading = ref(false)
+
+const basicFormRef = ref()
+const passwordFormRef = ref()
 
 const basicForm = reactive({
   loginUsername: '',
@@ -186,9 +192,9 @@ const passwordForm = reactive({
   confirmPwd: ''
 })
 
-  const safeWord = ref('')
+const safeWord = ref('')
 
-  const defaultAvatar = '@/assets/logo.svg'
+const defaultAvatar = '@/assets/logo.svg'
 const uploadAction = '/api/ossFiles/avatar'
 
 const passwordRulesConfig = reactive({
@@ -255,7 +261,7 @@ const fetchUserInfo = async () => {
 
 const fetchPasswordRules = async () => {
   try {
-    const res = await loginApi.getPwdRulesRegexp()
+    const res = await basicApi.getPwdRulesRegexp()
     if (res) {
       passwordRulesConfig.regexpRules = res.regexpRules
       passwordRulesConfig.errTips = res.errTips

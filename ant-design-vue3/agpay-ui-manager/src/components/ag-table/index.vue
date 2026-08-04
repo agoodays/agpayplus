@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="ag-table">
     <!-- 工具栏 -->
     <ag-table-toolbar
@@ -20,6 +20,8 @@
       :is-some-columns-visible="isSomeColumnsVisible"
       :selected-row-keys="state.selectedRowKeys"
       :row-selection-enabled="rowSelectionEnabled"
+      :is-all-selected="isAllRowsSelected"
+      :is-indeterminate="isSomeRowsSelected"
       @update:auto-refresh-enabled="handleAutoRefreshEnabledChange"
       @update:show-statistics="handleShowStatisticsChange"
       @update:column-settings-open="handleColumnSettingsOpenChange"
@@ -299,16 +301,15 @@ const state = reactive({
   selectedRows: [],
   sorter: { field: '', order: null },
   filters: {},
-})
-
-// 内部分页状态（由 state 管理，便于统一持久化/观察）
-state.pagination = reactive({
-  total: 0,
-  current: 1,
-  pageSize: 10,
-  showSizeChanger: true,
-  showQuickJumper: true,
-  showTotal: (total) => t('agTable.totalItems', { total }),
+  // 内部分页状态（由 state 管理，便于统一持久化/观察）
+  pagination: {
+    total: 0,
+    current: 1,
+    pageSize: 10,
+    showSizeChanger: true,
+    showQuickJumper: true,
+    showTotal: (total) => t('agTable.totalItems', { total }),
+  },
 })
 
 const columnSettingsOpen = ref(false)
@@ -443,6 +444,25 @@ const computedRowSelection = computed(() => {
     onSelect: handleSelect,
     onSelectAll: handleSelectAll,
   }
+})
+
+/** 当前页是否全部选中（用于工具栏全选 checkbox 的 checked 状态） */
+const isAllRowsSelected = computed(() => {
+  if (!props.rowSelectionEnabled || !tableData.value.records.length) return false
+  return tableData.value.records.every((record) => {
+    const key = typeof props.rowKey === 'function' ? props.rowKey(record) : record[props.rowKey]
+    return state.selectedRowKeys.includes(key)
+  })
+})
+
+/** 当前页是否部分选中（用于工具栏全选 checkbox 的 indeterminate 状态） */
+const isSomeRowsSelected = computed(() => {
+  if (!props.rowSelectionEnabled || !tableData.value.records.length) return false
+  if (isAllRowsSelected.value) return false
+  return tableData.value.records.some((record) => {
+    const key = typeof props.rowKey === 'function' ? props.rowKey(record) : record[props.rowKey]
+    return state.selectedRowKeys.includes(key)
+  })
 })
 
 /**
@@ -646,6 +666,18 @@ function handleColumnSettingsOpenChange(value) {
   columnSettingsOpen.value = !!value
 }
 
+const {
+  autoRefreshEnabled,
+  startAutoRefresh,
+  stopAutoRefresh,
+  handleAutoRefreshEnabledChange,
+  initAutoRefresh,
+} = useTableAutoRefresh({
+  props,
+  state,
+  reload,
+})
+
 // ==================== 监听器 ====================
 
 watch(
@@ -672,18 +704,6 @@ onMounted(() => {
   }
 
   initAutoRefresh()
-})
-
-const {
-  autoRefreshEnabled,
-  startAutoRefresh,
-  stopAutoRefresh,
-  handleAutoRefreshEnabledChange,
-  initAutoRefresh,
-} = useTableAutoRefresh({
-  props,
-  state,
-  reload,
 })
 
 defineExpose({

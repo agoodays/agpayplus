@@ -201,6 +201,10 @@
 </template>
 
 <script setup>
+/**
+ * 支付订单详情抽屉组件
+ * 功能：展示订单的完整信息、支付明细、退款记录等详情
+ */
 import { AgDrawer } from '@/components'
 import { orderApi } from '@/api/business/order/order-api'
 import { message } from 'ant-design-vue'

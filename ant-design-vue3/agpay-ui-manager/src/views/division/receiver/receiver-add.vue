@@ -254,8 +254,8 @@
       </ag-table>
     </a-card>
 
-    <add-or-edit ref="infoAddOrEdit" :callback-func="getReceiverGroup" />
-    <channel-user ref="channelUserModal" @change-channel-user-id="changeChannelUserIdFunc" />
+    <add-or-edit ref="infoAddOrEdit" @success="getReceiverGroup" />
+    <channel-user-modal ref="channelUserModal" @change-channel-user-id="changeChannelUserIdFunc" />
   </ag-drawer>
 </template>
 
@@ -266,7 +266,7 @@
  */
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
 import { AgDrawer, AgSelectInfinite, AgTable } from '@/components'
-import { ChannelUser } from '@/components/channel-user'
+import { ChannelUserModal } from '@/components/channel-user'
 import { usePermission } from '@/composables/useCommon'
 import { genRowKey } from '@/utils/util'
 import {

@@ -19,7 +19,7 @@
 
     <!-- 自定义日期范围选择器 -->
     <a-popover
-      v-else-if="!actualShowQuickSelect || currentMode === 'custom'"
+      v-else
       placement="bottom"
       trigger="hover"
       :open="popoverVisible && !!dateRangeTip"
@@ -511,7 +511,7 @@ const displayFormat = computed(() => {
   }
 
   const pickerFormats = {
-    date: 'YYYY-MM-DD', //props.showTime ? 'YYYY-MM-DD HH:mm:ss' : 'YYYY-MM-DD',
+    date: 'YYYY-MM-DD',
     week: 'YYYY-wo',
     month: 'YYYY-MM',
     quarter: 'YYYY-[Q]Q',
@@ -558,7 +558,6 @@ const showTimeConfig = computed(() => {
  * @returns {String}
  *
  * 在输入框上方显示完整的日期范围
- * 根据 picker 类型显示不同的标签
  */
 const dateRangeTip = computed(() => {
   if (!dateRange.value || dateRange.value.length !== 2) {
@@ -566,23 +565,9 @@ const dateRangeTip = computed(() => {
   }
 
   const [start, end] = dateRange.value
-  //const startStr = start.format(displayFormat.value)
-  //const endStr = end.format(displayFormat.value)
   const startStr = start.format(props.outputFormat)
   const endStr = end.format(props.outputFormat)
   return `范围：${startStr} ~ ${endStr}`
-
-  //// 根据 picker 类型显示不同的标签
-  //const labels = {
-  //  date: '日期',
-  //  week: '周',
-  //  month: '月份',
-  //  quarter: '季度',
-  //  year: '年份'
-  //}
-
-  //const label = labels[props.picker] || '范围'
-  //return `${label}：${startStr} ~ ${endStr}`
 })
 
 // ============================================================

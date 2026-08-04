@@ -8,29 +8,28 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
-
 /**
  * 全局加载组件
- * 用于显示全局加载状态
+ * 功能：在全屏遮罩层中展示加载状态，支持自定义文本
  */
+import { ref, watch } from 'vue'
 
-// Props
 const props = defineProps({
+  /** 是否显示加载遮罩 */
   visible: {
     type: Boolean,
     default: false
   },
+  /** 加载提示文本（为空则不显示） */
   text: {
     type: String,
     default: ''
   }
 })
 
-// State
+/** 本地控制显隐（与 props.visible 同步） */
 const visible = ref(props.visible)
 
-// 监听 props 变化
 watch(
   () => props.visible,
   (val) => {

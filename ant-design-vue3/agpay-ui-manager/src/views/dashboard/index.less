@@ -1,30 +1,40 @@
 /* 响应式布局 */
-#chart-card {
+.chart-card {
   display: grid;
-  grid-template-columns: 640px 312px 312px;
-  grid-template-rows: 320px 320px;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 340px 480px;
   grid-gap: 16px;
-  margin: 16px 0;
+  padding: 16px;
 
+  // ==================== amount：左侧统计 + 右侧趋势图 ====================
   .amount {
-    grid-column: 1 / 2;
-    grid-row: 1 / 3;
+    grid-column: 1 / 8;
+    grid-row: 1;
     background: linear-gradient(135deg, #6760f7 0%, #3c86f6 100%);
     border-radius: 8px;
-    padding: 24px;
+    padding: 20px;
     color: #fff;
+    overflow: hidden;
+
+    > div {
+      display: flex;
+      flex-direction: row;
+      height: 100%;
+    }
 
     .amount-top {
-      margin-bottom: 24px;
+      flex: 0 0 230px;
+      display: flex;
+      flex-direction: column;
 
       .amount-date {
         display: flex;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
 
         div {
-          margin-right: 24px;
+          margin-right: 8px;
           cursor: pointer;
-          padding: 4px 12px;
+          padding: 8px 24px;
           border-radius: 16px;
 
           &.amount-date-active {
@@ -35,19 +45,33 @@
     }
 
     .amount-line {
-      height: 1px;
+      width: 1px;
       background: rgba(255, 255, 255, 0.2);
-      margin: 24px 0;
+      margin: 0 20px;
+      flex-shrink: 0;
+      align-self: stretch;
     }
 
     .amount-bottom {
-      height: 200px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      position: relative;
+
+      // 骨架屏覆盖层：不参与 flex 高度分配
+      > .ant-skeleton {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+      }
 
       .echart-title {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
+        flex-shrink: 0;
 
         .date {
           background: rgba(255, 255, 255, 0.2);
@@ -62,12 +86,14 @@
 
     .amount-list {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: auto;
 
       div {
         p {
-          margin-bottom: 8px;
-          font-size: 14px;
+          margin-bottom: 4px;
+          font-size: 13px;
           opacity: 0.8;
         }
 
@@ -79,16 +105,20 @@
     }
   }
 
+  // ==================== quantity：代理商/商户数量 ====================
   .quantity {
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-    background: #fff;
+    grid-column: 8 / 10;
+    grid-row: 1;
+    background: var(--layout-surface);
     border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 4px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 
-    .quantity-top {
-      margin-bottom: 24px;
+    .quantity-top,
+    .quantity-bottom {
+      padding: 20px;
 
       .quantity-title {
         display: flex;
@@ -99,41 +129,23 @@
           font-size: 16px;
           font-weight: 600;
         }
-
-        .bi {
-          margin-left: 8px;
-          color: #999;
-        }
       }
 
       .quantity-number {
         font-size: 32px;
         font-weight: 600;
-        color: #333;
+        color: var(--text-color);
       }
     }
 
+    .quantity-top {
+      border-radius: 8px 8px 0 0;
+    }
+
     .quantity-bottom {
-      .quantity-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 12px;
-
-        span {
-          font-size: 16px;
-          font-weight: 600;
-        }
-
-        .bi {
-          margin-left: 8px;
-          color: #999;
-        }
-      }
+      border-radius: 0 0 8px 8px;
 
       .quantity-number {
-        font-size: 32px;
-        font-weight: 600;
-        color: #333;
         margin-bottom: 16px;
       }
 
@@ -144,16 +156,16 @@
           margin-bottom: 8px;
 
           .especially {
-            color: #ff8066;
+            color: rgb(255, 128, 102);
           }
 
           .ordinary {
-            color: #ffd080;
+            color: rgb(255, 208, 128);
           }
         }
 
         .contrast-chart {
-          height: 8px;
+          height: 24px;
           border-radius: 4px;
           display: flex;
           overflow: hidden;
@@ -162,13 +174,14 @@
     }
   }
 
+  // ==================== personal：个人信息 + 快速入口 ====================
   .personal {
-    grid-column: 2 / 3;
-    grid-row: 2 / 3;
-    background: #fff;
+    grid-column: 10 / 13;
+    grid-row: 1;
+    background: var(--layout-surface);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 4px var(--shadow-color);
 
     .personal-title {
       display: flex;
@@ -191,14 +204,14 @@
 
         span {
           font-size: 12px;
-          color: #999;
+          color: var(--text-color-secondary);
         }
       }
     }
 
     .personal-line {
       height: 1px;
-      background: #f0f0f0;
+      background: var(--border-color);
       margin: 16px 0;
     }
 
@@ -216,20 +229,37 @@
     }
   }
 
+  // ==================== method：支付方式饼图 ====================
   .method {
-    grid-column: 3 / 4;
-    grid-row: 1 / 2;
-    background: #fff;
+    grid-column: 1 / 5;
+    grid-row: 2;
+    background: var(--layout-surface);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    height: 100%;
+    box-shadow: 0 1px 4px var(--shadow-color);
+    overflow: hidden;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+
+      // 骨架屏覆盖层：不参与 flex 高度分配
+      > .ant-skeleton {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: var(--layout-surface);
+      }
+    }
 
     .echart-title {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
+      flex-shrink: 0;
 
       b {
         font-size: 16px;
@@ -238,20 +268,37 @@
     }
   }
 
+  // ==================== pay-statistics：交易统计面积图 ====================
   .pay-statistics {
-    grid-column: 3 / 4;
-    grid-row: 2 / 3;
-    background: #fff;
+    grid-column: 5 / 13;
+    grid-row: 2;
+    background: var(--layout-surface);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    height: 100%;
+    box-shadow: 0 1px 4px var(--shadow-color);
+    overflow: hidden;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      position: relative;
+
+      // 骨架屏覆盖层：不参与 flex 高度分配
+      > .ant-skeleton {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        background: var(--layout-surface);
+      }
+    }
 
     .echart-title {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 16px;
+      flex-shrink: 0;
 
       b {
         font-size: 16px;
@@ -261,58 +308,84 @@
   }
 }
 
-/* 响应式调整 */
-@media (max-width: 1366px) {
-  #chart-card {
-    grid-template-columns: 580px 280px 280px;
-    grid-template-rows: 290px 290px;
-  }
-}
-
+// ==================== 响应式：中等屏幕（2列） ====================
 @media (max-width: 1280px) {
-  #chart-card {
+  .chart-card {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto 480px;
 
     .amount {
       grid-column: 1 / 3;
-      grid-row: 1 / 2;
+      grid-row: 1;
+
+      > div {
+        flex-direction: column;
+      }
+
+      .amount-top {
+        flex: 0 0 auto;
+      }
+
+      .amount-line {
+        width: auto;
+        height: 1px;
+        margin: 24px 0;
+      }
+
+      .amount-bottom {
+        flex: 1;
+        min-height: 200px;
+      }
+
+      .amount-list {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 0;
+      }
     }
 
     .quantity {
       grid-column: 1 / 2;
-      grid-row: 2 / 3;
+      grid-row: 2;
     }
 
     .personal {
       grid-column: 2 / 3;
-      grid-row: 2 / 3;
+      grid-row: 2;
     }
 
     .method {
       grid-column: 1 / 2;
-      grid-row: 3 / 4;
+      grid-row: 3;
+      min-height: 480px;
     }
 
     .pay-statistics {
       grid-column: 2 / 3;
-      grid-row: 3 / 4;
+      grid-row: 3;
+      min-height: 480px;
     }
   }
 }
 
+// ==================== 响应式：小屏幕（单列） ====================
 @media (max-width: 768px) {
-  #chart-card {
+  .chart-card {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
 
     .amount,
     .quantity,
-    .personal,
+    .personal {
+      grid-column: 1 / 2;
+      grid-row: auto;
+    }
+
     .method,
     .pay-statistics {
       grid-column: 1 / 2;
       grid-row: auto;
+      min-height: 480px;
     }
   }
 }

@@ -1,14 +1,11 @@
 <template>
-  <div>
-    <a-modal :open="visible" title="自动获取渠道用户ID" :footer="null" :width="300" @ok="handleClose">
-      <div style="width: 100%; margin-bottom: 20px; text-align: center">
-        <div id="qrCodeUrl" style="width: 300px" class="qrcode"></div>
-        <vueQr :text="qrImgUrl" />
-        <hr />
-        <span>{{ payText }}</span>
-      </div>
-    </a-modal>
-  </div>
+  <a-modal :open="visible" title="自动获取渠道用户ID" :footer="null" :width="300" @ok="handleClose">
+    <div class="channel-user-modal__body">
+      <a-qrcode :value="qrImgUrl" :size="200" />
+      <a-divider />
+      <span>{{ payText }}</span>
+    </div>
+  </a-modal>
 </template>
 <script setup>
 /**
@@ -17,7 +14,6 @@
  */
 import { ref } from 'vue'
 import ReconnectingWebSocket from 'reconnectingwebsocket'
-import vueQr from 'vue-qr'
 import { basicApi } from '@/api/system/basic-api'
 
 const emit = defineEmits(['changeChannelUserId'])
@@ -42,7 +38,7 @@ const extObject = ref(null)
 async function showModal(appId, ifCode, extObj) {
   extObject.value = extObj
 
-  // 关闭上一个webSocket监听
+  // 关闭上一个 WebSocket 监听
   if (transferOrderWebSocket.value) {
     transferOrderWebSocket.value.close()
   }
@@ -55,7 +51,7 @@ async function showModal(appId, ifCode, extObj) {
     payText.value = '请使用支付宝客户端"扫一扫"'
   }
 
-  // 当前客户端CID
+  // 当前客户端 CID
   const cid = appId + new Date().getTime()
 
   try {
@@ -68,7 +64,6 @@ async function showModal(appId, ifCode, extObj) {
     transferOrderWebSocket.value = new ReconnectingWebSocket(
       basicApi.getWebSocketPrefix() + '/api/anon/ws/channelUserId/' + appId + '/' + cid
     )
-    transferOrderWebSocket.value.onopen = () => {}
     transferOrderWebSocket.value.onmessage = (msgObject) => {
       emit('changeChannelUserId', { channelUserId: msgObject.data, extObject: extObject.value })
       handleClose()
@@ -79,7 +74,7 @@ async function showModal(appId, ifCode, extObj) {
 }
 
 /**
- * 关闭弹窗并清理WebSocket连接
+ * 关闭弹窗并清理 WebSocket 连接
  */
 function handleClose() {
   if (transferOrderWebSocket.value) {
@@ -93,10 +88,9 @@ defineExpose({
 })
 </script>
 <style lang="less" scoped>
-.describe {
-  img {
-    width: 30px;
-    height: 25px;
-  }
+.channel-user-modal__body {
+  width: 100%;
+  margin-bottom: 20px;
+  text-align: center;
 }
 </style>

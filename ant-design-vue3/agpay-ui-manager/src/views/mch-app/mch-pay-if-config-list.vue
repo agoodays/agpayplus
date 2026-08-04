@@ -12,7 +12,7 @@
       </a-steps>
     </template>
     <div v-if="currentStep === 0">
-      <ag-card ref="infoCard" :req-card-list-func="reqCardListFunc" :span="agpayCard.span" :height="agpayCard.height">
+      <ag-card ref="cardRef" :load-data="loadData" :span="agpayCard.span" :height="agpayCard.height">
         <template #cardContentSlot="{ record }">
           <div>
             <div :style="{ height: agpayCard.height + 'px' }" class="ag-card-content">
@@ -107,11 +107,11 @@
         </a-button>
       </div>
     </template>
-    <json-pay-config v-model:open="mchPayConfigOpen" :app-id="props.appId" :record="currentRecord" @success="refCardList" />
-    <wxpay-pay-config v-model:open="wxpayPayConfigOpen" :app-id="props.appId" :record="currentRecord" @success="refCardList" />
-    <alipay-pay-config v-model:open="alipayPayConfigOpen" :app-id="props.appId" :record="currentRecord" @success="refCardList" />
+    <json-pay-config v-model:open="mchPayConfigOpen" :app-id="props.appId" :record="currentRecord" @success="reloadCardList" />
+    <wxpay-pay-config v-model:open="wxpayPayConfigOpen" :app-id="props.appId" :record="currentRecord" @success="reloadCardList" />
+    <alipay-pay-config v-model:open="alipayPayConfigOpen" :app-id="props.appId" :record="currentRecord" @success="reloadCardList" />
     <mch-pay-passage-config v-model:open="mchPayPassageOpen" :app-id="props.appId" :way-code="currentWayCode" @success="searchFunc" />
-    <alipay-auth v-model:open="alipayAuthOpen" :app-id="props.appId" @success="refCardList" />
+    <alipay-auth v-model:open="alipayAuthOpen" :app-id="props.appId" @success="reloadCardList" />
   </a-drawer>
 </template>
 
@@ -162,7 +162,7 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-const infoCard = ref(null)
+const cardRef = ref(null)
 const currentStep = ref(0)
 const localOpen = ref(false)
 const searchData = ref({})
@@ -188,7 +188,7 @@ watch(
     localOpen.value = val
     if (val && props.appId) {
       currentStep.value = 0
-      refCardList()
+      reloadCardList()
     }
   }
 )
@@ -201,12 +201,12 @@ watch(localOpen, (val) => {
 /**
  * 加载卡片列表数据
  */
-function reqCardListFunc() {
+function loadData() {
   return mchAppApi.queryCardList(props.appId)
 }
 
-function refCardList() {
-  infoCard.value?.refCardList?.()
+function reloadCardList() {
+  cardRef.value?.reload?.()
 }
 
 /**

@@ -15,11 +15,13 @@
       @change="handleChange"
       @preview="handlePreview"
     >
-      <slot name="uploadSlot" :loading="loading" v-if="!readOnly && (replaceMode || fileList.length < num)">
-        <a-button>
-          <upload-outlined /> {{ t('components.upload') }}
-        </a-button>
-      </slot>
+      <template v-if="!readOnly && (replaceMode || fileList.length < num)">
+        <slot name="uploadSlot" :loading="loading">
+          <a-button>
+            <upload-outlined /> {{ t('components.upload') }}
+          </a-button>
+        </slot>
+      </template>
       <slot v-else />
     </a-upload>
   </div>
@@ -37,6 +39,9 @@ import { viewerApi } from '@/utils/viewer-api'
 import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
 
 const { t } = useI18n()
+
+/** 用户 store（在 setup 顶层初始化，避免在 computed 中重复调用） */
+const userStore = useUserStore()
 
 const props = defineProps({
   name: { type: String, default: 'file' },
@@ -66,14 +71,20 @@ const fileList = ref([])
 const loading = ref(false)
 
 const headers = computed(() => {
-  const token = useUserStore().getToken
+  const token = userStore.getToken
   return token ? { [ACCESS_TOKEN_NAME]: `Bearer ${token}` } : {}
 })
 
+/**
+ * 从上传完成后的 fileList 中提取文件项
+ * @param {Array} fileList - a-upload 的 fileList
+ * @returns {Array} 处理后的文件项数组
+ */
 function getFileItems(fileList) {
   const fileItems = []
   for (const item of fileList) {
-    const url = item.response.data
+    const url = item?.response?.data
+    if (!url) continue
     item.name = url.split('/').pop()
     item.url = url
     item.thumbUrl = url
@@ -82,21 +93,23 @@ function getFileItems(fileList) {
   return fileItems
 }
 
+/**
+ * 根据 url 数组构建默认的 fileList
+ * @param {Array} urls - 文件 url 数组
+ * @returns {Array} 初始 fileList
+ */
 function getDefaultFileList(urls) {
   const fileItems = []
-  for (const i in urls) {
-    const url = urls[i]
-    if (!url || url?.length <= 0) {
-      continue
-    }
+  urls.forEach((url, index) => {
+    if (!url || url.length <= 0) return
     fileItems.push({
-      uid: i,
+      uid: String(index),
       name: url.split('/').pop(),
       status: 'done',
       url: url,
       thumbUrl: url
     })
-  }
+  })
   return fileItems
 }
 

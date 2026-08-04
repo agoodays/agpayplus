@@ -549,7 +549,12 @@
 </template>
 
 <script setup>
-import { onMounted, watch } from 'vue'
+/**
+ * 费率配置面板组件
+ * 渲染支付方式费率配置表单，支持单一费率、阶梯费率、合并模式等。
+ * 通过 useRateConfig composable 管理全部费率配置逻辑。
+ */
+import { watch } from 'vue'
 import { BulbOutlined, DeleteOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { useRateConfig } from './composables/useRateConfig'
 
@@ -559,11 +564,12 @@ const props = defineProps({
   infoType: { type: String, default: null },
   ifCode: { type: String, default: '' },
   permCode: { type: String, default: '' },
-  configMode: { type: String, default: '' },
-  callbackFunc: { type: Function, default: () => ({}) }
+  configMode: { type: String, default: '' }
 })
 
-const rateConfigState = useRateConfig(props)
+const emit = defineEmits(['success'])
+
+const rateConfigState = useRateConfig(props, emit)
 
 const {
   readonlyFeeTypes,
@@ -591,24 +597,25 @@ const {
   onSubmit
 } = rateConfigState
 
-const onPayWayCheck = (wayCode, event, feeGroup) => {
-  console.log(wayCode, event.target.checked)
-}
-
+/**
+ * 切换合并模式
+ * @param {Object} feeGroup - 费率分组对象
+ */
 const toggleMergeMode = (feeGroup) => {
   feeGroup.isMergeMode = !feeGroup.isMergeMode
 }
 
+// 渠道编码变化时重新加载费率配置
 watch(() => props.ifCode, (val) => {
   if (val) {
     getRateConfig(val)
   }
 }, { immediate: true })
 
-onMounted(() => {})
-
 defineExpose({
+  /** 加载费率配置 */
   getRateConfig,
+  /** 提交保存 */
   onSubmit
 })
 </script>

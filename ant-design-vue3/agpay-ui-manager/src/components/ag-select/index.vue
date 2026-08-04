@@ -30,6 +30,23 @@
 </template>
 
 <script setup>
+/**
+ * AgSelect - 浮动标签选择器
+ *
+ * 基于 a-select 封装，支持浮动标签动画、远程搜索、多选等。
+ * 支持两种 options 传入方式：
+ * 1. 通过 props.options 传入
+ * 2. 通过默认插槽传入 a-select-option
+ *
+ * @example
+ * <AgSelect
+ *   v-model="form.type"
+ *   label="类型"
+ *   :options="typeOptions"
+ *   show-search
+ *   allow-clear
+ * />
+ */
 import { useFloatLabel } from '@/composables/useFloatLabel'
 import { computed, ref, useSlots, watch } from 'vue'
 
@@ -50,6 +67,7 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  /** a-select 的 mode 属性（如 'multiple'、'tags'） */
   mode: {
     type: String,
     default: undefined
@@ -86,6 +104,7 @@ const props = defineProps({
     type: [String, Function],
     default: undefined
   },
+  /** 浮动标签配置 */
   floatOptions: {
     type: Object,
     default: () => ({})
@@ -96,13 +115,17 @@ const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'searc
 
 const slots = useSlots()
 const selectRef = ref()
+/** 下拉框是否展开（用于浮动标签状态判断） */
 const isOpen = ref(false)
+/** 内部选中值（与 useFloatLabel 的 inputValue 分离，避免空值 '' 干扰 select 行为） */
 const selectValue = ref(props.modelValue)
 
+/** 是否使用 props.options（无默认插槽或 options 非空时） */
 const useOptions = computed(() => {
   return !slots.default || props.options.length > 0
 })
 
+/** 自定义值检查：兼容数组（多选）和单值 */
 function hasValueCheck(value) {
   if (Array.isArray(value)) {
     return value.length > 0
@@ -130,6 +153,7 @@ const {
   }
 )
 
+/** 统一的事件处理器（focus/blur/dropdown-visible-change/search） */
 const eventHandlers = computed(() => {
   const handlers = {
     focus: handleFocus,
@@ -144,6 +168,7 @@ const eventHandlers = computed(() => {
   return handlers
 })
 
+// 外部 modelValue 变化时同步到内部 selectValue
 watch(
   () => props.modelValue,
   (newVal) => {
@@ -154,6 +179,7 @@ watch(
   { deep: true, immediate: true }
 )
 
+// 内部 selectValue 变化时向外 emit
 watch(
   selectValue,
   (newVal) => {
@@ -162,15 +188,28 @@ watch(
   { deep: true }
 )
 
+/**
+ * 处理选中值变化
+ * @param {*} value - 新值
+ * @param {*} option - 选中项
+ */
 function handleSelectChange(value, option) {
   selectValue.value = value
   handleChange(value, option)
 }
 
+/**
+ * 处理搜索
+ * @param {string} value - 搜索关键词
+ */
 function handleSearch(value) {
   emit('search', value)
 }
 
+/**
+ * 处理下拉框显隐变化
+ * @param {boolean} open - 是否展开
+ */
 function handleDropdownVisibleChange(open) {
   isOpen.value = open
 }

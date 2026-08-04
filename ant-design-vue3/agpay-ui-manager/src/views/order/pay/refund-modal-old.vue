@@ -62,6 +62,10 @@
 </template>
 
 <script setup>
+/**
+ * 订单退款弹框（旧版实现）
+ * 功能：发起支付订单退款申请，填写退款金额与备注
+ */
 import { orderApi } from '@/api/business/order/order-api'
 import { message, Modal } from 'ant-design-vue'
 import { computed, nextTick, reactive, ref, watch } from 'vue'

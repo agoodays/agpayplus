@@ -6,7 +6,7 @@
     width="80%"
     @close="handleClose"
   >
-    <ag-card ref="infoCard" :req-card-list-func="reqCardListFunc" :span="agpayCard.span" :height="agpayCard.height">
+    <ag-card ref="cardRef" :load-data="loadData" :span="agpayCard.span" :height="agpayCard.height">
       <template #cardContentSlot="{ record }">
         <div>
           <div :style="{ height: agpayCard.height + 'px' }" class="ag-card-content">
@@ -31,11 +31,11 @@
       </template>
     </ag-card>
     <!-- JSON动态渲染支付参数配置组件 -->
-    <json-pay-config v-model:open="jsonConfigOpen" :isv-no="props.isvNo" :record="currentJsonRecord" @success="refCardList" />
+    <json-pay-config v-model:open="jsonConfigOpen" :isv-no="props.isvNo" :record="currentJsonRecord" @success="reloadCardList" />
     <!-- 微信支付参数配置组件 -->
-    <wxpay-pay-config v-model:open="wxpayConfigOpen" :isv-no="props.isvNo" :record="currentCustomRecord" @success="refCardList" />
+    <wxpay-pay-config v-model:open="wxpayConfigOpen" :isv-no="props.isvNo" :record="currentCustomRecord" @success="reloadCardList" />
     <!-- 支付宝支付参数配置组件 -->
-    <alipay-pay-config v-model:open="alipayConfigOpen" :isv-no="props.isvNo" :record="currentCustomRecord" @success="refCardList" />
+    <alipay-pay-config v-model:open="alipayConfigOpen" :isv-no="props.isvNo" :record="currentCustomRecord" @success="reloadCardList" />
   </ag-drawer>
 </template>
 
@@ -74,7 +74,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:open'])
 
-const infoCard = ref(null)
+const cardRef = ref(null)
 const localOpen = ref(false)
 const jsonConfigOpen = ref(false)
 const wxpayConfigOpen = ref(false)
@@ -92,7 +92,7 @@ watch(
   (val) => {
     localOpen.value = val
     if (val && props.isvNo) {
-      refCardList()
+      reloadCardList()
     }
   }
 )
@@ -101,12 +101,12 @@ watch(localOpen, (val) => {
   emit('update:open', val)
 })
 
-function reqCardListFunc() {
+function loadData() {
   return isvPayConfigApi.queryCardList(props.isvNo)
 }
 
-function refCardList() {
-  infoCard.value?.refCardList?.()
+function reloadCardList() {
+  cardRef.value?.reload?.()
 }
 
 function editPayIfConfigFunc(record) {

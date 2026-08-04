@@ -56,10 +56,6 @@ const props = defineProps({
     type: Number,
     default: undefined
   },
-  value: {
-    type: Number,
-    default: undefined
-  },
   label: {
     type: String,
     default: ''
@@ -100,14 +96,14 @@ const props = defineProps({
     type: String,
     default: 'middle'
   },
-  // 浮动标签配置
+  /** 浮动标签配置 */
   floatOptions: {
     type: Object,
     default: () => ({})
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'update:value', 'change', 'focus', 'blur', 'pressEnter'])
+const emit = defineEmits(['update:modelValue', 'change', 'focus', 'blur', 'pressEnter'])
 
 const inputRef = ref()
 

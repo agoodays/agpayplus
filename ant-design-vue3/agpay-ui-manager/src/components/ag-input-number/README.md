@@ -1,9 +1,9 @@
-﻿# AgInputNumber - 数字输入框组件 🔢
+# AgInputNumber - 数字输入框组件 🔢
 
 ## 📌 当前推荐用法（2026）
 
 - 推荐导入：`import { AgInputNumber } from '@/components'`
-- 推荐绑定：`v-model`（兼容 `v-model:value`，新代码建议统一 `v-model`）
+- 推荐绑定：`v-model`（统一使用 `v-model`，不再支持 `v-model:value`）
 - 若本文出现 `@/components/ag-xxx` 直引路径，属于历史写法，统一按上方推荐导入替换。
 - 统一规范参考：[自定义组件使用指南](../../../CUSTOM_COMPONENTS_USAGE_GUIDE.md)
 
@@ -54,17 +54,20 @@ const value = ref(undefined)
 | max | 最大值 | Number | Infinity |
 | step | 步进值 | Number | 1 |
 | precision | 数字精度（小数位数）| Number | undefined |
+| controls | 是否显示增减按钮 | Boolean | true |
 | required | 是否显示必填星号 | Boolean | false |
 | size | 输入框尺寸 | 'small' \| 'middle' \| 'large' | 'middle' |
+| floatOptions | 浮动标签配置（动画时长、失焦延迟等）| Object | {} |
 
 ## 📤 Events
 
 | 事件名 | 说明 | 回调参数 |
 |--------|------|---------|
 | update:modelValue | 值改变时触发 | (value: Number) => void |
-| change | 值改变时触发 | (event: Event) => void |
+| change | 值改变时触发 | (value: Number) => void |
 | focus | 获得焦点 | (event: FocusEvent) => void |
 | blur | 失去焦点 | (event: FocusEvent) => void |
+| pressEnter | 按下回车键时触发 | (event: KeyboardEvent) => void |
 
 ## 🎨 示例
 
@@ -238,6 +241,7 @@ function handleFocus() {
 |--------|------|------|
 | focus() | 使输入框获得焦点 | - |
 | blur() | 使输入框失去焦点 | - |
+| clear() | 清空输入框的值 | - |
 
 ## 📝 与表单验证结合
 

@@ -78,82 +78,61 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
+/**
+ * 微信 Oauth2 配置页面（普通商户模式）
+ *
+ * 配置服务商公众号 / 小程序的 Oauth2 授权参数，包括：
+ * - 公众号 appId / appSecret
+ * - oauth2 地址
+ * - 小程序 appId / appSecret / 版本 / 原始ID / 路径
+ *
+ * 通过 `useOauth2Form` composable 管理表单数据与提交逻辑，
+ * 敏感字段（appSecret / liteAppSecret）以占位符形式提示已配置过。
+ */
+import { computed } from 'vue'
+import { useOauth2Form } from '../composables/useOauth2Form'
 
 const props = defineProps({
+  /** 配置模式（如 mgrIsv、mgrMch） */
   configMode: { type: String, default: null },
+  /** 后端返回的初始表单数据 */
   formData: { type: Object, default: () => ({}) }
 })
 
 const emit = defineEmits(['update-if-params'])
 
-const formDataRef = reactive({ ...props.formData })
+const {
+  infoForm,
+  ifParams,
+  updateIfParams,
+  getSubmitParams,
+  validate,
+  resetFields
+} = useOauth2Form(props, emit, {
+  placeholders: [
+    { key: 'appSecret', placeholder: '请输入应用AppSecret' },
+    { key: 'liteAppSecret', placeholder: '服务商的小程序appSecret' }
+  ],
+  clearKeys: ['appSecret', 'liteAppSecret']
+})
 
-formDataRef.appSecret_ph = formDataRef.appSecret ? formDataRef.appSecret : '请输入应用AppSecret'
-if (formDataRef.appSecret) {
-  formDataRef.appSecret = ''
-}
-
-formDataRef.liteAppSecret_ph = formDataRef.liteAppSecret
-  ? formDataRef.liteAppSecret
-  : '服务商的小程序appSecret'
-if (formDataRef.liteAppSecret) {
-  formDataRef.liteAppSecret = ''
-}
-
-emit('update-if-params', { ...formDataRef })
-
-const ifParams = reactive({ ...formDataRef })
-
+/**
+ * 表单校验规则
+ *
+ * appSecret 在初始化后会被清空（敏感字段以占位符形式展示），
+ * 因此 appSecret 始终必填，由用户重新输入或保持原值。
+ */
 const rules = computed(() => {
   const result = {
     appId: [{ required: true, trigger: 'blur', message: '请输入应用AppID' }]
   }
-  if (!formDataRef.appSecret) {
+  if (!ifParams.appSecret) {
     result.appSecret = [{ required: true, trigger: 'blur', message: '请输入应用AppSecret' }]
   }
   return result
 })
 
-const infoForm = ref(null)
-
-const updateIfParams = (key, value) => {
-  emit('update-if-params', {
-    ...ifParams,
-    [key]: value
-  })
-}
-
-const handleStarParams = () => {
-  const params = JSON.parse(JSON.stringify(ifParams) || '{}')
-  clearEmptyKey(params, 'appSecret')
-  clearEmptyKey(params, 'liteAppSecret')
-  return params
-}
-
-const clearEmptyKey = (obj, key) => {
-  if (!obj[key]) {
-    obj[key] = undefined
-  }
-  obj[key + '_ph'] = undefined
-}
-
-const validate = async (callback) => {
-  try {
-    await infoForm.value.validate()
-    callback?.(true)
-    return true
-  } catch {
-    callback?.(false)
-    return false
-  }
-}
-
-const resetFields = () => {
-  infoForm.value?.resetFields?.()
-}
-
-defineExpose({ validate, resetFields, handleStarParams })
+defineExpose({ validate, resetFields, getSubmitParams })
 </script>
 
 <style scoped></style>

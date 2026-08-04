@@ -5,11 +5,11 @@
         <div v-if="currentIfCode" class="tab-wrapper">
           <div class="tab-content">
             <div
-              v-for="(item, key) in tabData"
-              :key="key"
+              v-for="item in tabData"
+              :key="item.code"
               class="tab-item"
               :class="{ 'tab-selected': currentTabVal === item.code }"
-              @click="tabSelected(item.code)"
+              @click="handleTabSelect(item.code)"
             >
               {{ item.name }}
             </div>
@@ -25,7 +25,7 @@
             :if-define="ifDefine"
             :perm-code="permCode"
             :config-mode="configMode"
-            :callback-func="callbackFunc"
+            @success="emit('success')"
           />
         </div>
       </div>
@@ -34,86 +34,139 @@
 </template>
 
 <script setup>
+/**
+ * 应用配置通用页面（Tab 容器）
+ *
+ * 根据支付渠道定义（ifDefine）渲染标签页，并动态加载对应的参数配置子组件。
+ * 当前支持「应用参数」标签页，加载 `config-page.vue`。
+ *
+ * 通过 `defineExpose` 向上暴露 getConfig / reset / onSubmit 命令式方法，
+ * 子组件保存成功后通过 `success` 事件逐级向上通知。
+ */
 import { ref, shallowRef, watch } from 'vue'
 
+/** 标签页编码常量 */
+const TAB_CODES = {
+  APP_PARAM: 'appParamTab'
+}
+
+/** 标签页元数据（驱动模板渲染） */
+const TAB_DEFINITIONS = [
+  { code: TAB_CODES.APP_PARAM, name: '应用参数' }
+]
+
 const props = defineProps({
+  /** 信息 ID（如服务商/商户 ID） */
   infoId: {
     type: String,
     default: null
   },
+  /** 信息类型 */
   infoType: {
     type: String,
     default: null
   },
+  /** 渠道定义对象，包含 ifCode、ifName 等 */
   ifDefine: {
     type: Object,
     default: null
   },
+  /** 权限编码 */
   permCode: {
     type: String,
     default: ''
   },
+  /** 配置模式（如 mgrIsv、mgrMch） */
   configMode: {
     type: String,
     default: ''
-  },
-  callbackFunc: {
-    type: Function,
-    default: () => {}
   }
 })
 
-// State
-const showCard = ref(false)
-const title = ref('')
-const currentTabVal = ref('')
-const currentIfCode = ref(null)
-const tabData = ref([])
-const configComponent = shallowRef(null)
+const emit = defineEmits(['success'])
 
-// Refs
+/** 是否展示卡片 */
+const showCard = ref(false)
+/** 卡片标题 */
+const title = ref('')
+/** 当前选中的标签页编码 */
+const currentTabVal = ref('')
+/** 当前渠道编码 */
+const currentIfCode = ref(null)
+/** 标签页数据列表 */
+const tabData = ref([])
+/** 当前动态加载的配置组件（shallowRef 避免组件对象被深度响应式） */
+const configComponent = shallowRef(null)
+/** 已加载组件缓存（path -> component），避免重复 import */
+const loadedComponents = shallowRef({})
+
+/** 子配置组件实例引用 */
 const configComponentRef = ref(null)
 
-// Methods
+/**
+ * 触发子组件加载配置数据
+ */
 const getConfig = () => {
   if (configComponentRef.value) {
     configComponentRef.value.getConfig()
   }
 }
 
+/**
+ * 重置子组件表单
+ */
 const reset = () => {
   if (configComponentRef.value) {
     configComponentRef.value.reset()
   }
 }
 
+/**
+ * 触发子组件提交表单
+ */
 const onSubmit = async () => {
   if (configComponentRef.value && configComponentRef.value.onSubmit) {
     await configComponentRef.value.onSubmit()
   }
 }
 
-const tabSelected = (code) => {
+/**
+ * 选中指定标签页并加载对应配置组件
+ * @param {string} code - 标签页编码
+ */
+const handleTabSelect = (code) => {
   if (currentTabVal.value !== code) {
     currentTabVal.value = code
-    getConfigComponent(code)
+    loadConfigComponent(code)
   }
 }
 
 /**
- * 根据标签页代码加载对应配置组件
- * @param {string} code - 标签页代码
+ * 根据标签页编码动态加载对应配置组件（带缓存）
+ * @param {string} code - 标签页编码
  */
-const getConfigComponent = async (code) => {
+const loadConfigComponent = async (code) => {
   if (!props.ifDefine) return
 
-  if (code === 'appParamTab') {
-    const module = await import('./config-page.vue')
-    configComponent.value = module.default || module
+  if (code !== TAB_CODES.APP_PARAM) return
+
+  const componentPath = './config-page.vue'
+  const cached = loadedComponents.value[componentPath]
+  if (cached) {
+    configComponent.value = cached
+    return
+  }
+
+  try {
+    const module = await import(componentPath)
+    const component = module.default || module
+    configComponent.value = component
+    loadedComponents.value[componentPath] = component
+  } catch (error) {
+    console.error('加载参数配置组件失败:', error)
   }
 }
 
-// Watch
 watch(
   () => props.ifDefine,
   (newVal) => {
@@ -121,12 +174,9 @@ watch(
       showCard.value = true
       title.value = newVal.ifName + '参数配置'
       currentIfCode.value = newVal.ifCode
-      tabData.value = []
-
-      tabData.value.push({ code: 'appParamTab', name: '应用参数' })
-
+      tabData.value = [...TAB_DEFINITIONS]
       currentTabVal.value = tabData.value[0].code
-      getConfigComponent(currentTabVal.value)
+      loadConfigComponent(currentTabVal.value)
     } else {
       showCard.value = false
     }
@@ -134,7 +184,6 @@ watch(
   { immediate: true }
 )
 
-// Expose methods
 defineExpose({
   getConfig,
   reset,
