@@ -1,14 +1,13 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    class="drawer-width"
-    :mask-closable="false"
-    :title="isAdd ? '新增公告' : '修改公告'"
     :width="drawerWidth"
+    :title="isAdd ? '新增公告' : '修改公告'"
+    :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="loading"
-    @close="handleClose"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row justify="space-between" type="flex">
@@ -59,7 +58,7 @@ const props = defineProps({
     default: false
   },
   recordId: {
-    type: String,
+    type: [String, Number],
     default: ''
   }
 })

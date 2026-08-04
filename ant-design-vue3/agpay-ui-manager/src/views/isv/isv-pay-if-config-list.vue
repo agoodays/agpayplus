@@ -1,9 +1,8 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    title="支付参数列表"
-    :closable="true"
     width="80%"
+    title="支付参数列表"
     @close="handleClose"
   >
     <ag-card ref="cardRef" :load-data="loadData" :span="agpayCard.span" :height="agpayCard.height">

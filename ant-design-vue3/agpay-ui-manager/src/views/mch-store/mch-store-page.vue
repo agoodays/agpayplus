@@ -79,7 +79,11 @@
         </template>
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_MCH_STORE_EDIT')" type="link" size="small" @click="handleEdit(record)">
+            <a-button 
+              v-if="hasPermission('ENT_MCH_STORE_EDIT')"
+              type="link"
+              size="small"
+              @click="handleEdit(record)">
               修改
             </a-button>
             <a-button

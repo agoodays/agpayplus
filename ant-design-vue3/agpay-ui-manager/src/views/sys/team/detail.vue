@@ -1,9 +1,8 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    title="团队详情"
     width="40%"
-    :show-footer="false"
+    title="团队详情"
     @close="handleClose"
   >
     <a-descriptions :column="2" :bordered="false">
@@ -22,10 +21,10 @@
  * 用户团队详情弹窗组件
  * 功能：展示团队详细信息
  */
-import { AgDrawer } from '@/components'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
-import { reactive, ref, watch } from 'vue'
+import { AgDrawer } from '@/components'
 import { STAT_RANGE_TYPE_ENUM, SYS_TYPE_ENUM } from '@/constants/common-const'
+import { reactive, ref, watch } from 'vue'
 
 const props = defineProps({
   open: { type: Boolean, default: false },

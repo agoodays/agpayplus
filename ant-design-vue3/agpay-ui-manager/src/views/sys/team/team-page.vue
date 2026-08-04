@@ -59,7 +59,7 @@
         </template>
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_UR_TEAM_EDIT')" type="link" @click="editFunc(record.teamId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_UR_TEAM_EDIT')" type="link" @click="editFunc(record.teamId)">修改</a-button>
             <a-button v-if="hasPermission('ENT_UR_TEAM_DEL')" type="link" style="color: red" @click="delFunc(record.teamId)">删除</a-button>
           </ag-table-actions>
         </template>

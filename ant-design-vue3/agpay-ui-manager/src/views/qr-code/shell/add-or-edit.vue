@@ -1,13 +1,13 @@
 <template>
   <ag-drawer
-    width="60%"
     v-model:open="localOpen"
-    :mask-closable="false"
+    width="60%"
     :title="isAdd ? '新增模板' : '修改模板'"
+    :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="loading"
-    @close="handleClose"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-row>
       <a-col span="14">
@@ -157,13 +157,13 @@
 </template>
 
 <script setup>
-import { AgDrawer, AgUpload } from '@/components'
-import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
+import { AgDrawer, AgUpload } from '@/components'
 import { upload } from '@/lib/ag-axios'
+import { viewerApi } from '@/utils/viewer-api'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
-import { viewerApi } from '@/utils/viewer-api'
 
 /**
  * 图标组件映射

@@ -1,9 +1,8 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    :title="'设置权限匹配规则'"
     width="60%"
-    class="drawer-width"
+    title="设置权限匹配规则"
     @close="handleClose"
   >
     <a-row>
@@ -52,20 +51,21 @@
         </a-form>
       </a-col>
     </a-row>
-    <div class="drawer-btn-center">
+
+    <template #footer>
       <a-button :style="{ marginRight: '8px' }" @click="handleClose">
         <template #icon><CloseOutlined /></template>
         取消
       </a-button>
-      <a-button type="primary" :style="{ marginRight: '8px' }" :loading="addLoading" @click="handleOkFunc('add')">
+      <a-button type="primary" :style="{ marginRight: '8px' }" :loading="confirmLoading" @click="handleConfirm('add')">
         <template #icon><CheckOutlined /></template>
         添加匹配规则
       </a-button>
-      <a-button type="danger" :loading="deleteLoading" @click="handleOkFunc('delete')">
+      <a-button type="danger" :loading="deleteLoading" @click="handleConfirm('delete')">
         <template #icon><DeleteOutlined /></template>
         删除匹配规则
       </a-button>
-    </div>
+    </template>
   </ag-drawer>
 </template>
 
@@ -109,7 +109,7 @@ const localOpen = ref(false)
 /**
  * 添加加载状态
  */
-const addLoading = ref(false)
+const confirmLoading = ref(false)
 
 /**
  * 删除加载状态
@@ -198,9 +198,9 @@ const onMchTypeChange = (value) => {
  * 处理确认操作
  * @param {string} opType - 操作类型：add 或 delete
  */
-const handleOkFunc = async (opType) => {
+const handleConfirm = async (opType) => {
   if (opType === 'add') {
-    addLoading.value = true
+    confirmLoading.value = true
   } else {
     deleteLoading.value = true
   }
@@ -219,7 +219,7 @@ const handleOkFunc = async (opType) => {
   } catch (error) {
     console.error('设置匹配规则失败:', error)
   } finally {
-    addLoading.value = false
+    confirmLoading.value = false
     deleteLoading.value = false
   }
 }

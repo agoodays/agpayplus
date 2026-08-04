@@ -2,9 +2,8 @@
   <!-- 商户通知详情抽屉组件 -->
   <ag-drawer
     v-model:open="localOpen"
-    title="商户通知详情"
     width="40%"
-    :show-footer="false"
+    title="商户通知详情"
     @close="handleClose"
   >
     <a-spin :spinning="loading">
@@ -74,8 +73,8 @@
 </template>
 
 <script setup>
-import { AgDrawer } from '@/components'
 import { orderApi } from '@/api/business/order/order-api'
+import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 

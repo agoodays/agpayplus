@@ -58,6 +58,7 @@
 
     <!-- 数据表格 -->
     <a-table
+      ref="antTableRef"
       :components="tableComponents"
       :columns="displayColumns"
       :data-source="tableData.records"
@@ -66,8 +67,8 @@
       :row-selection="computedRowSelection"
       :row-key="rowKey"
       :size="state.density"
-      :scroll="{ x: scrollX }"
-      :virtual="{ scroll: true, itemHeight: getRowHeight() }"
+      :scroll="tableScrollConfig"
+      :virtual="tableVirtualConfig"
       :summary="summaryFunc"
       @change="handleTableChangeEvent"
       @row-click="handleRowClick"
@@ -86,7 +87,7 @@
 
 <script setup>
 import { message } from 'ant-design-vue'
-import { computed, defineComponent, h, onBeforeUnmount, onMounted, reactive, ref, useSlots, watch } from 'vue'
+import { computed, defineComponent, h, nextTick, onBeforeUnmount, onMounted, reactive, ref, useSlots, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AgTableStatisticsPanel from './table-statistics-panel.vue'
 import AgTableToolbar from './table-toolbar.vue'
@@ -195,7 +196,7 @@ const ResizableHeaderCell = defineComponent({
 
     return () => {
       const widthStyle = normalizeWidth(props.width)
-      const mergedStyle = [attrs.style, widthStyle ? { width: widthStyle, minWidth: widthStyle } : null]
+      const mergedStyle = [attrs.style, widthStyle ? { width: widthStyle } : null]
       const className = [attrs.class, 'ag-resizable-th', { 'ag-resizable-th--resizing': resizing.value }]
 
       return h(
@@ -229,7 +230,9 @@ const props = defineProps({
   rowKey: { type: [String, Function], default: 'id' },
   rowSelection: { type: Object, default: null },
   rowSelectionEnabled: { type: Boolean, default: false },
-  scrollX: { type: Number, default: 500 },
+  // 横向滚动最小宽度。未传时由组件自动决策：列宽总和<容器宽就不建滚动容器，溢出才建；传入后强制按该值设置 scroll.x（优先级最高）。
+  scrollX: { type: [Number, String], default: undefined },
+  virtual: { type: Boolean, default: false },
 
   // 行点击事件
   columnResizable: { type: Boolean, default: true },
@@ -316,6 +319,60 @@ const columnSettingsOpen = ref(false)
 const dragKey = ref(null)
 const slots = useSlots()
 const hasStatisticsSlot = !!slots.statistics
+const antTableRef = ref(null)
+// a-table 外层内容容器的可视宽度（用于决定是否真的需要横向滚动）
+const containerWidth = ref(0)
+let resizeObserver = null
+
+/**
+ * 将列宽值解析为像素数字。支持 120 / '120px' / '12%' / undefined 等格式。
+ * 百分比返回 NaN（因为没有父级参照，由调用方兜底）。
+ */
+function parseWidthPx(width) {
+  if (width === undefined || width === null || width === '') return NaN
+  if (typeof width === 'number') return width
+  const str = String(width).trim()
+  if (str.endsWith('%')) return NaN
+  const match = str.match(/^([\d.]+)(px)?$/i)
+  return match ? Number(match[1]) : NaN
+}
+
+/**
+ * 解析 a-table 的 DOM，定位真实的内容容器（承载横向滚动的那个节点）。
+ * Ant Design Vue 4.x 结构：.ant-table-container > .ant-table-content / .ant-table-body
+ */
+function resolveScrollContainer() {
+  const tableEl = antTableRef.value?.$el
+  if (!tableEl) return null
+  return (
+    tableEl.querySelector?.('.ant-table-container') ||
+    tableEl.querySelector?.('.ant-table-content') ||
+    tableEl.querySelector?.('.ant-table-body') ||
+    tableEl
+  )
+}
+
+function observeContainerWidth() {
+  if (resizeObserver) return
+  const target = resolveScrollContainer()
+  if (!target) return
+  resizeObserver = new ResizeObserver((entries) => {
+    const entry = entries?.[0]
+    if (!entry) return
+    const w = entry.contentRect?.width ?? target.clientWidth ?? 0
+    containerWidth.value = Math.round(w)
+  })
+  resizeObserver.observe(target)
+  // 初始同步一次，避免首次渲染时 containerWidth 为 0 造成误判
+  containerWidth.value = Math.round(target.clientWidth || 0)
+}
+
+function disconnectResizeObserver() {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+}
 
 // 仅在启用列宽拖拽时注入自定义表头单元，避免影响普通表格渲染链路。
 const tableComponents = computed(() => {
@@ -328,6 +385,58 @@ const tableComponents = computed(() => {
       cell: ResizableHeaderCell,
     },
   }
+})
+
+/**
+ * 表格滚动配置（动态决策）。
+ *
+ * 优先级：
+ * 1. 外部显式传了 props.scrollX（数字/'max-content' 等）→ 按用户值强制设置 `scroll.x`（最高优先级）。
+ * 2. 否则按「真实列宽 vs 容器可视宽度」动态判断：
+ *    · 有 fixed 固定列（left/right）：Ant Design Vue 必须依赖 scroll.x 才能正确布局，
+ *      因此始终传 { x: Math.max(容器宽, 列宽总和) }，保证够宽时不溢出不出现滚动条，溢出时滚动条正常出现。
+ *    · 无 fixed 固定列，且 列宽总和 ≤ 容器宽 → 不传 scroll.x，让表格按 auto 布局铺满容器，不出现横向滚动条。
+ *    · 无 fixed 固定列，且 列宽总和 > 容器宽 → 传 { x: 'max-content' }，按真实列宽渲染并出现横向滚动条。
+ * 3. 首次渲染还没拿到容器宽度（containerWidth=0）时兜底：
+ *    · 有固定列 → 'max-content'；无固定列 → {}（避免首次渲染就出现滚动条）。
+ */
+const tableScrollConfig = computed(() => {
+  // 用户明确指定了 scrollX：完全按用户值走，不做动态调整
+  if (props.scrollX !== undefined && props.scrollX !== null && props.scrollX !== '') {
+    return { x: props.scrollX }
+  }
+
+  const cols = totalColumnsWidth.value
+  const cw = Number(containerWidth.value) || 0
+  const fixed = !!hasFixedColumn.value
+
+  // 首次渲染还没拿到容器宽度（ResizeObserver 尚未触发），做保守兜底
+  if (cw <= 0) {
+    if (fixed) return { x: 'max-content' }
+    return {}
+  }
+
+  if (fixed) {
+    // 有固定列必须传 x：够宽就按容器宽（不溢出，不出滚动条），不够就按列宽总和（保证列不被挤，溢出出滚动条）
+    return { x: Math.max(cw, cols) }
+  }
+
+  if (cols > cw) {
+    return { x: 'max-content' }
+  }
+  return {}
+})
+
+/**
+ * 虚拟滚动配置。
+ * - 默认关闭，避免 Ant Design Vue 内部强制启用虚拟滚动容器（导致不管内容多少都出现滚动区）。
+ * - 明确开启时，使用当前密度对应行高。
+ */
+const tableVirtualConfig = computed(() => {
+  if (!props.virtual) {
+    return false
+  }
+  return { scroll: true, itemHeight: getRowHeight() }
 })
 
 const {
@@ -433,6 +542,20 @@ const displayColumns = computed(() => {
 
       return currentColumn
     })
+})
+
+/** 可见列宽总和（未设置宽度的列按 columnMinWidth 兜底）。必须放在 displayColumns 定义之后，避免暂时性死区。 */
+const totalColumnsWidth = computed(() => {
+  if (!displayColumns.value?.length) return 0
+  return displayColumns.value.reduce((sum, col) => {
+    const w = parseWidthPx(col.width)
+    return sum + (Number.isFinite(w) ? w : (Number(props.columnMinWidth) || 80))
+  }, 0)
+})
+
+/** 是否存在 fixed 固定列，存在则必须有 scroll.x 才能保证布局正确 */
+const hasFixedColumn = computed(() => {
+  return displayColumns.value?.some((col) => col.fixed === 'left' || col.fixed === 'right' || col.fixed === true)
 })
 
 const computedRowSelection = computed(() => {
@@ -693,6 +816,9 @@ watch(
 // ==================== 生命周期 ====================
 
 onMounted(() => {
+  // 首次 DOM 渲染后（尤其是异步数据/插槽就绪后）再尝试挂载 ResizeObserver
+  nextTick(() => observeContainerWidth())
+
   loadColumnSettings()
 
   if (props.onLoad) {
@@ -704,6 +830,10 @@ onMounted(() => {
   }
 
   initAutoRefresh()
+})
+
+onBeforeUnmount(() => {
+  disconnectResizeObserver()
 })
 
 defineExpose({

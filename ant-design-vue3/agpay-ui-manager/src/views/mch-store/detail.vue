@@ -1,9 +1,8 @@
 ﻿<template>
   <ag-drawer
     v-model:open="localOpen"
-    title="门店详情"
     width="40%"
-    :show-footer="false"
+    title="门店详情"
     @close="handleClose"
   >
     <a-spin :spinning="loading">
@@ -79,8 +78,8 @@
 </template>
 
 <script setup>
-import { AgDrawer } from '@/components'
 import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
+import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 
@@ -91,7 +90,7 @@ const props = defineProps({
     default: false
   },
   recordId: {
-    type: String,
+    type: [String, Number],
     default: ''
   }
 })

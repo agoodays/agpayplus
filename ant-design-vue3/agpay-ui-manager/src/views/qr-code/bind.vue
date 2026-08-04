@@ -1,13 +1,13 @@
 ﻿<template>
   <ag-drawer
     v-model:open="localOpen"
-    :mask-closable="false"
-    title="绑定码牌"
     width="40%"
-    @close="handleClose"
+    title="绑定码牌"
+    :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="loading"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form
       ref="infoForm"
@@ -57,8 +57,8 @@
  * 二维码绑定组件
  * 功能：将二维码绑定到商户、应用和门店
  */
-import { AgDrawer, AgSelectInfinite } from '@/components'
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
+import { AgDrawer, AgSelectInfinite } from '@/components'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
 

@@ -12,7 +12,7 @@
         <template #icon><RocketOutlined /></template>
         发起绑定请求
       </a-button>
-      <a-button @click="onClose">
+      <a-button @click="handleClose">
         <template #icon><CloseOutlined /></template>
         关闭
       </a-button>
@@ -254,8 +254,9 @@
       </ag-table>
     </a-card>
 
-    <add-or-edit ref="infoAddOrEdit" @success="getReceiverGroup" />
-    <channel-user-modal ref="channelUserModal" @change-channel-user-id="changeChannelUserIdFunc" />
+    <!-- 新增 / 编辑 页面弹窗  -->
+    <add-or-edit v-model:open="modalOpen" @success="getReceiverGroup" />
+    <channel-user-modal ref="channelUserModalRef" @change-channel-user-id="changeChannelUserIdFunc" />
   </ag-drawer>
 </template>
 
@@ -337,8 +338,8 @@ const relationOptions = [
   { key: 'CUSTOM', label: '自定义' }
 ]
 
-const infoAddOrEdit = ref(null)
-const channelUserModal = ref(null)
+const modalOpen = ref(null)
+const channelUserModalRef = ref(null)
 
 const localOpen = ref(false)
 const mchNo = ref(null)
@@ -416,7 +417,7 @@ const getReceiverGroup = async (currentMchNo) => {
 }
 
 const addGroupFunc = () => {
-  infoAddOrEdit.value?.show()
+  modalOpen.value = true
 }
 
 /**
@@ -451,7 +452,7 @@ const changeRelationType = (record, value) => {
 }
 
 const showChannelUserModal = (currentIfCode, record) => {
-  channelUserModal.value?.showModal(appId.value, currentIfCode, record)
+  channelUserModalRef.value?.showModal(appId.value, currentIfCode, record)
 }
 
 const changeChannelUserIdFunc = ({ channelUserId, extObject }) => {

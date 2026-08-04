@@ -1,8 +1,8 @@
 ﻿<template>
   <ag-drawer
     v-model:open="localOpen"
-    :title="'流水详情'"
     width="40%"
+    :title="'流水详情'"
     :show-footer="false"
     @close="handleClose"
   >

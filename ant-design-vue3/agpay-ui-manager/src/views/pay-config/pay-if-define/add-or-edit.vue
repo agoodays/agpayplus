@@ -1,13 +1,13 @@
 <template>
   <ag-drawer
-    width="50%"
     v-model:open="localOpen"
-    :mask-closable="false"
+    width="50%"
     :title="isAdd ? '新增支付接口' : '修改支付接口'"
+    :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="loading"
-    @close="handleClose"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form
       ref="infoForm"

@@ -131,7 +131,7 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_DIVISION_RECEIVER_EDIT')" type="link" @click="editFunc(record.receiverId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_DIVISION_RECEIVER_EDIT')" type="link" @click="editFunc(record.receiverId)">修改</a-button>
           </ag-table-actions>
         </template>
       </ag-table>

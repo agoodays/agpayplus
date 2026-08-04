@@ -1,8 +1,8 @@
 ﻿<template>
   <ag-drawer
     v-model:open="localOpen"
-    title="公告详情"
     width="60%"
+    title="公告详情"
     @close="handleClose"
   >
     <div class="article-container">
@@ -33,7 +33,7 @@ const props = defineProps({
     default: false
   },
   recordId: {
-    type: String,
+    type: [String, Number],
     default: ''
   }
 })

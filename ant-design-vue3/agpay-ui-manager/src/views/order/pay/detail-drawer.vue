@@ -2,9 +2,8 @@
   <!-- 订单详情抽屉组件 -->
   <ag-drawer
     v-model:open="localOpen"
-    title="订单详情"
     width="50%"
-    :show-footer="false"
+    title="订单详情"
     @close="handleClose"
   >
     <!-- 加载状态 -->
@@ -205,8 +204,8 @@
  * 支付订单详情抽屉组件
  * 功能：展示订单的完整信息、支付明细、退款记录等详情
  */
-import { AgDrawer } from '@/components'
 import { orderApi } from '@/api/business/order/order-api'
+import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 

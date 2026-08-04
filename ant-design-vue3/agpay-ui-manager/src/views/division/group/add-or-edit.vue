@@ -3,7 +3,7 @@
     v-model:open="localOpen"
     :title="isAdd ? '新增账号组' : '修改账号组'"
     :confirm-loading="confirmLoading"
-    @ok="handleOkFunc"
+    @ok="handleOk"
     @cancel="handleClose"
   >
     <a-form
@@ -46,9 +46,9 @@
  */
 import { divisionGroupApi } from '@/api/business/division/division-group-api'
 import { AgSelectInfinite } from '@/components'
-import { message } from 'ant-design-vue'
-import { ref, watch, computed } from 'vue'
 import { getFlagOptions } from '@/constants/common-const'
+import { message } from 'ant-design-vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -126,7 +126,7 @@ const validateForm = async () => {
   }
 }
 
-const handleOkFunc = async () => {
+const handleOk = async () => {
   const valid = await validateForm()
   if (!valid) return
 

@@ -56,7 +56,7 @@
           <template #opSlot="{ record }">
             <ag-table-actions>
               <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_VIEW')" type="link" @click="handlePreview(record.shellImgViewUrl)">预览</a-button>
-              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_EDIT')" type="link" @click="openEdit(record.id)">编辑</a-button>
+              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_EDIT')" type="link" @click="openEdit(record.id)">修改</a-button>
               <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_DEL')" type="link" danger @click="confirmDelete(record.id)">删除</a-button>
             </ag-table-actions>
           </template>
@@ -125,8 +125,8 @@
  */
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
 import { AgCard, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
-import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { viewerApi } from '@/utils/viewer-api'
 import { AppstoreOutlined, BarsOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'

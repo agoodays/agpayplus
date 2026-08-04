@@ -98,8 +98,12 @@
   --dark-text-color: rgba(255, 255, 255, 0.88);
   --dark-text-color-weak: rgba(255, 255, 255, 0.65);
   --dark-text-color-muted: rgba(255, 255, 255, 0.45);
+  --dark-text-color-secondary: rgba(255, 255, 255, 0.45);
+  --dark-text-muted: rgba(255, 255, 255, 0.25);
   --dark-border-color: #303030;
+  --dark-border-dashed: rgba(255, 255, 255, 0.15);
   --dark-shadow-color: rgba(0, 0, 0, 0.35);
+  --dark-table-row-alt-bg: rgba(255, 255, 255, 0.02);
 }
 
 /**
@@ -117,20 +121,16 @@
   --surface-subtle: var(--dark-surface-subtle);
   --surface-light: var(--dark-surface-light);
   --surface-lighter: var(--dark-surface-lighter);
-  --hover-bg-color: var(--dark-hover-bg-color); /* 覆盖悬停背景 */
+  --hover-bg-color: var(--dark-hover-bg-color);
   --text-color: var(--dark-text-color);
   --text-color-weak: var(--dark-text-color-weak);
   --text-color-muted: var(--dark-text-color-muted);
+  --text-color-secondary: var(--dark-text-color-secondary);
+  --text-muted: var(--dark-text-muted);
   --border-color: var(--dark-border-color);
+  --border-dashed: var(--dark-border-dashed);
   --shadow-color: var(--dark-shadow-color);
-
-  /* Ant Design 暗色主题变量 */
-  --ant-primary-color: var(--primary-color);
-  --ant-primary-color-hover: var(--primary-color-hover);
-  --ant-primary-color-active: var(--primary-color);
-  --ant-primary-color-outline: var(--primary-color-hover);
-  --ant-primary-1: var(--primary-color-weak);
-  --ant-primary-2: var(--primary-color-hover);
+  --table-row-alt-bg: var(--dark-table-row-alt-bg);
 }
 
 /* ==================== WangEditor 主题适配 ==================== */
@@ -205,7 +205,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  outline: none !important;
+}
+
+/* 键盘聚焦时显示 outline，鼠标点击时隐藏（无障碍访问） */
+*:focus:not(:focus-visible) {
+  outline: none;
 }
 
 html,

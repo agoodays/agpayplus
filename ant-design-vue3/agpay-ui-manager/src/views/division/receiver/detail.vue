@@ -1,9 +1,8 @@
 <!-- 详情抽屉 -->
 <template>
   <ag-drawer
-    width="40%"
-    :closable="true"
     v-model:open="localOpen"
+    width="40%"
     title="详情"
     @close="handleClose"
   >
@@ -64,7 +63,7 @@ const props = defineProps({
     default: false
   },
   recordId: {
-    type: String,
+    type: [String, Number],
     default: ''
   }
 })

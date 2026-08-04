@@ -1,13 +1,13 @@
 ﻿<template>
   <ag-drawer
     v-model:open="localOpen"
-    :title="isAdd ? '新增门店' : '修改门店'"
     width="60%"
+    :title="isAdd ? '新增门店' : '修改门店'"
     :mask-closable="false"
-    @close="handleClose"
     :show-confirm="true"
     :confirm-loading="loading"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 商户号（仅新增时显示） -->
@@ -187,7 +187,7 @@ const props = defineProps({
     default: false
   },
   recordId: {
-    type: String,
+    type: [String, Number],
     default: ''
   }
 })

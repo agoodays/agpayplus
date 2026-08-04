@@ -2,9 +2,8 @@
   <!-- 转账订单详情抽屉组件 -->
   <ag-drawer
     v-model:open="localOpen"
-    title="转账订单详情"
     width="50%"
-    :show-footer="false"
+    title="转账订单详情"
     @close="handleClose"
   >
     <!-- 加载状态 -->
@@ -139,8 +138,8 @@
 </template>
 
 <script setup>
-import { AgDrawer } from '@/components'
 import { orderApi } from '@/api/business/order/order-api'
+import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 

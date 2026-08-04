@@ -1,13 +1,13 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    :title="isAdd ? '新增角色' : '修改角色'"
     width="40%"
+    :title="isAdd ? '新增角色' : '修改角色'"
     :mask-closable="false"
-    @close="handleClose"
     :show-confirm="true"
     :confirm-loading="loading"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" :label-col="{ span: 4 }" :rules="rules">
       <a-form-item label="角色名称：" name="roleName">

@@ -1,9 +1,8 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    title="商户详情"
     width="40%"
-    :show-footer="false"
+    title="商户详情"
     @close="handleClose"
   >
     <a-spin :spinning="loading">
@@ -87,17 +86,16 @@
  * 商户详情抽屉组件
  * 功能：展示商户的详细信息
  */
-import { AgDrawer } from '@/components'
 import { mchApi } from '@/api/business/mch/mch-api'
-import { message } from 'ant-design-vue'
-import { reactive, ref, watch } from 'vue'
+import { AgDrawer } from '@/components'
 import {
   MCH_TYPE_ENUM,
-  REFUND_MODE_ENUM,
   getMchTypeInfo,
   getRefundModeInfo,
   getStateInfo
 } from '@/constants/common-const'
+import { message } from 'ant-design-vue'
+import { reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

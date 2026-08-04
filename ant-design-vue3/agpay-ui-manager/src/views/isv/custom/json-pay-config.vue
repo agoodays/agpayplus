@@ -1,14 +1,13 @@
 <template>
   <ag-drawer
-    title="支付参数配置"
-    width="40%"
-    :closable="true"
     v-model:open="localOpen"
+    width="40%"
+    title="支付参数配置"
     :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="loading"
-    @close="handleClose"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
@@ -83,7 +82,7 @@ import { isvPayConfigApi } from '@/api/business/isv/isv-pay-config-api'
 import { AgDrawer, AgUpload } from '@/components'
 import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
-import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -2,8 +2,7 @@
   <a-modal
     v-model:open="localOpen"
     title="支付宝子商户扫码授权"
-    @ok="handleOkFunc"
-    @cancel="handleOkFunc"
+    @ok="handleOk"
   >
     <div style="text-align: center">
       <p>方式1： <br/> 请商家登录【支付宝】APP, 扫描如下二维码, 按提示授权：</p>
@@ -24,9 +23,9 @@
  * 支付宝子商户扫码授权组件
  * 功能：展示支付宝授权二维码和授权链接，支持复制链接
  */
-import { ref, reactive, watch } from 'vue'
-import { message } from 'ant-design-vue'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
+import { message } from 'ant-design-vue'
+import { reactive, ref, watch } from 'vue'
 
 /** 组件属性 */
 const props = defineProps({
@@ -79,7 +78,7 @@ const loadAuthData = async (appIdVal) => {
 /**
  * 处理确认/取消操作
  */
-const handleOkFunc = () => {
+const handleOk = () => {
   localOpen.value = false
   emit('success')
 }

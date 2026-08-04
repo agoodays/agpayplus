@@ -1,9 +1,8 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    title="配置支付通道"
     width="40%"
-    :closable="true"
+    title="配置支付通道"
     :mask-closable="false"
     :show-confirm="hasPermission('ENT_MCH_PAY_PASSAGE_ADD')"
     @confirm="handleConfirm"

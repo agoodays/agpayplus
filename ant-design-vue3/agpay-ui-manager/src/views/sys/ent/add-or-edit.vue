@@ -2,8 +2,7 @@
   <a-modal
     :open="localOpen"
     :title="isAdd ? '新增菜单' : '修改菜单'"
-    :confirm-loading="confirmLoading"
-    @ok="handleOkFunc"
+    @ok="handleOk"
     @cancel="handleCancel"
     @update:open="handleUpdateOpen"
   >
@@ -228,7 +227,7 @@ const onMchTypeChange = (value) => {
 /**
  * 处理确认操作
  */
-const handleOkFunc = async () => {
+const handleOk = async () => {
   try {
     await infoForm.value.validate()
   } catch {

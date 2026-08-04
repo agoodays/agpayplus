@@ -1,9 +1,9 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
+    width="60%"
     title="商户高级配置"
     :mask-closable="false"
-    width="60%"
     @close="handleClose"
   >
     <a-tabs v-model:active-key="groupKey" @change="selectTabs" :animated="false">

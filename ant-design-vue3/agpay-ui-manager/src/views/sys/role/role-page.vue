@@ -60,7 +60,7 @@
         <!-- 操作列 -->
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_UR_ROLE_EDIT')" type="link" @click="editFunc(record.roleId, record.sysType)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_UR_ROLE_EDIT')" type="link" @click="editFunc(record.roleId, record.sysType)">修改</a-button>
             <a-button v-if="hasPermission('ENT_UR_ROLE_DEL')" type="link" style="color: red" @click="delFunc(record.roleId)">删除</a-button>
           </ag-table-actions>
         </template>

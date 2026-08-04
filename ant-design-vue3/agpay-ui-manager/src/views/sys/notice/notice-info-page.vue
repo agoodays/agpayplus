@@ -41,7 +41,7 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_NOTICE_EDIT')" type="link" @click="editFunc(record.articleId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_NOTICE_EDIT')" type="link" @click="editFunc(record.articleId)">修改</a-button>
             <a-button v-if="hasPermission('ENT_NOTICE_VIEW')" type="link" @click="detailFunc(record.articleId)">详情</a-button>
             <a-button v-if="hasPermission('ENT_NOTICE_DEL')" type="link" style="color: red" @click="delFunc(record.articleId)">删除</a-button>
           </ag-table-actions>

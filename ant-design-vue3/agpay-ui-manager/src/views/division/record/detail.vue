@@ -1,9 +1,8 @@
 <!-- 详情抽屉 -->
 <template>
   <ag-drawer
-    width="50%"
-    :closable="true"
     v-model:open="localOpen"
+    width="50%"
     title="记录详情"
     @close="handleClose"
   >

@@ -1,13 +1,13 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    :mask-closable="false"
-    :title="isAdd ? '新增码牌' : '修改码牌'"
     width="40%"
-    @close="handleClose"
+    :title="isAdd ? '新增码牌' : '修改码牌'"
+    :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="loading"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form
       ref="infoForm"

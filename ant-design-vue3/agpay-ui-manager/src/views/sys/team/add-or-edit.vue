@@ -1,9 +1,8 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    class="drawer-width"
-    :title="isAdd ? '新增团队' : '修改团队'"
     :width="drawerWidth"
+    :title="isAdd ? '新增团队' : '修改团队'"
     :show-confirm="true"
     :confirm-loading="loading"
     @confirm="handleConfirm"
@@ -40,11 +39,11 @@
  * 用户团队新增/编辑弹窗组件
  * 功能：支持新增和编辑团队信息
  */
-import { AgDrawer, AgInput, AgSelect } from '@/components'
 import { teamApi } from '@/api/business/sys-user-team/team-api'
+import { AgDrawer, AgInput, AgSelect } from '@/components'
+import { STAT_RANGE_TYPE_ENUM, getStatRangeTypeOptions } from '@/constants/common-const'
 import { message } from 'ant-design-vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { STAT_RANGE_TYPE_ENUM, getStatRangeTypeOptions } from '@/constants/common-const'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

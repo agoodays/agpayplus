@@ -1,8 +1,8 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    :title="isAdd ? '新增操作员' : '修改操作员'"
     width="40%"
+    :title="isAdd ? '新增操作员' : '修改操作员'"
     :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="confirmLoading"

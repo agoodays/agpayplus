@@ -1,9 +1,8 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    title="统计明细"
     width="80%"
-    :show-footer="false"
+    title="统计明细"
     @close="handleClose"
   >
     <a-tabs v-model="activeKey" size="large">

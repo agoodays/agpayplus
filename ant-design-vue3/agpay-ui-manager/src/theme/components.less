@@ -35,11 +35,6 @@
     background-color: var(--primary-color);
     color: var(--text-on-primary);
     border-color: var(--primary-color);
-
-    &:hover {
-      background-color: var(--primary-color);
-      border-color: var(--primary-color);
-    }
   }
 
   &.ag-button-default {
@@ -57,11 +52,6 @@
     background-color: var(--error-color);
     color: var(--text-on-primary);
     border-color: var(--error-color);
-
-    &:hover {
-      background-color: var(--error-color);
-      border-color: var(--error-color);
-    }
   }
 
   &.ag-button-disabled {
@@ -404,13 +394,13 @@
   color: var(--base-bg-color); //卡片底色
 }
 .ag-theme-mask {
-  color: rgba(22, 119, 255, 0.1); //主体遮罩色(10% 透明度)
+  color: var(--primary-color-weak); //主体遮罩色
 }
 .ag-strengthen {
   color: var(--text-color-weak); //强化色
 }
 .ag-theme-hover {
-  color: rgba(22, 119, 255, 0.8); //主题Hover
+  color: var(--primary-color-hover); //主题Hover
 }
 .ag-warning {
   color: var(--warning-color); //危险，强化警告色
@@ -433,13 +423,13 @@
   background-color: var(--base-bg-color); //卡片底色
 }
 .ag-theme-mask-back-color {
-  background-color: rgba(22, 119, 255, 0.1); //主体遮罩色(10% 透明度)
+  background-color: var(--primary-color-weak); //主体遮罩色
 }
 .ag-strengthen-back-color {
   background-color: var(--text-color-weak); //强化色
 }
 .ag-theme-hover-back-color {
-  background-color: rgba(22, 119, 255, 0.8); //主题Hover
+  background-color: var(--primary-color-hover); //主题Hover
 }
 .ag-warning-back-color {
   background-color: var(--warning-color); //危险，强化警告色
@@ -572,12 +562,8 @@
 
 // ==================== 输入框样式 ====================
 
-// 登录页输入框fcous hover事件，边框为主题蓝
+// 登录页输入框 hover 事件，边框为主题蓝
 .ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled) {
-  border-color: var(--primary-color);
-}
-
-.ant-input:focus {
   border-color: var(--primary-color);
 }
 
@@ -765,14 +751,6 @@
   box-shadow: none !important;
 }
 
-.ant-menu-item {
-  border-radius: 3px;
-}
-
-.ant-menu-item:hover {
-  background: var(--primary-color-weak);
-}
-
 .ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
   background-color: var(--primary-color) !important;
   color: #ffffff !important;
@@ -875,15 +853,9 @@
 // ==================== 颜色选择器样式 ====================
 
 .m-colorPicker {
-  // --vcp-swatch-size: 48px !important;
-  // --vcp-panel-width: 190px;
-  --vcp-panel-bg: var(--base-bg-color);
-  --vcp-panel-border: 1px solid var(--border-color);
   --vcp-panel-radius: var(--border-radius);
-  --vcp-panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --vcp-panel-shadow: 0 8px 24px var(--shadow-color);
   --vcp-panel-padding: 10px;
-  --vcp-text-color: var(--text-color);
-  --vcp-focus-color: var(--primary-color);
   --vcp-transition: 0.3s ease;
   --vcp-z-index: 10000;
   height: 66px !important;
@@ -892,7 +864,6 @@
   border: 1px solid var(--border-color) !important;
   border-radius: var(--border-radius) !important;
   text-align: left;
-  outline: none;
   font-size: 14px;
   display: inline-block;
   position: relative;

@@ -104,7 +104,7 @@
           <!-- 操作按钮 -->
           <ag-table-actions>
             <a-button v-if="hasPermission('ENT_DEVICE_QRC_VIEW')" type="link" @click="onPreview(record.qrcId)">预览</a-button>
-            <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT')" type="link" @click="openEdit(record.qrcId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT')" type="link" @click="openEdit(record.qrcId)">修改</a-button>
             <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT')" type="link" @click="bindFunc(record.qrcId)">绑定</a-button>
             <a-button v-if="hasPermission('ENT_DEVICE_QRC_EDIT') && record.bindState === 1" type="link" @click="unbindFunc(record.qrcId)">解绑</a-button>
             <a-button v-if="hasPermission('ENT_DEVICE_QRC_DEL')" type="link" style="color: red" @click="confirmDelete(record.qrcId)">删除</a-button>
@@ -124,8 +124,8 @@
  */
 import { qrcApi } from '@/api/business/qr-code/qrc-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgStateSwitch, AgTable, AgTableActions } from '@/components'
-import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { getStateInfo } from '@/constants/common-const'
 import { viewerApi } from '@/utils/viewer-api'
 import { ExclamationCircleOutlined, PlusOutlined, QrcodeOutlined } from '@ant-design/icons-vue'

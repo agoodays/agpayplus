@@ -66,7 +66,7 @@
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_DIVISION_RECEIVER_GROUP_EDIT')" type="link" @click="editFunc(record.receiverGroupId)">编辑</a-button>
+            <a-button v-if="hasPermission('ENT_DIVISION_RECEIVER_GROUP_EDIT')" type="link" @click="editFunc(record.receiverGroupId)">修改</a-button>
             <a-button v-if="hasPermission('ENT_DIVISION_RECEIVER_GROUP_DELETE')" type="link" style="color: red" @click="delFunc(record.receiverGroupId)">删除</a-button>
           </ag-table-actions>
         </template>

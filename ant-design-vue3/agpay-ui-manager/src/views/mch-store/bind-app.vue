@@ -42,7 +42,7 @@ const props = defineProps({
     default: false
   },
   storeId: {
-    type: String,
+    type: [String, Number],
     default: ''
   },
   bindAppId: {

@@ -3,12 +3,11 @@
     v-model:open="localOpen"
     title="填写参数"
     width="40%"
-    :closable="true"
     :mask-closable="false"
     :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')"
     :confirm-loading="loading"
-    @close="handleClose"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">

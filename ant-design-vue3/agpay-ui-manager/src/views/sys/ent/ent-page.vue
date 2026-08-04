@@ -67,7 +67,7 @@
               size="small"
               @click="editFunc(record.entId)"
             >
-              编辑
+              修改
             </a-button>
           </ag-table-actions>
         </template>

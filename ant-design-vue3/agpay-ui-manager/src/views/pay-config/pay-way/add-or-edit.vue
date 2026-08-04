@@ -3,8 +3,7 @@
     v-model:open="localOpen"
     :title="isAdd ? '新增支付方式' : '修改支付方式'"
     :width="700"
-    @ok="handleOkFunc"
-    :confirm-loading="loading"
+    @ok="handleOk"
   >
     <a-form
       ref="infoForm"
@@ -149,7 +148,7 @@ const initForm = async (wayCodeParam) => {
 /**
  * 处理确认操作
  */
-const handleOkFunc = async () => {
+const handleOk = async () => {
   try {
     await infoForm.value.validate()
     loading.value = true

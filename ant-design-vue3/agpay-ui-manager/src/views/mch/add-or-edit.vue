@@ -1,13 +1,13 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    :title="isAdd ? '新增商户' : '修改商户'"
     width="40%"
+    :title="isAdd ? '新增商户' : '修改商户'"
     :mask-closable="false"
-    @close="handleClose"
     :show-confirm="true"
     :confirm-loading="loading"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
       <!-- 基本信息 -->

@@ -2,12 +2,12 @@
   <ag-drawer
     v-model:open="localOpen"
     width="40%"
-    :mask-closable="false"
     :title="isAdd ? '新增服务商' : '修改服务商'"
+    :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="loading"
-    @close="handleClose"
     @confirm="handleConfirm"
+    @close="handleClose"
   >
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">

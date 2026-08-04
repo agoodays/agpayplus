@@ -1,9 +1,12 @@
 <template>
   <ag-drawer
     v-model:open="localOpen"
-    title="修改分账用户信息"
     width="30%"
+    title="修改分账用户信息"
     :mask-closable="false"
+    :show-confirm="true"
+    :confirm-loading="confirmLoading"
+    @confirm="handleConfirm"
     @close="handleClose"
   >
     <a-form
@@ -35,17 +38,6 @@
         </a-select>
       </a-form-item>
     </a-form>
-
-    <div class="drawer-btn-center">
-      <a-button :style="{ marginRight: '8px' }" @click="onClose">
-        <template #icon><CloseOutlined /></template>
-        取消
-      </a-button>
-      <a-button type="primary" :loading="confirmLoading" @click="handleOkFunc">
-        <template #icon><CheckOutlined /></template>
-        保存
-      </a-button>
-    </div>
   </ag-drawer>
 </template>
 
@@ -54,9 +46,8 @@
  * 分账接收者编辑组件
  * 功能：修改分账接收者信息
  */
-import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
-import { AgDrawer } from '@/components'
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
+import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
 
@@ -67,7 +58,7 @@ const props = defineProps({
     default: false
   },
   recordId: {
-    type: String,
+    type: [String, Number],
     default: ''
   }
 })
@@ -122,7 +113,7 @@ const initForm = async () => {
   allReceiverGroup.value = groupRes.records || []
 }
 
-const handleOkFunc = async () => {
+const handleConfirm = async () => {
   try {
     await infoForm.value.validate()
   } catch {
