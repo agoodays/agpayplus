@@ -4,7 +4,7 @@ AgPay Plus SDK 是一个用于集成 AgPay Plus 支付系统的客户端库，�
 
 ## 接口文档
 
-接口文档：[https://www.yuque.com/xiangyisheng/bhkges/cweewhugp7h7hvml](https://www.yuque.com/xiangyisheng/bhkges/cweewhugp7h7hvml "AgPay接口文档")
+接口文档：[https://www.yuque.com/xiangyisheng/agooday/cweewhugp7h7hvml](https://www.yuque.com/xiangyisheng/agooday/cweewhugp7h7hvml "AgPay接口文档")
 
 ## 项目位置
 

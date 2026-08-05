@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# 构建产物：包分析报告（npm run build 自动生成）
+stats.html
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

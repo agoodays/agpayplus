@@ -416,4 +416,4 @@ const validateField = async (_rule, value) => {
 - [useTabConfig](./composables/useTabConfig.js) - 标签页配置
 - [usePassageManager](./composables/usePassageManager.js) - 支付通道管理
 - [useRateConfig](./composables/useRateConfig.js) - 费率配置逻辑
-- [pay-config-api](../..//api/business/pay-config/pay-config-api.js) - API 接口
+- [pay-config-api](../../api/business/pay-config/pay-config-api.js) - API 接口

@@ -1,4 +1,4 @@
-﻿# AgInputNumberRange - 数字范围输入框组件 📊
+# AgInputNumberRange - 数字范围输入框组件 📊
 
 ## 📌 当前推荐用法（2026）
 
@@ -398,9 +398,9 @@ function handleFocus() {
 
 ## 📚 相关组件
 
-- [AgInputNumber](./ag-input-number/README.md) - 单个数字输入框
-- [AgInput](./ag-input/README.md) - 文本输入框
-- [AgDateRangePicker](./ag-date-range-picker/README.md) - 日期范围选择器
+- [AgInputNumber](../ag-input-number/README.md) - 单个数字输入框
+- [AgInput](../ag-input/README.md) - 文本输入框
+- [AgDateRangePicker](../ag-date-range-picker/README.md) - 日期范围选择器
 
 ---
 

@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div class="demo-index-container">
     <a-card class="welcome-card mb-4">
       <template #title>
@@ -31,7 +31,7 @@
       <a-col :span="12">
         <a-card title="浮动标签表单组件" hoverable>
           <template #extra>
-            <a-tag color="blue">8 个</a-tag>
+            <a-tag color="blue">7 个</a-tag>
           </template>
 
           <a-list size="small" :data-source="floatLabelComponents">
@@ -60,7 +60,7 @@
       <a-col :span="12">
         <a-card title="表格相关组件" hoverable>
           <template #extra>
-            <a-tag color="green">6 个</a-tag>
+            <a-tag color="green">4 个</a-tag>
           </template>
 
           <a-list size="small" :data-source="tableComponents">
@@ -163,12 +163,9 @@
               <a-alert message="💡 推荐阅读" type="info" show-icon>
                 <template #description>
                   <ul style="margin: 8px 0; padding-left: 20px">
-                    <li><a href="#" @click.prevent="openDoc('COMPONENTS_OVERVIEW.md')">组件库总览</a></li>
                     <li><a href="#" @click.prevent="openDoc('QUICK_START.md')">快速开始指南</a></li>
-                    <li><a href="#" @click.prevent="openDoc('FLOAT_COMPONENTS_README.md')">浮动标签完整指南</a></li>
-                    <li>
-                      <a href="#" @click.prevent="openDoc('AG_SEARCH_SLOT_PROPS_SOLUTION.md')">AgSearch 简化方案</a>
-                    </li>
+                    <li><a href="#" @click.prevent="openDoc('CUSTOM_COMPONENTS_USAGE_GUIDE.md')">自定义组件使用指南</a></li>
+                    <li><a href="#" @click.prevent="openDoc('FRONTEND_NAMING_CONVENTIONS.md')">前端开发与命名规范</a></li>
                   </ul>
                 </template>
               </a-alert>
@@ -202,7 +199,7 @@
 
       <a-col :span="6">
         <a-card>
-          <a-statistic title="文档数量" :value="11" suffix="份" :value-style="{ color: '#cf1322' }">
+          <a-statistic title="文档数量" :value="5" suffix="份" :value-style="{ color: '#cf1322' }">
             <template #prefix>
               <CodeOutlined />
             </template>

@@ -9,7 +9,7 @@
 | 技术 | 版本 | 说明 |
 |-----|------|------|
 | Vue | 3.4+ | Composition API |
-| Vite | 6.0+ | 快速构建工具 |
+| Vite | 5.0+ | 快速构建工具 |
 | Ant Design Vue | 4.2+ | UI 组件库 |
 | Pinia | 2.1+ | 状态管理 |
 | Vue Router | 4.3+ | 路由管理 |
@@ -19,12 +19,13 @@
 
 **20 个高质量组件，开箱即用**
 
-- 🏷️ **浮动标签组件**（8个）- Material Design 风格的表单组件
-- 📊 **表格组件**（5个）- 强大的数据表格和搜索组件
+- 🏷️ **浮动标签组件**（7个）- Material Design 风格的表单组件
+- 📊 **数据展示组件**（4个）- 数据表格、操作按钮、卡片等
+- 🔍 **搜索组件**（1个）- 搜索表单
 - 📦 **容器组件**（2个）- 模态框、抽屉等
-- 🎨 **其他组件**（5个）- 卡片、上传、编辑器等
+- 🎨 **功能组件**（4个）- 上传、编辑器、状态开关、加载等
 
-查看 [组件总览](./COMPONENTS_OVERVIEW.md) 了解所有组件
+查看 [快速开始](./QUICK_START.md) 了解所有组件分类与使用方式
 
 ### 核心功能
 
@@ -121,13 +122,10 @@ npm run format        # 格式化代码
 
 | 文档 | 说明 |
 |-----|------|
-| [快速开始](./QUICK_START.md) | 新手入门指南 ⭐ |
-| [组件总览](./COMPONENTS_OVERVIEW.md) | 所有组件介绍 |
+| [快速开始](./QUICK_START.md) | 新手入门指南与组件分类总览 ⭐ |
 | [自定义组件使用指南](./CUSTOM_COMPONENTS_USAGE_GUIDE.md) | 自定义组件统一使用规范 |
-| [前端迁移升级执行计划](./FRONTEND_MIGRATION_UPGRADE_PLAN.md) | Vue2 -> Vue3 迁移路线与执行门禁 |
-| [迁移批次清单（Batch 01）](./FRONTEND_MIGRATION_BATCH_01.md) | 第一批文件级迁移任务与验收清单 |
-| [项目状态](./PROJECT_STATUS.md) | 项目进度和统计 |
-| [文档索引](./DOCUMENTATION_INDEX.md) | 完整文档列表 |
+| [前端开发与命名规范](./FRONTEND_NAMING_CONVENTIONS.md) | 文件、符号、分层与提交检查清单 |
+| [文档索引](./DOCUMENTATION_INDEX.md) | 完整文档列表与统计 |
 
 ### 组件文档
 
@@ -155,63 +153,9 @@ src/views/demo/
 
 ## 🎨 组件快速使用
 
-### 浮动标签输入框
+项目提供 20 个通用组件，涵盖浮动标签表单、数据展示、搜索、容器与功能组件，统一从 `@/components` 导入。
 
-```vue
-<template>
-  <AgInput
-    v-model="form.name"
-    label="姓名"
-    placeholder="请输入姓名"
-    :required="true"
-  />
-</template>
-
-<script setup>
-import { ref } from 'vue'
-import { AgInput } from '@/components'
-
-const form = ref({ name: '' })
-</script>
-```
-
-### 搜索表单
-
-```vue
-<template>
-  <AgSearch
-    v-model="searchForm"
-    @search="handleSearch"
-    @reset="handleReset"
-  >
-    <template #base>
-      <a-col :xs="24" :sm="12" :md="8" :lg="6">
-        <a-form-item label="">
-          <AgInput
-            v-model="searchForm.keyword"
-            label="关键字"
-          />
-        </a-form-item>
-      </a-col>
-    </template>
-  </AgSearch>
-</template>
-```
-
-### 数据表格
-
-```vue
-<template>
-  <AgTable
-    :columns="columns"
-    :data-source="dataSource"
-    :loading="loading"
-    :pagination="pagination"
-  />
-</template>
-```
-
-更多示例请查看 [快速开始](./QUICK_START.md)
+组件分类总览、设计特点、主题定制、性能优化、问题排查，以及 AgInput / AgSearch / AgTable / AgDrawer / AgModal 等组件的完整使用示例，请查看 [快速开始](./QUICK_START.md)。
 
 ---
 
@@ -254,17 +198,7 @@ const form = ref({ name: '' })
 
 ## 📊 项目统计
 
-```
-🎊 项目状态
-━━━━━━━━━━━━━━━━━━━━━━
-📦 通用组件:     20 个
-📚 组件文档:     20 个
-🎯 Demo 数量:    10 个
-✨ 文档覆盖率:   100%
-━━━━━━━━━━━━━━━━━━━━━━
-```
-
-查看 [项目状态](./PROJECT_STATUS.md) 了解详细信息
+项目统计信息（组件数量、文档覆盖率、Demo 数量等）已整合至 [文档索引](./DOCUMENTATION_INDEX.md) 的「文档统计」章节。
 
 ---
 

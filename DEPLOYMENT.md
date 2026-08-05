@@ -27,10 +27,11 @@
 6. [回滚流程](#6-回滚流程)
 7. [Cashier 管理](#7-Cashier-管理)
 8. [使用场景](#8-使用场景)
-9. [故障排查](#9-故障排查)
-10. [数据库设置](#10-数据库设置)
-11. [部署前检查清单](#11-部署前检查清单)
-12. [镜像源配置](#12-镜像源配置)
+9. [首次部署 vs 更新部署](#9-首次部署-vs-更新部署)
+10. [故障排查](#10-故障排查)
+11. [数据库设置](#11-数据库设置)
+12. [部署前检查清单](#12-部署前检查清单)
+13. [镜像源配置](#13-镜像源配置)
 
 ***
 
@@ -175,7 +176,7 @@ MYSQL_PASSWORD=your_secure_password  # 改为安全密码
 # ========== 数据路径 ==========
 # Linux: /var/agpayplus
 # Windows: E:/app/agpayplus
-DATA_PATH_HOST=/var/agpayplus
+DATA_PATH_HOST=/opt/agpayplus
 
 # ========== SSL 证书 ==========
 # Linux: /root/.aspnet/https
@@ -183,10 +184,25 @@ DATA_PATH_HOST=/var/agpayplus
 CERT_PATH=/root/.aspnet/https
 CERT_PASSWORD=123456
 
+# 容器内证书路径（一般无需修改）
+CERT_PATH_IN_CONTAINER=/https/agpayplusapi.pfx
+
 # ========== Cashier 构建 ==========
 # true: 每次重新构建 cashier
 # false: 使用现有 cashier（推荐）
 BUILD_CASHIER=false
+
+# ========== 消息队列 (RabbitMQ) 配置 ==========
+MQ_VENDER=RabbitMQ
+MQ_HOSTNAME=rabbitmq
+MQ_USERNAME=admin
+MQ_PASSWORD=admin
+MQ_PORT=5672
+
+# ========== 日志配置 (Seq) ==========
+SEQ_URL=http://seq:80
+ENABLE_SEQ=true
+SEQ_API_KEY=
 
 # ========== Redis 配置 ==========
 REDIS_HOST=redis
@@ -199,6 +215,9 @@ HEALTH_CHECK_ENABLED=true
 HEALTH_CHECK_INTERVAL=30s
 HEALTH_CHECK_TIMEOUT=10s
 HEALTH_CHECK_RETRIES=3
+
+# 注：以上 HEALTH_CHECK_* 为预留配置项，当前 docker-compose.yml 中健康检查参数为硬编码值，
+# 修改此处环境变量暂不生效，如需调整请直接修改 docker-compose.yml 各服务的 healthcheck 段。
 
 # ========== 备份配置 ==========
 BACKUP_ENABLED=true
@@ -215,7 +234,7 @@ BACKUP_PATH=/var/agpayplus/backup
 
 #### MYSQL\_SERVER\_NAME
 
-- 容器内 MySQL: `mysql`
+- 容器内 MySQL: `db`
 - 宿主机 MySQL: `host.docker.internal`
 - 远程 MySQL: `192.168.1.100`
 
@@ -279,6 +298,9 @@ BACKUP_PATH=/var/agpayplus/backup
 | `agpay-agent-api`    | 代理商 API  | 9816 |
 | `agpay-merchant-api` | 商户 API   | 9818 |
 | `agpay-payment-api`  | 支付网关     | 9819 |
+| `redis`              | Redis 缓存 | 6379 |
+| `rabbitmq`           | 消息队列 | 5672 / 15672 |
+| `seq`                | 日志面板 | 5341 |
 
 ### 4.3 部署示例
 
@@ -745,11 +767,9 @@ docker compose logs -f agpay-manager-api
 
 ***
 
-### 首次部署 vs 更新部署
+## 9. 首次部署 vs 更新部署
 
-# 首次部署 vs 更新部署说明
-
-## 🎯 重要区别
+### 🎯 重要区别
 
 ### 首次部署（First Deployment）
 
@@ -787,7 +807,7 @@ docker compose logs -f agpay-manager-api
 
 ***
 
-## 🔍 脚本自动识别
+### 🔍 脚本自动识别
 
 新版部署脚本会**自动检测**是首次部署还是更新部署并采取相应策略（跳过备份或自动创建备份、回滚等）。
 
@@ -806,7 +826,7 @@ docker compose logs -f agpay-manager-api
   首次部署失败，请检查错误信息后重试
   提示：
     1. 检查 .env 配置是否正确
-    2. 确保网络连接正常（参考 DOCKER_MIRROR_GUIDE.md）
+    2. 确保网络连接正常（国内建议配置 Docker Hub 镜像加速器）
     3. 查看错误日志定位问题
 ```
 
@@ -843,7 +863,7 @@ docker compose logs -f agpay-manager-api
 
 ***
 
-## 📊 对比要点
+### 📊 对比要点
 
 | 特性   | 首次部署  | 更新部署   |
 | ---- | ----- | ------ |
@@ -855,7 +875,7 @@ docker compose logs -f agpay-manager-api
 
 ***
 
-## 🚀 使用与范例
+### 🚀 使用与范例
 
 - 首次部署（自动检测）：
   - Windows: `.\\deploy.ps1`
@@ -869,7 +889,7 @@ docker compose logs -f agpay-manager-api
 
 ***
 
-## 📝 常见问题
+### 📝 常见问题
 
 Q: 如何判断是否为首次部署？
 
@@ -881,7 +901,7 @@ A: 不需要，首次部署失败只需清理失败资源并重试。
 
 ***
 
-## 💡 最佳实践
+### 💡 最佳实践
 
 - 首次部署前：确认 `.env` 配置、网络和磁盘空间；建议构建时开启 `--build-cashier`（若首次需要收银台）。
 - 更新部署前：务必备份，避免使用 `--skip-backup`。
@@ -889,9 +909,9 @@ A: 不需要，首次部署失败只需清理失败资源并重试。
 
 ***
 
-## 9. 故障排查
+## 10. 故障排查
 
-### 9.1 查看日志
+### 10.1 查看日志
 
 ```bash
 # 所有服务
@@ -904,7 +924,7 @@ docker compose logs -f agpay-manager-api
 docker compose logs --tail=100 -f agpay-manager-api
 ```
 
-### 9.2 查看状态
+### 10.2 查看状态
 
 ```bash
 # 服务状态
@@ -914,7 +934,7 @@ docker compose ps
 docker compose ps -a
 ```
 
-### 9.3 重启服务
+### 10.3 重启服务
 
 ```bash
 # 单个服务
@@ -924,7 +944,7 @@ docker compose restart agpay-manager-api
 docker compose restart
 ```
 
-### 9.4 清理重建
+### 10.4 清理重建
 
 ```bash
 # 停止服务
@@ -937,17 +957,16 @@ docker system prune -a
 ./deploy.sh
 ```
 
-### 9.5 常见问题
+### 10.5 常见问题
 
-详见 DEPLOYMENT_USAGE_GUIDE.md 中的故障排查章节
+详见上文「故障排查」章节相关内容。
 
 ***
 
 ## 📚 相关文档
 
 - [README.md](./README.md) - 项目主文档
-- [GETTING_STARTED.md](./GETTING_STARTED.md) - 快速上手指南
-- [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) - 常用命令速查
+- [CHEATSHEET.md](./CHEATSHEET.md) - 常用命令速查
 - [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md) - 环境变量说明
 
 ***
@@ -1041,9 +1060,9 @@ restart: unless-stopped
 
 ***
 
-## 10. 数据库设置
+## 11. 数据库设置
 
-### 10.1 数据库部署方式
+### 11.1 数据库部署方式
 
 **重要提示：生产环境不建议使用 Docker MySQL！**
 
@@ -1069,7 +1088,7 @@ restart: unless-stopped
 - **开发环境** → Docker MySQL
 - **快速体验** → Docker MySQL
 
-### 10.2 宿主机 MySQL（推荐生产环境）
+### 11.2 宿主机 MySQL（推荐生产环境）
 
 #### 步骤 1：安装 MySQL 8.0+
 
@@ -1209,7 +1228,7 @@ MYSQL_USER=root
 MYSQL_PASSWORD=your_actual_password  # 修改为实际密码
 ```
 
-### 10.3 Docker MySQL（仅开发/测试）
+### 11.3 Docker MySQL（仅开发/测试）
 
 #### 步骤 1：配置 .env 文件
 
@@ -1252,7 +1271,7 @@ SHOW TABLES;
 EXIT;
 ```
 
-### 10.4 数据库管理
+### 11.4 数据库管理
 
 #### 使用 MySQL Workbench
 
@@ -1297,7 +1316,7 @@ DESCRIBE table_name;
 SELECT COUNT(*) FROM table_name;
 ```
 
-### 10.5 故障排查
+### 11.5 故障排查
 
 #### 问题 1：无法连接数据库
 
@@ -1349,7 +1368,7 @@ GRANT ALL PRIVILEGES ON agpayplusdb.* TO 'root'@'%';
 FLUSH PRIVILEGES;
 ```
 
-### 10.6 性能优化
+### 11.6 性能优化
 
 **宿主机 MySQL**：
 
@@ -1391,11 +1410,11 @@ db:
     - --collation-server=utf8mb4_unicode_ci
 ```
 
-## 11. 部署前检查清单
+## 12. 部署前检查清单
 
 在执行部署前，请按照此清单逐项检查，确保所有前置条件都已满足。
 
-### 11.1 系统环境检查
+### 12.1 系统环境检查
 
 #### 1. Docker 环境
 
@@ -1421,10 +1440,10 @@ db:
 
 #### 2. .NET SDK（用于生成证书）
 
-- [ ] .NET SDK 6.0 或更高版本已安装
+- [ ] .NET SDK 9.0 或更高版本已安装
   ```bash
   dotnet --version
-  # 预期输出：6.0.x 或更高
+  # 预期输出：9.0.x 或更高
   ```
 - [ ] 如果未安装，请访问：
   - Windows/macOS: <https://dotnet.microsoft.com/download>
@@ -1467,7 +1486,7 @@ db:
   FLUSH PRIVILEGES;
   ```
 
-### 11.2 项目文件检查
+### 12.2 项目文件检查
 
 #### 1. 代码完整性
 
@@ -1487,6 +1506,8 @@ db:
       ├── agpay-ui-agent/
       ├── agpay-ui-merchant/
       └── agpay-ui-cashier/
+  └── ant-design-vue3/
+      └── agpay-ui-manager/  (Vue3 目标项目)
   ```
 - [ ] RabbitMQ 延迟插件文件存在
   ```bash
@@ -1513,7 +1534,7 @@ db:
 ls -l .env.development .env.staging .env.production .env.example
 ```
 
-### 11.3 环境配置
+### 12.3 环境配置
 
 #### 1. 环境变量配置
 
@@ -1588,7 +1609,7 @@ cp .env.production .env
   sudo chown -R $(whoami):$(whoami) /opt/agpayplus
   ```
 
-### 11.4 SSL 证书
+### 12.4 SSL 证书
 
 #### 选项 1：自动生成（推荐）
 
@@ -1622,7 +1643,7 @@ cp .env.production .env
 - [ ] 复制到证书目录
 - [ ] 更新 docker-compose.yml 中的证书密码
 
-### 11.5 网络和端口
+### 12.5 网络和端口
 
 #### 1. 端口占用检查
 
@@ -1644,6 +1665,7 @@ cp .env.production .env
 - [ ] **9819/5819**（支付网关 API + 收银台）
 - [ ] **6379**（Redis）
 - [ ] **5672/15672**（RabbitMQ）
+- [ ] **5341**（Seq 日志面板）
 
 #### 2. 防火墙规则
 
@@ -1651,7 +1673,7 @@ cp .env.production .env
 - [ ] Linux iptables/firewalld 允许相关端口
 - [ ] 云服务器安全组规则已配置
 
-### 11.6 部署前最终检查
+### 12.6 部署前最终检查
 
 #### 1. 验证 Docker Compose 配置
 
@@ -1670,6 +1692,7 @@ cp .env.production .env
   # agpay-agent-api
   # agpay-merchant-api
   # agpay-payment-api
+  # seq
   # redis
   # rabbitmq
   ```
@@ -1700,7 +1723,7 @@ cp .env.production .env
   top -l 1 | grep PhysMem
   ```
 
-### 11.7 准备开始部署
+### 12.7 准备开始部署
 
 所有检查项都完成后，您可以开始部署：
 
@@ -1708,13 +1731,11 @@ cp .env.production .env
 
 ```powershell
 # 完整部署
-.deploy.ps1
+.\deploy.ps1
 
 # 如果已有证书，跳过证书生成
-.deploy.ps1 -SkipCert
+.\deploy.ps1 -SkipCert
 
-# 如果已配置 .env，跳过环境配置
-.deploy.ps1 -SkipEnv
 ```
 
 #### Linux/macOS 部署
@@ -1726,11 +1747,9 @@ cp .env.production .env
 # 跳过证书生成
 ./deploy.sh --skip-cert
 
-# 跳过环境配置
-./deploy.sh --skip-env
 ```
 
-### 11.8 预期部署时间
+### 12.8 预期部署时间
 
 - **首次部署**：15-25 分钟（包括下载镜像、构建）
 - **后续更新**：5-10 分钟
@@ -1741,9 +1760,9 @@ cp .env.production .env
 2. 前端构建：每个 3-5 分钟
 3. 后端 API 构建：每个 2-3 分钟
 
-## 12. 镜像源配置
+## 13. 镜像源配置
 
-### 11.1 Docker 镜像源加速
+### 13.1 Docker 镜像源加速
 
 #### Linux 系统
 
@@ -1784,7 +1803,7 @@ cp .env.production .env
    ```
 4. **应用并重启 Docker**
 
-### 10.2 npm 镜像源配置
+### 13.2 npm 镜像源配置
 
 在前端构建过程中，可以配置 npm 镜像源加速依赖安装：
 
@@ -1796,7 +1815,7 @@ npm install --registry=https://registry.npmmirror.com
 npm config set registry https://registry.npmmirror.com
 ```
 
-### 10.3 验证镜像源
+### 13.3 验证镜像源
 
 ```bash
 # 检查 Docker 镜像源

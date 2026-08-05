@@ -1,4 +1,4 @@
-﻿# DockerWslCleanup 使用文档
+# DockerWslCleanup 使用文档
 
 > **文件名**：`DockerWslCleanup.ps1`  
 > **适用系统**：Windows 10 / Windows 11 + Docker Desktop（WSL2 后端）  
@@ -73,7 +73,7 @@ Build Cache     200       0         25.8GB
 
 [ℹ️] 开始清理 Docker 资源...
 [ℹ️] 准备压缩 WSL2 虚拟硬盘...
-[ℹ️] 检测到数据盘: C:\Users\haha\AppData\Local\Docker\wsl\disk\docker_data.vhdx
+[ℹ️] 检测到数据盘: C:\Users\<username>\AppData\Local\Docker\wsl\disk\docker_data.vhdx
 [ℹ️] 当前大小: 72.50 GB
 [ℹ️] 正在压缩虚拟硬盘（请稍候）...
 [✅] 压缩完成！

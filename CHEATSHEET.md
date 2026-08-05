@@ -402,7 +402,7 @@ docker compose logs -f agpay-manager-api agpay-agent-api merchant-api agpay-paym
 
 ## 🔗 帮助和文档
 
-- **完整文档**: [DEPLOYMENT_USAGE_GUIDE.md](./DEPLOYMENT_USAGE_GUIDE.md)
+- **完整文档**: [DEPLOYMENT.md](./DEPLOYMENT.md)
 - **环境变量说明**: [ENVIRONMENT_VARIABLES.md](./ENVIRONMENT_VARIABLES.md)
 
 ### 查看脚本帮助

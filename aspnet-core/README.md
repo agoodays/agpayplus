@@ -5,7 +5,8 @@ AgPay Plus 是一套适合互联网企业使用的支付系统，支持多渠道
 AgPay Plus 基于 .NET 9，使用 Web API 开发，实现权限管理功能，是一套非常实用的Web开发框架。
 
 ## 前端项目
-- 前端项目地址：https://github.com/agoodays/agpayplus/tree/main/ant-design-vue
+- 遗留项目（Vue2）：https://github.com/agoodays/agpayplus/tree/main/ant-design-vue
+- 目标项目（Vue3）：https://github.com/agoodays/agpayplus/tree/main/ant-design-vue3/agpay-ui-manager
 
 ## 主要功能
 
@@ -125,10 +126,10 @@ dotnet run --project src/AGooday.AgPay.Agent.Api
 
 6. **访问服务**
 
-- 管理端API: http://localhost:5817
-- 商户端API: http://localhost:5818
-- 支付网关API: http://localhost:5819
-- 代理端API: http://localhost:5816
+- 管理端API: http://localhost:9817
+- 商户端API: http://localhost:9818
+- 支付网关API: http://localhost:9819
+- 代理端API: http://localhost:9816
 
 ### 容器化部署
 
@@ -154,10 +155,10 @@ docker-compose -f docker-compose.monitoring.yml up -d
 
 AgPay Plus 集成了 Prometheus 监控系统，通过 `/metrics` 端点暴露指标：
 
-- 管理端: http://localhost:5817/metrics
-- 商户端: http://localhost:5818/metrics
-- 支付网关: http://localhost:5819/metrics
-- 代理端: http://localhost:5816/metrics
+- 管理端: http://localhost:9817/metrics
+- 商户端: http://localhost:9818/metrics
+- 支付网关: http://localhost:9819/metrics
+- 代理端: http://localhost:9816/metrics
 
 同时提供了 Grafana 仪表板，位于 `grafana/dashboards/agpay-dashboard.json`。
 
@@ -165,10 +166,10 @@ AgPay Plus 集成了 Prometheus 监控系统，通过 `/metrics` 端点暴露指
 
 各API服务启动后，可以通过 Swagger 查看API文档：
 
-- 管理端API: http://localhost:5817/swagger
-- 商户端API: http://localhost:5818/swagger
-- 支付网关API: http://localhost:5819/swagger
-- 代理端API: http://localhost:5816/swagger
+- 管理端API: http://localhost:9817/swagger
+- 商户端API: http://localhost:9818/swagger
+- 支付网关API: http://localhost:9819/swagger
+- 代理端API: http://localhost:9816/swagger
 
 ## 贡献指南
 

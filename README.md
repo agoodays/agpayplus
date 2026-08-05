@@ -8,7 +8,7 @@ AgPay 是一套适合互联网企业使用的支付系统，支持多渠道服�
 
 后端技术：.Net9、EFCore9、Web API、Swagger、WebSocket、AutoMapper、FluentValidation、Log4Net、MediatR、Redis、RabbitMQ、Quartz.NET、SkiaSharp
 
-前端技术：Vue2.x、Antd Of Vue 2.x
+前端技术：Vue2.x、Antd Of Vue 2.x；Vue3.x、Ant Design Vue 4.x、Vite、Pinia
 
 开发工具：Visual Studio 2022、SQLyog、WebStorm
 
@@ -169,6 +169,14 @@ agpayplus/
 │   │   ├── package.json
 │   │   └── vue.config.js
 │   └── README.md
+├── ant-design-vue3/
+│   └── agpay-ui-manager/ (vue-app 端口：8817)
+│       ├── public/
+│       ├── src/
+│       ├── .env.development
+│       ├── package.json
+│       ├── vite.config.js
+│       └── README.md
 ├── docs/
 ├── .gitignore
 ├── README.md
@@ -271,10 +279,11 @@ docker compose logs -f
 
 | 文档 | 说明 |
 |------|------|
-| **[GETTING_STARTED.md](GETTING_STARTED.md)** | 🚀 快速上手指南：快速部署、更新和管理 AgPay+ 系统 |
-| **[DEPLOYMENT_USAGE_GUIDE.md](DEPLOYMENT_USAGE_GUIDE.md)** | 📘 完整部署与更新指南：包含首次部署/更新/回滚/CI/CD |
-| **[QUICK_REFERENCE.md](QUICK_REFERENCE.md)** | 📖 常用命令速查：一键命令、示例和操作速查表 |
+| **[DEPLOYMENT.md](DEPLOYMENT.md)** | 📘 完整部署与更新指南：包含首次部署/更新/回滚/CI/CD、部署架构、环境配置、故障排查 |
+| **[CHEATSHEET.md](CHEATSHEET.md)** | 📖 常用命令速查：一键命令、示例和操作速查表 |
 | **[ENVIRONMENT_VARIABLES.md](ENVIRONMENT_VARIABLES.md)** | ⚙️ 环境变量说明：详细的环境变量配置指南 |
+| **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** | 🧑‍💻 开发者指南：核心模块职责、关键类与函数、依赖关系、开发规范 |
+| **[AGENTS.md](AGENTS.md)** | 🤖 AI 编码智能体指南：仓库结构与开发约定 |
 
 额外模块与子项目说明：
 
@@ -799,11 +808,8 @@ agpayplus> docker compose -p agpay-prod --env-file .env.production up -d
 
 ---
 
-## 🔗 相关链接
+## 🔗 外部链接
 
-- 📖 [快速参考手册](QUICK_REFERENCE.md) - 常用命令速查
-- 📘 [完整使用指南](DEPLOYMENT_USAGE_GUIDE.md) - 详细的部署和更新说明
-- ⚙️ [环境变量说明](ENVIRONMENT_VARIABLES.md) - 详细的环境变量配置指南
 - 📝 [接口文档](https://www.yuque.com/xiangyisheng/agooday/cweewhugp7h7hvml) - API 接口说明
 
 ---

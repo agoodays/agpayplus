@@ -1,4 +1,4 @@
-﻿# 快速开始 🚀
+# 快速开始 🚀
 
 欢迎使用 AgPay 管理平台！本指南将帮助你快速上手开发。
 
@@ -8,6 +8,7 @@
 - [快速启动](#快速启动)
 - [项目结构](#项目结构)
 - [开发模式](#开发模式)
+- [组件分类总览](#组件分类总览)
 - [组件使用](#组件使用)
 - [常见问题](#常见问题)
 
@@ -95,7 +96,7 @@ agpay-ui-manager/
 │   ├── views/          # 页面组件
 │   │   ├── demo/                  # Demo 示例 ⭐
 │   │   ├── order/                 # 订单管理
-│   │   ├── merchant/              # 商户管理
+│   │   ├── mch/                   # 商户管理
 │   │   └── ...                    # 其他页面
 │   ├── App.vue         # 根组件
 │   └── main.js         # 入口文件
@@ -133,12 +134,205 @@ VITE_BYPASS_LOGIN=true
  ├─ 🔍 搜索表格           # AgSearch + AgTable
  ├─ 🎚️  状态切换          # AgStateSwitch
  ├─ 📝 表单组件           # 各种表单组件
- ├─ 🏷️  浮动标签组件       # 8个浮动标签组件
+ ├─ 🏷️  浮动标签组件       # 7个浮动标签组件
  ├─ 📋 分页下拉选择       # AgSelectInfinite
  ├─ 🎴 卡片组件           # AgCard
  ├─ 📤 文件上传           # AgUpload
  ├─ ✍️  富文本编辑         # AgEditor
  └─ 📦 容器组件           # AgDrawer + AgModal
+```
+
+---
+
+## 📚 组件分类总览
+
+本项目提供 20 个高质量通用组件，按功能分为五大类，所有组件统一从 `@/components` 导入。
+
+### 表单组件 - 浮动标签系列 ⭐
+
+所有表单组件都支持浮动标签效果，提供统一的用户体验。
+
+| 组件名 | 说明 | 文档 | 状态 |
+|--------|------|------|------|
+| **AgInput** | 文本输入框 | [README](./src/components/ag-input/README.md) | ✅ 完成 |
+| **AgInputNumber** | 数字输入框 | [README](./src/components/ag-input-number/README.md) | ✅ 完成 |
+| **AgInputNumberRange** | 数字范围输入框 | [README](./src/components/ag-input-number-range/README.md) | ✅ 完成 |
+| **AgTextarea** | 多行文本域 | [README](./src/components/ag-textarea/README.md) | ✅ 完成 |
+| **AgSelect** | 下拉选择框 | [README](./src/components/ag-select/README.md) | ✅ 完成 |
+| **AgSelectInfinite** | 分页下拉选择 | [README](./src/components/ag-select-infinite/README.md) | ✅ 完成 |
+| **AgDateRangePicker** | 日期范围选择器 | [README](./src/components/ag-date-range-picker/README.md) | ✅ 完成 |
+
+### 数据展示组件
+
+| 组件名 | 说明 | 文档 | 状态 |
+|--------|------|------|------|
+| **AgTable** | 数据表格 | [README](./src/components/ag-table/README.md) | ✅ 完成 |
+| **AgTableAction** | 表格操作按钮 | [README](./src/components/ag-table-action/README.md) | ✅ 完成 |
+| **AgTableActions** | 表格操作列 | [README](./src/components/ag-table-actions/README.md) | ✅ 完成 |
+| **AgCard** | 卡片容器 | [README](./src/components/ag-card/README.md) | ✅ 完成 |
+
+### 搜索组件
+
+| 组件名 | 说明 | 文档 | 状态 |
+|--------|------|------|------|
+| **AgSearch** | 搜索表单 | [README](./src/components/ag-search/README.md) | ✅ 完成 |
+
+### 容器组件
+
+| 组件名 | 说明 | 文档 | 状态 |
+|--------|------|------|------|
+| **AgDrawer** | 抽屉 | [README](./src/components/ag-drawer/README.md) | ✅ 完成 |
+| **AgModal** | 模态框 | [README](./src/components/ag-modal/README.md) | ✅ 完成 |
+
+### 功能组件
+
+| 组件名 | 说明 | 文档 | 状态 |
+|--------|------|------|------|
+| **AgUpload** | 文件上传 | [README](./src/components/ag-upload/README.md) | ✅ 完成 |
+| **AgEditor** | 富文本编辑器 | [README](./src/components/ag-editor/README.md) | ✅ 完成 |
+| **AgStateSwitch** | 状态开关 | [README](./src/components/ag-state-switch/README.md) | ✅ 完成 |
+| **AgLoading** | 加载提示 | [README](./src/components/ag-loading/README.md) | ✅ 完成 |
+
+### 工具组件
+
+| 组件名 | 说明 | 文档 | 状态 |
+|--------|------|------|------|
+| **GlobalLoad** | 全局加载控制 | [README](./src/components/global-load/README.md) | ✅ 完成 |
+| **AgErrorBoundary** | 错误边界捕获 | [README](./src/components/ag-error-boundary/README.md) | ✅ 完成 |
+
+### 🎨 设计特点
+
+#### 1. 浮动标签
+
+所有表单组件都支持 Material Design 风格的浮动标签：
+
+```vue
+<AgInput
+  label="用户名"           <!-- 浮动标签 -->
+  placeholder="请输入"     <!-- 标签浮动后显示 -->
+  :required="true"        <!-- 显示必填星号 -->
+/>
+```
+
+**特点：**
+- ✅ 无值时标签居中
+- ✅ 聚焦/有值时标签上浮
+- ✅ 蓝色高亮反馈
+- ✅ 与原生组件完美对齐
+
+#### 2. 响应式布局
+
+AgSearch 组件支持响应式布局，通过 slot props 自动适配不同屏幕：
+
+```vue
+<ag-search>
+  <template #base="{ colSpan }">
+    <a-col v-bind="colSpan">  <!-- 自动响应式 -->
+      <AgInput label="关键字" v-model="keyword" />
+    </a-col>
+  </template>
+</ag-search>
+```
+
+**效果：**
+- 📱 手机：1 列
+- 📱 平板：2 列
+- 💻 桌面：4 列
+
+#### 3. 统一尺寸
+
+所有组件支持统一的 size 属性：
+
+```vue
+<AgInput size="small" />   <!-- 小号 -->
+<AgInput size="middle" />  <!-- 中号（默认）-->
+<AgInput size="large" />   <!-- 大号 -->
+```
+
+### 🎨 主题定制
+
+#### 浮动标签颜色
+
+```css
+/* 修改主题色 */
+.ag-float-label.is-floating {
+  color: #your-primary-color !important;
+}
+
+.ag-xxx.is-focused .ag-float-label {
+  color: #your-primary-color !important;
+}
+```
+
+#### 必填星号颜色
+
+```css
+.ag-required-star {
+  color: #your-error-color !important;
+}
+```
+
+### ⚡ 性能优化
+
+#### 1. 按需加载
+
+大型项目建议按需引入：
+
+```javascript
+// 只引入需要的组件
+import { AgInput, AgSelect } from '@/components'
+```
+
+#### 2. 虚拟滚动
+
+AgTable 支持虚拟滚动，处理大数据集：
+
+```vue
+<ag-table
+  :virtual-scroll="true"
+  :scroll="{ y: 500 }"
+/>
+```
+
+### 🐛 问题排查
+
+#### 浮动标签不显示
+
+检查是否添加了 `label` 属性：
+
+```vue
+<!-- ❌ 错误 -->
+<AgInput v-model="value" />
+
+<!-- ✅ 正确 -->
+<AgInput v-model="value" label="用户名" />
+```
+
+#### 与原生组件对齐问题
+
+已优化为绝对定位方案，无论有无 label 都能完美对齐：
+
+```vue
+<!-- 完美对齐 -->
+<a-input v-model="value1" />
+<AgInput v-model="value2" label="带标签" />
+<a-input v-model="value3" />
+```
+
+#### 响应式布局不生效
+
+确保使用了 slot props：
+
+```vue
+<!-- ❌ 错误 -->
+<template #base>
+  <a-col :span="6">...</a-col>
+</template>
+
+<!-- ✅ 正确 -->
+<template #base="{ colSpan }">
+  <a-col v-bind="colSpan">...</a-col>
+</template>
 ```
 
 ---
@@ -242,25 +436,21 @@ async function fetchMerchants({ page, pageSize, keyword }) {
     @search="handleSearch"
     @reset="handleReset"
   >
-    <template #base>
-      <a-col :xs="24" :sm="12" :md="8" :lg="6">
-        <a-form-item label="">
-          <AgInput
-            v-model="searchForm.orderNo"
-            label="订单号"
-            placeholder="请输入订单号"
-          />
-        </a-form-item>
+    <template #base="{ colSpan }">
+      <a-col v-bind="colSpan">
+        <AgInput
+          v-model="searchForm.orderNo"
+          label="订单号"
+          placeholder="请输入订单号"
+        />
       </a-col>
       
-      <a-col :xs="24" :sm="12" :md="8" :lg="6">
-        <a-form-item label="">
-          <AgSelect
-            v-model="searchForm.status"
-            label="状态"
-            :options="statusOptions"
-          />
-        </a-form-item>
+      <a-col v-bind="colSpan">
+        <AgSelect
+          v-model="searchForm.status"
+          label="状态"
+          :options="statusOptions"
+        />
       </a-col>
     </template>
   </AgSearch>
@@ -492,7 +682,7 @@ function handleSubmit() {
 ### 1. 如何查看所有组件？
 
 **方法1**：查看文档
-- 打开 [COMPONENTS_OVERVIEW.md](./COMPONENTS_OVERVIEW.md)
+- 参阅本文档 [组件分类总览](#组件分类总览) 章节
 - 所有 20 个组件的完整说明
 
 **方法2**：访问 Demo 页面
@@ -578,9 +768,8 @@ lsof -ti:5173 | xargs kill -9
 ## 📚 更多资源
 
 ### 文档
-- [组件总览](./COMPONENTS_OVERVIEW.md) - 所有组件介绍
-- [项目状态](./PROJECT_STATUS.md) - 项目进度和统计
 - [文档索引](./DOCUMENTATION_INDEX.md) - 完整文档列表
+- [README](./README.md) - 项目说明
 
 ### Demo 示例
 - `src/views/demo/` - 所有组件的实际使用示例

@@ -5,20 +5,16 @@ module.exports = {
     es2021: true,
     node: true
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:vue/vue3-recommended',
-    'plugin:prettier/recommended'
-  ],
+  parser: 'vue-eslint-parser',
   parserOptions: {
+    parser: 'espree',
     ecmaVersion: 'latest',
     sourceType: 'module'
   },
-  plugins: ['vue', 'prettier'],
+  plugins: ['vue'],
   rules: {
-    'vue/multi-word-component-names': 'off',
-    'vue/no-v-html': 'off',
     'no-shadow': 'warn',
+    'no-unused-vars': 'off',
     'no-restricted-imports': [
       'warn',
       {
@@ -36,14 +32,6 @@ module.exports = {
             message: 'script setup 宏不应从 vue 导入，请直接使用编译宏。'
           }
         ]
-      }
-    ],
-    'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'prettier/prettier': [
-      'error',
-      {
-        endOfLine: 'auto'
       }
     ]
   },
@@ -74,7 +62,12 @@ module.exports = {
                 message: 'script setup 宏不应从 vue 导入，请直接使用编译宏。'
               }
             ],
-            patterns: []
+            patterns: [
+              {
+                group: ['@/api/manage', '@/api/manage*'],
+                message: '页面层禁止直连 manage，请改用 src/api/business 领域 API。'
+              }
+            ]
           }
         ]
       }

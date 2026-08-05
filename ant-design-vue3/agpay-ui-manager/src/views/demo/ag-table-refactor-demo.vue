@@ -3,37 +3,24 @@
     <!-- 搜索表单 -->
     <template #title> 订单列表 </template>
 
-    <a-form :model="searchForm" layout="inline" class="search-form">
-      <a-form-item label="订单号">
-        <a-input v-model:value="searchForm.orderNo" placeholder="请输入订单号" allow-clear />
-      </a-form-item>
-      <a-form-item label="状态">
-        <a-select v-model:value="searchForm.status" placeholder="请选择状态" allow-clear>
-          <a-select-option value="pending">待支付</a-select-option>
-          <a-select-option value="success">成功</a-select-option>
-          <a-select-option value="failed">失败</a-select-option>
-        </a-select>
-      </a-form-item>
-      <a-form-item label="日期">
-        <a-range-picker v-model:value="searchForm.dateRange" />
-      </a-form-item>
-
-      <a-form-item>
-        <a-space>
-          <a-button type="primary" @click="handleSearch"> <search-outlined /> 搜索 </a-button>
-          <a-button @click="handleReset"> <reload-outlined /> 重置 </a-button>
-        </a-space>
-      </a-form-item>
-
-      <a-form-item>
-        <a-space>
-          <a-button type="primary" @click="handleAdd"> <plus-outlined /> 新增 </a-button>
-          <a-button danger :disabled="selectedRowKeys.length === 0" @click="handleBatchDelete">
-            <delete-outlined /> 批量删除
-          </a-button>
-        </a-space>
-      </a-form-item>
-    </a-form>
+    <ag-search v-model="searchForm" @search="handleSearch" @reset="handleReset">
+      <template #base="{ colSpan }">
+        <a-col v-bind="colSpan">
+          <ag-input v-model="searchForm.orderNo" label="订单号" placeholder="请输入订单号" />
+        </a-col>
+        <a-col v-bind="colSpan">
+          <ag-select
+            v-model="searchForm.status"
+            label="状态"
+            placeholder="请选择状态"
+            :options="statusOptions"
+          />
+        </a-col>
+        <a-col v-bind="colSpan">
+          <ag-date-range-picker v-model:value="searchForm.dateRange" label="日期" />
+        </a-col>
+      </template>
+    </ag-search>
 
     <!-- 表格 -->
     <ag-table
@@ -138,10 +125,11 @@
 
 <script setup>
 import { orderApi } from '@/api/business/order/order-api'
-import { AgTable } from '@/components'
-import { DeleteOutlined, PlusOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons-vue'
+import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable } from '@/components'
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { computed, reactive, ref } from 'vue'
+import dayjs from 'dayjs'
 
 // ==================== 搜索表单 ====================
 const searchForm = reactive({
@@ -150,14 +138,23 @@ const searchForm = reactive({
   dateRange: []
 })
 
+const statusOptions = [
+  { label: '待支付', value: 'pending' },
+  { label: '成功', value: 'success' },
+  { label: '失败', value: 'failed' }
+]
+
 // ==================== 使用 onLoad 调用后端 ====================
 // 将请求函数传入 ag-table 的 `onLoad` prop，组件会在需要时调用它。
-const tableSearchParams = computed(() => ({
-  orderNo: searchForm.orderNo,
-  status: searchForm.status,
-  startDate: searchForm.dateRange?.[0]?.format('YYYY-MM-DD'),
-  endDate: searchForm.dateRange?.[1]?.format('YYYY-MM-DD')
-}))
+const tableSearchParams = computed(() => {
+  const [startDate, endDate] = searchForm.dateRange || []
+  return {
+    orderNo: searchForm.orderNo,
+    status: searchForm.status,
+    startDate: startDate ? dayjs(startDate).format('YYYY-MM-DD') : undefined,
+    endDate: endDate ? dayjs(endDate).format('YYYY-MM-DD') : undefined
+  }
+})
 
 // onLoad 函数，ag-table 会传入分页等参数作为参数对象
 async function loadTable(params) {
@@ -333,10 +330,4 @@ const getStatusColor = (status) => {
 </script>
 
 <style scoped>
-.search-form {
-  margin-bottom: 16px;
-  padding: 16px;
-  /* background: #fafafa; */
-  border-radius: 4px;
-}
 </style>

@@ -1,4 +1,4 @@
-﻿# 文档索引 📚
+# 文档索引 📚
 
 ## 📋 文档分类
 
@@ -6,17 +6,17 @@
 
 | 文档 | 说明 | 优先级 |
 |-----|------|--------|
-| [COMPONENTS_OVERVIEW.md](./COMPONENTS_OVERVIEW.md) | **组件库总览** - 所有组件概览 | ⭐⭐⭐⭐⭐ |
+| [README.md](./README.md) | **项目说明** - 项目整体介绍 | ⭐⭐⭐⭐⭐ |
+| [QUICK_START.md](./QUICK_START.md) | **快速开始** - 快速上手指南与组件分类总览 | ⭐⭐⭐⭐⭐ |
+| [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md) | **文档索引** - 完整文档列表与统计 | ⭐⭐⭐⭐⭐ |
 | [CUSTOM_COMPONENTS_USAGE_GUIDE.md](./CUSTOM_COMPONENTS_USAGE_GUIDE.md) | **自定义组件使用指南** - 统一使用规范与场景示例 | ⭐⭐⭐⭐⭐ |
-| [QUICK_START.md](./QUICK_START.md) | **快速开始** - 快速上手指南 | ⭐⭐⭐⭐⭐ |
-| [README.md](./README.md) | **项目说明** - 项目整体介绍 | ⭐⭐⭐⭐ |
-| [PROJECT_STATUS.md](./PROJECT_STATUS.md) | **项目状态** - 快速状态参考 | ⭐⭐⭐⭐ |
+| [FRONTEND_NAMING_CONVENTIONS.md](./FRONTEND_NAMING_CONVENTIONS.md) | **前端开发与命名规范** - 文件、符号、分层与提交检查清单 | ⭐⭐⭐⭐⭐ |
 
 ### 🎨 组件文档
 
-所有组件文档位于: `src/components/[组件名]/README.md`
+所有组件文档位于: `src/components/[组件名]/README.md`，共 20 个通用组件。
 
-#### 浮动标签表单组件（8个）✅
+#### 浮动标签表单组件（7个）✅
 
 | 组件 | 文档路径 | 状态 | 说明 |
 |-----|---------|------|------|
@@ -31,55 +31,43 @@
 > **💡 日期选择器选择指南：**
 > - **AgDateRangePicker（推荐）**：功能全面，支持周报/月报/季报/年报，自动调整日期范围 ⭐⭐⭐
 
-#### 表格相关组件（6个）✅
+#### 数据展示组件（4个）✅
 
 | 组件 | 文档路径 | 状态 |
 |-----|---------|------|
 | AgTable | [src/components/ag-table/README.md](./src/components/ag-table/README.md) | ✅ |
-| AgSearch | [src/components/ag-search/README.md](./src/components/ag-search/README.md) | ✅ |
 | AgTableAction | [src/components/ag-table-action/README.md](./src/components/ag-table-action/README.md) | ✅ |
 | AgTableActions | [src/components/ag-table-actions/README.md](./src/components/ag-table-actions/README.md) | ✅ |
+| AgCard | [src/components/ag-card/README.md](./src/components/ag-card/README.md) | ✅ |
 
-#### 其他组件（6个）✅
+#### 搜索组件（1个）✅
 
 | 组件 | 文档路径 | 状态 |
 |-----|---------|------|
-| AgCard | [src/components/ag-card/README.md](./src/components/ag-card/README.md) | ✅ |
-| AgUpload | [src/components/ag-upload/README.md](./src/components/ag-upload/README.md) | ✅ |
-| AgEditor | [src/components/ag-editor/README.md](./src/components/ag-editor/README.md) | ✅ |
-| AgStateSwitch | [src/components/ag-state-switch/README.md](./src/components/ag-state-switch/README.md) | ✅ |
+| AgSearch | [src/components/ag-search/README.md](./src/components/ag-search/README.md) | ✅ |
+
+#### 容器组件（2个）✅
+
+| 组件 | 文档路径 | 状态 |
+|-----|---------|------|
 | AgDrawer | [src/components/ag-drawer/README.md](./src/components/ag-drawer/README.md) | ✅ |
 | AgModal | [src/components/ag-modal/README.md](./src/components/ag-modal/README.md) | ✅ |
 
-### 📦 已归档文档（仅供参考）
+#### 功能组件（4个）✅
 
-历史文档已归档至 `docs/archive/` 目录（77个文件）：
+| 组件 | 文档路径 | 状态 |
+|-----|---------|------|
+| AgUpload | [src/components/ag-upload/README.md](./src/components/ag-upload/README.md) | ✅ |
+| AgEditor | [src/components/ag-editor/README.md](./src/components/ag-editor/README.md) | ✅ |
+| AgStateSwitch | [src/components/ag-state-switch/README.md](./src/components/ag-state-switch/README.md) | ✅ |
+| AgLoading | [src/components/ag-loading/README.md](./src/components/ag-loading/README.md) | ✅ |
 
-- 📄 Markdown 文档: 0 个
-- 📜 JavaScript 脚本: 0 个
-- 📦 Vue 组件: 0 个
-- ⚙️ PowerShell 脚本: 0 个
+#### 工具组件（2个）✅
 
-<details>
-<summary>点击展开查看归档文档类别</summary>
-
-#### 主要类别
-
-- **迁移相关** - 组件迁移、代码风格迁移、批处理指南等
-- **完成报告** - 各阶段完成报告、会话总结等
-- **重命名相关** - 组件重命名、文件命名规范等
-- **浮动标签演进** - 方案演进、优化记录等
-- **配置相关** - 环境配置、端口配置、主题配置等
-- **开发辅助** - 示例组件、辅助脚本等
-
-#### 归档原因
-
-- ✅ 任务已完成
-- ✅ 内容已过时
-- ✅ 已被新方案替代
-- ✅ 仅供历史参考
-
-</details>
+| 组件 | 文档路径 | 状态 | 说明 |
+|-----|---------|------|------|
+| AgErrorBoundary | [src/components/ag-error-boundary/README.md](./src/components/ag-error-boundary/README.md) | ✅ | 全局错误边界 |
+| GlobalLoad | [src/components/global-load/README.md](./src/components/global-load/README.md) | ✅ | 全局加载控制 |
 
 ---
 
@@ -87,10 +75,9 @@
 
 ### 新项目开发者
 
-1. ⭐ 阅读 [COMPONENTS_OVERVIEW.md](./COMPONENTS_OVERVIEW.md) - 了解所有组件
-2. ⭐ 查看 [QUICK_START.md](./QUICK_START.md) - 快速上手
-3. 📖 参考组件文档: `src/components/[组件名]/README.md`
-4. 🎨 查看 Demo: `src/views/demo/`
+1. ⭐ 查看 [QUICK_START.md](./QUICK_START.md) - 快速上手与组件分类总览
+2. 📖 参考组件文档: `src/components/[组件名]/README.md`
+3. 🎨 查看 Demo: `src/views/demo/`
 
 ### 维护者
 
@@ -108,14 +95,13 @@
 
 ## 📞 获取帮助
 
-- 📖 [组件总览](./COMPONENTS_OVERVIEW.md) - 查看所有组件
+- 📖 [快速开始](./QUICK_START.md) - 组件分类总览与使用指南
 - 🎯 [Demo 示例](./src/views/demo/) - 实际代码示例
-- 📊 [项目状态](./PROJECT_STATUS.md) - 快速状态参考
 - 💬 [问题反馈](https://github.com/agoodays/agpayplus/issues)
 
 ---
 
-**最后更新**: 2026-02-11  
+**最后更新**: 2026-08-05  
 **维护者**: AGPay Team  
 
 ### 📊 文档统计
@@ -123,13 +109,21 @@
 ```
 🎊 文档库状态
 ━━━━━━━━━━━━━━━━━━━━━━
-📁 根目录文档:   10 个
+📁 根目录文档:   5 个
 📚 组件文档:     20 个
 📦 归档文档:     0 个
 ✨ 文档覆盖率:   100%
 🎯 Demo 数量:    10 个
 ━━━━━━━━━━━━━━━━━━━━━━
 ```
+
+| 指标 | 数量 | 说明 |
+|-----|------|------|
+| 根目录文档 | 5 个 | 核心活跃文档 |
+| 组件数量 | 20 个 | 通用组件 |
+| 组件文档 | 20 个 | 覆盖率 100% ✨ |
+| Demo 数量 | 10 个 | 完整示例 |
+| 归档文档 | 0 个 | 已清理完毕 |
 
 🎉 保持文档简洁，专注核心内容！
 

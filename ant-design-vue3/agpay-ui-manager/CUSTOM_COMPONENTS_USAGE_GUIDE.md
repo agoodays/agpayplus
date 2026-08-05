@@ -93,6 +93,9 @@ import { AgInput, AgSelect, AgSearch, AgTable } from '@/components'
 - 日期范围：`AgDateRangePicker`
 - 搜索容器：`AgSearch`
 - 数据列表：`AgTable`
+- 全局加载控制：`GlobalLoad`
+- 全局加载动画：`AgLoading`
+- 错误边界捕获：`AgErrorBoundary`
 
 ## 6. 使用建议与注意事项
 
@@ -100,6 +103,9 @@ import { AgInput, AgSelect, AgSearch, AgTable } from '@/components'
 - `AgTable` 推荐优先使用 `onLoad` 非受控模式，降低页面样板代码。
 - 浮动标签类组件建议始终传 `label`，保持交互一致性。
 - 新增页面建议先参考 `src/views/demo/` 对应示例再落业务实现。
+- 自定义表单组件（如 AgSelect、AgDateRangePicker 等）在页面级应使用 `<a-form-item-rest>` 包裹，避免 a-form 自动收集值导致校验异常。
+- `AgModal` / `AgDrawer` 推荐使用 `v-model:open` + `@success` 事件模式控制显隐和处理成功回调，而非 callback-func 模式。
+- `AgTable` 分页切换时仅触发一次 API 请求，切勿在 onChange 中叠加手动 reload。
 
 ## 7. 新增/维护自定义组件清单（给开发者）
 
@@ -110,12 +116,13 @@ import { AgInput, AgSelect, AgSearch, AgTable } from '@/components'
 3. 补充组件 README（Props / Events / Slots / 示例）。
 4. 在 `src/views/demo/` 增加演示页面或补充现有示例。
 5. 更新文档入口（本文件、组件总览或索引）。
+6. 更新 `DOCUMENTATION_INDEX.md` 中的组件统计数字。
 
 ---
 
 ## 8. 参考文档
 
-- 组件总览：`COMPONENTS_OVERVIEW.md`
+- 快速开始（含组件分类总览）：`QUICK_START.md`
 - 文档索引：`DOCUMENTATION_INDEX.md`
-- 快速开始：`QUICK_START.md`
+- 前端开发与命名规范：`FRONTEND_NAMING_CONVENTIONS.md`
 - 各组件文档：`src/components/*/README.md`
