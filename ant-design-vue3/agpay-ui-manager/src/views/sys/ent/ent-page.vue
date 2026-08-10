@@ -5,8 +5,10 @@
       <ag-search
         v-model="searchData"
         :collapsible="false"
-        :search-loading="tableRef?.isLoading?.value || false"
+        :search-loading="searchLoading"
         :reset-exclude="['sysType']"
+        reset-mode="default"
+        :default-model-value="defaultSearchData"
         @search="searchFunc"
         @reset="searchFunc"
       >
@@ -18,11 +20,7 @@
                 label="系统类型"
                 placeholder="选择系统菜单"
                 allow-clear
-                :options="[
-                  { value: 'MGR', label: '显示菜单-运营平台' },
-                  { value: 'AGENT', label: '显示菜单-代理商系统' },
-                  { value: 'MCH', label: '显示菜单-商户系统' }
-                ]"
+                :options="sysTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -92,12 +90,21 @@ import { entApi } from '@/api/business/ent/ent-api'
 import { AgSearch, AgSelect, AgStateSwitch, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getSysTypeOptions } from '@/constants/common-const'
 import { message } from 'ant-design-vue'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AddOrEdit from './add-or-edit.vue'
 import SetEntMatchRule from './set-ent-match-rule.vue'
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
+
+/** i18n */
+const { t } = useI18n()
+
+/** 枚举选项（带国际化） */
+const sysTypeOptions = computed(() => getSysTypeOptions(t))
 
 /** 设置权限匹配规则弹窗控制 */
 const { open: setRuleOpen, showModal: showSetRuleModal, hideModal: closeSetRuleModal } = useModal()
@@ -108,15 +115,18 @@ const { open: setRuleOpen, showModal: showSetRuleModal, hideModal: closeSetRuleM
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   modalOpen,
   currentRecordId,
   reloadTable,
   openEdit,
   closeModal
-} = useCrudTablePage()
-
-// 初始化默认搜索参数
-searchData.sysType = 'MGR'
+} = useCrudTablePage({
+  searchDefaults: {
+    sysType: 'MGR'
+  }
+})
 
 /**
  * 表格列配置

@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Domain.Models;
+using AGooday.AgPay.Domain.Models;
 using AGooday.AgPay.Infrastructure.Interceptor;
 using AGooday.AgPay.Infrastructure.Mappings;
 using Microsoft.AspNetCore.Http;
@@ -29,6 +29,7 @@ namespace AGooday.AgPay.Infrastructure.Context
         public DbSet<AgentInfo> AgentInfo { get; set; }
         public DbSet<IsvInfo> IsvInfo { get; set; }
         public DbSet<PayRateLevelConfig> PayRateLevelConfig { get; set; }
+        public DbSet<MchApply> MchApply { get; set; }
         public DbSet<MchApp> MchApp { get; set; }
         public DbSet<MchDivisionReceiver> MchDivisionReceiver { get; set; }
         public DbSet<MchDivisionReceiverGroup> MchDivisionReceiverGroup { get; set; }
@@ -171,6 +172,14 @@ namespace AGooday.AgPay.Infrastructure.Context
             modelBuilder.Entity<IsvInfo>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<IsvInfo>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
             modelBuilder.Entity<IsvInfo>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<MchApply>().Property(c => c.IsTempData).HasDefaultValue(false);
+            modelBuilder.Entity<MchApply>().Property(c => c.State).HasDefaultValue(0);
+            modelBuilder.Entity<MchApply>().Property(c => c.Progress).HasDefaultValue(0);
+            modelBuilder.Entity<MchApply>().Property(c => c.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<MchApply>().Property(c => c.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            modelBuilder.Entity<MchApply>().HasIndex(c => c.MchNo, "idx_mch_no");
+            modelBuilder.Entity<MchApply>().HasIndex(c => new { c.IfCode, c.State }, "idx_if_code_state");
+            modelBuilder.Entity<MchApply>().HasIndex(c => c.CreatedAt, "idx_created_at");
             modelBuilder.Entity<MchApp>().Property(c => c.AppName).HasDefaultValue("");
             modelBuilder.Entity<MchApp>().Property(c => c.State).HasDefaultValue(1);
             modelBuilder.Entity<MchApp>().Property(c => c.DefaultFlag).HasDefaultValue(0);

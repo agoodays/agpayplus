@@ -3,18 +3,20 @@
     <!-- 搜索表单 -->
     <template #title> 订单列表 </template>
 
-    <ag-search v-model="searchForm" @search="handleSearch" @reset="handleReset">
+    <ag-search
+      v-model="searchForm"
+      reset-mode="default"
+      :default-model-value="defaultSearchForm"
+      :search-loading="searchLoading"
+      @search="handleSearch"
+      @reset="handleReset"
+    >
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <ag-input v-model="searchForm.orderNo" label="订单号" placeholder="请输入订单号" />
         </a-col>
         <a-col v-bind="colSpan">
-          <ag-select
-            v-model="searchForm.status"
-            label="状态"
-            placeholder="请选择状态"
-            :options="statusOptions"
-          />
+          <ag-select v-model="searchForm.status" label="状态" placeholder="请选择状态" :options="statusOptions" />
         </a-col>
         <a-col v-bind="colSpan">
           <ag-date-range-picker v-model:value="searchForm.dateRange" label="日期" />
@@ -128,14 +130,22 @@ import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable } from '@/components'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import dayjs from 'dayjs'
 
 // ==================== 搜索表单 ====================
-const searchForm = reactive({
-  orderNo: '',
-  status: '',
-  dateRange: []
+const {
+  tableRef,
+  searchData: searchForm,
+  defaultSearchData: defaultSearchForm,
+  searchLoading
+} = useCrudTablePage({
+  searchDefaults: {
+    orderNo: '',
+    status: '',
+    dateRange: []
+  }
 })
 
 const statusOptions = [
@@ -169,7 +179,6 @@ async function loadTable(params) {
 }
 
 // ==================== 表格配置 ====================
-const tableRef = ref()
 const selectedRowKeys = ref([])
 
 const columns = [
@@ -262,9 +271,6 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  searchForm.orderNo = ''
-  searchForm.status = ''
-  searchForm.dateRange = []
   selectedRowKeys.value = []
   tableRef.value?.reload(true)
 }
@@ -329,5 +335,4 @@ const getStatusColor = (status) => {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

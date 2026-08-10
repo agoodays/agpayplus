@@ -2,7 +2,7 @@
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="searchLoading" :default-model-value="defaultSearchData" reset-mode="default" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -190,12 +190,15 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   currentRecordId,
   reloadTable
-} = useCrudTablePage()
-
-// 初始化搜索数据
-searchData.appId = ''
+} = useCrudTablePage({
+  searchDefaults: {
+    appId: ''
+  }
+})
 
 /** 弹窗显示状态 */
 const showReceiverAdd = ref(false)

@@ -1,7 +1,7 @@
 <template>
   <a-drawer
     :open="open"
-    :title="title"
+    :title="resolvedTitle"
     :width="computedWidth"
     :closable="closable"
     :mask-closable="maskClosable"
@@ -16,11 +16,11 @@
           <a-space>
             <a-button @click="handleClose">
               <close-outlined />
-              {{ cancelText }}
+              {{ resolvedCancelText }}
             </a-button>
             <a-button v-if="showConfirm" type="primary" :loading="confirmLoading" @click="handleConfirm">
               <check-outlined />
-              {{ confirmText }}
+              {{ resolvedConfirmText }}
             </a-button>
           </a-space>
         </slot>
@@ -31,6 +31,7 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 
 /** 预设尺寸映射表（提取为常量避免每次 computed 重复创建） */
@@ -48,7 +49,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: '详情'
+    default: ''
   },
   width: {
     type: [String, Number],
@@ -88,17 +89,23 @@ const props = defineProps({
   },
   confirmText: {
     type: String,
-    default: '保存'
+    default: ''
   },
   cancelText: {
     type: String,
-    default: '关闭'
+    default: ''
   },
   confirmLoading: {
     type: Boolean,
     default: false
   }
 })
+
+const { t } = useI18n()
+
+const resolvedTitle = computed(() => props.title || t('components.drawer.defaultTitle'))
+const resolvedConfirmText = computed(() => props.confirmText || t('components.drawer.confirmText'))
+const resolvedCancelText = computed(() => props.cancelText || t('components.drawer.cancelText'))
 
 const emit = defineEmits(['update:open', 'close', 'confirm'])
 

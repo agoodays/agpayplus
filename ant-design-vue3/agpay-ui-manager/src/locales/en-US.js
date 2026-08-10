@@ -82,7 +82,39 @@ export default {
     confirmDelete: 'Confirm deletion?',
     scrollLoadMore: 'Scroll to load more',
     noMoreData: 'No more data available',
-    searching: 'Searching...'
+    searching: 'Searching...',
+    modal: {
+      defaultTitle: 'Notice',
+      okText: 'OK',
+      cancelText: 'Cancel'
+    },
+    drawer: {
+      defaultTitle: 'Details',
+      confirmText: 'Save',
+      cancelText: 'Close'
+    },
+    editor: {
+      placeholder: 'Please enter content...'
+    },
+    dateRange: {
+      tipRange: 'Range: {start} ~ {end}',
+      backToSelect: 'Back to quick select',
+      today: 'Today',
+      yesterday: 'Yesterday',
+      near7: 'Last 7 days',
+      near30: 'Last 30 days',
+      thisWeek: 'This week',
+      thisMonth: 'This month',
+      thisYear: 'This year',
+      mtd: 'Month to date',
+      ytd: 'Year to date',
+      lastWeek: 'Last week',
+      lastMonth: 'Last month',
+      lastYear: 'Last year',
+      lfm: 'Last full month',
+      pyFull: 'Prior year full',
+      custom: 'Custom range'
+    }
   },
   common: {
     success: 'Success',
@@ -183,6 +215,83 @@ export default {
       fix: "Fixed Fee (Per Transaction)",
       single: "Single Fee (Per Transaction)",
       fixAndRate: "Fixed Fee + Rate"
+    },
+    profitInfoType: {
+      platform: "Platform",
+      agent: "Agent"
+    },
+    productType: {
+      pay: "Payment",
+      transfer: "Transfer",
+      division: "Division"
+    },
+    wayType: {
+      wechat: "WeChat",
+      alipay: "Alipay",
+      ysfpay: "UnionPay QR",
+      unionpay: "UnionPay",
+      dceppay: "Digital CNY",
+      transfer: "Transfer",
+      division: "Division",
+      other: "Other"
+    },
+    payState: {
+      created: "Created",
+      paying: "Paying",
+      success: "Success",
+      failed: "Failed",
+      canceled: "Canceled",
+      refunded: "Refunded",
+      closed: "Closed"
+    },
+    notifyState: {
+      unsent: "Unsent",
+      sent: "Sent"
+    },
+    refundState: {
+      created: "Created",
+      refunding: "Refunding",
+      success: "Success",
+      failed: "Failed",
+      closed: "Closed"
+    },
+    transferState: {
+      created: "Created",
+      transferring: "Transferring",
+      success: "Success",
+      failed: "Failed",
+      closed: "Closed"
+    },
+    divisionState: {
+      pending: "Pending",
+      success: "Success",
+      failed: "Failed",
+      refunded: "Refunded"
+    },
+    mchNotifyState: {
+      notifying: "Notifying",
+      success: "Notified",
+      failed: "Failed"
+    },
+    orderType: {
+      pay: "Payment",
+      refund: "Refund",
+      transfer: "Transfer"
+    },
+    bizType: {
+      platformCommission: "Platform Commission Income",
+      withdrawExpense: "Withdrawal Expense",
+      commissionExpense: "Commission Expense",
+      rechargeIncome: "Recharge Income"
+    },
+    accountType: {
+      wallet: "Wallet Account",
+      purpose: "Purpose Account"
+    },
+    queryDateType: {
+      day: "Daily",
+      month: "Monthly",
+      year: "Yearly"
     }
   },
   main: {

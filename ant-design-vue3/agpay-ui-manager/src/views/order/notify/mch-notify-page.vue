@@ -6,17 +6,18 @@
       <ag-search
         v-model="searchData"
         :collapsible="true"
-        :search-loading="tableRef?.isLoading?.value || false"
-        :reset-exclude="['dateRange']"
+        :search-loading="searchLoading"
+        reset-mode="default"
+        :default-model-value="defaultSearchData"
         @search="searchFunc"
-        @reset="resetFunc"
+        @reset="() => tableRef?.value?.reload()"
       >
         <!-- 基础搜索条件 -->
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model="searchData.dateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间"
                 allow-clear
@@ -48,11 +49,7 @@
                 label="通知状态"
                 placeholder="请选择状态"
                 allow-clear
-                :options="[
-                  { value: '1', label: '通知中' },
-                  { value: '2', label: '通知成功' },
-                  { value: '3', label: '通知失败' }
-                ]"
+                :options="notifyStateOptions"
               />
             </a-form-item>
           </a-col>
@@ -76,11 +73,7 @@
                 label="订单类型"
                 placeholder="请选择订单类型"
                 allow-clear
-                :options="[
-                  { value: '1', label: '支付' },
-                  { value: '2', label: '退款' },
-                  { value: '3', label: '转账' }
-                ]"
+                :options="orderTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -100,15 +93,15 @@
       >
         <!-- 通知状态列 -->
         <template #stateSlot="{ record }">
-          <a-tag :color="getStateColor(record.state)">
-            {{ getStateText(record.state) }}
+          <a-tag :color="getMchNotifyStateInfo(record.state, t).status">
+            {{ getMchNotifyStateInfo(record.state, t).text }}
           </a-tag>
         </template>
 
         <!-- 订单类型列 -->
         <template #orderTypeSlot="{ record }">
-          <a-tag :color="getOrderTypeColor(record.orderType)">
-            {{ getOrderTypeText(record.orderType) }}
+          <a-tag :color="getOrderTypeInfo(record.orderType, t).status">
+            {{ getOrderTypeInfo(record.orderType, t).text }}
           </a-tag>
         </template>
 
@@ -133,10 +126,13 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
-import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getMchNotifyStateInfo, getMchNotifyStateOptions, getOrderTypeInfo, getOrderTypeOptions } from '@/constants/common-const'
 import { message } from 'ant-design-vue'
 import DetailDrawer from './detail-drawer.vue'
 
@@ -145,27 +141,39 @@ import DetailDrawer from './detail-drawer.vue'
  * 仅包含详情查看和重发通知，无新增/编辑/删除操作。
  */
 
+/** i18n */
+const { t } = useI18n()
+
 /** 用户权限检查 */
 const { hasPermission } = usePermission()
+
+/** 枚举下拉选项 */
+const notifyStateOptions = computed(() => getMchNotifyStateOptions(t))
+const orderTypeOptions = computed(() => getOrderTypeOptions(t))
 
 /**
  * CRUD 表格页面状态
  * 注：本页面无新增/编辑/删除，仅使用 tableRef/searchData/detailOpen 等部分能力。
  */
-const { tableRef, searchData, detailOpen, currentRecordId, reloadTable, openDetail } = useCrudTablePage()
-
-/** 搜索数据默认值（用于 resetFunc 恢复） */
-const defaultSearchData = {
-  dateRange: 'today',
-  orderId: '',
-  mchOrderNo: '',
-  state: '',
-  isvNo: '',
-  orderType: ''
-}
-
-// 初始化 searchData 默认值
-Object.assign(searchData, defaultSearchData)
+const {
+  tableRef,
+  searchData,
+  defaultSearchData,
+  searchLoading,
+  detailOpen,
+  currentRecordId,
+  reloadTable,
+  openDetail
+} = useCrudTablePage({
+  searchDefaults: {
+    queryDateRange: 'today',
+    orderId: '',
+    mchOrderNo: '',
+    state: '',
+    isvNo: '',
+    orderType: ''
+  }
+})
 
 /** 表格列定义 */
 const tableColumns = [
@@ -194,47 +202,8 @@ function handleExport(params) {
   orderApi.exportMchNotify(params)
 }
 
-/** 搜索函数 */
 function searchFunc() {
-  tableRef.value?.refresh()
-}
-
-/**
- * 重置搜索条件为默认值并刷新表格
- * dateRange 默认值为 'today'，需手动恢复
- */
-function resetFunc() {
-  Object.assign(searchData, defaultSearchData)
   reloadTable()
-}
-
-/** 通知状态颜色映射 */
-const STATE_COLOR_MAP = { 1: 'orange', 2: 'green', 3: 'volcano' }
-/** 通知状态文本映射 */
-const STATE_TEXT_MAP = { 1: '通知中', 2: '通知成功', 3: '通知失败' }
-/** 订单类型颜色映射 */
-const ORDER_TYPE_COLOR_MAP = { 1: 'green', 2: 'volcano', 3: 'blue' }
-/** 订单类型文本映射 */
-const ORDER_TYPE_TEXT_MAP = { 1: '支付', 2: '退款', 3: '转账' }
-
-/** 获取通知状态颜色 */
-function getStateColor(state) {
-  return STATE_COLOR_MAP[state] || 'default'
-}
-
-/** 获取通知状态文本 */
-function getStateText(state) {
-  return STATE_TEXT_MAP[state] || '未知'
-}
-
-/** 获取订单类型颜色 */
-function getOrderTypeColor(type) {
-  return ORDER_TYPE_COLOR_MAP[type] || 'orange'
-}
-
-/** 获取订单类型文本 */
-function getOrderTypeText(type) {
-  return ORDER_TYPE_TEXT_MAP[type] || '未知'
 }
 
 /**
@@ -253,7 +222,7 @@ async function handleResend(record) {
   try {
     await orderApi.resendMchNotify(record.notifyId)
     message.success('任务更新成功，请稍后查看最新状态！')
-    tableRef.value?.refresh()
+    tableRef.value?.reload()
   } catch (error) {
     message.error(error.msg || '重发通知失败')
   }

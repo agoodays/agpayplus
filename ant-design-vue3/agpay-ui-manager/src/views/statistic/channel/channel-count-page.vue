@@ -2,7 +2,7 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+    <ag-search v-model="searchData" :search-loading="searchLoading" reset-mode="default" :default-model-value="defaultSearchData" @search="searchFunc" @reset="() => tableRef.value?.reload()">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -199,6 +199,7 @@
 <script setup>
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { downloadFile } from '@/lib/ag-axios'
 import {
     DollarOutlined,
@@ -209,6 +210,20 @@ import {
     WalletOutlined
 } from '@ant-design/icons-vue'
 import { reactive, ref } from 'vue'
+
+const {
+  tableRef,
+  searchData,
+  defaultSearchData,
+  searchFunc,
+  searchLoading
+} = useCrudTablePage({
+  searchDefaults: {
+    method: 'channel',
+    queryDateRange: 'today'
+  }
+})
+
 const icons = { InfoCircleOutlined }
 
 const tableColumns = ref([
@@ -224,14 +239,6 @@ const tableColumns = ref([
   { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot', titleSlot: 'roundTitle' }
 ])
 
-// 默认查询参数数据结构
-const defaultSearchData = {
-  method: 'channel',
-  queryDateRange: 'today' // 查询日期范围
-}
-
-const tableRef = ref(null)
-const searchData = reactive({ ...defaultSearchData })
 const sortState = reactive({
   field: '',
   order: null
@@ -264,10 +271,6 @@ const handleSortChange = ({ field, order }) => {
 
 const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '通道交易统计.xlsx')
-}
-
-const searchFunc = () => {
-  tableRef.value?.reload()
 }
 </script>
 <style lang="less" scoped>

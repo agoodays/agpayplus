@@ -2,7 +2,15 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
-      <ag-search v-if="hasPermission('ENT_UR_USER_SEARCH')" v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+      <ag-search
+        v-if="hasPermission('ENT_UR_USER_SEARCH')"
+        v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
+        :search-loading="searchLoading"
+        @search="searchFunc"
+        @reset="searchFunc"
+      >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -151,13 +159,25 @@
     </a-card>
 
     <!-- 新增/编辑抽屉 -->
-    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" :sys-type="searchData.sysType" :belong-info-id="currentBelongInfoId" @success="handleModalSuccess" />
+    <add-or-edit
+      v-model:open="modalOpen"
+      :record-id="currentRecordId"
+      :sys-type="searchData.sysType"
+      :belong-info-id="currentBelongInfoId"
+      @success="handleModalSuccess"
+    />
 
     <!-- 邀请码弹窗 -->
     <invite-code v-model:open="inviteCodeOpen" :invite-code="currentInviteCode" :sys-type="currentSysType" />
 
     <!-- 分配角色抽屉 -->
-    <role-dist v-model:open="roleDistOpen" :record-id="currentRoleDistId" :sys-type="currentRoleDistSysType" :belong-info-id="currentRoleDistBelongInfoId" @success="handleRoleDistSuccess" />
+    <role-dist
+      v-model:open="roleDistOpen"
+      :record-id="currentRoleDistId"
+      :sys-type="currentRoleDistSysType"
+      :belong-info-id="currentRoleDistBelongInfoId"
+      @success="handleRoleDistSuccess"
+    />
   </div>
 </template>
 
@@ -203,7 +223,7 @@ const userTypeList = [
 /**
  * 用户类型选项
  */
-const userTypeOptions = userTypeList.map(item => ({
+const userTypeOptions = userTypeList.map((item) => ({
   label: item.userTypeName,
   value: item.userType
 }))
@@ -228,6 +248,8 @@ const currentRoleDistBelongInfoId = ref('')
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   modalOpen,
   currentRecordId,
   reloadTable,
@@ -239,12 +261,15 @@ const {
   deleteAction: (recordId) => sysUserApi.delById(recordId),
   deleteConfirmTitle: '确认删除？',
   deleteConfirmContent: '',
-  deleteSuccessMessage: '删除成功！'
+  deleteSuccessMessage: '删除成功！',
+  searchDefaults: {
+    sysType: 'MGR',
+    belongInfoId: '',
+    sysUserId: '',
+    realname: '',
+    userType: ''
+  }
 })
-
-// 初始化搜索数据
-searchData.userType = ''
-searchData.sysType = 'MGR'
 
 /**
  * 表格列配置
@@ -331,7 +356,7 @@ const openInviteCode = (inviteCodeValue, sysTypeValue) => {
  * @returns {string} 用户类型名称
  */
 const getUserTypeName = (userType) => {
-  return userTypeList.find(f => f.userType === userType)?.userTypeName || ''
+  return userTypeList.find((f) => f.userType === userType)?.userTypeName || ''
 }
 
 /**
@@ -410,7 +435,8 @@ const openRoleDist = (recordId, sysType, belongInfoId) => {
 const updateState = async (recordId, state) => {
   const stateInfo = getStateInfo(state)
   const title = `确认[${stateInfo.desc}]该用户？`
-  const content = stateInfo === ENABLE_ENUM.ENABLE ? '启用后用户可进行登陆等一系列操作' : '停用后该用户将立即退出系统并不可再次登陆'
+  const content =
+    stateInfo === ENABLE_ENUM.ENABLE ? '启用后用户可进行登陆等一系列操作' : '停用后该用户将立即退出系统并不可再次登陆'
 
   infoBox.confirmPrimary(title, content, async () => {
     await sysUserApi.updateStateById(recordId, { state })
@@ -435,5 +461,4 @@ const handleRoleDistSuccess = () => {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

@@ -2,7 +2,7 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="searchFunc">
+      <ag-search v-model="searchData" :search-loading="searchLoading" reset-mode="default" :default-model-value="defaultSearchData" @search="searchFunc" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -21,11 +21,7 @@
                 label="产品类型"
                 placeholder="请选择产品类型"
                 allow-clear
-                :options="[
-                  { value: 'PAY', label: '支付产品' },
-                  { value: 'TRANSFER', label: '转账产品' },
-                  { value: 'DIVISION', label: '分账产品' }
-                ]"
+                :options="productTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -36,16 +32,7 @@
                 label="支付类型"
                 placeholder="请选择支付类型"
                 allow-clear
-                :options="[
-                  { value: 'WECHAT', label: '微信' },
-                  { value: 'ALIPAY', label: '支付宝' },
-                  { value: 'YSFPAY', label: '云闪付' },
-                  { value: 'UNIONPAY', label: '银联' },
-                  { value: 'DCEPPAY', label: '数字人民币' },
-                  { value: 'TRANSFER', label: '转账' },
-                  { value: 'DIVISION', label: '分账' },
-                  { value: 'OTHER', label: '其他' }
-                ]"
+                :options="wayTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -70,15 +57,15 @@
         <template #productTypeSlot="{ record }">
           <a-tag
             :key="record.productType"
-            :color="getProductTypeColor(record.productType)">
-            {{ getProductTypeText(record.productType) }}
+            :color="getProductTypeInfo(record.productType, t).status">
+            {{ getProductTypeInfo(record.productType, t).text }}
           </a-tag>
         </template>
         <template #wayTypeSlot="{ record }">
           <a-tag
             :key="record.wayType"
-            :color="getWayTypeColor(record.wayType)">
-            {{ getWayTypeText(record.wayType) }}
+            :color="getWayTypeInfo(record.wayType, t).status">
+            {{ getWayTypeInfo(record.wayType, t).text }}
           </a-tag>
         </template>
         <template #opSlot="{ record }">  <!-- 操作列插槽 -->
@@ -103,11 +90,21 @@ import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getProductTypeOptions, getWayTypeOptions, getProductTypeInfo, getWayTypeInfo } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AddOrEdit from './add-or-edit.vue'
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
+
+/** i18n */
+const { t } = useI18n()
+
+/** 枚举选项（带国际化） */
+const productTypeOptions = computed(() => getProductTypeOptions(t))
+const wayTypeOptions = computed(() => getWayTypeOptions(t))
 
 /**
  * 表格列配置
@@ -126,6 +123,8 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   modalOpen,
   currentRecordId,
   reloadTable,
@@ -136,7 +135,13 @@ const {
 } = useCrudTablePage({
   deleteAction: (wayCode) => payConfigApi.delPayWayById(wayCode),
   deleteConfirmTitle: '确认删除？',
-  deleteSuccessMessage: '删除成功！'
+  deleteSuccessMessage: '删除成功！',
+  searchDefaults: {
+    wayCode: '',
+    wayName: '',
+    productType: '',
+    wayType: ''
+  }
 })
 
 /**
@@ -176,70 +181,5 @@ const delFunc = (wayCode) => confirmDelete(wayCode)
 const handleSuccess = () => {
   closeModal()
   reloadTable()
-}
-
-
-/**
- * 获取产品类型颜色
- * @param {string} productType - 产品类型
- * @returns {string} 颜色值
- */
-const getProductTypeColor = (productType) => {
-  const colorMap = {
-    PAY: 'rgb(4, 190, 2)',
-    TRANSFER: '#0099ff',
-    DIVISION: '#ff9900'
-  }
-  return colorMap[productType] || '#fa8c16'
-}
-
-/**
- * 获取产品类型文本
- * @param {string} productType - 产品类型
- * @returns {string} 类型文本
- */
-const getProductTypeText = (productType) => {
-  const textMap = {
-    PAY: '支付产品',
-    TRANSFER: '转账',
-    DIVISION: '分账'
-  }
-  return textMap[productType] || '其他'
-}
-
-/**
- * 获取支付类型颜色
- * @param {string} wayType - 支付类型
- * @returns {string} 颜色值
- */
-const getWayTypeColor = (wayType) => {
-  const colorMap = {
-    WECHAT: 'rgb(4, 190, 2)',
-    ALIPAY: 'rgb(23, 121, 255)',
-    YSFPAY: '#f5222d',
-    UNIONPAY: '#00508e',
-    DCEPPAY: '#d12c2c',
-    DIVISION: '#ff9900',
-    TRANSFER: '#0099ff'
-  }
-  return colorMap[wayType] || '#fa8c16'
-}
-
-/**
- * 获取支付类型文本
- * @param {string} wayType - 支付类型
- * @returns {string} 类型文本
- */
-const getWayTypeText = (wayType) => {
-  const textMap = {
-    WECHAT: '微信',
-    ALIPAY: '支付宝',
-    YSFPAY: '云闪付',
-    UNIONPAY: '银联',
-    DCEPPAY: '数字人民币',
-    TRANSFER: '转账',
-    DIVISION: '分账'
-  }
-  return textMap[wayType] || '其他'
 }
 </script>

@@ -82,7 +82,39 @@ export default {
     confirmDelete: '确认删除？',
     scrollLoadMore: '滚动加载更多',
     noMoreData: '没有更多数据了',
-    searching: '搜索中...'
+    searching: '搜索中...',
+    modal: {
+      defaultTitle: '提示',
+      okText: '确定',
+      cancelText: '取消'
+    },
+    drawer: {
+      defaultTitle: '详情',
+      confirmText: '保存',
+      cancelText: '关闭'
+    },
+    editor: {
+      placeholder: '请输入内容...'
+    },
+    dateRange: {
+      tipRange: '范围：{start} ~ {end}',
+      backToSelect: '返回日期下拉框',
+      today: '今天',
+      yesterday: '昨天',
+      near7: '近7天',
+      near30: '近30天',
+      thisWeek: '本周',
+      thisMonth: '本月',
+      thisYear: '本年',
+      mtd: '本月至今',
+      ytd: '本年至今',
+      lastWeek: '上周',
+      lastMonth: '上月',
+      lastYear: '上年',
+      lfm: '上月全月',
+      pyFull: '去年全年',
+      custom: '自定义时间'
+    }
   },
   common: {
     success: '成功',
@@ -183,6 +215,83 @@ export default {
       fix: "单笔固定",
       single: "单笔费率",
       fixAndRate: "固定+费率"
+    },
+    profitInfoType: {
+      platform: "运营平台",
+      agent: "代理商"
+    },
+    productType: {
+      pay: "支付产品",
+      transfer: "转账产品",
+      division: "分账产品"
+    },
+    wayType: {
+      wechat: "微信",
+      alipay: "支付宝",
+      ysfpay: "云闪付",
+      unionpay: "银联",
+      dceppay: "数字人民币",
+      transfer: "转账",
+      division: "分账",
+      other: "其他"
+    },
+    payState: {
+      created: "订单生成",
+      paying: "支付中",
+      success: "支付成功",
+      failed: "支付失败",
+      canceled: "已撤销",
+      refunded: "已退款",
+      closed: "订单关闭"
+    },
+    notifyState: {
+      unsent: "未发送",
+      sent: "已发送"
+    },
+    refundState: {
+      created: "订单生成",
+      refunding: "退款中",
+      success: "退款成功",
+      failed: "退款失败",
+      closed: "任务关闭"
+    },
+    transferState: {
+      created: "订单生成",
+      transferring: "转账中",
+      success: "转账成功",
+      failed: "转账失败",
+      closed: "任务关闭"
+    },
+    divisionState: {
+      pending: "待分账",
+      success: "分账成功",
+      failed: "分账失败",
+      refunded: "已退款"
+    },
+    mchNotifyState: {
+      notifying: "通知中",
+      success: "通知成功",
+      failed: "通知失败"
+    },
+    orderType: {
+      pay: "支付",
+      refund: "退款",
+      transfer: "转账"
+    },
+    bizType: {
+      platformCommission: "平台佣金收入",
+      withdrawExpense: "提现支出",
+      commissionExpense: "佣金支出",
+      rechargeIncome: "充值收入"
+    },
+    accountType: {
+      wallet: "钱包账户",
+      purpose: "用途账户"
+    },
+    queryDateType: {
+      day: "日报",
+      month: "月报",
+      year: "年报"
     }
   },
   main: {

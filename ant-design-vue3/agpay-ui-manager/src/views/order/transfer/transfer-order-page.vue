@@ -5,7 +5,9 @@
       <ag-search
         v-model="searchData"
         :collapsible="false"
-        :search-loading="tableRef?.isLoading?.value || false"
+        :search-loading="searchLoading"
+        reset-mode="default"
+        :default-model-value="defaultSearchData"
         @search="searchFunc"
         @reset="searchFunc"
       >
@@ -13,7 +15,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model="searchData.dateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -62,13 +64,7 @@
                 label="转账状态"
                 placeholder="全部"
                 allow-clear
-                :options="[
-                  { value: '0', label: '订单生成' },
-                  { value: '1', label: '转账中' },
-                  { value: '2', label: '转账成功' },
-                  { value: '3', label: '转账失败' },
-                  { value: '4', label: '任务关闭' }
-                ]"
+                :options="transferStateOptions"
               />
             </a-form-item>
           </a-col>
@@ -185,8 +181,8 @@
 
         <!-- 状态插槽 -->
         <template #stateSlot="{ record }">
-          <a-tag :color="getStateColor(record.state)">
-            {{ getStateText(record.state) }}
+          <a-tag :color="getTransferStateInfo(record.state, t).status">
+            {{ getTransferStateInfo(record.state, t).text }}
           </a-tag>
         </template>
 
@@ -211,34 +207,44 @@
  */
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import { getTransferStateInfo, getTransferStateOptions } from '@/constants/common-const'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { CopyOutlined, DollarOutlined, TransactionOutlined, WalletOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import { computed, ref } from 'vue'
 import DetailDrawer from './detail-drawer.vue'
 
 // 权限检查
 const { hasPermission } = usePermission()
 
+const { t } = useI18n()
+
+const transferStateOptions = computed(() => getTransferStateOptions(t))
+
 /**
  * 使用 CRUD 表格页面组合式函数
  */
 const {
+  searchFunc: _baseSearch,
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   detailOpen,
   currentRecordId,
   reloadTable,
   openDetail
-} = useCrudTablePage()
-
-// 初始化搜索表单默认值
-searchData.dateRange = ''
-searchData.unionOrderId = ''
-searchData.mchNo = ''
-searchData.appId = ''
-searchData.state = ''
+} = useCrudTablePage({
+  searchDefaults: {
+    queryDateRange: '',
+    unionOrderId: '',
+    mchNo: '',
+    appId: '',
+    state: ''
+  }
+})
 
 /**
  * 额外数据源
@@ -276,34 +282,7 @@ const tableColumns = [
  * @returns {Promise<Object>} 表格数据
  */
 const loadDataFunc = async (params) => {
-  const requestParams = {
-    pageNumber: params.pageNumber,
-    pageSize: params.pageSize
-  }
-
-  // 处理日期范围
-  if (searchData.dateRange && searchData.dateRange.length === 2) {
-    requestParams.createdStart = searchData.dateRange[0]
-    requestParams.createdEnd = searchData.dateRange[1]
-  }
-
-  // 处理订单号搜索
-  if (searchData.unionOrderId) {
-    requestParams.unionOrderId = searchData.unionOrderId
-  }
-
-  // 处理其他字段
-  if (searchData.mchNo) {
-    requestParams.mchNo = searchData.mchNo
-  }
-  if (searchData.appId) {
-    requestParams.appId = searchData.appId
-  }
-  if (searchData.state) {
-    requestParams.state = parseInt(searchData.state)
-  }
-
-  return await orderApi.queryTransferOrderPage(requestParams)
+  return await orderApi.queryTransferOrderPage(params)
 }
 
 /**
@@ -312,71 +291,15 @@ const loadDataFunc = async (params) => {
  * @returns {Promise<Object>} 统计数据
  */
 const loadStatistics = async (params) => {
-  const requestParams = {}
-
-  // 处理日期范围
-  if (searchData.dateRange && searchData.dateRange.length === 2) {
-    requestParams.createdStart = searchData.dateRange[0]
-    requestParams.createdEnd = searchData.dateRange[1]
-  }
-
-  // 处理订单号搜索
-  if (searchData.unionOrderId) {
-    requestParams.unionOrderId = searchData.unionOrderId
-  }
-
-  // 处理其他字段
-  if (searchData.mchNo) {
-    requestParams.mchNo = searchData.mchNo
-  }
-  if (searchData.appId) {
-    requestParams.appId = searchData.appId
-  }
-  if (searchData.state) {
-    requestParams.state = parseInt(searchData.state)
-  }
-
-  return await orderApi.queryTransferOrderCount(requestParams)
+  return await orderApi.queryTransferOrderCount(params)
 }
 
 /**
  * 搜索回调函数（同时刷新表格和统计）
  */
 function searchFunc() {
-  reloadTable()
+  _baseSearch()
   tableRef.value?.reloadStatistics()
-}
-
-/**
- * 获取状态颜色
- * @param {number} state - 状态值
- * @returns {string} 状态颜色
- */
-const getStateColor = (state) => {
-  const colorMap = {
-    0: 'blue',
-    1: 'orange',
-    2: 'green',
-    3: 'volcano',
-    4: 'default'
-  }
-  return colorMap[state] || 'default'
-}
-
-/**
- * 获取状态文本
- * @param {number} state - 状态值
- * @returns {string} 状态文本
- */
-const getStateText = (state) => {
-  const textMap = {
-    0: '订单生成',
-    1: '转账中',
-    2: '转账成功',
-    3: '转账失败',
-    4: '任务关闭'
-  }
-  return textMap[state] || '未知'
 }
 
 /**

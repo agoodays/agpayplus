@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+    <ag-search v-model="searchData" :search-loading="searchLoading" reset-mode="default" :default-model-value="defaultSearchData" @search="searchFunc" @reset="() => tableRef.value?.reload()">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -227,6 +227,7 @@
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { downloadFile } from '@/lib/ag-axios'
 import {
     DollarOutlined,
@@ -238,7 +239,7 @@ import {
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
-import { onMounted, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Detail from './detail.vue'
 
@@ -265,7 +266,6 @@ const tableColumns = [
 ]
 
 // 响应式数据
-const tableRef = ref(null)
 const { open: detailOpen, showModal: showDetail } = useModal()
 const currentRecordId = ref(null)
 const route = useRoute()
@@ -273,9 +273,7 @@ const route = useRoute()
 // 初始化查询参数
 let queryDateRange = 'today'
 if (route.query.queryDate) {
-  // 解析时间范围
   const [startTimestamp, endTimestamp] = route.query.queryDate.split('_').map(Number)
-  // 转换为日期格式
   const startDate = dayjs(startTimestamp)
   const endDate = dayjs(endTimestamp)
   queryDateRange = `customDateTime_${startDate.format('YYYY-MM-DD')} 00:00:00_${endDate.format('YYYY-MM-DD')} 23:59:59`
@@ -292,15 +290,27 @@ if (route.query.isvNo) {
   isvNo = route.query.isvNo
 }
 
-// 搜索数据
-const defaultSearchData = {
-  method: 'mch',
-  agentNo: agentNo,
-  isvNo: isvNo,
-  queryDateRange: queryDateRange
-}
-const searchData = reactive({ ...defaultSearchData })
 const detailQueryDateRange = ref(queryDateRange)
+
+const {
+  tableRef,
+  searchData,
+  defaultSearchData,
+  searchFunc: _baseSearch,
+  searchLoading
+} = useCrudTablePage({
+  searchDefaults: {
+    method: 'mch',
+    agentNo: agentNo,
+    isvNo: isvNo,
+    queryDateRange: queryDateRange
+  }
+})
+
+const searchFunc = () => {
+  detailQueryDateRange.value = searchData.queryDateRange
+  _baseSearch()
+}
 
 // 统计初始化数据
 const countInitData = reactive({
@@ -334,23 +344,11 @@ const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '商户交易统计.xlsx')
 }
 
-// 搜索函数
-const searchFunc = () => {
-  detailQueryDateRange.value = searchData.queryDateRange
-  tableRef.value?.reload()
-}
-
 // 详情函数
 const detailFunc = (mchNo) => {
   currentRecordId.value = mchNo
   showDetail()
 }
-
-// 组件挂载时
-onMounted(() => {
-  // 组件初始化时将默认数据赋值给 searchData
-  Object.assign(searchData, defaultSearchData)
-})
 </script>
 <style lang="less" scoped>
 .data-statistics {

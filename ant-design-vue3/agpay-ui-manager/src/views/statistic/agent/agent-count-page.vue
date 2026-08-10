@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+    <ag-search v-model="searchData" :search-loading="searchLoading" reset-mode="default" :default-model-value="defaultSearchData" @search="searchFunc" @reset="() => tableRef.value?.reload()">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -221,6 +221,7 @@
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { downloadFile } from '@/lib/ag-axios'
 import {
   DollarOutlined,
@@ -255,22 +256,33 @@ const tableColumns = ref([
 const route = useRoute()
 const router = useRouter()
 
-const tableRef = ref(null)
 const queryDateRange = route.query.queryDateRange || 'today'
 const isvNo = route.query.isvNo || ''
 const detailQueryDateRange = ref(queryDateRange)
 
-const defaultSearchData = {
-  method: 'agent',
-  isvNo,
-  queryDateRange
-}
-
-const searchData = reactive({ ...defaultSearchData })
 const sortState = reactive({
   field: '',
   order: null
 })
+
+const {
+  tableRef,
+  searchData,
+  defaultSearchData,
+  searchFunc: _baseSearch,
+  searchLoading
+} = useCrudTablePage({
+  searchDefaults: {
+    method: 'agent',
+    isvNo,
+    queryDateRange
+  }
+})
+
+const searchFunc = () => {
+  detailQueryDateRange.value = searchData.queryDateRange
+  _baseSearch()
+}
 
 const countInitData = {
   allAmount: 0.0,
@@ -299,11 +311,6 @@ const handleSortChange = ({ field, order }) => {
 
 const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '代理商统计.xlsx')
-}
-
-const searchFunc = () => {
-  detailQueryDateRange.value = searchData.queryDateRange
-  tableRef.value?.reload()
 }
 
 const detailFunc = (agentNo) => {

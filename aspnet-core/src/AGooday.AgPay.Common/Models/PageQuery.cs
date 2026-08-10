@@ -31,5 +31,10 @@
         /// 排序方式
         /// </summary>
         public string SortOrder { get; set; }
+        
+        /// <summary>
+        /// 关键词：商户号 / 商户全称 / 商户简称（模糊匹配，优先级低于 MchNo 精确匹配）
+        /// </summary>
+        public string Keyword { get; set; }
     }
 }

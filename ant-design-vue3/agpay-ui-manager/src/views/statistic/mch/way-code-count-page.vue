@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+    <ag-search v-model="searchData" :search-loading="searchLoading" reset-mode="default" :default-model-value="defaultSearchData" @search="searchFunc" @reset="() => tableRef.value?.reload(true)">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -191,6 +191,7 @@
 <script setup>
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { downloadFile } from '@/lib/ag-axios'
 import {
   DollarOutlined,
@@ -200,7 +201,7 @@ import {
   UndoOutlined,
   WalletOutlined
 } from '@ant-design/icons-vue'
-import { onMounted, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 
 const icons = { InfoCircleOutlined }
 
@@ -224,20 +225,27 @@ const tableColumns = ref([
   { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot', titleSlot: 'roundTitle' }
 ])
 
-// 响应式数据
-const tableRef = ref(null)
 const sortState = reactive({
   field: '',
   order: null
 })
 
-// 默认搜索数据
-const defaultSearchData = {
-  method: 'wayCode',
-  mchNo: props.mchNo,
-  queryDateRange: props.queryDateRange
+const {
+  tableRef,
+  searchData,
+  defaultSearchData,
+  searchLoading
+} = useCrudTablePage({
+  searchDefaults: {
+    method: 'wayCode',
+    mchNo: props.mchNo,
+    queryDateRange: props.queryDateRange
+  }
+})
+
+const searchFunc = () => {
+  tableRef.value?.reload(true)
 }
-const searchData = reactive({ ...defaultSearchData })
 
 // 统计初始化数据
 const countInitData = reactive({
@@ -251,16 +259,6 @@ const countInitData = reactive({
   refundFeeAmount: 0.0,
   round: 0.0
 })
-
-// 处理搜索表单数据
-const handleSearchFormData = (searchDataParam) => {
-  // 处理搜索参数为null/undefined
-  if (!searchDataParam || Object.keys(searchDataParam).length === 0) {
-    Object.assign(searchData, defaultSearchData)
-  } else {
-    Object.assign(searchData, searchDataParam)
-  }
-}
 
 // 表格接口方法
 const loadDataFunc = async (params) => {
@@ -284,17 +282,6 @@ const loadCountFunc = async (params) => {
 const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '支付方式统计.xlsx')
 }
-
-// 搜索函数
-const searchFunc = () => {
-  tableRef.value?.reload(true)
-}
-
-// 组件挂载时
-onMounted(() => {
-  // 组件初始化时将默认数据赋值给 searchData
-  Object.assign(searchData, defaultSearchData)
-})
 </script>
 
 <style lang="less" scoped>

@@ -4,9 +4,12 @@
       <!-- 搜索区域 -->
       <ag-search
         v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
         :collapsible="true"
-        :search-loading="tableRef?.isLoading?.value || false"
+        :search-loading="searchLoading"
         @search="searchFunc"
+        @reset="searchFunc"
       >
         <!-- 基础搜索条件 -->
         <template #base="{ colSpan }">
@@ -90,9 +93,18 @@
         <!-- 操作列 -->
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button type="link" @click="editFunc(record.agentNo)" v-if="hasPermission('ENT_AGENT_INFO_EDIT')">修改</a-button>
-            <a-button type="link" @click="payConfigFunc(record.agentNo)" v-if="hasPermission('ENT_AGENT_PAY_CONFIG_LIST')">支付配置</a-button>
-            <a-button type="link" @click="delFunc(record.agentNo)" danger v-if="hasPermission('ENT_AGENT_INFO_DEL')">删除</a-button>
+            <a-button v-if="hasPermission('ENT_AGENT_INFO_EDIT')" type="link" @click="editFunc(record.agentNo)"
+              >修改</a-button
+            >
+            <a-button
+              v-if="hasPermission('ENT_AGENT_PAY_CONFIG_LIST')"
+              type="link"
+              @click="payConfigFunc(record.agentNo)"
+              >支付配置</a-button
+            >
+            <a-button v-if="hasPermission('ENT_AGENT_INFO_DEL')" type="link" danger @click="delFunc(record.agentNo)"
+              >删除</a-button
+            >
           </ag-table-actions>
         </template>
       </ag-table>
@@ -105,7 +117,12 @@
     <detail v-model:open="detailOpen" :record-id="currentRecordId" />
 
     <!-- 支付配置抽屉 -->
-    <ag-pay-config v-model:open="payConfigOpen" :info-id="currentRecordId" :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'" :config-mode="'mgrAgent'" />
+    <ag-pay-config
+      v-model:open="payConfigOpen"
+      :info-id="currentRecordId"
+      :perm-code="'ENT_AGENT_PAY_CONFIG_ADD'"
+      :config-mode="'mgrAgent'"
+    />
   </div>
 </template>
 
@@ -157,6 +174,9 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchFunc,
+  searchLoading,
   modalOpen,
   detailOpen,
   currentRecordId,
@@ -167,6 +187,15 @@ const {
   closeModal,
   confirmDelete
 } = useCrudTablePage({
+  searchDefaults: {
+    agentNo: '',
+    pid: '',
+    isvNo: '',
+    agentName: '',
+    loginUsername: '',
+    contactTel: '',
+    state: undefined
+  },
   deleteAction: (recordId) => agentApi.delById(recordId),
   deleteConfirmTitle: '确定删除吗',
   deleteConfirmContent: '此操作将删除该代理商及其所有关联用户信息',
@@ -181,9 +210,6 @@ const {
 const loadDataFunc = async (params) => {
   return await agentApi.queryPage(params)
 }
-
-/** 搜索触发 */
-const searchFunc = () => reloadTable()
 
 /** 新增代理商 */
 const addFunc = () => openCreate()

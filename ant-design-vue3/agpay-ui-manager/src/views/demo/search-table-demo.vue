@@ -3,10 +3,11 @@
     <div style="margin-bottom: 16px">
       <ag-search
         v-model:model-value="searchForm"
+        reset-mode="default"
+        :default-model-value="defaultSearchForm"
         :collapsible="true"
         :default-collapsed="true"
-        :search-loading="tableRef?.isLoading?.value || false"
-        :reset-exclude="['dateRange']"
+        :search-loading="searchLoading"
         @search="searchFunc"
         @reset="resetFunc"
       >
@@ -14,12 +15,7 @@
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchForm.orderNo"
-                label="订单号"
-                placeholder="请输入订单号"
-                :allow-clear="true"
-              />
+              <ag-input v-model="searchForm.orderNo" label="订单号" placeholder="请输入订单号" :allow-clear="true" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -104,18 +100,23 @@ import {
   AgTableActions
 } from '@/components'
 import { message } from 'ant-design-vue'
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 
 // 搜索参数
-const searchForm = reactive({
-  orderNo: '',
-  dateRange: '',
-  state: '',
-  amountRange: [undefined, undefined]
+const {
+  tableRef,
+  searchData: searchForm,
+  defaultSearchData: defaultSearchForm,
+  searchLoading
+} = useCrudTablePage({
+  searchDefaults: {
+    orderNo: '',
+    dateRange: '',
+    state: '',
+    amountRange: [undefined, undefined]
+  }
 })
-
-// 表格引用
-const tableRef = ref(null)
 
 // 表格列定义
 const tableColumns = ref([
@@ -300,6 +301,7 @@ function searchFunc(vals) {
 }
 
 function resetFunc() {
+  tableRef.value?.reload(true)
 }
 
 function onView(record) {

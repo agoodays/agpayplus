@@ -27,6 +27,8 @@
  * <AgEditor v-model="form.content" :height="600" />
  */
 import { ref, shallowRef, watch, onBeforeUnmount, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { i18nChangeLanguage } from '@wangeditor/editor'
 import { Skeleton } from 'ant-design-vue'
 import { upload, uploadFile } from '@/lib/ag-axios'
 import { appDefaultConfig } from '@/config/app-config'
@@ -51,7 +53,7 @@ const props = defineProps({
   editorConfig: {
     type: Object,
     default: () => ({
-      placeholder: '请输入内容...'
+      placeholder: 'components.editor.placeholder'
     })
   },
   /** 编辑器模式：default | simple */
@@ -68,6 +70,22 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
+
+const { t, locale } = useI18n()
+
+/** vue-i18n locale → wangeditor locale 映射 */
+function resolveWangEditorLang(lang) {
+  if (!lang || lang.startsWith('zh')) return 'zh-CN'
+  return 'en'
+}
+
+/** 应用当前语言到 wangeditor（在编辑器创建前调用） */
+i18nChangeLanguage(resolveWangEditorLang(locale.value))
+
+/** 语言切换时同步更新（wangeditor 会在下次创建编辑器时生效） */
+watch(locale, (newLang) => {
+  i18nChangeLanguage(resolveWangEditorLang(newLang))
+})
 
 /** 编辑器实例（使用 shallowRef 避免深层响应式开销） */
 const editorRef = shallowRef()
@@ -96,9 +114,16 @@ const uploadHeaders = computed(() => {
 })
 
 /** 合并后的编辑器配置（含图片/视频上传） */
+const translatePlaceholder = (ph) => {
+  if (!ph) return t('components.editor.placeholder')
+  if (ph.startsWith('components.')) return t(ph)
+  return ph
+}
+
 const mergedEditorConfig = computed(() => {
   return {
     ...props.editorConfig,
+    placeholder: translatePlaceholder(props.editorConfig.placeholder),
     MENU_CONF: {
       ...props.editorConfig.MENU_CONF,
       // 自定义插入图片

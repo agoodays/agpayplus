@@ -1,8 +1,8 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="searchLoading" @search="searchFunc" reset-mode="default" :default-model-value="defaultSearchData" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -83,18 +83,13 @@ const tableColumns = [
 ]
 
 /**
- * 默认搜索条件
- */
-const defaultSearchData = {
-  articleType: 1
-}
-
-/**
  * 使用 CRUD 表格页面组合式函数
  */
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   modalOpen,
   detailOpen,
   currentRecordId,
@@ -108,10 +103,11 @@ const {
   deleteAction: (recordId) => noticeApi.delById(recordId),
   deleteConfirmTitle: '确定删除吗',
   deleteConfirmContent: '',
-  deleteSuccessMessage: '删除成功'
+  deleteSuccessMessage: '删除成功',
+  searchDefaults: {
+    articleType: 1
+  }
 })
-
-Object.assign(searchData, defaultSearchData)
 
 /**
  * 请求表格数据函数

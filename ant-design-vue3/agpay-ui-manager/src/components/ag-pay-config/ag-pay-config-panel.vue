@@ -124,18 +124,53 @@
         <slot name="passage-search">
           <ag-search 
             v-model="passageManager.passageSearchForm"
+            reset-mode="default"
+            :default-model-value="passageManager.defaultSearchData"
             @search="handlePassageSearch"
-            @reset="passageManager.handleResetPassageSearch"
+            @reset="handlePassageReset"
           >
             <template #base="{ colSpan }">
               <a-col v-bind="colSpan">
                 <a-form-item label="">
-                  <ag-input v-model="passageManager.passageSearchForm.wayCode" placeholder="支付方式代码" />
+                  <ag-input v-model="passageManager.passageSearchForm.wayCode" label="支付方式代码" placeholder="请输入支付方式代码" />
                 </a-form-item>
               </a-col>
               <a-col v-bind="colSpan">
                 <a-form-item label="">
-                  <ag-input v-model="passageManager.passageSearchForm.wayName" placeholder="支付方式名称" />
+                  <ag-input v-model="passageManager.passageSearchForm.wayName" label="支付方式名称" placeholder="请输入支付方式名称" />
+                </a-form-item>
+              </a-col>
+              <a-col v-bind="colSpan">
+                <a-form-item label="">
+                  <ag-select
+                    v-model="passageManager.passageSearchForm.isConfig"
+                    label="配置状态"
+                    placeholder="请选择配置状态"
+                    allow-clear
+                    :options="isConfigOptions"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col v-bind="colSpan">
+                <a-form-item label="">
+                  <ag-select
+                    v-model="passageManager.passageSearchForm.passageState"
+                    label="通道启用状态"
+                    placeholder="请选择通道启用状态"
+                    allow-clear
+                    :options="stateOptions"
+                  />
+                </a-form-item>
+              </a-col>
+              <a-col v-bind="colSpan">
+                <a-form-item label="">
+                  <ag-select
+                    v-model="passageManager.passageSearchForm.state"
+                    label="通道运行状态"
+                    placeholder="请选择通道运行状态"
+                    allow-clear
+                    :options="stateOptions"
+                  />
                 </a-form-item>
               </a-col>
             </template>
@@ -152,6 +187,8 @@
                 :columns="passageManager.wayTableColumns.value"
                 :search-data="passageManager.passageSearchForm"
                 :row-selection="passageManager.wayRowSelection.value"
+                @selection-change="passageManager.handleWaySelectionChange"
+                @reload="handleWayLoadComplete"
               >
                 <template #stateSlot="{ record }">
                   <a-badge
@@ -220,9 +257,9 @@
                   </div>
                 </template>
                 <template #stateSlot="{ record }">
-                  <ag-table-actions
+                  <ag-state-switch
                     :state="record.state"
-                    :show-switch="true"
+                    show-switch
                     :on-change="(state) => handlePassageStateUpdate(record, state)"
                   />
                 </template>
@@ -243,10 +280,12 @@
  * 由 ag-pay-config-drawer.vue 包裹使用，也可独立使用。
  */
 import { payOauth2Api } from '@/api/business/pay-oauth2/pay-oauth2-api'
-import { AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
+import { AgInput, AgSearch, AgSelect, AgStateSwitch, AgTable } from '@/components'
+import { getStateOptions } from '@/constants/common-const'
 import { DownOutlined, ReloadOutlined, SearchOutlined, UpOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AgPayWayRatePanel from './ag-pay-payway-rate-panel.vue'
 import { useChannelList } from './composables/useChannelList'
 import { useConfigLoader } from './composables/useConfigLoader'
@@ -276,6 +315,18 @@ const diyConfigList = ref([])
 const configModeRef = ref(props.configMode)
 /** 信息 ID 响应式引用（传给 composables） */
 const infoIdRef = ref(props.infoId)
+
+/** i18n */
+const { t } = useI18n()
+
+/** 通道状态下拉选项 */
+const stateOptions = computed(() => getStateOptions(t))
+
+/** 配置状态下拉选项 */
+const isConfigOptions = computed(() => [
+  { label: '已配置', value: 1 },
+  { label: '未配置', value: 0 }
+])
 
 /** 通道列表管理 */
 const channelList = useChannelList(configModeRef, infoIdRef, props.channelListConfig, (channelCode) => {
@@ -346,7 +397,10 @@ watch(
     currentInfoType.value = tabConfig.getInfoTypeByConfigMode(configModeVal)
     tabConfig.initTabConfig(isIsvSubMch)
     resetState()
+    wayTableRef.value?.clearSelection?.()
+    passageTableRef.value?.clearSelection?.()
     await channelList.refreshChannelList()
+    wayTableRef.value?.reload(true)
 
     if (currentInfoType.value === 'AGENT') {
       await fetchDiyConfigList()
@@ -388,11 +442,55 @@ const handleSubTabSelect = (tabCode) => {
 }
 
 /**
- * 刷新支付方式表格
+ * 支付方式表格加载完成回调（@reload 事件，payload 为分页结果）
+ * 自动选中首项（仅当前未选中或选中项不在当前数据中时）
+ */
+const handleWayLoadComplete = (payload) => {
+  const records = payload?.records || []
+
+  if (records.length === 0) {
+    passageManager.handleResetPassageSearch()
+    return
+  }
+
+  const currentKey = passageManager.activeWayCode.value
+  const stillExists = records.some(r => r.wayCode === currentKey)
+
+  if (!stillExists) {
+    const firstKey = records[0].wayCode
+    wayTableRef.value?.toggleRowSelection?.(firstKey, true)
+    passageManager.activeWayCode.value = firstKey
+  }
+}
+
+/**
+ * activeWayCode 变化时刷新通道列表
+ */
+watch(
+  () => passageManager.activeWayCode.value,
+  (wayCode) => {
+    if (wayCode) {
+      passageTableRef.value?.reload(true)
+    } else {
+      passageTableRef.value?.clearSelection?.()
+    }
+  }
+)
+
+/**
+ * 刷新支付方式表格（搜索触发）
  * @param {boolean} [isToFirst=false] - 是否跳转到第一页
  */
 const handlePassageSearch = (isToFirst = false) => {
   wayTableRef.value?.reload(isToFirst)
+}
+
+/**
+ * 重置通道搜索条件并刷新表格
+ */
+const handlePassageReset = () => {
+  passageManager.handleResetPassageSearch()
+  wayTableRef.value?.reload(true)
 }
 
 /**
@@ -407,6 +505,7 @@ const handlePassageStateUpdate = async (record, state) => {
     handlePassageSearch()
     emit('passage-state-update', { record, state })
   } catch (error) {
+    if (error?.message === '用户取消') return
     console.error('更新通道状态失败:', error)
     message.error('配置失败')
   }

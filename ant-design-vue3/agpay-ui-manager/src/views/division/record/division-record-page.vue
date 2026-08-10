@@ -2,14 +2,19 @@
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" :reset-exclude="['queryDateRange']" @search="searchFunc" @reset="searchFunc">
+      <ag-search
+        v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
+        :search-loading="searchLoading"
+        :reset-exclude="['queryDateRange']"
+        @search="searchFunc"
+        @reset="searchFunc"
+      >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-date-range-picker
-                v-model="searchData.queryDateRange"
-                label="创建时间"
-                placeholder="请选择创建时间" />
+              <ag-date-range-picker v-model="searchData.queryDateRange" label="创建时间" placeholder="请选择创建时间" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -54,12 +59,7 @@
                 v-model="searchData.state"
                 placeholder="分账状态"
                 allow-clear
-                :options="[
-                  { value: '0', label: '待分账' },
-                  { value: '1', label: '分账成功' },
-                  { value: '2', label: '分账失败' },
-                  { value: '3', label: '已退款' }
-                ]"
+                :options="divisionStateOptions"
               />
             </a-form-item>
           </a-col>
@@ -88,7 +88,9 @@
         :columns="tableColumns"
         :search-data="searchData"
       >
-        <template #amountSlot="{ record }"><b>¥{{ record.calDivisionAmount / 100 }}</b></template>
+        <template #amountSlot="{ record }"
+          ><b>¥{{ record.calDivisionAmount / 100 }}</b></template
+        >
 
         <!-- 订单金额列 -->
         <template #payOrderAmountSlot="{ record }">
@@ -101,9 +103,7 @@
         </template>
 
         <!-- 分账比例列 -->
-        <template #divisionProfitSlot="{ record }">
-          {{ (record.divisionProfit * 100).toFixed(2) }}%
-        </template>
+        <template #divisionProfitSlot="{ record }"> {{ (record.divisionProfit * 100).toFixed(2) }}% </template>
 
         <!-- 自定义列 -->
         <!-- 支付接口 -->
@@ -134,22 +134,20 @@
           </a-tooltip>
         </template>
         <template #stateSlot="{ record }">
-          <!--<a-tag
-            :key="record.state"
-            :color="record.state === 0?'orange':record.state === 1?'blue':record.state === 2?'volcano':record.state === 3 ? 'purple' : 'volcano'"
-          >
-            {{ record.state === 0?'待分账':record.state === 1?'分账成功':record.state === 2?'分账失败' : record.state === 3?'已退款' : '未知' }}
-          </a-tag>-->
-          <a-tag v-if="record.state === 0" :key="record.state" color="orange">待分账</a-tag>
-          <a-tag v-if="record.state === 1" :key="record.state" color="blue">分账成功</a-tag>
-          <a-tag v-if="record.state === 2" :key="record.state" color="volcano">分账失败</a-tag>
-          <a-tag v-if="record.state === 3" :key="record.state" color="purple">已退款</a-tag>
+          <a-tag v-bind="getDivisionStateInfo(String(record.state), t)" />
         </template>
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_DIVISION_RECORD_VIEW')" type="link" @click="detailFunc(record.recordId)">详情</a-button>
-            <a-button v-if="record.state == 2 && hasPermission('ENT_DIVISION_RECORD_RESEND')" type="link" @click="redivFunc(record.recordId)">重发</a-button>
+            <a-button v-if="hasPermission('ENT_DIVISION_RECORD_VIEW')" type="link" @click="detailFunc(record.recordId)"
+              >详情</a-button
+            >
+            <a-button
+              v-if="record.state == 2 && hasPermission('ENT_DIVISION_RECORD_RESEND')"
+              type="link"
+              @click="redivFunc(record.recordId)"
+              >重发</a-button
+            >
           </ag-table-actions>
         </template>
       </ag-table>
@@ -168,8 +166,13 @@ import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { infoBox } from '@/utils/info-box'
 import { message } from 'ant-design-vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { getDivisionStateOptions, getDivisionStateInfo } from '@/constants/common-const'
 import Detail from './detail.vue'
+
+const { t } = useI18n()
+const divisionStateOptions = computed(() => getDivisionStateOptions(t))
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
@@ -182,13 +185,31 @@ const tableColumns = [
   { key: 'batchOrderId', dataIndex: 'batchOrderId', title: '分账批次号', width: 120 },
   { key: 'payOrderId', dataIndex: 'payOrderId', title: '支付订单号', width: 220 },
   { key: 'ifCode', title: '支付接口', width: 200, customRender: 'ifCodeSlot' },
-  { key: 'payOrderAmount', dataIndex: 'payOrderAmount', title: '订单金额', width: 108, customRender: 'payOrderAmountSlot' },
-  { key: 'payOrderDivisionAmount', dataIndex: 'payOrderDivisionAmount', title: '分账基数', width: 108, customRender: 'payOrderDivisionAmountSlot' },
+  {
+    key: 'payOrderAmount',
+    dataIndex: 'payOrderAmount',
+    title: '订单金额',
+    width: 108,
+    customRender: 'payOrderAmountSlot'
+  },
+  {
+    key: 'payOrderDivisionAmount',
+    dataIndex: 'payOrderDivisionAmount',
+    title: '分账基数',
+    width: 108,
+    customRender: 'payOrderDivisionAmountSlot'
+  },
   { key: 'receiverAlias', dataIndex: 'receiverAlias', title: '账户别名', width: 120 },
   { key: 'accNo', dataIndex: 'accNo', title: '收款账号', width: 120 },
   { key: 'accName', dataIndex: 'accName', title: '账号名称', width: 120 },
   { key: 'relationTypeName', dataIndex: 'relationTypeName', title: '收款关系类型', width: 120 },
-  { key: 'divisionProfit', dataIndex: 'divisionProfit', title: '分账比例', width: 108, customRender: 'divisionProfitSlot' },
+  {
+    key: 'divisionProfit',
+    dataIndex: 'divisionProfit',
+    title: '分账比例',
+    width: 108,
+    customRender: 'divisionProfitSlot'
+  },
   { key: 'state', title: '分账状态', width: 100, customRender: 'stateSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
@@ -200,14 +221,25 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   detailOpen,
   currentRecordId,
   reloadTable,
   openDetail
-} = useCrudTablePage()
-
-// 初始化搜索数据
-searchData.queryDateRange = 'today'
+} = useCrudTablePage({
+  searchDefaults: {
+    queryDateRange: 'today',
+    mchNo: undefined,
+    appId: '',
+    payOrderId: '',
+    receiverId: '',
+    receiverGroupId: '',
+    accNo: '',
+    state: undefined,
+    ifCode: undefined
+  }
+})
 
 /** 支付接口定义列表 */
 const ifDefineList = ref([])

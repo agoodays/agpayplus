@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using AGooday.AgPay.Components.Third.Models;
 using AGooday.AgPay.Components.Third.Utils;
 
@@ -23,6 +23,12 @@ namespace AGooday.AgPay.Components.Third.Channel
                 PayWayUtil.PayWayServiceRegister(services, targetType);
                 PayWayUtil.PayWayV3ServiceRegister(services, targetType);
             });
+            #endregion
+            #region ApplymentService
+            ServiceRegister<IApplymentService, AbstractApplymentService>(services);
+            #endregion
+            #region ApplymentChannelNoticeService
+            ServiceRegister<IApplymentChannelNoticeService, AbstractApplymentChannelNoticeService>(services);
             #endregion
             #region RefundService
             ServiceRegister<IRefundService, AbstractRefundService>(services);

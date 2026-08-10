@@ -1,10 +1,17 @@
 import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { getStateInfo, STATE_ENUM } from '@/constants/common-const.js'
 import { infoBox } from '@/utils/info-box'
-import { computed, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-/** 支付通道搜索表单默认值 */
-const DEFAULT_PASSAGE_SEARCH_FORM = () => ({})
+/** 搜索表单默认值（frozen，供 ag-search reset-mode="default" 使用） */
+const DEFAULT_PASSAGE_SEARCH_FORM = Object.freeze({
+  wayCode: '',
+  wayName: '',
+  passageState: '',
+  isConfig: '',
+  state: ''
+})
 
 /**
  * 支付通道管理 Composable
@@ -14,8 +21,11 @@ const DEFAULT_PASSAGE_SEARCH_FORM = () => ({})
  * @returns {Object} 支付通道管理相关状态与方法
  */
 export function usePassageManager(infoId) {
-  /** 通道搜索表单（使用 ref 以便整体替换重置） */
-  const passageSearchForm = ref(DEFAULT_PASSAGE_SEARCH_FORM())
+  const { t } = useI18n()
+  /** 搜索表单（reactive，Object.assign 不改变引用，配合 ag-search reset-mode="default"） */
+  const passageSearchForm = reactive({ ...DEFAULT_PASSAGE_SEARCH_FORM })
+  /** 搜索表单默认值（冻结对象，供 ag-search :default-model-value 绑定） */
+  const defaultSearchData = DEFAULT_PASSAGE_SEARCH_FORM
   /** 当前选中的支付方式编码 */
   const activeWayCode = ref(null)
   /** 通道状态切换加载状态 */
@@ -25,7 +35,7 @@ export function usePassageManager(infoId) {
   const wayTableColumns = computed(() => [
     { key: 'wayCode', dataIndex: 'wayCode', title: '支付方式代码' },
     { key: 'wayName', dataIndex: 'wayName', title: '支付方式名称' },
-    { key: 'isConfig', title: '状态', customRender: 'stateSlot' }
+    { key: 'isConfig', title: '配置状态', customRender: 'stateSlot' }
   ])
 
   /** 通道表格列定义 */
@@ -35,13 +45,18 @@ export function usePassageManager(infoId) {
     { key: 'state', title: '状态', customRender: 'stateSlot' }
   ])
 
-  /** 支付方式表格单选配置 */
+  /** 支付方式表格单选配置（onChange 由外部 @selection-change 处理） */
   const wayRowSelection = computed(() => ({
-    type: 'radio',
-    onChange: (selectedRowKeys) => {
-      activeWayCode.value = selectedRowKeys
-    }
+    type: 'radio'
   }))
+
+  /**
+   * 支付方式表格选中变化处理
+   * @param {Array} selectedRowKeys - 选中的行 key 数组
+   */
+  const handleWaySelectionChange = ({ selectedRowKeys }) => {
+    activeWayCode.value = selectedRowKeys?.[0] ?? null
+  }
 
   /**
    * 请求支付方式分页数据
@@ -49,16 +64,34 @@ export function usePassageManager(infoId) {
    * @returns {Promise} 支付方式分页结果
    */
   const fetchWayTableData = (params) => {
-    return payConfigApi.queryMchPayPassagePage({ ...params, appId: infoId.value })
+    const { state, ...rest } = params
+    const query = { ...rest }
+    if (query.passageState !== undefined && query.passageState !== null && query.passageState !== '') {
+      query.passageState = query.passageState
+    } else {
+      delete query.passageState
+    }
+    if (query.isConfig !== undefined && query.isConfig !== null && query.isConfig !== '') {
+      query.isConfig = query.isConfig
+    } else {
+      delete query.isConfig
+    }
+    delete query.state
+    return payConfigApi.queryMchPayPassagePage({ ...query, appId: infoId.value })
   }
 
   /**
    * 请求当前支付方式下可用通道分页数据
-   * @param {Object} params - 分页参数
+   * @param {Object} params - 分页参数（包含 state 可选过滤条件）
    * @returns {Promise} 通道分页结果
    */
   const fetchPassageTableData = (params) => {
-    return payConfigApi.getAvailablePayInterfaceList(infoId.value, activeWayCode.value, params)
+    const { state, wayCode, wayName, passageState, isConfig, ...rest } = params
+    const query = { ...rest }
+    if (state !== undefined && state !== null && state !== '') {
+      query.state = state
+    }
+    return payConfigApi.getAvailablePayInterfaceList(infoId.value, activeWayCode.value, query)
   }
 
   /**
@@ -68,9 +101,9 @@ export function usePassageManager(infoId) {
    * @returns {Promise<void>} 确认并调用成功后 resolve；用户取消或调用失败时 reject
    */
   const handlePassageStateUpdate = (record, state) => {
-    const currentState = getStateInfo(state)
+    const currentState = getStateInfo(state, t)
     const title = `确认[${currentState.desc}]该通道？`
-    const content = currentState === STATE_ENUM.ENABLED
+    const content = currentState.value === STATE_ENUM.ENABLED.value
       ? '启用后将会将其他通道关闭'
       : '停用后将无法正常支付'
 
@@ -93,24 +126,26 @@ export function usePassageManager(infoId) {
     })
   }
 
-  /** 重置通道搜索表单与选中状态 */
+  /** 重置选中的支付方式 */
   const handleResetPassageSearch = () => {
-    passageSearchForm.value = DEFAULT_PASSAGE_SEARCH_FORM()
     activeWayCode.value = null
   }
 
   /** 重置全部状态 */
   const resetState = () => {
+    Object.assign(passageSearchForm, DEFAULT_PASSAGE_SEARCH_FORM)
     handleResetPassageSearch()
   }
 
   return {
     passageSearchForm,
+    defaultSearchData,
     activeWayCode,
     passageLoading,
     wayTableColumns,
     passageTableColumns,
     wayRowSelection,
+    handleWaySelectionChange,
     fetchWayTableData,
     fetchPassageTableData,
     handlePassageStateUpdate,

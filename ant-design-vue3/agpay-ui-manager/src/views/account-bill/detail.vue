@@ -7,7 +7,7 @@
     @close="handleClose"
   >
     <a-spin :spinning="loading">
-      <a-descriptions :column="2" bordered :label-style="{ width: '140px' }">
+      <a-descriptions :column="2" bordered size="small">
         <a-descriptions-item label="流水号">
           <a-tag color="purple">{{ detailData.id }}</a-tag>
         </a-descriptions-item>

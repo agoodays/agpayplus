@@ -1,8 +1,8 @@
-﻿<template>
+<template>
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" @search="searchFunc">
+      <ag-search v-model="searchData" reset-mode="default" :default-model-value="defaultSearchData" :search-loading="searchLoading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -19,23 +19,7 @@
                 label="角色类型"
                 placeholder="请选择角色类型"
                 allow-clear
-                :options="[
-                  { value: 'PLATFORM', label: '运营平台' },
-                  { value: 'AGENT', label: '代理商' }
-                ]" />
-            </a-form-item>
-          </a-col>
-          <a-col v-bind="colSpan">
-            <a-form-item label="">
-              <ag-select
-                v-model="searchData.infoType"
-                label="角色类型"
-                placeholder="请选择角色类型"
-                allow-clear
-                :options="[
-                  { value: 'PLATFORM', label: '运营平台' },
-                  { value: 'AGENT', label: '代理商' }
-                ]" />
+                :options="profitInfoTypeOptions" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -45,12 +29,7 @@
                 label="业务类型"
                 placeholder="请选择业务类型"
                 allow-clear
-                :options="[
-                  { value: '1', label: '平台佣金收入' },
-                  { value: '2', label: '提现支出' },
-                  { value: '3', label: '佣金支出' },
-                  { value: '4', label: '充值收入' }
-                ]" />
+                :options="bizTypeOptions" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -60,10 +39,7 @@
                 label="账户类型"
                 placeholder="请选择账户类型"
                 allow-clear
-                :options="[
-                  { value: '1', label: '钱包账户' },
-                  { value: '2', label: '用途账户' }
-                ]" />
+                :options="accountTypeOptions" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -95,9 +71,7 @@
       >
         <!-- 业务类型列 -->
         <template #bizTypeSlot="{ record }">
-          <a-tag :color="getBizTypeColor(record.bizType)">
-            {{ getBizTypeText(record.bizType) }}
-          </a-tag>
+          <a-tag v-bind="getBizTypeInfo(String(record.bizType), t)" />
         </template>
 
         <!-- 角色名称列 -->
@@ -144,8 +118,15 @@ import { accountBillApi } from '@/api/business/account-bill/account-bill-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { onMounted, ref } from 'vue'
+import { getProfitInfoTypeOptions, getBizTypeOptions, getAccountTypeOptions, getBizTypeInfo } from '@/constants/common-const'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Detail from './detail.vue'
+
+const { t } = useI18n()
+const profitInfoTypeOptions = getProfitInfoTypeOptions(t)
+const bizTypeOptions = computed(() => getBizTypeOptions(t))
+const accountTypeOptions = computed(() => getAccountTypeOptions(t))
 
 // 权限检查
 const { hasPermission } = usePermission()
@@ -156,25 +137,19 @@ const { hasPermission } = usePermission()
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchFunc,
+  searchLoading,
   detailOpen,
   currentRecordId,
-  reloadTable,
   openDetail
-} = useCrudTablePage()
-
-/**
- * 加载状态
- */
-const loading = ref(true)
-
-/**
- * 默认查询参数
- */
-const defaultSearchData = {
-  queryDateRange: 'today',
-  infoType: 'PLATFORM',
-  accountType: 1
-}
+} = useCrudTablePage({
+  searchDefaults: {
+    queryDateRange: 'today',
+    infoType: 'PLATFORM',
+    accountType: 1
+  }
+})
 
 /**
  * 表格列配置
@@ -190,36 +165,6 @@ const tableColumns = [
   { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
-
-/**
- * 获取业务类型文本
- * @param {number} bizType - 业务类型
- * @returns {string} 类型文本
- */
-const getBizTypeText = (bizType) => {
-  const map = {
-    1: '平台佣金收入',
-    2: '提现支出',
-    3: '佣金支出',
-    4: '充值收入'
-  }
-  return map[bizType] || ''
-}
-
-/**
- * 获取业务类型颜色
- * @param {number} bizType - 业务类型
- * @returns {string} 颜色值
- */
-const getBizTypeColor = (bizType) => {
-  const map = {
-    1: 'green',
-    2: 'red',
-    3: 'orange',
-    4: 'cyan'
-  }
-  return map[bizType] || 'default'
-}
 
 /**
  * 获取角色名称文本
@@ -243,17 +188,9 @@ const getInfoNameText = (record) => {
 }
 
 /**
- * 搜索触发
- */
-const searchFunc = () => {
-  loading.value = true
-  reloadTable()
-}
-
-/**
  * 请求表格数据函数
  * @param {Object} params - 查询参数
- * @returns {Promise<Object>} 表格数据
+ * @returns {Promise} - 查询结果
  */
 const loadDataFunc = async (params) => {
   return await accountBillApi.queryPage(params)
@@ -266,11 +203,4 @@ const loadDataFunc = async (params) => {
 const detailFunc = (recordId) => {
   openDetail(recordId)
 }
-
-/**
- * 组件挂载时
- */
-onMounted(() => {
-  Object.assign(searchData, defaultSearchData)
-})
 </script>

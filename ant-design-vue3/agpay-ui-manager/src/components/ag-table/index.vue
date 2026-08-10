@@ -847,10 +847,15 @@ defineExpose({
   getSelectedRows: () => state.selectedRows,
   clearSelection: handleClearSelection,
   toggleRowSelection: (key, selected) => {
+    const isRadio = props.rowSelection?.type === 'radio'
     const index = state.selectedRowKeys.indexOf(key)
-    if (selected && index === -1) {
-      state.selectedRowKeys.push(key)
-    } else if (!selected && index > -1) {
+    if (selected) {
+      if (isRadio) {
+        state.selectedRowKeys = [key]
+      } else if (index === -1) {
+        state.selectedRowKeys.push(key)
+      }
+    } else if (index > -1) {
       state.selectedRowKeys.splice(index, 1)
     }
   },

@@ -4,9 +4,11 @@
       <!-- 搜索区域 -->
       <ag-search
         v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
         :collapsible="false"
         :default-collapsed="true"
-        :search-loading="tableRef?.isLoading?.value || false"
+        :search-loading="searchLoading"
         @search="searchFunc"
         @reset="searchFunc"
       >
@@ -39,10 +41,7 @@
                 label="商户类型"
                 placeholder="请选择商户类型"
                 allow-clear
-                :options="[
-                  { value: '1', label: '普通商户' },
-                  { value: '2', label: '特约商户' }
-                ]"
+                :options="mchTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -77,17 +76,26 @@
         </template>
 
         <template #typeSlot="{ record }">
-          <a-tag :color="record.type === 1 ? 'green' : 'orange'">
-            {{ record.type === 1 ? '普通商户' : '特约商户' }}
-          </a-tag>
+          <a-tag v-bind="getMchTypeInfo(record.type, t)" />
         </template>
 
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button type="link" @click="editFunc(record.mchNo)" v-if="hasPermission('ENT_MCH_INFO_EDIT')">修改</a-button>
-            <a-button type="link" @click="appConfigFunc(record.mchNo)" v-if="hasPermission('ENT_MCH_APP_CONFIG')">应用配置</a-button>
-            <a-button type="link" @click="advancedConfigFunc(record.mchNo)" v-if="hasPermission('ENT_MCH_ADVANCED_CONFIG')">高级功能</a-button>
-            <a-button type="link" @click="delFunc(record.mchNo)" danger v-if="hasPermission('ENT_MCH_INFO_DEL')">删除</a-button>
+            <a-button v-if="hasPermission('ENT_MCH_INFO_EDIT')" type="link" @click="editFunc(record.mchNo)"
+              >修改</a-button
+            >
+            <a-button v-if="hasPermission('ENT_MCH_APP_CONFIG')" type="link" @click="appConfigFunc(record.mchNo)"
+              >应用配置</a-button
+            >
+            <a-button
+              v-if="hasPermission('ENT_MCH_ADVANCED_CONFIG')"
+              type="link"
+              @click="advancedConfigFunc(record.mchNo)"
+              >高级功能</a-button
+            >
+            <a-button v-if="hasPermission('ENT_MCH_INFO_DEL')" type="link" danger @click="delFunc(record.mchNo)"
+              >删除</a-button
+            >
           </ag-table-actions>
         </template>
       </ag-table>
@@ -114,7 +122,7 @@ import { mchApi } from '@/api/business/mch/mch-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { getStateInfo, getStateOptions } from '@/constants/common-const'
+import { getStateInfo, getStateOptions, getMchTypeOptions, getMchTypeInfo } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -127,6 +135,7 @@ const { t } = useI18n()
 
 // 获取翻译后的下拉选项
 const stateOptions = computed(() => getStateOptions(t))
+const mchTypeOptions = computed(() => getMchTypeOptions(t))
 
 // 路由实例
 const router = useRouter()
@@ -160,6 +169,9 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchFunc,
+  searchLoading,
   modalOpen,
   detailOpen,
   currentRecordId,
@@ -170,6 +182,12 @@ const {
   closeModal,
   confirmDelete
 } = useCrudTablePage({
+  searchDefaults: {
+    mchNo: '',
+    mchName: '',
+    state: undefined,
+    type: undefined
+  },
   deleteAction: (recordId) => mchApi.delById(recordId),
   deleteConfirmTitle: '确认删除该商户吗？',
   deleteConfirmContent: '该操作将删除商户下所有配置及用户信息',
@@ -190,11 +208,6 @@ const loadDataFunc = async (params) => {
   }
   return await mchApi.queryPage(params)
 }
-
-/**
- * 搜索回调函数
- */
-const searchFunc = () => reloadTable()
 
 /**
  * 打开新增弹窗

@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Common.Models;
+using AGooday.AgPay.Common.Models;
 
 namespace AGooday.AgPay.Application.DataTransfer
 {
@@ -21,5 +21,15 @@ namespace AGooday.AgPay.Application.DataTransfer
         /// 支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他
         /// </summary>
         public string WayType { get; set; }
+
+        /// <summary>
+        /// 通道状态 0-停用 1-启用（内存过滤，可选）
+        /// </summary>
+        public byte? PassageState { get; set; }
+
+        /// <summary>
+        /// 配置状态 0-未配置 1-已配置（内存过滤，可选）
+        /// </summary>
+        public byte? IsConfig { get; set; }
     }
 }

@@ -4,8 +4,10 @@
       <!-- 搜索表单 -->
       <ag-search
         v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
         :collapsible="true"
-        :search-loading="tableRef?.isLoading?.value || false"
+        :search-loading="searchLoading"
         @search="searchFunc"
         @reset="searchFunc"
       >
@@ -14,7 +16,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model="searchData.dateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 placeholder="请选择创建时间"
                 allow-clear
@@ -25,20 +27,12 @@
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchData.payOrderId"
-                label="支付订单号"
-                placeholder="请输入订单号"
-              />
+              <ag-input v-model="searchData.payOrderId" label="支付订单号" placeholder="请输入订单号" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchData.mchOrderNo"
-                label="商户订单号"
-                placeholder="请输入商户订单号"
-              />
+              <ag-input v-model="searchData.mchOrderNo" label="商户订单号" placeholder="请输入商户订单号" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -48,16 +42,29 @@
                 label="支付状态"
                 placeholder="请选择状态"
                 allow-clear
-                :options="[
-                  { value: '0', label: '订单生成' },
-                  { value: '1', label: '支付中' },
-                  { value: '2', label: '支付成功' },
-                  { value: '3', label: '支付失败' },
-                  { value: '4', label: '已撤销' },
-                  { value: '5', label: '已退款' },
-                  { value: '6', label: '订单关闭' }
-                ]"
+                :options="payStateOptions"
               />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="colSpan">
+            <a-form-item label="">
+              <ag-select v-model="searchData.ifCode" label="支付接口" placeholder="请选择接口" allow-clear show-search>
+                <a-select-option v-for="c in channelList" :key="c.ifCode" :value="c.ifCode">
+                  <span class="channel-option">
+                    <span class="channel-option-icon" :style="c.bgColor ? { backgroundColor: c.bgColor + '20' } : {}">
+                      <img v-if="c.icon" :src="c.icon" :alt="c.ifName" />
+                      <span v-else class="fallback-letter">{{ (c.ifName || c.ifCode || '?').slice(0, 2) }}</span>
+                    </span>
+                    <span>{{ c.ifName || c.ifCode }}</span>
+                  </span>
+                </a-select-option>
+                <!-- <a-select-option v-for="c in channelList" :key="c.ifCode" :value="c.ifCode">
+                  <a-space>
+                    <a-avatar shape="square" size="small" :src="c.icon" :style="{ backgroundColor: c.bgColor }"/>
+                    <span>{{ c.ifName }}[{{ c.ifCode }}]</span>                    
+                  </a-space>
+                </a-select-option> -->
+              </ag-select>
             </a-form-item>
           </a-col>
         </template>
@@ -71,29 +78,18 @@
                 label="回调状态"
                 placeholder="请选择状态"
                 allow-clear
-                :options="[
-                  { value: '0', label: '未发送' },
-                  { value: '1', label: '已发送' }
-                ]"
+                :options="notifyStateOptions"
               />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchData.appId"
-                label="应用ID"
-                placeholder="请输入应用ID"
-              />
+              <ag-input v-model="searchData.appId" label="应用ID" placeholder="请输入应用ID" />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchData.storeId"
-                label="门店ID"
-                placeholder="请输入门店ID"
-              />
+              <ag-input v-model="searchData.storeId" label="门店ID" placeholder="请输入门店ID" />
             </a-form-item>
           </a-col>
         </template>
@@ -128,7 +124,9 @@
                     </a-tooltip>
                   </div>
                   <div class="amount">
-                    <span class="amount-num">{{ ((statistics?.payAmount || 0) - (statistics?.mchFeeAmount || 0)).toFixed(2) }}</span>
+                    <span class="amount-num">{{
+                      ((statistics?.payAmount || 0) - (statistics?.mchFeeAmount || 0)).toFixed(2)
+                    }}</span>
                     <span class="amount-unit">元</span>
                   </div>
                 </div>
@@ -179,7 +177,7 @@
             </div>
           </div>
 
-          <a-modal :open="detailVisible" :footer="null" @cancel="detailVisible = false" width="560px">
+          <a-modal :open="detailVisible" :footer="null" width="560px" @cancel="detailVisible = false">
             <div class="modal-title">成交订单详细</div>
             <div class="modal-describe">创建订单金额/笔数 = 成交订单金额/笔数 + 未付款订单金额/笔数</div>
             <div class="detail-statistics">
@@ -264,11 +262,13 @@
                 </a-button>
               </a-tooltip>
             </div>
-            <div class="order-no-item" v-if="record.mchOrderNo">
+            <div v-if="record.mchOrderNo" class="order-no-item">
               <a-tag color="green" class="order-tag">商户</a-tag>
               <a-tooltip placement="bottom">
                 <template #title>{{ record.mchOrderNo }}</template>
-                <span class="order-no-text">{{ changeStr2ellipsis(record.mchOrderNo, record.payOrderId?.length) }}</span>
+                <span class="order-no-text">{{
+                  changeStr2ellipsis(record.mchOrderNo, record.payOrderId?.length)
+                }}</span>
               </a-tooltip>
               <a-tooltip placement="bottom" title="复制">
                 <a-button type="link" size="small" class="copy-btn" @click="copyOrderNo(record.mchOrderNo)">
@@ -276,11 +276,13 @@
                 </a-button>
               </a-tooltip>
             </div>
-            <div class="order-no-item" v-if="record.channelOrderNo">
+            <div v-if="record.channelOrderNo" class="order-no-item">
               <a-tag color="orange" class="order-tag">渠道</a-tag>
               <a-tooltip placement="bottom">
                 <template #title>{{ record.channelOrderNo }}</template>
-                <span class="order-no-text">{{ changeStr2ellipsis(record.channelOrderNo, record.payOrderId?.length) }}</span>
+                <span class="order-no-text">{{
+                  changeStr2ellipsis(record.channelOrderNo, record.payOrderId?.length)
+                }}</span>
               </a-tooltip>
               <a-tooltip placement="bottom" title="复制">
                 <a-button type="link" size="small" class="copy-btn" @click="copyOrderNo(record.channelOrderNo)">
@@ -295,57 +297,52 @@
           <b>￥{{ (record.amount / 100).toFixed(2) }}</b>
         </template>
 
-        <template #refundAmountSlot="{ record }">
-          ￥{{ (record.refundAmount / 100).toFixed(2) }}
-        </template>
+        <template #refundAmountSlot="{ record }"> ￥{{ (record.refundAmount / 100).toFixed(2) }} </template>
 
-        <template #mchFeeAmountSlot="{ record }">
-          ￥{{ (record.mchFeeAmount / 100).toFixed(2) }}
-        </template>
+        <template #mchFeeAmountSlot="{ record }"> ￥{{ (record.mchFeeAmount / 100).toFixed(2) }} </template>
 
-        <template #mchOrderFeeAmountSlot="{ record }">
-          ￥{{ (record.mchOrderFeeAmount / 100).toFixed(2) }}
-        </template>
+        <template #mchOrderFeeAmountSlot="{ record }"> ￥{{ (record.mchOrderFeeAmount / 100).toFixed(2) }} </template>
 
         <template #ifCodeSlot="{ record }">
           <a-tooltip placement="bottom">
             <template #title>
-              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }"/>
+              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }" />
               {{ record.ifName }}[{{ record.ifCode }}]
             </template>
             <span v-if="record.ifCode">
-              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }"/>
+              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }" />
               {{ record.ifName }}[{{ record.ifCode }}]
             </span>
           </a-tooltip>
         </template>
 
         <template #stateSlot="{ record }">
-          <a-tag :color="getStateColor(record.state)">
-            {{ getStateText(record.state) }}
+          <a-tag :color="getPayStateInfo(record.state, t).status">
+            {{ getPayStateInfo(record.state, t).text }}
           </a-tag>
         </template>
 
         <template #notifyStateSlot="{ record }">
-          <a-badge :status="record.notifyState === 1 ? 'processing' : 'error'" :text="record.notifyState === 1 ? '已发送' : '未发送'" />
+          <a-badge
+            :status="getNotifyStateInfo(record.notifyState, t).status"
+            :text="getNotifyStateInfo(record.notifyState, t).text"
+          />
         </template>
 
         <template #divisionStateSlot="{ record }">
           <span v-if="record.divisionState == 0"> - </span>
-          <a-tag color="orange" v-else-if="record.divisionState == 1">待分账</a-tag>
-          <a-tag color="red" v-else-if="record.divisionState == 2">分账处理中</a-tag>
-          <a-tag color="green" v-else-if="record.divisionState == 3">任务已结束</a-tag>
+          <a-tag v-else-if="record.divisionState == 1" color="orange">待分账</a-tag>
+          <a-tag v-else-if="record.divisionState == 2" color="red">分账处理中</a-tag>
+          <a-tag v-else-if="record.divisionState == 3" color="green">任务已结束</a-tag>
           <span v-else>未知</span>
         </template>
 
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" @click="handleDetail(record)">详情</a-button>
-            <a-button
-              type="link"
-              style="color: red"
-              @click="handleRefund(record)"
-            >退款</a-button>
+            <a-button v-if="hasPermission('ENT_PAY_ORDER_VIEW')" type="link" @click="handleDetail(record)"
+              >详情</a-button
+            >
+            <a-button type="link" style="color: red" @click="handleRefund(record)">退款</a-button>
           </ag-table-actions>
         </template>
       </ag-table>
@@ -366,6 +363,7 @@
  */
 
 import { orderApi } from '@/api/business/order/order-api'
+import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { useModal, usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
@@ -378,8 +376,14 @@ import {
   WalletOutlined
 } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import {
+  getNotifyStateInfo,
+  getNotifyStateOptions,
+  getPayStateInfo,
+  getPayStateOptions
+} from '@/constants/common-const'
 import DetailDrawer from './detail-drawer.vue'
 import RefundModal from './refund-modal.vue'
 
@@ -393,23 +397,32 @@ const { hasPermission } = usePermission()
  * 使用 CRUD 表格页面组合式函数
  */
 const {
+  searchFunc: _baseSearch,
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   detailOpen,
   currentRecordId,
   reloadTable,
   openDetail
-} = useCrudTablePage()
+} = useCrudTablePage({
+  searchDefaults: {
+    queryDateRange: '',
+    payOrderId: '',
+    mchOrderNo: '',
+    state: undefined,
+    ifCode: undefined,
+    notifyState: undefined,
+    appId: '',
+    storeId: ''
+  }
+})
 
-// 初始化搜索表单默认值
-searchData.dateRange = ''
-searchData.payOrderId = ''
-searchData.mchOrderNo = ''
-searchData.channelOrderNo = ''
-searchData.state = ''
-searchData.notifyState = ''
-searchData.appId = ''
-searchData.storeId = ''
+const channelList = ref([])
+
+const payStateOptions = computed(() => getPayStateOptions(t))
+const notifyStateOptions = computed(() => getNotifyStateOptions(t))
 
 // 退款弹窗控制
 const { open: refundOpen, showModal: showRefund } = useModal()
@@ -421,78 +434,25 @@ const currentPayOrder = ref(null)
 const detailVisible = ref(false)
 
 /**
- * 构建请求参数
- * @param {Object} searchData - 搜索表单数据
- * @returns {Object} 请求参数
- */
-const buildRequestParams = (searchData) => {
-  const requestParams = {}
-
-  // 处理日期范围
-  if (searchData.dateRange && searchData.dateRange.length === 2) {
-    requestParams.createdStart = searchData.dateRange[0]
-    requestParams.createdEnd = searchData.dateRange[1]
-  }
-  
-  // 处理订单号
-  if (searchData.payOrderId) {
-    requestParams.payOrderId = searchData.payOrderId
-  }
-  if (searchData.mchOrderNo) {
-    requestParams.mchOrderNo = searchData.mchOrderNo
-  }
-  if (searchData.channelOrderNo) {
-    requestParams.channelOrderNo = searchData.channelOrderNo
-  }
-  
-  // 处理数字类型字段
-  if (searchData.state) {
-    requestParams.state = parseInt(searchData.state)
-  }
-  if (searchData.notifyState) {
-    requestParams.notifyState = parseInt(searchData.notifyState)
-  }
-  
-  // 处理其他字段
-  if (searchData.appId) {
-    requestParams.appId = searchData.appId
-  }
-  if (searchData.storeId) {
-    requestParams.storeId = searchData.storeId
-  }
-
-  return requestParams
-}
-
-/**
  * 请求表格数据函数
- * @param {Object} params - 查询参数
- * @returns {Promise<Object>} 表格数据
+ * @param {Object} params - 查询参数（ag-table 自动 merge 了 searchData）
  */
 const loadData = async (params) => {
-  const requestParams = {
-    pageNumber: params.pageNumber,
-    pageSize: params.pageSize,
-    ...buildRequestParams(searchData)
-  }
-  return await orderApi.queryPayOrderPage(requestParams)
+  return await orderApi.queryPayOrderPage(params)
 }
 
 /**
  * 请求统计数据函数
- * @param {Object} params - 查询参数
- * @returns {Promise<Object>} 统计数据
  */
-const loadStatistics = async (params) => {  
-  const requestParams = buildRequestParams(searchData)
-  return await orderApi.queryPayOrderCount(requestParams)
+const loadStatistics = async (params) => {
+  return await orderApi.queryPayOrderCount(params)
 }
 
 /**
  * 搜索回调函数（同时刷新表格和统计）
  */
 function searchFunc() {
-  reloadTable()
+  _baseSearch()
   tableRef.value?.reloadStatistics()
 }
 
@@ -502,42 +462,6 @@ function searchFunc() {
 function refresh() {
   reloadTable()
   tableRef.value?.reloadStatistics()
-}
-
-/**
- * 获取支付状态颜色
- * @param {number} state - 支付状态值
- * @returns {string} 状态颜色
- */
-const getStateColor = (state) => {
-  const colorMap = {
-    0: 'default',
-    1: 'processing',
-    2: 'success',
-    3: 'error',
-    4: 'warning',
-    5: 'orange',
-    6: 'default'
-  }
-  return colorMap[state] || 'default'
-}
-
-/**
- * 获取支付状态文本
- * @param {number} state - 支付状态值
- * @returns {string} 状态文本
- */
-const getStateText = (state) => {
-  const textMap = {
-    0: '订单生成',
-    1: '支付中',
-    2: '支付成功',
-    3: '支付失败',
-    4: '已撤销',
-    5: '已退款',
-    6: '订单关闭'
-  }
-  return textMap[state] || '未知'
 }
 
 /**
@@ -603,6 +527,15 @@ const copyOrderNo = async (orderNo) => {
   }
 }
 
+onMounted(async () => {
+  try {
+    const res = await payConfigApi.queryIfDefineList({ state: 1, pageNumber: 1, pageSize: 200 })
+    channelList.value = res?.items || res || []
+  } catch {
+    channelList.value = []
+  }
+})
+
 /**
  * 表格列配置
  */
@@ -610,14 +543,34 @@ const tableColumns = [
   { key: 'orderNo', title: '订单号', width: 235, fixed: 'left', customRender: 'orderSlot' },
   { key: 'amount', dataIndex: 'amount', title: '支付金额', width: 108, ellipsis: true, customRender: 'amountSlot' },
   { key: 'refundAmount', dataIndex: 'refundAmount', title: '退款金额', width: 108, customRender: 'refundAmountSlot' },
-  { key: 'mchFeeAmount', dataIndex: 'mchFeeAmount', title: '实际手续费', width: 110, align: 'right', customRender: 'mchFeeAmountSlot' },
-  { key: 'mchOrderFeeAmount', dataIndex: 'mchOrderFeeAmount', title: '收单手续费', width: 110, align: 'right', customRender: 'mchOrderFeeAmountSlot' },
+  {
+    key: 'mchFeeAmount',
+    dataIndex: 'mchFeeAmount',
+    title: '实际手续费',
+    width: 110,
+    align: 'right',
+    customRender: 'mchFeeAmountSlot'
+  },
+  {
+    key: 'mchOrderFeeAmount',
+    dataIndex: 'mchOrderFeeAmount',
+    title: '收单手续费',
+    width: 110,
+    align: 'right',
+    customRender: 'mchOrderFeeAmountSlot'
+  },
   { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140, ellipsis: true },
   { key: 'ifCode', title: '支付接口', width: 180, ellipsis: true, customRender: 'ifCodeSlot' },
   { key: 'wayName', dataIndex: 'wayName', title: '支付方式', width: 120 },
   { key: 'state', dataIndex: 'state', title: '支付状态', width: 100, customRender: 'stateSlot' },
   { key: 'notifyState', dataIndex: 'notifyState', title: '回调状态', width: 100, customRender: 'notifyStateSlot' },
-  { key: 'divisionState', dataIndex: 'divisionState', title: '分账状态', width: 100, customRender: 'divisionStateSlot' },
+  {
+    key: 'divisionState',
+    dataIndex: 'divisionState',
+    title: '分账状态',
+    width: 100,
+    customRender: 'divisionStateSlot'
+  },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
@@ -909,5 +862,31 @@ const tableColumns = [
   :deep(.order-list .icon-style) {
     border-color: var(--border-color);
   }
+}
+
+.channel-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.channel-option-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+  flex-shrink: 0;
+}
+.channel-option-icon img {
+  max-width: 14px;
+  max-height: 14px;
+  object-fit: contain;
+}
+.channel-option-icon .fallback-letter {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-color-secondary);
 }
 </style>

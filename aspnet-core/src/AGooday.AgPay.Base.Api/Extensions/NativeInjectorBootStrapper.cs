@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.Interfaces;
+using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Application.Services;
 using AGooday.AgPay.Domain.CommandHandlers;
 using AGooday.AgPay.Domain.Commands.AgentInfos;
@@ -44,6 +44,7 @@ namespace AGooday.AgPay.Base.Api.Extensions
             services.AddScoped<IAccountBillService, AccountBillService>();
             services.AddScoped<IAgentInfoService, AgentInfoService>();
             services.AddScoped<IIsvInfoService, IsvInfoService>();
+            services.AddScoped<IMchApplyService, MchApplyService>();
             services.AddScoped<IMchAppService, MchAppService>();
             services.AddScoped<IMchStoreService, MchStoreService>();
             services.AddScoped<IMchDivisionReceiverGroupService, MchDivisionReceiverGroupService>();
@@ -113,6 +114,7 @@ namespace AGooday.AgPay.Base.Api.Extensions
             services.AddScoped<IAccountBillRepository, AccountBillRepository>();
             services.AddScoped<IAgentInfoRepository, AgentInfoRepository>();
             services.AddScoped<IIsvInfoRepository, IsvInfoRepository>();
+            services.AddScoped<IMchApplyRepository, MchApplyRepository>();
             services.AddScoped<IMchAppRepository, MchAppRepository>();
             services.AddScoped<IMchStoreRepository, MchStoreRepository>();
             services.AddScoped<IMchDivisionReceiverGroupRepository, MchDivisionReceiverGroupRepository>();

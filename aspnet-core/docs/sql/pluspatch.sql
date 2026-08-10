@@ -129,3 +129,46 @@ MODIFY COLUMN `bind_state` TINYINT(6) NOT NULL COMMENT '绑定状态: 0-未绑�
 MODIFY COLUMN `bind_type` TINYINT(6) NOT NULL COMMENT '绑定类型: 0-门店, 1-码牌' AFTER `bind_state`,
 MODIFY COLUMN `store_id` BIGINT(20) NOT NULL COMMENT '门店ID' AFTER `app_id`,
 MODIFY COLUMN `bind_qrc_id` BIGINT(20) NOT NULL COMMENT '绑定码牌ID' AFTER `store_id`;
+
+#####    商户进件表结构升级    #####
+
+-- 1. 修改字段类型和约束
+ALTER TABLE `t_mch_apply`
+  MODIFY COLUMN `apply_detail_info` TEXT COMMENT '申请详细信息(JSON)',
+  MODIFY COLUMN `apply_error_info` TEXT COMMENT '申请错误信息',
+  MODIFY COLUMN `succ_res_parameter` TEXT COMMENT '成功响应参数',
+  MODIFY COLUMN `agent_no` VARCHAR(64) DEFAULT '' COMMENT '代理商号',
+  MODIFY COLUMN `auto_config_mch_app_id` VARCHAR(64) DEFAULT NULL COMMENT '自动配置到应用ID',
+  MODIFY COLUMN `channel_apply_no` VARCHAR(64) DEFAULT NULL COMMENT '渠道申请单号',
+  MODIFY COLUMN `mch_no` VARCHAR(64) DEFAULT NULL COMMENT '商户号';
+
+-- 2. 新增进件参数 JSON 字段
+ALTER TABLE `t_mch_apply`
+  ADD COLUMN `apply_params` JSON DEFAULT NULL COMMENT '进件参数详情(各通道差异化参数)' AFTER `apply_detail_info`,
+  ADD COLUMN `channel_ext_params` JSON DEFAULT NULL COMMENT '渠道扩展参数(替代原 channel_var1/2)' AFTER `succ_res_parameter`,
+  ADD COLUMN `channel_mch_id` VARCHAR(64) DEFAULT NULL COMMENT '渠道返回的商户标识(如微信sub_mch_id、支付宝smid)' AFTER `channel_apply_no`;
+
+-- 3. 新增审核相关字段
+ALTER TABLE `t_mch_apply`
+  ADD COLUMN `audit_uid` BIGINT(20) DEFAULT NULL COMMENT '审核人用户ID' AFTER `state`,
+  ADD COLUMN `audit_by` VARCHAR(64) DEFAULT NULL COMMENT '审核人姓名' AFTER `audit_uid`,
+  ADD COLUMN `audit_remark` VARCHAR(512) DEFAULT NULL COMMENT '审核意见' AFTER `audit_by`,
+  ADD COLUMN `audited_at` TIMESTAMP(6) DEFAULT NULL COMMENT '审核时间' AFTER `audit_remark`;
+
+-- 4. 新增签约/验证相关字段
+ALTER TABLE `t_mch_apply`
+  ADD COLUMN `sign_url` VARCHAR(512) DEFAULT NULL COMMENT '签约链接' AFTER `audited_at`,
+  ADD COLUMN `sign_expire_at` TIMESTAMP(6) DEFAULT NULL COMMENT '签约链接过期时间' AFTER `sign_url`,
+  ADD COLUMN `verify_amount` BIGINT(20) DEFAULT NULL COMMENT '小额打款金额(分)' AFTER `sign_expire_at`,
+  ADD COLUMN `verify_code` VARCHAR(32) DEFAULT NULL COMMENT '验证金额/验证码' AFTER `verify_amount`,
+  ADD COLUMN `verified_at` TIMESTAMP(6) DEFAULT NULL COMMENT '验证时间' AFTER `verify_code`;
+
+-- 5. 新增进度字段
+ALTER TABLE `t_mch_apply`
+  ADD COLUMN `progress` TINYINT(6) NOT NULL DEFAULT '0' COMMENT '进件进度百分比: 0-100' AFTER `verified_at`;
+
+-- 6. 新增索引
+ALTER TABLE `t_mch_apply`
+  ADD INDEX `idx_mch_no` (`mch_no`),
+  ADD INDEX `idx_if_code_state` (`if_code`, `state`),
+  ADD INDEX `idx_created_at` (`created_at`);

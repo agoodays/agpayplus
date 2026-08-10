@@ -8,7 +8,7 @@
   >
     <a-spin :spinning="loading">
       <!-- 基本信息 -->
-      <a-descriptions :column="2" :bordered="false">
+      <a-descriptions :column="2">
         <a-descriptions-item label="代理商号">{{ detailData.agentNo }}</a-descriptions-item>
         <a-descriptions-item label="代理商名称">{{ detailData.agentName }}</a-descriptions-item>
         <a-descriptions-item label="登录名">{{ detailData.loginUsername }}</a-descriptions-item>
@@ -143,16 +143,15 @@
  */
 import { agentApi } from '@/api/business/agent/agent-api'
 import { AgDrawer, AgUpload } from '@/components'
+import {
+  SETT_ACCOUNT_TYPE_ENUM,
+  getAgentTypeInfo,
+  getFlagInfo,
+  getSettAccountTypeInfo,
+  getStateInfo
+} from '@/constants/common-const'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
-import { 
-  AGENT_TYPE_ENUM,
-  SETT_ACCOUNT_TYPE_ENUM,
-  getFlagInfo,
-  getStateInfo,
-  getAgentTypeInfo,
-  getSettAccountTypeInfo
-} from '@/constants/common-const'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

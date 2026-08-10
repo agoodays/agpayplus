@@ -1,7 +1,14 @@
 <template>
   <div>
     <a-card :bordered="false">
-      <ag-search v-model="searchData" :search-loading="computedLoading" @search="searchFunc" @reset="searchFunc">
+      <ag-search
+        v-model="searchData"
+        :search-loading="computedLoading"
+        reset-mode="default"
+        :default-model-value="defaultSearchData"
+        @search="searchFunc"
+        @reset="searchFunc"
+      >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -12,16 +19,10 @@
         <template #extra>
           <a-space>
             <a-button-group>
-              <a-button
-                :type="viewMode === 'card' ? 'primary' : 'default'"
-                @click="switchViewMode('card')"
-              >
+              <a-button :type="viewMode === 'card' ? 'primary' : 'default'" @click="switchViewMode('card')">
                 <appstore-outlined /> 卡片
               </a-button>
-              <a-button
-                :type="viewMode === 'list' ? 'primary' : 'default'"
-                @click="switchViewMode('list')"
-              >
+              <a-button :type="viewMode === 'list' ? 'primary' : 'default'" @click="switchViewMode('list')">
                 <bars-outlined /> 列表
               </a-button>
             </a-button-group>
@@ -55,9 +56,22 @@
 
           <template #opSlot="{ record }">
             <ag-table-actions>
-              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_VIEW')" type="link" @click="handlePreview(record.shellImgViewUrl)">预览</a-button>
-              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_EDIT')" type="link" @click="openEdit(record.id)">修改</a-button>
-              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_DEL')" type="link" danger @click="confirmDelete(record.id)">删除</a-button>
+              <a-button
+                v-if="hasPermission('ENT_DEVICE_QRC_SHELL_VIEW')"
+                type="link"
+                @click="handlePreview(record.shellImgViewUrl)"
+                >预览</a-button
+              >
+              <a-button v-if="hasPermission('ENT_DEVICE_QRC_SHELL_EDIT')" type="link" @click="openEdit(record.id)"
+                >修改</a-button
+              >
+              <a-button
+                v-if="hasPermission('ENT_DEVICE_QRC_SHELL_DEL')"
+                type="link"
+                danger
+                @click="confirmDelete(record.id)"
+                >删除</a-button
+              >
             </ag-table-actions>
           </template>
         </ag-table>
@@ -141,23 +155,19 @@ const { hasPermission } = usePermission()
  * 复用 tableRef/searchData/modalOpen/currentRecordId/confirmDelete 等
  * 注：删除后需根据当前视图刷新（list/card），通过 onDeleted 回调处理。
  */
-const {
-  tableRef,
-  searchData,
-  modalOpen,
-  currentRecordId,
-  openCreate,
-  openEdit,
-  confirmDelete
-} = useCrudTablePage({
-  deleteAction: async (recordId) => {
-    await qrcShellApi.delById(recordId)
-    message.success('删除成功')
-  },
-  deleteConfirmTitle: '确认删除？',
-  deleteSuccessMessage: '删除成功',
-  onDeleted: () => refreshList()
-})
+const { tableRef, searchData, defaultSearchData, modalOpen, currentRecordId, openCreate, openEdit, confirmDelete } =
+  useCrudTablePage({
+    searchDefaults: {
+      shellAlias: ''
+    },
+    deleteAction: async (recordId) => {
+      await qrcShellApi.delById(recordId)
+      message.success('删除成功')
+    },
+    deleteConfirmTitle: '确认删除？',
+    deleteSuccessMessage: '删除成功',
+    onDeleted: () => refreshList()
+  })
 
 /** AgCard 组件引用（卡片视图专用） */
 const cardRef = ref(null)

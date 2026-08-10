@@ -12,7 +12,7 @@
       @focus="onFocus"
       @blur="onBlur"
     >
-      <a-select-option v-for="option in options" :key="option.value" :value="option.value">
+      <a-select-option v-for="option in resolvedOptions" :key="option.value" :value="option.value">
         {{ option.label }}
       </a-select-option>
     </a-select>
@@ -50,7 +50,7 @@
         <template v-if="actualShowQuickSelect" #renderExtraFooter>
           <a-button type="link" size="small" @click="handleBackToSelect">
             <left-circle-outlined />
-            返回日期下拉框
+            {{ t('components.dateRange.backToSelect') }}
           </a-button>
         </template>
       </a-range-picker>
@@ -72,10 +72,13 @@ import dayjs from 'dayjs'
 import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
 import { computed, nextTick, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // 启用 dayjs 插件
 dayjs.extend(weekOfYear)
 dayjs.extend(quarterOfYear)
+
+const { t } = useI18n()
 
 /**
  * AgDateRangePicker - 高级日期范围选择器
@@ -143,9 +146,13 @@ const props = defineProps({
    *    - 'custom_YYYY-MM-DD_YYYY-MM-DD' 自定义日期范围
    * 2. 数组格式：['YYYY-MM-DD', 'YYYY-MM-DD'] 或 ['YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD HH:mm:ss']
    */
+  modelValue: {
+    type: [String, Array],
+    default: undefined
+  },
   value: {
     type: [String, Array],
-    default: ''
+    default: undefined
   },
 
   /**
@@ -275,21 +282,21 @@ const props = defineProps({
     type: Array,
     default: () => [
       // { label: '全部时间', value: '' },
-      { label: '今天', value: 'today' },
-      { label: '昨天', value: 'yesterday' },
-      { label: '近7天', value: 'near7' },
-      { label: '近30天', value: 'near30' },
-      { label: '本周', value: 'thisWeek' },
-      { label: '本月', value: 'thisMonth' },
-      { label: '本年', value: 'thisYear' },
-      { label: '本月至今', value: 'mtd' },
-      { label: '本年至今', value: 'ytd' },
-      { label: '上周', value: 'lastWeek' },
-      { label: '上月', value: 'lastMonth' },
-      { label: '上年', value: 'lastYear' },
-      { label: '上月全月', value: 'lfm' },
-      { label: '去年全年', value: 'pyFull' },
-      { label: '自定义时间', value: 'custom' }
+      { label: 'components.dateRange.today', value: 'today' },
+      { label: 'components.dateRange.yesterday', value: 'yesterday' },
+      { label: 'components.dateRange.near7', value: 'near7' },
+      { label: 'components.dateRange.near30', value: 'near30' },
+      { label: 'components.dateRange.thisWeek', value: 'thisWeek' },
+      { label: 'components.dateRange.thisMonth', value: 'thisMonth' },
+      { label: 'components.dateRange.thisYear', value: 'thisYear' },
+      { label: 'components.dateRange.mtd', value: 'mtd' },
+      { label: 'components.dateRange.ytd', value: 'ytd' },
+      { label: 'components.dateRange.lastWeek', value: 'lastWeek' },
+      { label: 'components.dateRange.lastMonth', value: 'lastMonth' },
+      { label: 'components.dateRange.lastYear', value: 'lastYear' },
+      { label: 'components.dateRange.lfm', value: 'lfm' },
+      { label: 'components.dateRange.pyFull', value: 'pyFull' },
+      { label: 'components.dateRange.custom', value: 'custom' }
     ]
   },
 
@@ -383,10 +390,7 @@ const props = defineProps({
 // ============================================================
 
 const emit = defineEmits([
-  /**
-   * 值更新事件
-   * @param {String | Array} value - 新的日期范围值
-   */
+  'update:modelValue',
   'update:value',
 
   /**
@@ -407,6 +411,19 @@ const emit = defineEmits([
    */
   'blur'
 ])
+
+/** 统一入口：modelValue 优先，value 兜底 */
+const currentValue = computed(() =>
+  props.modelValue !== undefined ? props.modelValue
+  : props.value !== undefined ? props.value
+  : ''
+)
+
+/** 同时 emit 两种事件，兼容新旧调用方 */
+function emitValue(val) {
+  emit('update:modelValue', val)
+  emit('update:value', val)
+}
 
 // ============================================================
 // 组件状态
@@ -446,7 +463,7 @@ function hasValueCheck(value) {
 
 // 使用浮动标签 composable
 const { isFocused, labelClass, handleFocus, handleBlur } = useFloatLabel(
-  { ...props, value: props.value },
+  { ...props, value: currentValue.value },
   emit,
   rangePickerRef,
   hasValueCheck,
@@ -477,6 +494,13 @@ const actualShowQuickSelect = computed(() => {
   return props.showQuickSelect
 })
 
+const resolvedOptions = computed(() => {
+  return props.options.map(opt => ({
+    ...opt,
+    label: opt.label?.startsWith('components.') ? t(opt.label) : opt.label
+  }))
+})
+
 /**
  * 自动识别返回值类型
  * @returns {'string' | 'array'}
@@ -490,7 +514,7 @@ const autoValueType = computed(() => {
     return props.valueType
   }
 
-  if (Array.isArray(props.value)) {
+  if (Array.isArray(currentValue.value)) {
     return 'array'
   }
 
@@ -567,7 +591,7 @@ const dateRangeTip = computed(() => {
   const [start, end] = dateRange.value
   const startStr = start.format(props.outputFormat)
   const endStr = end.format(props.outputFormat)
-  return `范围：${startStr} ~ ${endStr}`
+  return t('components.dateRange.tipRange', { start: startStr, end: endStr })
 })
 
 // ============================================================
@@ -1036,7 +1060,7 @@ const handleOptionChange = (value) => {
     dateRange.value = []
     lastNonCustomOption.value = ''
     const outputValue = formatValue('', [])
-    emit('update:value', outputValue)
+    emitValue(outputValue)
     emit('change', outputValue)
     if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
       formItemContext.onFieldChange()
@@ -1053,7 +1077,7 @@ const handleOptionChange = (value) => {
     dateRange.value = getDateRangeByOption(value)
 
     const outputValue = formatValue(value, dateRange.value)
-    emit('update:value', outputValue)
+    emitValue(outputValue)
     emit('change', outputValue)
     if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
       formItemContext.onFieldChange()
@@ -1079,7 +1103,7 @@ const handleDateChange = (dates) => {
     const [adjustedStart, adjustedEnd] = adjustDateRangeByPicker(dates[0], dates[1])
 
     const outputValue = formatValue(actualShowQuickSelect.value ? 'custom' : '', [adjustedStart, adjustedEnd])
-    emit('update:value', outputValue)
+    emitValue(outputValue)
     emit('change', outputValue)
     // 如果组件在 a-form-item 内，自动触发表单验证状态更新
     // 确保 formItemContext 和 onFieldChange 方法存在
@@ -1089,7 +1113,7 @@ const handleDateChange = (dates) => {
   } else {
     dateRange.value = []
     const emptyValue = autoValueType.value === 'array' ? [] : ''
-    emit('update:value', emptyValue)
+    emitValue(emptyValue)
     emit('change', emptyValue)
     // 如果组件在 a-form-item 内，自动触发表单验证状态更新
     // 确保 formItemContext 和 onFieldChange 方法存在
@@ -1108,7 +1132,7 @@ const handleBackToSelect = () => {
   dateRange.value = getDateRangeByOption(selectedOption.value)
 
   const outputValue = formatValue(selectedOption.value, dateRange.value)
-  emit('update:value', outputValue)
+  emitValue(outputValue)
   emit('change', outputValue)
 }
 
@@ -1147,7 +1171,7 @@ function clear({ silent = false } = {}) {
 
   const emptyValue = autoValueType.value === 'array' ? [] : ''
   if (!silent) {
-    emit('update:value', emptyValue)
+    emitValue(emptyValue)
     emit('change', emptyValue)
   }
 }
@@ -1179,11 +1203,19 @@ function setValue(val, { silent = false } = {}) {
   }
 
   // 保持当前快捷选项模式（避免不必要的切换）
+  // 仅当新旧值都是快捷选项（非 custom）时走此分支，避免模式来回切换
   const shouldKeepSelectMode =
-    currentMode.value === 'select' && selectedOption.value && selectedOption.value !== 'custom'
+    currentMode.value === 'select' && option && option !== 'custom'
 
   if (shouldKeepSelectMode) {
+    selectedOption.value = option
     dateRange.value = range
+    lastNonCustomOption.value = option
+    if (!silent) {
+      const output = formatValue(option, range)
+      emitValue(output)
+      emit('change', output)
+    }
     return
   }
 
@@ -1197,7 +1229,7 @@ function setValue(val, { silent = false } = {}) {
   // 规范化并向外同步（确保父组件也能接收到统一格式）
   const output = formatValue(option, range)
   if (!silent) {
-    emit('update:value', output)
+    emitValue(output)
     emit('change', output)
   }
 }
@@ -1217,7 +1249,7 @@ defineExpose({ clear, setValue })
  * 3. 根据 option 设置对应模式
  */
 watch(
-  () => props.value,
+  () => currentValue.value,
   (newValue) => {
     // 统一通过 setValue({ silent: true }) 处理所有外部赋值（包含空值）以保持行为一致
     setValue(newValue, { silent: true })

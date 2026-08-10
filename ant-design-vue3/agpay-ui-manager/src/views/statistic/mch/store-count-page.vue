@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+    <ag-search v-model="searchData" :search-loading="searchLoading" reset-mode="default" :default-model-value="defaultSearchData" @search="searchFunc" @reset="() => tableRef.value?.reload()">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -196,6 +196,7 @@
 <script setup>
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgTable } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { downloadFile } from '@/lib/ag-axios'
 import {
   DollarOutlined,
@@ -227,19 +228,24 @@ const props = defineProps({
   queryDateRange: { type: String, default: '' }
 })
 
-const tableRef = ref(null)
 const sortState = reactive({
   field: '',
   order: null
 })
 
-const defaultSearchData = {
-  method: 'store',
-  mchNo: props.mchNo,
-  queryDateRange: props.queryDateRange
-}
-
-const searchData = reactive({ ...defaultSearchData })
+const {
+  tableRef,
+  searchData,
+  defaultSearchData,
+  searchFunc,
+  searchLoading
+} = useCrudTablePage({
+  searchDefaults: {
+    method: 'store',
+    mchNo: props.mchNo,
+    queryDateRange: props.queryDateRange
+  }
+})
 
 const countInitData = {
   allAmount: 0.0,
@@ -268,10 +274,6 @@ const handleSortChange = ({ field, order }) => {
 
 const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '门店交易统计.xlsx')
-}
-
-const searchFunc = () => {
-  tableRef.value?.reload()
 }
 </script>
 

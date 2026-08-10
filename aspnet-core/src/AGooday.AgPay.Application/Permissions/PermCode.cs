@@ -1,4 +1,4 @@
-﻿namespace AGooday.AgPay.Application.Permissions
+namespace AGooday.AgPay.Application.Permissions
 {
     public static class PermCode
     {
@@ -84,6 +84,17 @@
             public const string ENT_MCH_INFO_EDIT = "ENT_MCH_INFO_EDIT";
             public const string ENT_MCH_INFO_DEL = "ENT_MCH_INFO_DEL";
             public const string ENT_MCH_INFO_ADD = "ENT_MCH_INFO_ADD";
+            public const string ENT_MCH_APPLY = "ENT_MCH_APPLY";
+            public const string ENT_MCH_APPLY_LIST = "ENT_MCH_APPLY_LIST";
+            public const string ENT_MCH_APPLY_VIEW = "ENT_MCH_APPLY_VIEW";
+            public const string ENT_MCH_APPLY_EDIT = "ENT_MCH_APPLY_EDIT";
+            public const string ENT_MCH_APPLY_ADD = "ENT_MCH_APPLY_ADD";
+            public const string ENT_MCH_APPLY_SUBMIT = "ENT_MCH_APPLY_SUBMIT";
+            public const string ENT_MCH_APPLY_AUDIT = "ENT_MCH_APPLY_AUDIT";
+            public const string ENT_MCH_APPLY_QUERY_CHANNEL = "ENT_MCH_APPLY_QUERY_CHANNEL";
+            public const string ENT_MCH_APPLY_SIGN_URL = "ENT_MCH_APPLY_SIGN_URL";
+            public const string ENT_MCH_APPLY_VERIFY = "ENT_MCH_APPLY_VERIFY";
+            public const string ENT_MCH_APPLY_DEL = "ENT_MCH_APPLY_DEL";
             public const string ENT_MCH_APP_CONFIG = "ENT_MCH_APP_CONFIG";
             public const string ENT_MCH_CONFIG_PAGE = "ENT_MCH_CONFIG_PAGE";
             public const string ENT_MCH_PAY_CONFIG_LIST = "ENT_MCH_PAY_CONFIG_LIST";

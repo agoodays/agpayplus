@@ -2,7 +2,7 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="searchFunc">
+      <ag-search v-model="searchData" :search-loading="searchLoading" reset-mode="default" :default-model-value="defaultSearchData" @search="searchFunc" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -150,6 +150,8 @@ const route = useRoute()
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   modalOpen,
   currentRecordId,
   reloadTable,
@@ -161,7 +163,14 @@ const {
     await qrcApi.delById(qrcId)
     message.success('删除成功')
   },
-  deleteConfirmTitle: '确定删除吗'
+  deleteConfirmTitle: '确定删除吗',
+  searchDefaults: {
+    queryDateRange: '',
+    agentNo: '',
+    mchNo: '',
+    appId: '',
+    qrcId: ''
+  }
 })
 
 // 在 ag-table 子组件挂载前同步设置路由参数，确保首次加载即带上 mchNo
@@ -215,7 +224,7 @@ async function loadDataFunc(params) {
 
 /** 搜索函数 */
 function searchFunc() {
-  tableRef.value?.refresh()
+  tableRef.value?.reload()
 }
 
 /** 新增/编辑弹窗保存成功后的统一处理 */

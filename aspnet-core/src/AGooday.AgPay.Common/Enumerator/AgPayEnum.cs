@@ -128,6 +128,52 @@ namespace AGooday.AgPay.Common.Enumerator
         [Description("特约商户")]
         TYPE_ISVSUB = 2,
     }
+    
+    /// <summary>
+    /// 商户进件状态
+    /// </summary>
+    public enum ApplymentState
+    {
+        /// <summary>草稿</summary>
+        [Description("草稿")]
+        DRAFT = 0,
+
+        /// <summary>审核中</summary>
+        [Description("审核中")]
+        AUDITING = 1,
+
+        /// <summary>预审通过，待提交渠道</summary>
+        [Description("预审通过")]
+        PRE_AUDIT_APPROVED = 9,
+
+        /// <summary>预审拒绝</summary>
+        [Description("预审拒绝")]
+        PRE_AUDIT_REJECTED = 8,
+
+        /// <summary>渠道审核中</summary>
+        [Description("渠道审核中")]
+        CHANNEL_AUDITING = 10,
+
+        /// <summary>渠道拒绝</summary>
+        [Description("渠道拒绝")]
+        CHANNEL_REJECTED = 11,
+
+        /// <summary>待签约</summary>
+        [Description("待签约")]
+        PENDING_SIGN = 5,
+
+        /// <summary>签约中</summary>
+        [Description("签约中")]
+        SIGNING = 12,
+
+        /// <summary>待验证(小额打款)</summary>
+        [Description("待验证")]
+        PENDING_VERIFY = 4,
+
+        /// <summary>进件成功</summary>
+        [Description("进件成功")]
+        SUCCESS = 2,
+    }
 
     /// <summary>
     /// 支付类型: WECHAT-微信, ALIPAY-支付宝, YSFPAY-云闪付, UNIONPAY-银联, DCEPPAY-数字人民币, OTHER-其他

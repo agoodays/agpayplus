@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Base.Api.Extensions;
+using AGooday.AgPay.Base.Api.Extensions;
 using AGooday.AgPay.Base.Api.Middlewares;
 using AGooday.AgPay.Base.Api.Models;
 using AGooday.AgPay.Base.Api.MQ;
@@ -138,7 +138,8 @@ services.AddRabbitMQServices(
         (typeof(PayOrderMchNotifyMQ.IMQReceiver), typeof(PayOrderMchNotifyMQReceiver)),
         (typeof(PayOrderReissueMQ.IMQReceiver), typeof(PayOrderReissueMQReceiver)),
         (typeof(ResetAppConfigMQ.IMQReceiver), typeof(ResetAppConfigMQReceiver)),
-        (typeof(ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver), typeof(ResetIsvAgentMchAppInfoMQReceiver))
+        (typeof(ResetIsvAgentMchAppInfoConfigMQ.IMQReceiver), typeof(ResetIsvAgentMchAppInfoMQReceiver)),
+        (typeof(ApplymentChannelResultMQ.IMQReceiver), typeof(ApplymentChannelResultMQReceiver))
     }
 );
 #endregion

@@ -1,4 +1,4 @@
-﻿namespace AGooday.AgPay.Common.Utils
+namespace AGooday.AgPay.Common.Utils
 {
     /// <summary>
     /// 序列号生成 工具类
@@ -11,6 +11,7 @@
         private const string TRANSFER_ID_SEQ_PREFIX = "T";
         private const string DIVISION_BATCH_ID_SEQ_PREFIX = "D";
         private const string BILL_ID_SEQ_PREFIX = "B";
+        private const string APPLY_ID_SEQ_PREFIX = "A";
 
         private static bool IS_USE_MP_ID = true;
         public static void Initialize(bool useSnowflakeId)
@@ -136,6 +137,16 @@
         public static string GenIsvNo()
         {
             return $"V{DateTimeOffset.Now.ToUnixTimeSeconds()}";
+        }
+
+        public static string GenApplyId()
+        {
+            if (IS_USE_MP_ID)
+            {
+                return $"{APPLY_ID_SEQ_PREFIX}{IdWorker.Instance.NextId()}";
+            }
+            Random rd = new Random();
+            return $"{APPLY_ID_SEQ_PREFIX}{DateTime.Now:yyyyMMddHHmmssFFF}{rd.Next(9999):d4}";
         }
     }
 }

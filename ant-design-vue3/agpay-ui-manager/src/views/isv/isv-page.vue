@@ -2,7 +2,15 @@
   <div>
     <a-card :bordered="false">
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :collapsible="false" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" @reset="searchFunc">
+      <ag-search
+        v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
+        :collapsible="false"
+        :search-loading="searchLoading"
+        @search="searchFunc"
+        @reset="searchFunc"
+      >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -57,11 +65,24 @@
         <!-- 操作列 -->
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_ISV_INFO_EDIT')" type="link" @click="editFunc(record.isvNo)">修改</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_OAUTH2_CONFIG_VIEW')" type="link" @click="payOauth2ConfigFunc(record.isvNo)">Oauth2配置</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payConfigFunc(record.isvNo)">支付配置</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payIfConfigFunc(record.isvNo)">支付配置(旧版)</a-button>
-            <a-button v-if="hasPermission('ENT_ISV_INFO_DEL')" type="link" @click="delFunc(record.isvNo)" danger>删除</a-button>
+            <a-button v-if="hasPermission('ENT_ISV_INFO_EDIT')" type="link" @click="editFunc(record.isvNo)"
+              >修改</a-button
+            >
+            <a-button
+              v-if="hasPermission('ENT_ISV_OAUTH2_CONFIG_VIEW')"
+              type="link"
+              @click="payOauth2ConfigFunc(record.isvNo)"
+              >Oauth2配置</a-button
+            >
+            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payConfigFunc(record.isvNo)"
+              >支付配置</a-button
+            >
+            <a-button v-if="hasPermission('ENT_ISV_PAY_CONFIG_LIST')" type="link" @click="payIfConfigFunc(record.isvNo)"
+              >支付配置(旧版)</a-button
+            >
+            <a-button v-if="hasPermission('ENT_ISV_INFO_DEL')" type="link" danger @click="delFunc(record.isvNo)"
+              >删除</a-button
+            >
           </ag-table-actions>
         </template>
       </ag-table>
@@ -71,10 +92,21 @@
     <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" @success="handleModalSuccess" />
 
     <!-- 支付配置抽屉 -->
-    <ag-pay-config-drawer v-model:open="payConfigOpen" :perm-code="'ENT_ISV_PAY_CONFIG_ADD'" :config-mode="'mgrIsv'" :info-id="currentRecordId" :channel-list-config="{ autoSelectFirst: false }"/>
+    <ag-pay-config-drawer
+      v-model:open="payConfigOpen"
+      :perm-code="'ENT_ISV_PAY_CONFIG_ADD'"
+      :config-mode="'mgrIsv'"
+      :info-id="currentRecordId"
+      :channel-list-config="{ autoSelectFirst: false }"
+    />
 
     <!-- OAuth2配置抽屉 -->
-    <ag-pay-oauth2-config-drawer v-model:open="payOauth2ConfigOpen" :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'" :config-mode="'mgrIsv'" :info-id="currentRecordId" />
+    <ag-pay-oauth2-config-drawer
+      v-model:open="payOauth2ConfigOpen"
+      :perm-code="'ENT_ISV_OAUTH2_CONFIG_ADD'"
+      :config-mode="'mgrIsv'"
+      :info-id="currentRecordId"
+    />
 
     <!-- 支付接口配置列表 -->
     <isv-pay-if-config-list v-model:open="isvPayIfConfigListOpen" :isv-no="currentRecordId" />
@@ -87,7 +119,15 @@
  * 功能：展示服务商列表、搜索、新增、编辑、配置管理、删除等操作
  */
 import { isvApi } from '@/api/business/isv/isv-api'
-import { AgInput, AgPayConfigDrawer, AgPayOauth2ConfigDrawer, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
+import {
+  AgInput,
+  AgPayConfigDrawer,
+  AgPayOauth2ConfigDrawer,
+  AgSearch,
+  AgSelect,
+  AgTable,
+  AgTableActions
+} from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { getStateInfo, getStateOptions } from '@/constants/common-const'
@@ -130,6 +170,9 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchFunc,
+  searchLoading,
   modalOpen,
   currentRecordId,
   reloadTable,
@@ -138,6 +181,11 @@ const {
   closeModal,
   confirmDelete
 } = useCrudTablePage({
+  searchDefaults: {
+    isvNo: '',
+    isvName: '',
+    state: undefined
+  },
   deleteAction: (recordId) => isvApi.delById(recordId),
   deleteConfirmTitle: '确定删除吗',
   deleteConfirmContent: '确定删除该服务商及其所有关联商户',
@@ -152,11 +200,6 @@ const {
 const loadDataFunc = async (params) => {
   return await isvApi.queryPage(params)
 }
-
-/**
- * 搜索回调函数
- */
-const searchFunc = () => reloadTable()
 
 /**
  * 确认删除

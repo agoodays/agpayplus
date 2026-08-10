@@ -1,7 +1,14 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="searchLoading" @search="searchFunc" @reset="resetFunc">
+    <ag-search
+      v-model="searchData"
+      :search-loading="searchLoading"
+      reset-mode="default"
+      :default-model-value="defaultSearchData"
+      @search="searchFunc"
+      @reset="reloadTable"
+    >
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -10,12 +17,8 @@
               label="查询类型"
               placeholder="请选择查询类型"
               allow-clear
+              :options="queryDateTypeOptions"
               @change="queryDateTypeChange"
-              :options="[
-                { value: 'day', label: '日报' },
-                { value: 'month', label: '月报' },
-                { value: 'year', label: '年报' }
-              ]"
             />
           </a-form-item>
         </a-col>
@@ -72,7 +75,6 @@
       row-key="groupDate"
       state-key="transaction_count"
       :columns="tableColumns"
-      :loading="tableLoading"
       :on-load="loadDataFunc"
       :on-load-statistics="loadCountFunc"
       :on-download="downloadDataFunc"
@@ -108,7 +110,7 @@
               <div class="content">
                 <div class="title">交易笔数</div>
                 <div class="amount">
-                  <span class="amount-num">{{ (statistics?.payCount || 0) }}</span>
+                  <span class="amount-num">{{ statistics?.payCount || 0 }}</span>
                   <span class="amount-unit">笔</span>
                 </div>
               </div>
@@ -136,7 +138,7 @@
                   <span class="amount-unit">元</span>
                 </div>
                 <div class="detail">
-                  <span>{{ (statistics?.refundCount || 0) }}笔</span>
+                  <span>{{ statistics?.refundCount || 0 }}笔</span>
                 </div>
               </div>
             </div>
@@ -234,11 +236,13 @@
       <template #roundSlot="{ record }">
         <b style="color: rgb(255, 136, 0)">{{ (record.round * 100).toFixed(2) }}%</b>
       </template>
-      
+
       <template #opSlot="{ record }">
         <!-- 操作按钮 -->
         <ag-table-actions>
-          <a-button v-if="hasPermission('ENT_STATISTIC_MCH')" type="link" @click="detailFunc(record.groupDate)">详情</a-button>
+          <a-button v-if="hasPermission('ENT_STATISTIC_MCH')" type="link" @click="detailFunc(record.groupDate)"
+            >详情</a-button
+          >
         </ag-table-actions>
       </template>
     </ag-table>
@@ -267,10 +271,16 @@ import 'dayjs/locale/zh-cn'
 import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { getQueryDateTypeOptions } from '@/constants/common-const'
 
 const icons = { InfoCircleOutlined, SyncOutlined }
+
+const { t } = useI18n()
+const queryDateTypeOptions = computed(() => getQueryDateTypeOptions(t))
 
 // 权限检查
 const { hasPermission } = usePermission()
@@ -283,7 +293,14 @@ dayjs.extend(quarterOfYear)
 // 表格列配置
 const tableColumns = [
   { key: 'groupDate', dataIndex: 'groupDate', title: '日期', width: 120, fixed: 'left' },
-  { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot', titleSlot: 'payAmountTitle' },
+  {
+    key: 'payAmount',
+    title: '交易金额',
+    width: 110,
+    ellipsis: true,
+    customRender: 'payAmountSlot',
+    titleSlot: 'payAmountTitle'
+  },
   { key: 'amount', title: '实际收入', width: 110, customRender: 'amountSlot', titleSlot: 'amountTitle' },
   { key: 'fee', title: '手续费', width: 110, customRender: 'feeSlot', titleSlot: 'feeTitle' },
   { key: 'refundAmount', title: '退款金额', width: 110, customRender: 'refundAmountSlot' },
@@ -294,23 +311,8 @@ const tableColumns = [
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 
-// 响应式数据
-const tableRef = ref(null)
-const searchLoading = ref(false)
-const tableLoading = ref(false)
-const dateRangeOpen = ref(false)
-const dateFormat = ref('YYYY-MM-DD')
-const dateRangeMode = ref('date')
-const dateRangeValue = ref([])
-
-const DATE_FORMAT = 'YYYY-MM-DD'
-
-/**
- * 生成默认搜索参数。
- * @returns {{method: string, queryDateType: string, queryDateRange: string, mchNo: string|undefined, agentNo: string, isvNo: string}}
- */
-function createDefaultSearchData() {
-  return {
+const { tableRef, searchData, defaultSearchData, searchLoading, reloadTable } = useCrudTablePage({
+  searchDefaults: {
     method: 'transaction',
     queryDateType: 'day',
     queryDateRange: '',
@@ -318,9 +320,14 @@ function createDefaultSearchData() {
     agentNo: '',
     isvNo: ''
   }
-}
+})
 
-const searchData = reactive(createDefaultSearchData())
+const dateRangeOpen = ref(false)
+const dateFormat = ref('YYYY-MM-DD')
+const dateRangeMode = ref('date')
+const dateRangeValue = ref([])
+
+const DATE_FORMAT = 'YYYY-MM-DD'
 const countInitData = reactive({
   allAmount: 0.0,
   allCount: 0,
@@ -388,7 +395,6 @@ function applyQueryTypeSettings(type) {
  * 初始化搜索参数和日期范围。
  */
 function initializeSearchData() {
-  Object.assign(searchData, createDefaultSearchData())
   applyQueryTypeSettings(searchData.queryDateType)
 }
 
@@ -405,24 +411,8 @@ const searchMch = async (params) => {
  * 触发表格查询。
  * @returns {Promise<void>}
  */
-const searchFunc = async () => {
-  searchLoading.value = true
-  try {
-    await tableRef.value?.reload?.(true)
-  } finally {
-    if (!tableLoading.value) {
-      searchLoading.value = false
-    }
-  }
-}
-
-/**
- * 重置搜索条件并重新加载数据。
- * @returns {Promise<void>}
- */
-const resetFunc = async () => {
-  initializeSearchData()
-  await searchFunc()
+const searchFunc = () => {
+  tableRef.value?.reload?.(true)
 }
 
 /**
@@ -431,13 +421,7 @@ const resetFunc = async () => {
  * @returns {Promise<any>}
  */
 const loadDataFunc = async (params) => {
-  tableLoading.value = true
-  try {
-    return await statisticApi.queryOrderStatistic(params)
-  } finally {
-    tableLoading.value = false
-    searchLoading.value = false
-  }
+  return await statisticApi.queryOrderStatistic(params)
 }
 
 /**
@@ -519,10 +503,7 @@ function onChange(_date, dateString) {
   const start = dayjs(startDate).startOf(searchData.queryDateType)
   const end = dayjs(endDate).endOf(searchData.queryDateType)
   dateRangeValue.value = [start, end]
-  searchData.queryDateRange =
-    !startDate || !endDate
-      ? ''
-      : buildQueryDateRange(start, end)
+  searchData.queryDateRange = !startDate || !endDate ? '' : buildQueryDateRange(start, end)
 }
 
 /**
@@ -545,8 +526,6 @@ function handleDateRangeOpenChange(open) {
 onMounted(() => {
   initializeSearchData()
 })
-
-
 </script>
 <style lang="less" scoped>
 .data-statistics {

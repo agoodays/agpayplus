@@ -6,26 +6,12 @@
     @close="handleClose"
   >
     <a-spin :spinning="loading">
-      <a-descriptions :column="2" :bordered="false">
-        <a-descriptions-item label="门店编号" :span="2">
-          <b>{{ detailData.storeId }}</b>
-        </a-descriptions-item>
-
-        <a-descriptions-item label="门店名称" :span="2">
-          {{ detailData.storeName }}
-        </a-descriptions-item>
-
-        <a-descriptions-item label="商户号">
-          {{ detailData.mchNo }}
-        </a-descriptions-item>
-
-        <a-descriptions-item label="商户名称">
-          {{ detailData.mchName }}
-        </a-descriptions-item>
-
-        <a-descriptions-item label="联系人电话" :span="2">
-          {{ detailData.contactPhone || '-' }}
-        </a-descriptions-item>
+      <a-descriptions :column="2" bordered size="small">
+        <a-descriptions-item label="门店编号" :span="2"><b>{{ detailData.storeId }}</b></a-descriptions-item>
+        <a-descriptions-item label="门店名称" :span="2">{{ detailData.storeName }}</a-descriptions-item>
+        <a-descriptions-item label="商户号">{{ detailData.mchNo }}</a-descriptions-item>
+        <a-descriptions-item label="商户名称">{{ detailData.mchName }}</a-descriptions-item>
+        <a-descriptions-item label="联系人电话" :span="2">{{ detailData.contactPhone || '-' }}</a-descriptions-item>
 
         <a-descriptions-item label="默认门店">
           <a-badge
@@ -34,9 +20,7 @@
           />
         </a-descriptions-item>
 
-        <a-descriptions-item label="创建时间">
-          {{ detailData.createdAt }}
-        </a-descriptions-item>
+        <a-descriptions-item label="创建时间">{{ detailData.createdAt }}</a-descriptions-item>
 
         <a-descriptions-item label="门店LOGO" :span="2">
           <a-image v-if="detailData.storeLogo" :width="100" :src="detailData.storeLogo" />
@@ -53,25 +37,11 @@
           <span v-else>-</span>
         </a-descriptions-item>
 
-        <a-descriptions-item label="省/市/区" :span="2">
-          {{ getFullAddress() }}
-        </a-descriptions-item>
-
-        <a-descriptions-item label="详细地址" :span="2">
-          {{ detailData.address || '-' }}
-        </a-descriptions-item>
-
-        <a-descriptions-item label="经度">
-          {{ detailData.lng || '-' }}
-        </a-descriptions-item>
-
-        <a-descriptions-item label="纬度">
-          {{ detailData.lat || '-' }}
-        </a-descriptions-item>
-
-        <a-descriptions-item label="备注" :span="2">
-          {{ detailData.remark || '-' }}
-        </a-descriptions-item>
+        <a-descriptions-item label="省/市/区" :span="2">{{ getFullAddress() }}</a-descriptions-item>
+        <a-descriptions-item label="详细地址" :span="2">{{ detailData.address || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="经度">{{ detailData.lng || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="纬度">{{ detailData.lat || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="备注" :span="2">{{ detailData.remark || '-' }}</a-descriptions-item>
       </a-descriptions>
     </a-spin>
   </ag-drawer>

@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Base.Api.Authorization;
+using AGooday.AgPay.Base.Api.Authorization;
 using AGooday.AgPay.Base.Api.Extensions;
 using AGooday.AgPay.Base.Api.Extensions.AuthContext;
 using AGooday.AgPay.Base.Api.Filter;
@@ -18,6 +18,8 @@ using AGooday.AgPay.Components.OSS.Config;
 using AGooday.AgPay.Components.OSS.Controllers;
 using AGooday.AgPay.Components.OSS.Extensions;
 using AGooday.AgPay.Components.SMS.Extensions;
+using AGooday.AgPay.Components.Third.Channel;
+using AGooday.AgPay.Components.Third.Services;
 using AGooday.AgPay.Logging.Serilog;
 using AGooday.AgPay.Manager.Api.Extensions;
 using AGooday.AgPay.Manager.Api.OpLog;
@@ -208,6 +210,12 @@ services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Program>()
 // .NET Core 原生依赖注入
 // 单写一层用来添加依赖项，从展示层 Presentation 中隔离
 NativeInjectorBootStrapper.RegisterServices(services);
+
+services.AddScoped<MchApplymentService>();
+services.AddScoped<ConfigContextQueryService>();
+services.AddSingleton<ConfigContextService>();
+
+ChannelNativeInjectorBootStrapper.RegisterServices(services);
 
 services.AddNotice(builder.Configuration);
 

@@ -103,6 +103,96 @@ export const CASH_OUT_FEE_TYPE_ENUM = {
   FIXANDRATE: { value: 'FIXANDRATE', descKey: 'common.cashOutFee.fixAndRate' }
 }
 
+export const PROFIT_INFO_TYPE_ENUM = {
+  PLATFORM: { value: 'PLATFORM', descKey: 'common.profitInfoType.platform', color: 'green' },
+  AGENT: { value: 'AGENT', descKey: 'common.profitInfoType.agent', color: 'blue' }
+}
+
+export const PRODUCT_TYPE_ENUM = {
+  PAY: { value: 'PAY', descKey: 'common.productType.pay', color: 'rgb(4, 190, 2)' },
+  TRANSFER: { value: 'TRANSFER', descKey: 'common.productType.transfer', color: '#0099ff' },
+  DIVISION: { value: 'DIVISION', descKey: 'common.productType.division', color: '#ff9900' }
+}
+
+export const WAY_TYPE_ENUM = {
+  WECHAT: { value: 'WECHAT', descKey: 'common.wayType.wechat', color: 'rgb(4, 190, 2)' },
+  ALIPAY: { value: 'ALIPAY', descKey: 'common.wayType.alipay', color: 'rgb(23, 121, 255)' },
+  YSFPAY: { value: 'YSFPAY', descKey: 'common.wayType.ysfpay', color: '#f5222d' },
+  UNIONPAY: { value: 'UNIONPAY', descKey: 'common.wayType.unionpay', color: '#00508e' },
+  DCEPPAY: { value: 'DCEPPAY', descKey: 'common.wayType.dceppay', color: '#d12c2c' },
+  TRANSFER: { value: 'TRANSFER', descKey: 'common.wayType.transfer', color: '#0099ff' },
+  DIVISION: { value: 'DIVISION', descKey: 'common.wayType.division', color: '#ff9900' },
+  OTHER: { value: 'OTHER', descKey: 'common.wayType.other', color: '#fa8c16' }
+}
+
+export const PAY_STATE_ENUM = {
+  CREATED: { value: '0', descKey: 'common.payState.created', color: 'blue' },
+  PAYING: { value: '1', descKey: 'common.payState.paying', color: 'processing' },
+  SUCCESS: { value: '2', descKey: 'common.payState.success', color: 'green' },
+  FAILED: { value: '3', descKey: 'common.payState.failed', color: 'red' },
+  CANCELED: { value: '4', descKey: 'common.payState.canceled', color: 'default' },
+  REFUNDED: { value: '5', descKey: 'common.payState.refunded', color: 'orange' },
+  CLOSED: { value: '6', descKey: 'common.payState.closed', color: 'default' }
+}
+
+export const NOTIFY_STATE_ENUM = {
+  UNSENT: { value: '0', descKey: 'common.notifyState.unsent', color: 'default' },
+  SENT: { value: '1', descKey: 'common.notifyState.sent', color: 'green' }
+}
+
+export const REFUND_STATE_ENUM = {
+  CREATED: { value: '0', descKey: 'common.refundState.created', color: 'blue' },
+  REFUNDING: { value: '1', descKey: 'common.refundState.refunding', color: 'processing' },
+  SUCCESS: { value: '2', descKey: 'common.refundState.success', color: 'green' },
+  FAILED: { value: '3', descKey: 'common.refundState.failed', color: 'red' },
+  CLOSED: { value: '4', descKey: 'common.refundState.closed', color: 'default' }
+}
+
+export const TRANSFER_STATE_ENUM = {
+  CREATED: { value: '0', descKey: 'common.transferState.created', color: 'blue' },
+  TRANSFERRING: { value: '1', descKey: 'common.transferState.transferring', color: 'processing' },
+  SUCCESS: { value: '2', descKey: 'common.transferState.success', color: 'green' },
+  FAILED: { value: '3', descKey: 'common.transferState.failed', color: 'red' },
+  CLOSED: { value: '4', descKey: 'common.transferState.closed', color: 'default' }
+}
+
+export const DIVISION_STATE_ENUM = {
+  PENDING: { value: '0', descKey: 'common.divisionState.pending', color: 'blue' },
+  SUCCESS: { value: '1', descKey: 'common.divisionState.success', color: 'green' },
+  FAILED: { value: '2', descKey: 'common.divisionState.failed', color: 'red' },
+  REFUNDED: { value: '3', descKey: 'common.divisionState.refunded', color: 'orange' }
+}
+
+export const MCH_NOTIFY_STATE_ENUM = {
+  NOTIFYING: { value: '1', descKey: 'common.mchNotifyState.notifying', color: 'processing' },
+  SUCCESS: { value: '2', descKey: 'common.mchNotifyState.success', color: 'green' },
+  FAILED: { value: '3', descKey: 'common.mchNotifyState.failed', color: 'red' }
+}
+
+export const ORDER_TYPE_ENUM = {
+  PAY: { value: '1', descKey: 'common.orderType.pay', color: 'green' },
+  REFUND: { value: '2', descKey: 'common.orderType.refund', color: 'orange' },
+  TRANSFER: { value: '3', descKey: 'common.orderType.transfer', color: 'blue' }
+}
+
+export const BIZ_TYPE_ENUM = {
+  PLATFORM_COMMISSION: { value: '1', descKey: 'common.bizType.platformCommission' },
+  WITHDRAW_EXPENSE: { value: '2', descKey: 'common.bizType.withdrawExpense' },
+  COMMISSION_EXPENSE: { value: '3', descKey: 'common.bizType.commissionExpense' },
+  RECHARGE_INCOME: { value: '4', descKey: 'common.bizType.rechargeIncome' }
+}
+
+export const ACCOUNT_TYPE_ENUM = {
+  WALLET: { value: '1', descKey: 'common.accountType.wallet' },
+  PURPOSE: { value: '2', descKey: 'common.accountType.purpose' }
+}
+
+export const QUERY_DATE_TYPE_ENUM = {
+  DAY: { value: 'day', descKey: 'common.queryDateType.day' },
+  MONTH: { value: 'month', descKey: 'common.queryDateType.month' },
+  YEAR: { value: 'year', descKey: 'common.queryDateType.year' }
+}
+
 // ================= 动态选项生成函数 (接收 t) =================
 
 const generateOptions = (enumObj, t) => {
@@ -124,6 +214,19 @@ export const getMchTypeOptions = (t) => generateOptions(MCH_TYPE_ENUM, t)
 export const getMchLevelOptions = (t) => generateOptions(MCH_LEVEL_ENUM, t)
 export const getRefundModeOptions = (t) => generateOptions(REFUND_MODE_ENUM, t)
 export const getCashOutFeeTypeOptions = (t) => generateOptions(CASH_OUT_FEE_TYPE_ENUM, t)
+export const getProfitInfoTypeOptions = (t) => generateOptions(PROFIT_INFO_TYPE_ENUM, t)
+export const getProductTypeOptions = (t) => generateOptions(PRODUCT_TYPE_ENUM, t)
+export const getWayTypeOptions = (t) => generateOptions(WAY_TYPE_ENUM, t)
+export const getPayStateOptions = (t) => generateOptions(PAY_STATE_ENUM, t)
+export const getNotifyStateOptions = (t) => generateOptions(NOTIFY_STATE_ENUM, t)
+export const getRefundStateOptions = (t) => generateOptions(REFUND_STATE_ENUM, t)
+export const getTransferStateOptions = (t) => generateOptions(TRANSFER_STATE_ENUM, t)
+export const getDivisionStateOptions = (t) => generateOptions(DIVISION_STATE_ENUM, t)
+export const getMchNotifyStateOptions = (t) => generateOptions(MCH_NOTIFY_STATE_ENUM, t)
+export const getOrderTypeOptions = (t) => generateOptions(ORDER_TYPE_ENUM, t)
+export const getBizTypeOptions = (t) => generateOptions(BIZ_TYPE_ENUM, t)
+export const getAccountTypeOptions = (t) => generateOptions(ACCOUNT_TYPE_ENUM, t)
+export const getQueryDateTypeOptions = (t) => generateOptions(QUERY_DATE_TYPE_ENUM, t)
 export const getUserTypeOptions = (t) => generateOptions(USER_TYPE_ENUM, t)
 
 // ================= 状态获取工具函数 =================
@@ -171,3 +274,16 @@ export const getMchTypeInfo = (type, t) => getEnumInfo(MCH_TYPE_ENUM, type, t)
 export const getMchLevelInfo = (level, t) => getEnumInfo(MCH_LEVEL_ENUM, level, t)
 export const getRefundModeInfo = (mode, t) => getEnumInfo(REFUND_MODE_ENUM, mode, t)
 export const getCashOutFeeTypeInfo = (type, t) => getEnumInfo(CASH_OUT_FEE_TYPE_ENUM, type, t)
+export const getProfitInfoTypeInfo = (type, t) => getEnumInfo(PROFIT_INFO_TYPE_ENUM, type, t)
+export const getProductTypeInfo = (type, t) => getEnumInfo(PRODUCT_TYPE_ENUM, type, t)
+export const getWayTypeInfo = (type, t) => getEnumInfo(WAY_TYPE_ENUM, type, t)
+export const getPayStateInfo = (state, t) => getEnumInfo(PAY_STATE_ENUM, state, t)
+export const getNotifyStateInfo = (state, t) => getEnumInfo(NOTIFY_STATE_ENUM, state, t)
+export const getRefundStateInfo = (state, t) => getEnumInfo(REFUND_STATE_ENUM, state, t)
+export const getTransferStateInfo = (state, t) => getEnumInfo(TRANSFER_STATE_ENUM, state, t)
+export const getDivisionStateInfo = (state, t) => getEnumInfo(DIVISION_STATE_ENUM, state, t)
+export const getMchNotifyStateInfo = (state, t) => getEnumInfo(MCH_NOTIFY_STATE_ENUM, state, t)
+export const getOrderTypeInfo = (type, t) => getEnumInfo(ORDER_TYPE_ENUM, type, t)
+export const getBizTypeInfo = (type, t) => getEnumInfo(BIZ_TYPE_ENUM, type, t)
+export const getAccountTypeInfo = (type, t) => getEnumInfo(ACCOUNT_TYPE_ENUM, type, t)
+export const getQueryDateTypeInfo = (type, t) => getEnumInfo(QUERY_DATE_TYPE_ENUM, type, t)

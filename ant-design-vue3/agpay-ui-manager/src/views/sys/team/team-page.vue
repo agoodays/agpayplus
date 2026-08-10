@@ -1,7 +1,7 @@
 <template>
   <div>
     <a-card :bordered="false">
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc" :reset-exclude="['sysType']" @reset="searchFunc">
+      <ag-search v-model="searchData" :search-loading="searchLoading" @search="searchFunc" reset-mode="default" :default-model-value="defaultSearchData" @reset="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -93,13 +93,6 @@ const sysTypeOptions = computed(() => getSysTypeOptions(t))
 /** 权限检查 */
 const { hasPermission } = usePermission()
 
-/**
- * 默认查询参数对象模板
- */
-const defaultSearchData = {
-  sysType: 'MGR'
-}
-
 const statRangeTypeMap = Object.fromEntries(Object.values(STAT_RANGE_TYPE_ENUM).map(item => [item.value, item.desc]))
 const sysTypeMap = Object.fromEntries(Object.values(SYS_TYPE_ENUM).map(item => [item.value, item.desc]))
 
@@ -138,6 +131,8 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   modalOpen,
   detailOpen,
   currentRecordId,
@@ -151,11 +146,11 @@ const {
   deleteAction: (recordId) => teamApi.delById(recordId),
   deleteConfirmTitle: '确定删除吗',
   deleteConfirmContent: '',
-  deleteSuccessMessage: '删除成功'
+  deleteSuccessMessage: '删除成功',
+  searchDefaults: {
+    sysType: 'MGR'
+  }
 })
-
-// 初始化默认搜索参数
-Object.assign(searchData, defaultSearchData)
 
 /**
  * 请求表格数据函数

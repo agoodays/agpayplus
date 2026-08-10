@@ -4,9 +4,11 @@
       <!-- 搜索表单 -->
       <ag-search
         v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
         :collapsible="false"
         :default-collapsed="false"
-        :search-loading="tableRef?.isLoading?.value || false"
+        :search-loading="searchLoading"
         @search="searchFunc"
         @reset="searchFunc"
       >
@@ -26,22 +28,12 @@
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchData.appId"
-                label="应用AppId"
-                placeholder="请输入应用AppId"
-                allow-clear
-              />
+              <ag-input v-model="searchData.appId" label="应用AppId" placeholder="请输入应用AppId" allow-clear />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchData.appName"
-                label="应用名称"
-                placeholder="请输入应用名称"
-                allow-clear
-              />
+              <ag-input v-model="searchData.appName" label="应用名称" placeholder="请输入应用名称" allow-clear />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -73,7 +65,7 @@
             <plus-outlined /> 新增
           </a-button>
         </template>
-        
+
         <template #appIdSlot="{ record }">
           <b>{{ record.appId }}</b>
         </template>
@@ -88,24 +80,68 @@
         </template>
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_MCH_APP_EDIT')" type="link" size="small" @click="handleEdit(record)">修改</a-button>
-            <a-button v-if="hasPermission('ENT_MCH_OAUTH2_CONFIG_VIEW')" type="link" size="small" @click="payOauth2ConfigFunc(record)">Oauth2配置</a-button>
-            <a-button v-if="hasPermission('ENT_MCH_PAY_CONFIG_LIST')" type="link" size="small" @click="payConfigFunc(record)">支付配置</a-button>
-            <a-button v-if="hasPermission('ENT_MCH_PAY_CONFIG_LIST')" type="link" size="small" @click="payIfConfigFunc(record.appId)">支付配置(旧版)</a-button>
-            <a-button v-if="hasPermission('ENT_MCH_APP_DEL')" type="link" size="small" danger @click="delFunc(record.appId)">删除</a-button>
+            <a-button v-if="hasPermission('ENT_MCH_APP_EDIT')" type="link" size="small" @click="handleEdit(record)"
+              >修改</a-button
+            >
+            <a-button
+              v-if="hasPermission('ENT_MCH_OAUTH2_CONFIG_VIEW')"
+              type="link"
+              size="small"
+              @click="payOauth2ConfigFunc(record)"
+              >Oauth2配置</a-button
+            >
+            <a-button
+              v-if="hasPermission('ENT_MCH_PAY_CONFIG_LIST')"
+              type="link"
+              size="small"
+              @click="payConfigFunc(record)"
+              >支付配置</a-button
+            >
+            <a-button
+              v-if="hasPermission('ENT_MCH_PAY_CONFIG_LIST')"
+              type="link"
+              size="small"
+              @click="payIfConfigFunc(record.appId)"
+              >支付配置(旧版)</a-button
+            >
+            <a-button
+              v-if="hasPermission('ENT_MCH_APP_DEL')"
+              type="link"
+              size="small"
+              danger
+              @click="delFunc(record.appId)"
+              >删除</a-button
+            >
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" :mch-no="currentMchNo" @success="handleModalSuccess" />
-    
+    <add-or-edit
+      v-model:open="modalOpen"
+      :record-id="currentRecordId"
+      :mch-no="currentMchNo"
+      @success="handleModalSuccess"
+    />
+
     <!-- 支付配置抽屉 -->
-    <ag-pay-config v-model:open="payConfigOpen" :info-id="currentRecordId" :perm-code="'ENT_MCH_PAY_CONFIG_ADD'" :config-mode="'mgrMch'" :is-isv-sub-mch="isIsvSubMch" />
+    <ag-pay-config
+      v-model:open="payConfigOpen"
+      :info-id="currentRecordId"
+      :perm-code="'ENT_MCH_PAY_CONFIG_ADD'"
+      :config-mode="'mgrMch'"
+      :is-isv-sub-mch="isIsvSubMch"
+    />
 
     <!-- OAuth2配置抽屉 -->
-    <ag-pay-oauth2-config-drawer v-model:open="payOauth2ConfigOpen" :perm-code="'ENT_MCH_OAUTH2_CONFIG_ADD'" :config-mode="'mgrMch'" :info-id="currentRecordId" :is-isv-sub-mch="isIsvSubMch" />
+    <ag-pay-oauth2-config-drawer
+      v-model:open="payOauth2ConfigOpen"
+      :perm-code="'ENT_MCH_OAUTH2_CONFIG_ADD'"
+      :config-mode="'mgrMch'"
+      :info-id="currentRecordId"
+      :is-isv-sub-mch="isIsvSubMch"
+    />
 
     <!-- 支付参数配置页面组件 -->
     <mch-pay-if-config-list v-model:open="payIfConfigOpen" :app-id="currentRecordId" />
@@ -118,13 +154,21 @@
  * 功能：展示商户应用列表，支持搜索、新增、编辑、删除、配置等操作
  */
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
-import { AgInput, AgPayOauth2ConfigDrawer, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
+import {
+  AgInput,
+  AgPayOauth2ConfigDrawer,
+  AgSearch,
+  AgSelect,
+  AgSelectInfinite,
+  AgTable,
+  AgTableActions
+} from '@/components'
 import { AgPayConfig } from '@/components/ag-pay-config'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { getStateInfo, getStateOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
@@ -152,7 +196,7 @@ const payIfConfigOpen = ref(false)
 /**
  * 当前商户号
  */
-const currentMchNo = ref('')
+const currentMchNo = ref(route.query.mchNo || '')
 
 /**
  * 使用 CRUD 表格页面组合式函数
@@ -160,6 +204,9 @@ const currentMchNo = ref('')
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchFunc,
+  searchLoading,
   modalOpen,
   currentRecordId,
   reloadTable,
@@ -168,20 +215,16 @@ const {
   closeModal,
   confirmDelete
 } = useCrudTablePage({
+  searchDefaults: {
+    mchNo: route.query.mchNo || undefined,
+    appId: '',
+    appName: '',
+    state: undefined
+  },
   deleteAction: (recordId) => mchAppApi.delById(recordId),
   deleteConfirmTitle: '确认删除',
   deleteConfirmContent: '确认删除该应用吗？',
   deleteSuccessMessage: '删除成功'
-})
-
-/**
- * 初始化搜索数据
- */
-Object.assign(searchData, {
-  mchNo: '',
-  appId: '',
-  appName: '',
-  state: ''
 })
 
 /**
@@ -198,38 +241,12 @@ const tableColumns = [
 ]
 
 /**
- * 初始化
- */
-onMounted(() => {
-  if (route.query.mchNo) {
-    searchData.mchNo = route.query.mchNo
-    currentMchNo.value = route.query.mchNo
-  }
-})
-
-/**
  * 请求表格数据函数
  * @param {Object} params - 查询参数
  * @returns {Promise<Object>} 表格数据
  */
 const loadDataFunc = async (params) => {
-  const requestParams = {
-    pageNumber: params.pageNumber,
-    pageSize: params.pageSize
-  }
-  if (searchData.mchNo) {
-    requestParams.mchNo = searchData.mchNo
-  }
-  if (searchData.appId) {
-    requestParams.appId = searchData.appId
-  }
-  if (searchData.appName) {
-    requestParams.appName = searchData.appName
-  }
-  if (searchData.state) {
-    requestParams.state = parseInt(searchData.state)
-  }
-  return await mchAppApi.queryPage(requestParams)
+  return await mchAppApi.queryPage(params)
 }
 
 /**
@@ -241,13 +258,6 @@ const loadDataFunc = async (params) => {
  * @returns {Promise<Object>} 商户列表
  */
 const searchMch = (params) => mchAppApi.queryMchPage(params)
-
-/**
- * 搜索函数
- */
-const searchFunc = () => {
-  reloadTable()
-}
 
 /**
  * 新增应用
@@ -310,5 +320,4 @@ const handleModalSuccess = () => {
 }
 </script>
 
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>

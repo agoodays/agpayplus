@@ -1,14 +1,14 @@
 <template>
   <a-modal
     :open="open"
-    :title="title"
+    :title="resolvedTitle"
     :width="width"
     :closable="closable"
     :mask-closable="maskClosable"
     :destroy-on-close="destroyOnClose"
     :confirm-loading="confirmLoading"
-    :ok-text="okText"
-    :cancel-text="cancelText"
+    :ok-text="resolvedOkText"
+    :cancel-text="resolvedCancelText"
     @ok="handleOk"
     @cancel="handleCancel"
   >
@@ -25,9 +25,10 @@
  * AgModal - 通用模态框组件
  * 功能：封装 Ant Design Vue Modal，统一默认参数与事件处理
  */
-import { useSlots } from 'vue'
+import { computed, useSlots } from 'vue'
+import { useI18n } from 'vue-i18n'
 
-defineProps({
+const props = defineProps({
   /** 是否显示 */
   open: {
     type: Boolean,
@@ -36,7 +37,7 @@ defineProps({
   /** 标题 */
   title: {
     type: String,
-    default: '提示'
+    default: ''
   },
   /** 宽度 */
   width: {
@@ -66,14 +67,20 @@ defineProps({
   /** 确定按钮文本 */
   okText: {
     type: String,
-    default: '确定'
+    default: ''
   },
   /** 取消按钮文本 */
   cancelText: {
     type: String,
-    default: '取消'
+    default: ''
   }
 })
+
+const { t } = useI18n()
+
+const resolvedTitle = computed(() => props.title || t('components.modal.defaultTitle'))
+const resolvedOkText = computed(() => props.okText || t('components.modal.okText'))
+const resolvedCancelText = computed(() => props.cancelText || t('components.modal.cancelText'))
 
 const emit = defineEmits(['update:open', 'ok', 'cancel'])
 

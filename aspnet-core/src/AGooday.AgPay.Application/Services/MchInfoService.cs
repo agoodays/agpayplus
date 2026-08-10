@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Models;
 using AGooday.AgPay.Domain.Commands.MchInfos;
@@ -93,6 +93,7 @@ namespace AGooday.AgPay.Application.Services
         public Task<PaginatedResult<MchInfoDto>> GetPaginatedDataAsync(MchInfoQueryDto dto)
         {
             var query = _mchInfoRepository.GetAllAsNoTracking()
+                .WhereIfNotEmpty(dto.Keyword, w => w.MchNo.Equals(dto.Keyword) || w.MchName.Contains(dto.Keyword) || w.MchShortName.Contains(dto.Keyword))
                 .WhereIfNotEmpty(dto.MchNo, w => w.MchNo.Equals(dto.MchNo))
                 .WhereIfNotEmpty(dto.AgentNo, w => w.AgentNo.Equals(dto.AgentNo))
                 .WhereIfNotEmpty(dto.IsvNo, w => w.IsvNo.Equals(dto.IsvNo))

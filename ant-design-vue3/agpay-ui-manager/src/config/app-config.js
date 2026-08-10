@@ -66,6 +66,7 @@ export const asyncRouteDefine = {
   MainPage: { defaultPath: '/main', component: () => import('@/views/main/main-page.vue') },
   // 商户管理
   MchPage: { defaultPath: '/mch', component: () => import('@/views/mch/mch-page.vue') }, // 商户列表
+  MchApplyPage: { defaultPath: '/mchApply', component: () => import('@/views/mch-apply/mch-apply-page.vue') }, // 商户进件列表
   MchAppPage: { defaultPath: '/apps', component: () => import('@/views/mch-app/mch-app-page.vue') }, // 商户应用列表
   MchStorePage: { defaultPath: '/store', component: () => import('@/views/mch-store/mch-store-page.vue') }, // 商户门店列表
   // 代理商管理

@@ -6,7 +6,7 @@
     @close="handleClose"
   >
     <a-spin :spinning="loading">
-      <a-descriptions :column="2" :bordered="false">
+      <a-descriptions :column="2" bordered size="small">
         <a-descriptions-item label="商户号">
           {{ detailData.mchNo }}
         </a-descriptions-item>

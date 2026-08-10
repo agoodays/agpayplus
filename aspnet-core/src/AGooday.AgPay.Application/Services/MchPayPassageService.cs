@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Constants;
 using AGooday.AgPay.Common.Models;
@@ -26,6 +26,7 @@ namespace AGooday.AgPay.Application.Services
         private readonly IPayInterfaceConfigRepository _payInterfaceConfigRepository;
         private readonly IPayRateConfigRepository _payRateConfigRepository;
         private readonly IPayRateLevelConfigRepository _payRateLevelConfigRepository;
+        private readonly IPayWayRepository _payWayRepository;
 
         public MchPayPassageService(IMapper mapper, IUnitOfWork uow, IMediatorHandler bus,
             IMchPayPassageRepository mchPayPassageRepository,
@@ -33,7 +34,8 @@ namespace AGooday.AgPay.Application.Services
             IPayInterfaceDefineRepository payInterfaceDefineRepository,
             IPayInterfaceConfigRepository payInterfaceConfigRepository,
             IPayRateConfigRepository payRateConfigRepository,
-            IPayRateLevelConfigRepository payRateLevelConfigRepository)
+            IPayRateLevelConfigRepository payRateLevelConfigRepository,
+            IPayWayRepository payWayRepository)
             : base(mapper, bus, mchPayPassageRepository)
         {
             _uow = uow;
@@ -45,6 +47,7 @@ namespace AGooday.AgPay.Application.Services
             _payInterfaceConfigRepository = payInterfaceConfigRepository;
             _payRateConfigRepository = payRateConfigRepository;
             _payRateLevelConfigRepository = payRateLevelConfigRepository;
+            _payWayRepository = payWayRepository;
         }
 
         public Task<bool> IsExistMchPayPassageUseWayCodeAsync(string wayCode)
@@ -76,32 +79,16 @@ namespace AGooday.AgPay.Application.Services
         /// <summary>
         /// 根据支付方式查询可用的支付接口列表
         /// </summary>
-        /// <param name="wayCode"></param>
         /// <param name="appId"></param>
+        /// <param name="wayCode"></param>
         /// <param name="infoType"></param>
         /// <param name="mchType"></param>
+        /// <param name="state"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="pageSize"></param>
         /// <returns></returns>
-        public async Task<PaginatedResult<AvailablePayInterfaceDto>> SelectAvailablePayInterfaceListAsync(string wayCode, string appId, string infoType, byte mchType, int pageNumber, int pageSize)
+        public async Task<PaginatedResult<AvailablePayInterfaceDto>> SelectAvailablePayInterfaceListAsync(string appId, string wayCode, string infoType, byte mchType, byte? state, int pageNumber, int pageSize)
         {
-            //var result = _payInterfaceDefineRepository.GetAll()
-            //    .Join(_payInterfaceDefineRepository.GetAll<PayInterfaceConfig>(),
-            //    pid => pid.IfCode, pic => pic.IfCode,
-            //    (pid, pic) => new { pid, pic })
-            //    .Where(w => w.pid.State.Equals(CS.YES) && w.pic.State.Equals(CS.YES)
-            //    && EF.Functions.JsonContains(w.pid.WayCodes, new { wayCode = wayCode })//&& w.pid.WayCodes.Contains(wayCode) 
-            //    && w.pic.InfoType.Equals(infoType) && w.pic.InfoId.Equals(appId)
-            //    && ((mchType.Equals(CS.MCH_TYPE_NORMAL) && w.pid.IsMchMode.Equals(CS.YES)) || (mchType.Equals(CS.MCH_TYPE_ISVSUB) && w.pid.IsIsvMode.Equals(CS.YES)))
-            //    && !string.IsNullOrWhiteSpace(w.pic.IfParams.Trim()))
-            //    .Select(s => new AvailablePayInterfaceDto()
-            //    {
-            //        IfCode = s.pid.IfCode,
-            //        IfName = s.pid.IfName,
-            //        ConfigPageType = s.pid.ConfigPageType,
-            //        Icon = s.pid.Icon,
-            //        BgColor = s.pid.BgColor,
-            //        IfParams = s.pic.IfParams,
-            //        IfRate = s.pic.IfRate * 100,
-            //    });
             var configType = CS.CONFIG_TYPE.MCHRATE;
             var payRateConfigs = _payRateConfigRepository.GetByInfoIdAsNoTracking(configType, infoType, appId);
             var ifCodes = payRateConfigs.Where(w => w.WayCode.Equals(wayCode)).Select(s => s.IfCode).Distinct().ToList();
@@ -122,6 +109,11 @@ namespace AGooday.AgPay.Application.Services
                         item.State = (sbyte)payPassage.State;
                         item.Rate = payPassage.Rate * 100;
                     }
+                }
+
+                if (state.HasValue)
+                {
+                    result = result.Where(w => w.State == (sbyte)state.Value);
                 }
             }
             var records = PaginatedResult<AvailablePayInterfaceDto>.Create(result, pageNumber, pageSize);
@@ -284,6 +276,92 @@ namespace AGooday.AgPay.Application.Services
                 dto.RateDesc = $"({payRateLevelConfig.MinAmount / 100M:F2}元-{payRateLevelConfig.MaxAmount / 100M:F2}元]{modeName}费率: {dto.Rate * 100:F4}%, 保底{payRateLevelConfig.MinFee / 100M:F2}元, 封顶{payRateLevelConfig.MaxFee / 100M:F2}元";
             }
             return dto;
+        }
+
+        /// <summary>
+        /// 查询应用支付接口配置列表（支付方式 + 通道配置状态）。
+        /// PassageState / IsConfig 是依赖通道数据计算的虚拟字段：
+        /// - 无虚拟字段过滤 → PayWay SQL 分页 → 映射 DTO → 计算虚拟字段 → 直接返回
+        /// - 有虚拟字段过滤 → PayWay SQL 全量查询 → 映射 DTO → 计算虚拟字段 → 内存过滤 → 手动分页
+        /// </summary>
+        public async Task<PaginatedResult<MchPayPassagePayWayDto>> GetConfiguredPayWayPageListAsync(string appId, PayWayQueryDto dto, string mchNo = null)
+        {
+            bool needsPostFilter = dto.PassageState.HasValue || dto.IsConfig.HasValue;
+
+            var payWayQuery = _payWayRepository.GetAllAsNoTracking()
+                .WhereIfNotEmpty(dto.WayCode, w => w.WayCode.Equals(dto.WayCode))
+                .WhereIfNotEmpty(dto.WayName, w => w.WayName.Contains(dto.WayName))
+                .WhereIfNotEmpty(dto.WayType, w => w.WayType.Equals(dto.WayType))
+                .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
+
+            PaginatedResult<MchPayPassagePayWayDto> data;
+
+            if (!needsPostFilter)
+            {
+                // 路径 A：SQL 分页 → 映射 → 计算虚拟字段
+                data = await payWayQuery.ToPaginatedResultAsync<PayWay, MchPayPassagePayWayDto>(_mapper, dto.PageNumber, dto.PageSize);
+            }
+            else
+            {
+                // 路径 B：查全量 → 映射 → 计算虚拟字段 → 内存过滤 → 手动分页
+                var allEntities = await payWayQuery.ToListAsync();
+                var allDtos = _mapper.Map<List<MchPayPassagePayWayDto>>(allEntities);
+
+                await ApplyPassageStateAsync(allDtos, appId, mchNo);
+
+                IEnumerable<MchPayPassagePayWayDto> filtered = allDtos;
+                if (dto.PassageState.HasValue)
+                    filtered = filtered.Where(x => x.PassageState == dto.PassageState.Value);
+                if (dto.IsConfig.HasValue)
+                    filtered = filtered.Where(x => x.IsConfig == dto.IsConfig.Value);
+
+                var filteredList = filtered.ToList();
+                data = new PaginatedResult<MchPayPassagePayWayDto>(
+                    filteredList.Skip((dto.PageNumber - 1) * dto.PageSize).Take(dto.PageSize).ToList(),
+                    filteredList.Count, dto.PageNumber, dto.PageSize);
+
+                return data;
+            }
+
+            // 路径 A：SQL 分页结果上计算虚拟字段
+            if (data.Items?.Count > 0)
+            {
+                await ApplyPassageStateAsync(data.Items, appId, mchNo);
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// 为 PayWay DTO 集合批量计算 PassageState / IsConfig 虚拟字段。
+        /// </summary>
+        private async Task ApplyPassageStateAsync(IEnumerable<MchPayPassagePayWayDto> payWays, string appId, string mchNo)
+        {
+            var wayCodes = payWays.Select(s => s.WayCode).ToList();
+            var mchPayPassages = _mchPayPassageRepository.GetAllAsNoTracking()
+                .Where(w => w.AppId.Equals(appId) && wayCodes.Contains(w.WayCode));
+
+            if (!string.IsNullOrWhiteSpace(mchNo))
+            {
+                mchPayPassages = mchPayPassages.Where(w => w.MchNo.Equals(mchNo));
+            }
+
+            var passageList = await mchPayPassages.ToListAsync();
+
+            foreach (var payWay in payWays)
+            {
+                payWay.PassageState = CS.NO;
+                payWay.IsConfig = CS.NO;
+                foreach (var passage in passageList)
+                {
+                    if (payWay.WayCode.Equals(passage.WayCode) && passage.State == CS.YES)
+                    {
+                        payWay.PassageState = CS.YES;
+                        payWay.IsConfig = CS.YES;
+                        break;
+                    }
+                }
+            }
         }
     }
 }

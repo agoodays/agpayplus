@@ -17,8 +17,8 @@
     >
       <template v-if="!readOnly && (replaceMode || fileList.length < num)">
         <slot name="uploadSlot" :loading="loading">
-          <a-button>
-            <upload-outlined /> {{ t('components.upload') }}
+          <a-button class="ag-upload-btn">
+            <loading-outlined v-if="loading" /><upload-outlined v-else /> {{ t('components.upload') }}
           </a-button>
         </slot>
       </template>
@@ -28,15 +28,15 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useUserStore } from '@/store/modules/system/user'
-import { upload, uploadFile } from '@/lib/ag-axios'
 import { ACCESS_TOKEN_NAME } from '@/constants/system/token-const'
-import { UploadOutlined } from '@ant-design/icons-vue'
-import { message } from 'ant-design-vue'
+import { uploadFile } from '@/lib/ag-axios'
+import { useUserStore } from '@/store/modules/system/user'
 import { viewerApi } from '@/utils/viewer-api'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
 import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

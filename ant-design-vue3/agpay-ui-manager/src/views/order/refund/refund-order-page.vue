@@ -4,8 +4,10 @@
       <!-- 搜索表单 -->
       <ag-search
         v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
         :collapsible="true"
-        :search-loading="tableRef?.isLoading?.value || false"
+        :search-loading="searchLoading"
         @search="searchFunc"
         @reset="searchFunc"
       >
@@ -14,7 +16,7 @@
           <a-col v-bind="colSpan">
             <a-form-item label="">
               <ag-date-range-picker
-                v-model="searchData.dateRange"
+                v-model="searchData.queryDateRange"
                 label="创建时间"
                 :show-time="{ format: 'HH:mm:ss' }"
                 format="YYYY-MM-DD HH:mm:ss"
@@ -48,12 +50,7 @@
           </a-col>
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchData.appId"
-                label="应用AppId"
-                placeholder="请输入应用AppId"
-                allow-clear
-              />
+              <ag-input v-model="searchData.appId" label="应用AppId" placeholder="请输入应用AppId" allow-clear />
             </a-form-item>
           </a-col>
         </template>
@@ -62,12 +59,7 @@
         <template #advanced="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
-              <ag-input
-                v-model="searchData.isvNo"
-                label="服务商号"
-                placeholder="请输入服务商号"
-                allow-clear
-              />
+              <ag-input v-model="searchData.isvNo" label="服务商号" placeholder="请输入服务商号" allow-clear />
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -77,13 +69,7 @@
                 label="退款状态"
                 placeholder="全部"
                 allow-clear
-                :options="[
-                  { value: '0', label: '订单生成' },
-                  { value: '1', label: '退款中' },
-                  { value: '2', label: '退款成功' },
-                  { value: '3', label: '退款失败' },
-                  { value: '4', label: '任务关闭' }
-                ]"
+                :options="refundStateOptions"
               />
             </a-form-item>
           </a-col>
@@ -94,8 +80,18 @@
                 label="支付接口"
                 placeholder="请选择支付接口"
                 allow-clear
-                :options="ifDefineOptions"
-              />
+                show-search
+              >
+                <a-select-option v-for="c in ifDefineList" :key="c.ifCode" :value="c.ifCode">
+                  <span class="channel-option">
+                    <span class="channel-option-icon" :style="c.bgColor ? { backgroundColor: c.bgColor + '20' } : {}">
+                      <img v-if="c.icon" :src="c.icon" :alt="c.ifName" />
+                      <span v-else class="fallback-letter">{{ (c.ifName || c.ifCode || '?').slice(0, 2) }}</span>
+                    </span>
+                    <span>{{ c.ifName || c.ifCode }}</span>
+                  </span>
+                </a-select-option>
+              </ag-select>
             </a-form-item>
           </a-col>
           <a-col v-bind="colSpan">
@@ -105,10 +101,7 @@
                 label="商户类型"
                 placeholder="全部"
                 allow-clear
-                :options="[
-                  { value: '1', label: '普通商户' },
-                  { value: '2', label: '特约商户' }
-                ]"
+                :options="mchTypeOptions"
               />
             </a-form-item>
           </a-col>
@@ -191,11 +184,13 @@
                 </a-button>
               </a-tooltip>
             </div>
-            <div class="order-no-item" v-if="record.mchRefundNo">
+            <div v-if="record.mchRefundNo" class="order-no-item">
               <a-tag color="green" class="order-tag">商户</a-tag>
               <a-tooltip placement="bottom">
                 <template #title>{{ record.mchRefundNo }}</template>
-                <span class="order-no-text">{{ changeStr2ellipsis(record.mchRefundNo, record.refundOrderId?.length) }}</span>
+                <span class="order-no-text">{{
+                  changeStr2ellipsis(record.mchRefundNo, record.refundOrderId?.length)
+                }}</span>
               </a-tooltip>
               <a-tooltip placement="bottom" title="复制">
                 <a-button type="link" size="small" class="copy-btn" @click="copyOrderNo(record.mchRefundNo)">
@@ -221,11 +216,13 @@
                 </a-button>
               </a-tooltip>
             </div>
-            <div class="order-no-item" v-if="record.channelPayOrderNo">
+            <div v-if="record.channelPayOrderNo" class="order-no-item">
               <a-tag color="orange" class="order-tag">渠道</a-tag>
               <a-tooltip placement="bottom">
                 <template #title>{{ record.channelPayOrderNo }}</template>
-                <span class="order-no-text">{{ changeStr2ellipsis(record.channelPayOrderNo, record.payOrderId?.length) }}</span>
+                <span class="order-no-text">{{
+                  changeStr2ellipsis(record.channelPayOrderNo, record.payOrderId?.length)
+                }}</span>
               </a-tooltip>
               <a-tooltip placement="bottom" title="复制">
                 <a-button type="link" size="small" class="copy-btn" @click="copyOrderNo(record.channelPayOrderNo)">
@@ -240,11 +237,11 @@
         <template #ifCodeSlot="{ record }">
           <a-tooltip placement="bottom">
             <template #title>
-              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }"/>
+              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }" />
               {{ record.ifName }}[{{ record.ifCode }}]
             </template>
             <span v-if="record.ifCode">
-              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }"/>
+              <a-avatar shape="square" size="small" :src="record.icon" :style="{ backgroundColor: record.bgColor }" />
               {{ record.ifName }}[{{ record.ifCode }}]
             </span>
           </a-tooltip>
@@ -267,15 +264,17 @@
 
         <!-- 状态插槽 -->
         <template #stateSlot="{ record }">
-          <a-tag :color="getStateColor(record.state)">
-            {{ getStateText(record.state) }}
+          <a-tag :color="getRefundStateInfo(record.state, t).status">
+            {{ getRefundStateInfo(record.state, t).text }}
           </a-tag>
         </template>
 
         <!-- 操作插槽 -->
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_REFUND_ORDER_VIEW')" type="link" @click="handleDetail(record)">详情</a-button>
+            <a-button v-if="hasPermission('ENT_REFUND_ORDER_VIEW')" type="link" @click="handleDetail(record)"
+              >详情</a-button
+            >
           </ag-table-actions>
         </template>
       </ag-table>
@@ -296,10 +295,15 @@ import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getMchTypeOptions, getRefundStateInfo, getRefundStateOptions } from '@/constants/common-const'
 import { CopyOutlined, DollarOutlined, TransactionOutlined, UndoOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
+import { useI18n } from 'vue-i18n'
 import { computed, onMounted, ref } from 'vue'
 import RefundDetailDrawer from './refund-detail-drawer.vue'
+
+// i18n
+const { t } = useI18n()
 
 // 权限检查
 const { hasPermission } = usePermission()
@@ -308,23 +312,27 @@ const { hasPermission } = usePermission()
  * 使用 CRUD 表格页面组合式函数
  */
 const {
+  searchFunc: _baseSearch,
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   detailOpen,
   currentRecordId,
   reloadTable,
   openDetail
-} = useCrudTablePage()
-
-// 初始化搜索表单默认值
-searchData.dateRange = ''
-searchData.unionOrderId = ''
-searchData.mchNo = ''
-searchData.appId = ''
-searchData.isvNo = ''
-searchData.state = ''
-searchData.ifCode = ''
-searchData.mchType = ''
+} = useCrudTablePage({
+  searchDefaults: {
+    queryDateRange: '',
+    unionOrderId: '',
+    mchNo: undefined,
+    appId: '',
+    isvNo: '',
+    state: undefined,
+    ifCode: undefined,
+    mchType: undefined
+  }
+})
 
 /**
  * 额外数据源 / 状态
@@ -336,21 +344,14 @@ const ifDefineList = ref([])
  * 商户选项（用于下拉选择）
  */
 const mchOptions = computed(() => {
-  return mchList.value.map(item => ({
+  return mchList.value.map((item) => ({
     value: item.mchNo,
     label: item.mchName
   }))
 })
 
-/**
- * 支付接口选项（用于下拉选择）
- */
-const ifDefineOptions = computed(() => {
-  return ifDefineList.value.map(item => ({
-    value: item.ifCode,
-    label: `${item.ifName}[${item.ifCode}]`
-  }))
-})
+const refundStateOptions = computed(() => getRefundStateOptions(t))
+const mchTypeOptions = computed(() => getMchTypeOptions(t))
 
 /**
  * 表格列配置
@@ -359,9 +360,30 @@ const tableColumns = [
   { key: 'refundOrderId', title: '退款订单号', width: 200, fixed: 'left', customRender: 'refundOrderSlot' },
   { key: 'payOrderId', title: '支付订单号', width: 200, customRender: 'payOrderSlot' },
   { key: 'ifCode', title: '支付接口', width: 160, ellipsis: true, customRender: 'ifCodeSlot' },
-  { key: 'payAmount', dataIndex: 'payAmount', title: '支付金额', width: 100, ellipsis: true, customRender: 'payAmountSlot' },
-  { key: 'refundAmount', dataIndex: 'refundAmount', title: '退款金额', width: 100, ellipsis: true, customRender: 'refundAmountSlot' },
-  { key: 'refundFeeAmount', dataIndex: 'refundFeeAmount', title: '手续费退还金额', width: 110, ellipsis: true, customRender: 'refundFeeAmountSlot' },
+  {
+    key: 'payAmount',
+    dataIndex: 'payAmount',
+    title: '支付金额',
+    width: 100,
+    ellipsis: true,
+    customRender: 'payAmountSlot'
+  },
+  {
+    key: 'refundAmount',
+    dataIndex: 'refundAmount',
+    title: '退款金额',
+    width: 100,
+    ellipsis: true,
+    customRender: 'refundAmountSlot'
+  },
+  {
+    key: 'refundFeeAmount',
+    dataIndex: 'refundFeeAmount',
+    title: '手续费退还金额',
+    width: 110,
+    ellipsis: true,
+    customRender: 'refundFeeAmountSlot'
+  },
   { key: 'mchName', dataIndex: 'mchName', title: '商户名称', width: 140, ellipsis: true },
   { key: 'state', dataIndex: 'state', title: '状态', width: 100, customRender: 'stateSlot' },
   { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 200 },
@@ -381,43 +403,7 @@ onMounted(() => {
  * @returns {Promise<Object>} 表格数据
  */
 const loadDataFunc = async (params) => {
-  const requestParams = {
-    pageNumber: params.pageNumber,
-    pageSize: params.pageSize
-  }
-
-  // 处理日期范围
-  if (searchData.dateRange && searchData.dateRange.length === 2) {
-    requestParams.createdStart = searchData.dateRange[0]
-    requestParams.createdEnd = searchData.dateRange[1]
-  }
-
-  // 处理订单号搜索
-  if (searchData.unionOrderId) {
-    requestParams.unionOrderId = searchData.unionOrderId
-  }
-
-  // 处理其他字段
-  if (searchData.mchNo) {
-    requestParams.mchNo = searchData.mchNo
-  }
-  if (searchData.appId) {
-    requestParams.appId = searchData.appId
-  }
-  if (searchData.isvNo) {
-    requestParams.isvNo = searchData.isvNo
-  }
-  if (searchData.state) {
-    requestParams.state = parseInt(searchData.state)
-  }
-  if (searchData.ifCode) {
-    requestParams.ifCode = searchData.ifCode
-  }
-  if (searchData.mchType) {
-    requestParams.mchType = parseInt(searchData.mchType)
-  }
-
-  return await orderApi.queryRefundOrderPage(requestParams)
+  return await orderApi.queryRefundOrderPage(params)
 }
 
 /**
@@ -426,40 +412,7 @@ const loadDataFunc = async (params) => {
  * @returns {Promise<Object>} 统计数据
  */
 const loadStatistics = async (params) => {
-  const requestParams = {}
-
-  // 处理日期范围
-  if (searchData.dateRange && searchData.dateRange.length === 2) {
-    requestParams.createdStart = searchData.dateRange[0]
-    requestParams.createdEnd = searchData.dateRange[1]
-  }
-
-  // 处理订单号搜索
-  if (searchData.unionOrderId) {
-    requestParams.unionOrderId = searchData.unionOrderId
-  }
-
-  // 处理其他字段
-  if (searchData.mchNo) {
-    requestParams.mchNo = searchData.mchNo
-  }
-  if (searchData.appId) {
-    requestParams.appId = searchData.appId
-  }
-  if (searchData.isvNo) {
-    requestParams.isvNo = searchData.isvNo
-  }
-  if (searchData.state) {
-    requestParams.state = parseInt(searchData.state)
-  }
-  if (searchData.ifCode) {
-    requestParams.ifCode = searchData.ifCode
-  }
-  if (searchData.mchType) {
-    requestParams.mchType = parseInt(searchData.mchType)
-  }
-
-  return await orderApi.queryRefundOrderCount(requestParams)
+  return await orderApi.queryRefundOrderCount(params)
 }
 
 /**
@@ -499,40 +452,8 @@ async function initIfDefineList() {
  * 搜索回调函数（同时刷新表格和统计）
  */
 function searchFunc() {
-  reloadTable()
+  _baseSearch()
   tableRef.value?.reloadStatistics()
-}
-
-/**
- * 获取状态颜色
- * @param {number} state - 状态值
- * @returns {string} 状态颜色
- */
-const getStateColor = (state) => {
-  const colorMap = {
-    0: 'blue',
-    1: 'orange',
-    2: 'green',
-    3: 'volcano',
-    4: 'default'
-  }
-  return colorMap[state] || 'default'
-}
-
-/**
- * 获取状态文本
- * @param {number} state - 状态值
- * @returns {string} 状态文本
- */
-const getStateText = (state) => {
-  const textMap = {
-    0: '订单生成',
-    1: '退款中',
-    2: '退款成功',
-    3: '退款失败',
-    4: '任务关闭'
-  }
-  return textMap[state] || '未知'
 }
 
 /**
@@ -745,5 +666,31 @@ const copyOrderNo = async (text) => {
       }
     }
   }
+}
+
+.channel-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.channel-option-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--primary-color) 8%, transparent);
+  flex-shrink: 0;
+}
+.channel-option-icon img {
+  max-width: 14px;
+  max-height: 14px;
+  object-fit: contain;
+}
+.channel-option-icon .fallback-letter {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-color-secondary);
 }
 </style>

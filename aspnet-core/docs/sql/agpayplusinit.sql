@@ -239,37 +239,51 @@ DROP TABLE IF EXISTS `t_mch_apply`;
 CREATE TABLE `t_mch_apply` (
   `apply_id` VARCHAR(64) NOT NULL COMMENT '进件单号',
   `mch_no` VARCHAR(64) NOT NULL COMMENT '商户号',
-  `agent_no` VARCHAR(64) NOT NULL COMMENT '代理商号',
+  `agent_no` VARCHAR(64) NULL COMMENT '代理商号',
   `top_agent_no` VARCHAR(64) NULL COMMENT '顶级代理商号',
-  `isv_no` VARCHAR(64) DEFAULT NULL COMMENT '服务商号',
-  `if_code` VARCHAR(20) NOT NULL COMMENT '接口代码 全小写  wxpay alipay ',
-  `auto_config_mch_app_id` VARCHAR(64) NOT NULL COMMENT '自动配置到应用ID',
-  `apply_page_type` VARCHAR(20) NOT NULL COMMENT '来源: PLATFORM_WEB-运营平台(WEB) AGENT_WEB-代理商(WEB) MCH_WEB-商户(WEB) AGENT_LITE-代理商(小程序) MCH_LITE-商户(小程序)',
-  `apply_detail_info` VARCHAR(255) NOT NULL COMMENT '申请详细信息', 
-  `apply_error_info` VARCHAR(255) NOT NULL COMMENT '申请错误信息(响应提示信息)', 
-  `channel_apply_no` VARCHAR(64) NOT NULL COMMENT '渠道申请单号', 
-  `succ_res_parameter` VARCHAR(255) NOT NULL COMMENT '成功响应参数(渠道响应参数)', 
-  `channel_var1` VARCHAR(255) NOT NULL COMMENT '渠道拓展参数1', 
-  `channel_var2` VARCHAR(255) NOT NULL COMMENT '渠道拓展参数2', 
-  `state` TINYINT(6) NOT NULL DEFAULT '0' COMMENT '状态: 0-草稿, 1-审核中, 2-进件成功, 3-驳回待修改, 4-待验证, 5-待签约, 7-等待预审, 8-预审拒绝', 
-  `is_temp_data` BOOLEAN NOT NULL COMMENT '是否临时数据', 
-  `mch_full_name` VARCHAR(64) NOT NULL COMMENT '商户名称全称', 
-  `mch_short_name` VARCHAR(32) NOT NULL COMMENT '进件商户简称', 
-  `merchant_type` TINYINT(6) NOT NULL DEFAULT '0' COMMENT '商户类型: 1-个人, 2-个体工商户, 3-企业', 
-  `contact_name` VARCHAR(32) NOT NULL COMMENT '商户联系人姓名', 
-  `contact_phone` VARCHAR(32) NOT NULL COMMENT '商户联系人电话', 
-  `contact_email` VARCHAR(32) NULL COMMENT '商户联系人邮箱', 
+  `isv_no` VARCHAR(64) NULL COMMENT '服务商号',
+  `if_code` VARCHAR(20) NOT NULL COMMENT '接口代码 全小写 wxpay alipay',
+  `auto_config_mch_app_id` VARCHAR(64) NULL COMMENT '自动配置到应用ID',
+  `apply_page_type` VARCHAR(20) NOT NULL COMMENT '来源: PLATFORM_WEB/AGENT_WEB/MCH_WEB/AGENT_LITE/MCH_LITE',
+  `apply_detail_info` TEXT NULL COMMENT '申请详细信息(JSON)',
+  `apply_params` JSON NULL COMMENT '进件参数详情(各通道差异化参数, JSON)',
+  `apply_error_info` TEXT NULL COMMENT '申请错误信息(响应提示信息)',
+  `channel_apply_no` VARCHAR(64) NULL COMMENT '渠道申请单号',
+  `channel_mch_id` VARCHAR(64) NULL COMMENT '渠道返回的商户标识(如微信sub_mch_id、支付宝smid)',
+  `succ_res_parameter` TEXT NULL COMMENT '成功响应参数(渠道响应参数)',
+  `channel_ext_params` JSON NULL COMMENT '渠道扩展参数(JSON)',
+  `state` TINYINT(6) NOT NULL DEFAULT 0 COMMENT '状态: 0-草稿, 7-等待预审, 8-预审拒绝, 1-审核中, 3-驳回待修改, 5-待签约, 4-待验证, 2-进件成功',
+  `audit_uid` BIGINT(20) NULL COMMENT '审核人用户ID',
+  `audit_by` VARCHAR(64) NULL COMMENT '审核人姓名',
+  `audit_remark` VARCHAR(512) NULL COMMENT '审核意见',
+  `audited_at` TIMESTAMP(6) NULL COMMENT '审核时间',
+  `sign_url` VARCHAR(512) NULL COMMENT '签约链接',
+  `sign_expire_at` TIMESTAMP(6) NULL COMMENT '签约链接过期时间',
+  `verify_amount` BIGINT(20) NULL COMMENT '小额打款金额(分)',
+  `verify_code` VARCHAR(32) NULL COMMENT '验证金额/验证码',
+  `verified_at` TIMESTAMP(6) NULL COMMENT '验证时间',
+  `progress` TINYINT(6) NOT NULL DEFAULT 0 COMMENT '进件进度百分比: 0-100',
+  `is_temp_data` BOOLEAN NOT NULL DEFAULT FALSE COMMENT '是否临时数据',
+  `mch_full_name` VARCHAR(64) NOT NULL COMMENT '商户名称全称',
+  `mch_short_name` VARCHAR(32) NOT NULL COMMENT '进件商户简称',
+  `merchant_type` TINYINT(6) NOT NULL DEFAULT 0 COMMENT '商户类型: 1-个人, 2-个体工商户, 3-企业',
+  `contact_name` VARCHAR(32) NOT NULL COMMENT '商户联系人姓名',
+  `contact_phone` VARCHAR(32) NOT NULL COMMENT '商户联系人电话',
+  `contact_email` VARCHAR(32) NULL COMMENT '商户联系人邮箱',
   `province_code` VARCHAR(32) NOT NULL COMMENT '省代码',
   `city_code` VARCHAR(32) NOT NULL COMMENT '市代码',
   `district_code` VARCHAR(32) NOT NULL COMMENT '区代码',
   `address` VARCHAR(128) NOT NULL COMMENT '商户详细地址',
-  `ep_user_id` BIGINT(20) DEFAULT NULL COMMENT '商户拓展员ID',
+  `ep_user_id` BIGINT(20) NULL COMMENT '商户拓展员ID',
   `last_apply_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '上次进件时间',
-  `created_uid` BIGINT(20) DEFAULT NULL COMMENT '创建者用户ID',
-  `created_by` VARCHAR(64) DEFAULT NULL COMMENT '创建者姓名',
+  `created_uid` BIGINT(20) NULL COMMENT '创建者用户ID',
+  `created_by` VARCHAR(64) NULL COMMENT '创建者姓名',
   `created_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) COMMENT '创建时间',
   `updated_at` TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6) COMMENT '更新时间',
-  PRIMARY KEY (apply_id)
+  PRIMARY KEY (`apply_id`),
+  KEY `idx_mch_no` (`mch_no`),
+  KEY `idx_if_code_state` (`if_code`, `state`),
+  KEY `idx_created_at` (`created_at`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='商户进件申请表';
 
 -- 商户应用表
@@ -1175,6 +1189,20 @@ VALUES ('ENT_MCH', '商户管理', 'shop', '', 'RouteView', 'ML', 0, 1,  'ROOT',
             VALUES ('ENT_MCH_PAY_PASSAGE_CONFIG', '应用支付通道配置入口', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_PAY_PASSAGE_LIST', '0', 'MGR', NOW(), NOW());
             INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
             VALUES ('ENT_MCH_PAY_PASSAGE_ADD', '应用支付通道配置保存', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_PAY_PASSAGE_LIST', '0', 'MGR', NOW(), NOW());
+
+    -- 进件管理
+    INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
+    VALUES ('ENT_MCH_APPLY', '进件管理', 'schedule', '/mchApply', 'MchApplyPage', 'ML', 0, 1,  'ENT_MCH', '30', 'MGR', NOW(), NOW());
+        INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
+        VALUES ('ENT_MCH_APPLY_LIST', '页面：进件列表', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APPLY', '0', 'MGR', NOW(), NOW());
+        INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
+        VALUES ('ENT_MCH_APPLY_ADD', '按钮：新增', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APPLY', '0', 'MGR', NOW(), NOW());
+        INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
+        VALUES ('ENT_MCH_APPLY_EDIT', '按钮：编辑', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APPLY', '0', 'MGR', NOW(), NOW());
+        INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
+        VALUES ('ENT_MCH_APPLY_VIEW', '按钮：详情', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APPLY', '0', 'MGR', NOW(), NOW());
+        INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 
+        VALUES ('ENT_MCH_APPLY_DEL', '按钮：删除', 'no-icon', '', '', 'PB', 0, 1,  'ENT_MCH_APPLY', '0', 'MGR', NOW(), NOW());
 
     -- 门店管理
     INSERT INTO `t_sys_entitlement` (`ent_id`, `ent_name`, `menu_icon`, `menu_uri`, `component_name`, `ent_type`, `quick_jump`, `state`, `pid`, `ent_sort`, `sys_type`, `created_at`, `updated_at`) 

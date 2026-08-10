@@ -1,8 +1,15 @@
-﻿<template>
+<template>
   <div>
     <a-card :bordered="false">
       <!-- 搜索表单 -->
-      <ag-search v-model="searchData" @search="searchFunc">
+      <ag-search
+        v-model="searchData"
+        :default-model-value="defaultSearchData"
+        reset-mode="default"
+        :search-loading="searchLoading"
+        @search="searchFunc"
+        @reset="searchFunc"
+      >
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -48,7 +55,9 @@
           </a-button>
         </template>
 
-        <template #roleIdSlot="{ record }"><b>{{ record.roleId }}</b></template>
+        <template #roleIdSlot="{ record }"
+          ><b>{{ record.roleId }}</b></template
+        >
 
         <!-- 所属系统列 -->
         <template #sysTypeSlot="{ record }">
@@ -60,15 +69,31 @@
         <!-- 操作列 -->
         <template #opSlot="{ record }">
           <ag-table-actions>
-            <a-button v-if="hasPermission('ENT_UR_ROLE_EDIT')" type="link" @click="editFunc(record.roleId, record.sysType)">修改</a-button>
-            <a-button v-if="hasPermission('ENT_UR_ROLE_DEL')" type="link" style="color: red" @click="delFunc(record.roleId)">删除</a-button>
+            <a-button
+              v-if="hasPermission('ENT_UR_ROLE_EDIT')"
+              type="link"
+              @click="editFunc(record.roleId, record.sysType)"
+              >修改</a-button
+            >
+            <a-button
+              v-if="hasPermission('ENT_UR_ROLE_DEL')"
+              type="link"
+              style="color: red"
+              @click="delFunc(record.roleId)"
+              >删除</a-button
+            >
           </ag-table-actions>
         </template>
       </ag-table>
     </a-card>
 
     <!-- 新增/编辑弹窗 -->
-    <add-or-edit v-model:open="modalOpen" :record-id="currentRecordId" :sys-type="currentSysType" @success="handleSuccess" />
+    <add-or-edit
+      v-model:open="modalOpen"
+      :record-id="currentRecordId"
+      :sys-type="currentSysType"
+      @success="handleSuccess"
+    />
   </div>
 </template>
 <script setup>
@@ -140,6 +165,8 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  defaultSearchData,
+  searchLoading,
   modalOpen,
   currentRecordId,
   reloadTable,
@@ -151,11 +178,14 @@ const {
   deleteAction: (recordId) => roleApi.delById(recordId),
   deleteConfirmTitle: '确定删除吗',
   deleteConfirmContent: '',
-  deleteSuccessMessage: '删除成功'
+  deleteSuccessMessage: '删除成功',
+  searchDefaults: {
+    sysType: 'MGR',
+    belongInfoId: '',
+    roleId: '',
+    roleName: ''
+  }
 })
-
-// 初始化默认搜索参数
-searchData.sysType = 'MGR'
 
 /**
  * 请求表格数据函数

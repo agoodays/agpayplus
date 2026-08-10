@@ -45,7 +45,7 @@
  * <AgStateSwitch :state="record.state" />
  */
 import { useInjectFormItemContext } from 'ant-design-vue/es/form/FormItemContext'
-import { ref, watch } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 
 const props = defineProps({
   /** 状态值：0=停用/禁用，1=启用/激活，其他=未知 */
@@ -130,22 +130,25 @@ async function handleChange(checked) {
   loading.value = true
 
   try {
-    // 调用父组件传入的 onChange 回调，等待异步操作完成
     await props.onChange(checked ? 1 : 0)
 
-    // 成功后更新状态
     emit('update:state', checked ? 1 : 0)
     emit('change', checked ? 1 : 0)
-    // 如果组件在 a-form-item 内，自动触发表单验证状态更新
     if (formItemContext && typeof formItemContext.onFieldChange === 'function') {
       formItemContext.onFieldChange()
     }
   } catch (error) {
-    // 失败时恢复原状态
-    localChecked.value = !checked
-    console.error('状态切换失败:', error)
+    // 用 props.state（原值）回滚，比 !checked 更准确
+    // 成功路径才会 emit update:state 改变 props.state，取消时 props.state 一定还是旧值
+    localChecked.value = props.state === 1
+    if (error?.message !== '用户取消') {
+      console.error('状态切换失败:', error)
+    }
   } finally {
     loading.value = false
+    // loading 解除后再同步一次，确保 disabled 状态下的 UI 恢复生效
+    await nextTick()
+    localChecked.value = props.state === 1
   }
 }
 </script>

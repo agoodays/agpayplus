@@ -1,7 +1,7 @@
 <template>
   <a-card :bordered="false">
     <!-- 搜索表单 -->
-    <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+    <ag-search v-model="searchData" :search-loading="searchLoading" reset-mode="default" :default-model-value="defaultSearchData" @search="searchFunc" @reset="() => tableRef.value?.reload(true)">
       <template #base="{ colSpan }">
         <a-col v-bind="colSpan">
           <a-form-item label="">
@@ -18,14 +18,7 @@
               label="支付类型"
               placeholder="请选择支付类型"
               allow-clear
-              :options="[
-                { value: 'WECHAT', label: '微信' },
-                { value: 'ALIPAY', label: '支付宝' },
-                { value: 'YSFPAY', label: '云闪付' },
-                { value: 'UNIONPAY', label: '银联' },
-                { value: 'DCEPPAY', label: '数字人民币' },
-                { value: 'OTHER', label: '其他' }
-              ]"
+              :options="wayTypeOptions"
             />
           </a-form-item>
         </a-col>
@@ -204,6 +197,8 @@
 <script setup>
 import { statisticApi } from '@/api/business/statistic/statistic-api'
 import { AgDateRangePicker, AgSearch, AgTable } from '@/components'
+import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getWayTypeOptions } from '@/constants/common-const'
 import { downloadFile } from '@/lib/ag-axios'
 import {
     DollarOutlined,
@@ -213,9 +208,16 @@ import {
     UndoOutlined,
     WalletOutlined
 } from '@ant-design/icons-vue'
-import { onMounted, reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 const icons = { InfoCircleOutlined }
+
+/** i18n */
+const { t } = useI18n()
+
+/** 枚举选项（带国际化） */
+const wayTypeOptions = computed(() => getWayTypeOptions(t))
 
 // 定义组件属性
 const props = defineProps({
@@ -237,21 +239,28 @@ const tableColumns = ref([
   { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot', titleSlot: 'roundTitle' }
 ])
 
-// 响应式数据
-const tableRef = ref(null)
 const sortState = reactive({
   field: '',
   order: null
 })
 
-// 默认搜索数据
-const defaultSearchData = {
-  method: 'wayType',
-  mchNo: props.mchNo,
-  queryDateRange: props.queryDateRange,
-  wayType: ''
+const {
+  tableRef,
+  searchData,
+  defaultSearchData,
+  searchLoading
+} = useCrudTablePage({
+  searchDefaults: {
+    method: 'wayType',
+    mchNo: props.mchNo,
+    queryDateRange: props.queryDateRange,
+    wayType: ''
+  }
+})
+
+const searchFunc = () => {
+  tableRef.value?.reload(true)
 }
-const searchData = reactive({ ...defaultSearchData })
 
 // 统计初始化数据
 const countInitData = reactive({
@@ -265,20 +274,6 @@ const countInitData = reactive({
   refundFeeAmount: 0.0,
   round: 0.0
 })
-
-// 处理搜索表单数据
-const handleSearchFormData = (searchDataParam) => {
-  // 防止强制清空时数据为null/undefined
-  if (!searchDataParam || Object.keys(searchDataParam).length === 0) {
-    Object.assign(searchData, defaultSearchData)
-  } else {
-    Object.assign(searchData, searchDataParam)
-  }
-}
-
-const searchFunc = () => {
-  tableRef.value?.reload(true)
-}
 
 const loadDataFunc = async (params) => {
   return await statisticApi.queryOrderStatistic({
@@ -296,12 +291,6 @@ const handleSortChange = ({ field, order }) => {
 const downloadDataFunc = async (params) => {
   await downloadFile(statisticApi.exportExcel(params), '支付类型统计.xlsx')
 }
-
-// 组件挂载时
-onMounted(() => {
-  // 组件初始化时将默认搜索数据赋值给 searchData
-  Object.assign(searchData, defaultSearchData)
-})
 </script>
 
 <style lang="less" scoped>

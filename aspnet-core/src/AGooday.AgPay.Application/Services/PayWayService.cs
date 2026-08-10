@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Application.Interfaces;
 using AGooday.AgPay.Common.Enumerator;
 using AGooday.AgPay.Common.Models;
@@ -15,7 +15,6 @@ namespace AGooday.AgPay.Application.Services
     /// </summary>
     public class PayWayService : AgPayService<PayWayDto, PayWay>, IPayWayService
     {
-        // 注意这里是要IoC依赖注入的，还没有实现
         private readonly IPayWayRepository _payWayRepository;
 
         public PayWayService(IMapper mapper, IMediatorHandler bus,
@@ -45,14 +44,14 @@ namespace AGooday.AgPay.Application.Services
             return entity?.WayType ?? PayWayType.OTHER.ToString();
         }
 
-        public Task<PaginatedResult<T>> GetPaginatedDataAsync<T>(PayWayQueryDto dto)
+        public async Task<PaginatedResult<T>> GetPaginatedDataAsync<T>(PayWayQueryDto dto)
         {
             var query = _payWayRepository.GetAllAsNoTracking()
                 .WhereIfNotEmpty(dto.WayCode, w => w.WayCode.Equals(dto.WayCode))
                 .WhereIfNotEmpty(dto.WayName, w => w.WayName.Contains(dto.WayName))
                 .WhereIfNotEmpty(dto.WayType, w => w.WayType.Equals(dto.WayType))
                 .OrderByDescending(o => o.WayCode).ThenByDescending(o => o.CreatedAt);
-            return query.ToPaginatedResultAsync<PayWay, T>(_mapper, dto.PageNumber, dto.PageSize);
+            return await query.ToPaginatedResultAsync<PayWay, T>(_mapper, dto.PageNumber, dto.PageSize);
         }
     }
 }

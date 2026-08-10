@@ -2,7 +2,7 @@
   <div>
     <a-card>
       <!-- 搜索区域 -->
-      <ag-search v-model="searchData" :search-loading="tableRef?.isLoading?.value || false" @search="searchFunc">
+      <ag-search v-model="searchData" :search-loading="searchLoading" @search="searchFunc">
         <template #base="{ colSpan }">
           <a-col v-bind="colSpan">
             <a-form-item label="">
@@ -111,6 +111,7 @@ const tableColumns = [
 const {
   tableRef,
   searchData,
+  searchLoading,
   modalOpen,
   currentRecordId,
   reloadTable,

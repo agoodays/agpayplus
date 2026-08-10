@@ -1,4 +1,4 @@
-﻿using AGooday.AgPay.Application.DataTransfer;
+using AGooday.AgPay.Application.DataTransfer;
 using AGooday.AgPay.Domain.Commands.AgentInfos;
 using AGooday.AgPay.Domain.Commands.MchInfos;
 using AGooday.AgPay.Domain.Commands.SysUsers;
@@ -27,6 +27,11 @@ namespace AGooday.AgPay.Application.AutoMapper
             CreateMap<ModifyAgentInfoCommand, AgentInfo>();
 
             CreateMap<IsvInfoDto, IsvInfo>();
+            CreateMap<MchApplySaveDto, MchApply>()
+                .ForMember(d => d.ApplyId, o => o.Ignore())
+                .ForMember(d => d.State, o => o.Ignore())
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.UpdatedAt, o => o.Ignore());
             CreateMap<PayRateLevelConfigDto, PayRateLevelConfig>();
             CreateMap<MchAppDto, MchApp>()
                 .ForMember(d => d.AppSignType, o =>
