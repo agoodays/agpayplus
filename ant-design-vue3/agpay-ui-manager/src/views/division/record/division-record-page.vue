@@ -134,7 +134,9 @@
           </a-tooltip>
         </template>
         <template #stateSlot="{ record }">
-          <a-tag v-bind="getDivisionStateInfo(String(record.state), t)" />
+          <a-tag v-bind="getDivisionStateInfo(record.state, t)">
+            {{ getDivisionStateInfo(record.state, t).text }}
+          </a-tag>
         </template>
         <template #opSlot="{ record }">
           <!-- 操作按钮 -->
@@ -164,11 +166,11 @@ import { divisionRecordApi } from '@/api/business/division/division-record-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgSelectInfinite, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getDivisionStateInfo, getDivisionStateOptions } from '@/constants/common-const'
 import { infoBox } from '@/utils/info-box'
 import { message } from 'ant-design-vue'
-import { onMounted, ref, computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getDivisionStateOptions, getDivisionStateInfo } from '@/constants/common-const'
 import Detail from './detail.vue'
 
 const { t } = useI18n()

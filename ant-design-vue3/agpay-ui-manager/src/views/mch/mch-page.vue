@@ -76,7 +76,9 @@
         </template>
 
         <template #typeSlot="{ record }">
-          <a-tag v-bind="getMchTypeInfo(record.type, t)" />
+          <a-tag v-bind="getMchTypeInfo(record.type, t)">
+            {{ getMchTypeInfo(record.type, t).text }}
+          </a-tag>
         </template>
 
         <template #opSlot="{ record }">
@@ -122,7 +124,7 @@ import { mchApi } from '@/api/business/mch/mch-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { getStateInfo, getStateOptions, getMchTypeOptions, getMchTypeInfo } from '@/constants/common-const'
+import { getMchTypeInfo, getMchTypeOptions, getStateInfo, getStateOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'

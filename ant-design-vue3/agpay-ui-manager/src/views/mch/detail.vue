@@ -25,7 +25,7 @@
 
         <a-descriptions-item label="商户类型">
           <a-tag v-bind="getMchTypeInfo(detailData.type, t)">
-            {{ getMchTypeInfo(detailData.type, t).desc }}
+            {{ getMchTypeInfo(detailData.type, t).text }}
           </a-tag>
         </a-descriptions-item>
 
@@ -62,7 +62,9 @@
         </a-descriptions-item>
 
         <a-descriptions-item label="退款方式">
-          <a-tag v-for="mode in detailData.refundMode" v-bind="getRefundModeInfo(mode, t)"> {{ getRefundModeInfo(mode, t).text }} </a-tag>
+          <a-tag v-for="mode in detailData.refundMode" v-bind="getRefundModeInfo(mode, t)">
+            {{ getRefundModeInfo(mode, t).text }}
+          </a-tag>
         </a-descriptions-item>
 
         <a-descriptions-item label="状态">

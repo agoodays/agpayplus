@@ -71,7 +71,9 @@
       >
         <!-- 业务类型列 -->
         <template #bizTypeSlot="{ record }">
-          <a-tag v-bind="getBizTypeInfo(String(record.bizType), t)" />
+          <a-tag v-bind="getBizTypeInfo(record.bizType, t)">
+            {{ getBizTypeInfo(record.bizType, t).text }}
+          </a-tag>
         </template>
 
         <!-- 角色名称列 -->
@@ -118,8 +120,8 @@ import { accountBillApi } from '@/api/business/account-bill/account-bill-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { getProfitInfoTypeOptions, getBizTypeOptions, getAccountTypeOptions, getBizTypeInfo } from '@/constants/common-const'
-import { computed, ref } from 'vue'
+import { getAccountTypeOptions, getBizTypeInfo, getBizTypeOptions, getProfitInfoTypeOptions } from '@/constants/common-const'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Detail from './detail.vue'
 

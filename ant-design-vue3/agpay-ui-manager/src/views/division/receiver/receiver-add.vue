@@ -181,7 +181,6 @@
         </a-button>
       </template>
       <ag-table
-        row-key="rowKey"
         :columns="accTableColumns"
         :data="receiverTableData.filter((item) => item.ifCode == 'alipay')"
         :pagination="false"

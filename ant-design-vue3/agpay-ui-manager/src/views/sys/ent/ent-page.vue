@@ -7,7 +7,7 @@
         :collapsible="false"
         :search-loading="searchLoading"
         :reset-exclude="['sysType']"
-        reset-mode="default"
+        :reset-mode="'default'"
         :default-model-value="defaultSearchData"
         @search="searchFunc"
         @reset="searchFunc"
@@ -41,6 +41,7 @@
       <!-- 数据表格 -->
       <ag-table
         ref="tableRef"
+        row-key="entId"
         state-key="ent"
         :columns="tableColumns"
         :on-load="loadDataFunc"

@@ -56,8 +56,7 @@
         <template #wayCodeSlot="{ record }"><b>{{ record.wayCode }}</b></template> <!-- 自定义插槽 -->
         <template #productTypeSlot="{ record }">
           <a-tag
-            :key="record.productType"
-            :color="getProductTypeInfo(record.productType, t).status">
+            v-bind="getProductTypeInfo(record.productType, t)">
             {{ getProductTypeInfo(record.productType, t).text }}
           </a-tag>
         </template>
@@ -90,7 +89,7 @@ import { payConfigApi } from '@/api/business/pay-config/pay-config-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { getProductTypeOptions, getWayTypeOptions, getProductTypeInfo, getWayTypeInfo } from '@/constants/common-const'
+import { getProductTypeInfo, getProductTypeOptions, getWayTypeInfo, getWayTypeOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
