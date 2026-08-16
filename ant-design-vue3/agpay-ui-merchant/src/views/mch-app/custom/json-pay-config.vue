@@ -1,0 +1,256 @@
+<template>
+  <ag-drawer
+    v-model:open="localOpen"
+    width="40%"
+    title="填写参数"
+    :mask-closable="false"
+    :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')"
+    :confirm-loading="loading"
+    @confirm="handleConfirm"
+    @close="handleClose"
+  >
+    <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
+      <a-row :gutter="16">
+        <a-col :span="12">
+          <a-form-item label="状态" name="state">
+            <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
+          </a-form-item>
+        </a-col>
+        <a-col :span="24">
+          <a-form-item label="备注" name="remark">
+            <a-input v-model:value="saveObject.remark" placeholder="请输入" type="textarea" />
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+
+    <a-divider orientation="left">
+      <a-tag color="#FF4B33">{{ saveObject.ifCode }} 商户参数配置</a-tag>
+    </a-divider>
+
+    <a-form ref="mchParamForm" :model="ifParams" layout="vertical" :rules="ifParamsRules">
+      <a-row :gutter="16">
+        <a-col v-for="(item, key) in mchParams" :key="key" :span="item.type === 'text' ? 12 : 24">
+          <a-form-item :label="item.desc" :name="item.name" v-if="item.type === 'text' || item.type === 'textarea'">
+            <a-input v-model:value="ifParams[item.name]" :placeholder="item.star === '1' ? (ifParams[item.name + '_ph'] || '请输入') : '请输入'" :type="item.type" />
+          </a-form-item>
+          <a-form-item :label="item.desc" :name="item.name" v-else-if="item.type === 'radio'">
+            <a-radio-group v-model:value="ifParams[item.name]">
+              <a-radio v-for="(radioItem, radioKey) in item.values" :key="radioKey" :value="radioItem.value">
+                {{ radioItem.title }}
+              </a-radio>
+            </a-radio-group>
+          </a-form-item>
+          <a-form-item :label="item.desc" :name="item.name" v-else-if="item.type === 'file'">
+            <ag-upload
+              :action="action"
+              :bind-name="item.name"
+              :urls="[ifParams[item.name]]"
+              list-type="picture"
+              @upload-success="uploadSuccess"
+            >
+              <template #uploadSlot="{ loading: uploadLoading }">
+                <a-button class="ag-upload-btn">
+                  <component :is="uploadLoading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
+                </a-button>
+              </template>
+            </ag-upload>
+          </a-form-item>
+        </a-col>
+      </a-row>
+    </a-form>
+  </ag-drawer>
+</template>
+
+<script setup>
+import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
+import { AgDrawer, AgUpload } from '@/components'
+import { usePermission } from '@/composables/useCommon'
+import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
+import { getStateOptions } from '@/constants/common-const'
+import { upload } from '@/lib/ag-axios'
+import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { computed, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
+const stateOptions = computed(() => getStateOptions(t))
+const icons = { LoadingOutlined, UploadOutlined }
+
+const { hasPermission } = usePermission()
+
+const props = defineProps({
+  open: {
+    type: Boolean,
+    default: false
+  },
+  appId: {
+    type: String,
+    default: ''
+  },
+  record: {
+    type: Object,
+    default: () => ({})
+  }
+})
+
+const emit = defineEmits(['update:open', 'success'])
+
+const infoForm = ref(null)
+const mchParamForm = ref(null)
+const mchType = ref(null)
+const action = ref(upload.cert)
+const mchParams = ref([])
+
+const saveObject = reactive({
+  infoId: null,
+  ifCode: null,
+  state: 1,
+  remark: ''
+})
+
+const ifParams = reactive({})
+
+const rules = {
+  infoId: [{ required: true, trigger: 'blur' }],
+  ifCode: [{ required: true, trigger: 'blur' }]
+}
+
+const ifParamsRules = ref({})
+
+const resetForm = () => {
+  mchType.value = props.record.mchType
+  Object.keys(saveObject).forEach((key) => {
+    saveObject[key] = null
+  })
+
+  Object.keys(ifParams).forEach((key) => {
+    delete ifParams[key]
+  })
+
+  mchParams.value = []
+  saveObject.infoId = props.appId
+  saveObject.ifCode = props.record.ifCode
+  saveObject.state = props.record.ifConfigState === 0 ? 0 : 1
+
+  if (mchParamForm.value) {
+    mchParamForm.value.resetFields()
+  }
+}
+
+const getMchPayConfig = async (record) => {
+  try {
+    resetForm()
+    const res = await mchAppApi.getMchPayConfigUnique(saveObject.infoId, saveObject.ifCode)
+    if (res && res.ifParams) {
+      Object.assign(saveObject, res)
+      const parsedParams = JSON.parse(res.ifParams)
+      Object.assign(ifParams, parsedParams)
+    }
+
+    const newItems = []
+    const mchParamsStr = mchType.value === 1 ? record.normalMchParams : record.isvsubMchParams
+    JSON.parse(mchParamsStr).forEach((item) => {
+      let radioItems = []
+      if (item.type === 'radio') {
+        const valueItems = item.values.split(',')
+        const titleItems = item.titles.split(',')
+        for (let i = 0; i < valueItems.length; i++) {
+          let radioVal = valueItems[i]
+          if (!Number.isNaN(Number(radioVal))) {
+            radioVal = Number(radioVal)
+          }
+          radioItems.push({ value: radioVal, title: titleItems[i] })
+        }
+      }
+
+      if (item.star === '1') {
+        ifParams[item.name + '_ph'] = ifParams[item.name] ? ifParams[item.name] : '请输入'
+        if (ifParams[item.name]) {
+          ifParams[item.name] = ''
+        }
+      }
+
+      newItems.push({
+        name: item.name,
+        desc: item.desc,
+        type: item.type,
+        verify: item.verify,
+        values: radioItems,
+        star: item.star
+      })
+    })
+
+    mchParams.value = newItems
+    generateRules()
+  } catch (error) {
+    console.error('获取商户支付配置失败:', error)
+  }
+}
+
+const { localOpen, loading, submit, uploadSuccess: handleUploadSuccess, handleClose: closeDrawer } = usePayConfigDrawer({
+  props,
+  emit,
+  infoForm,
+  paramForm: mchParamForm,
+  saveObject,
+  ifParams,
+  initialSaveObject: () => ({
+    infoId: props.appId,
+    ifCode: props.record.ifCode,
+    state: props.record.ifConfigState === 0 ? 0 : 1,
+    remark: ''
+  }),
+  initialIfParams: () => ({}),
+  loadConfig: async () => {
+    await getMchPayConfig(props.record)
+  },
+  buildSubmitPayload: ({ saveObject: currentSaveObject, ifParams: currentIfParams }) => {
+    const submitParams = { ...currentIfParams }
+    Object.keys(mchParams.value).forEach((key) => {
+      const item = mchParams.value[key]
+      if (item.star === '1' && submitParams[item.name] === '') {
+        submitParams[item.name] = undefined
+      }
+      if (submitParams[item.name + '_ph'] !== undefined) {
+        delete submitParams[item.name + '_ph']
+      }
+    })
+
+    return {
+      infoId: currentSaveObject.infoId,
+      ifCode: currentSaveObject.ifCode,
+      state: currentSaveObject.state,
+      remark: currentSaveObject.remark,
+      ifParams: JSON.stringify(submitParams)
+    }
+  },
+  saveConfig: async (reqParams) => {
+    await mchAppApi.addMchPayConfig(reqParams)
+  },
+  shouldInit: (propsData) => Boolean(propsData.appId && propsData.record?.ifCode)
+})
+
+const handleConfirm = submit
+const uploadSuccess = handleUploadSuccess
+const handleClose = closeDrawer
+
+const generateRules = () => {
+  const generatedRules = {}
+  Object.keys(mchParams.value).forEach((key) => {
+    const item = mchParams.value[key]
+    const ruleItems = []
+    if (item.verify === 'required' && item.star !== '1') {
+      ruleItems.push({
+        required: true,
+        message: '请输入' + item.desc,
+        trigger: 'blur'
+      })
+      generatedRules[item.name] = ruleItems
+    }
+  })
+  ifParamsRules.value = generatedRules
+}
+</script>
+
+<style lang="less" scoped></style>

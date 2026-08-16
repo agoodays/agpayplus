@@ -1,0 +1,298 @@
+/**
+ * Ant Design Vue 样式覆盖
+ * 
+ * 使用运行时 CSS 变量覆盖 Ant Design 组件样式
+ * 避免在构建时修改 Less 变量
+ */
+
+// ==================== 菜单 ====================
+
+.ant-menu,
+.ant-menu-item,
+.ant-menu-submenu-title {
+  border-radius: var(--border-radius) !important;
+}
+
+.ant-menu-item:hover,
+.ant-menu-item-active {
+  background: var(--primary-color-weak) !important;
+}
+
+// data-theme 暗色模式下的组件统一
+:root[data-theme='dark'] {
+  .ant-layout,
+  .ant-layout-content,
+  .ant-layout-header,
+  .ant-layout-footer {
+    background: var(--layout-bg) !important;
+    color: var(--text-color) !important;
+  }
+
+  .ant-dropdown-menu,
+  .ant-tooltip-inner,
+  .ant-menu-light,
+  .ant-menu-submenu-popup,
+  .ant-select-dropdown,
+  .ant-picker-dropdown,
+  .ant-modal-content,
+  .ant-drawer-content,
+  .ant-card,
+  .ant-form,
+  .ant-message-notice-content,
+  .ant-notification-notice-content,
+  .ant-popover-inner {
+    background: var(--layout-surface) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-tooltip-arrow-content,
+  .ant-popover-arrow-content {
+    --antd-arrow-background-color: var(--layout-surface);
+    background: var(--layout-surface) !important;
+  }
+
+  .ant-dropdown-menu-item,
+  .ant-menu-item,
+  .ant-menu-submenu-title,
+  .ant-select-item,
+  .ant-picker-cell,
+  .ant-form-item-label > label,
+  .ant-modal-title,
+  .ant-drawer-title,
+  .ant-message-notice-content,
+  .ant-notification-notice-title,
+  .ant-notification-notice-description,
+  .ant-popover-inner-title,
+  .ant-popconfirm-message-title,
+  .ant-popconfirm-description {
+    color: var(--text-color) !important;
+  }
+
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-select-selector,
+  .ant-picker,
+  .ant-textarea,
+  .ant-input[disabled],
+  .ant-input-disabled,
+  .ant-select-disabled .ant-select-selector,
+  .ant-picker.ant-picker-disabled,
+  .ant-input-number,
+  .ant-input-number-input {
+    background: var(--layout-surface) !important;
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-input[disabled],
+  .ant-input-disabled,
+  .ant-select-disabled .ant-select-selector,
+  .ant-picker.ant-picker-disabled,
+  .ant-input-number-disabled,
+  .ant-btn[disabled],
+  .ant-btn[disabled]:hover {
+    opacity: 0.72;
+    color: var(--text-color-muted) !important;
+    background: var(--surface-subtle) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-input-number,
+  .ant-input-number-handler-wrap,
+  .ant-input-number-group-addon,
+  .ant-picker-panel-container,
+  .ant-picker-header,
+  .ant-pagination-item,
+  .ant-pagination-prev .ant-pagination-item-link,
+  .ant-pagination-next .ant-pagination-item-link,
+  .ant-tabs-tab,
+  .ant-tabs-nav::before,
+  .ant-descriptions-bordered .ant-descriptions-item-label,
+  .ant-descriptions-bordered .ant-descriptions-item-content,
+  .ant-list-item,
+  .ant-list-header,
+  .ant-list-footer,
+  .ant-empty-normal,
+  .ant-modal-header,
+  .ant-modal-footer,
+  .ant-drawer-header,
+  .ant-drawer-body,
+  .ant-drawer-footer,
+  .ant-breadcrumb,
+  .ant-breadcrumb-link,
+  .ant-breadcrumb-separator,
+  .ant-divider,
+  .ant-descriptions-view,
+  .ant-card-head,
+  .ant-card-bordered,
+  .ant-statistic,
+  .ant-statistic-content,
+  .ant-statistic-title {
+    color: var(--text-color) !important;
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-pagination-item a,
+  .ant-tabs-tab-btn,
+  .ant-tabs-tab .anticon,
+  .ant-descriptions-item-label,
+  .ant-descriptions-item-content,
+  .ant-empty-description,
+  .ant-breadcrumb-link,
+  .ant-breadcrumb-separator,
+  .ant-statistic-content-value,
+  .ant-statistic-title,
+  .ant-select-arrow,
+  .ant-picker-suffix,
+  .ant-picker-separator {
+    color: var(--text-color) !important;
+  }
+
+  .ant-input::placeholder,
+  .ant-input-number-input::placeholder,
+  .ant-select-selection-placeholder,
+  .ant-picker-input > input::placeholder,
+  .ant-empty-description,
+  .ant-form-item-explain,
+  .ant-form-item-extra {
+    color: var(--text-color-muted) !important;
+  }
+
+  .ant-spin-dot-item {
+    background-color: var(--primary-color) !important;
+  }
+
+  .ant-skeleton-content .ant-skeleton-title,
+  .ant-skeleton-content .ant-skeleton-paragraph > li,
+  .ant-skeleton.ant-skeleton-element .ant-skeleton-button,
+  .ant-skeleton.ant-skeleton-element .ant-skeleton-avatar,
+  .ant-skeleton.ant-skeleton-element .ant-skeleton-input,
+  .ant-skeleton.ant-skeleton-element .ant-skeleton-image {
+    background: linear-gradient(
+      90deg,
+      var(--surface-subtle) 25%,
+      var(--surface-variant) 37%,
+      var(--surface-subtle) 63%
+    ) !important;
+    background-size: 400% 100% !important;
+  }
+
+  .ant-pagination-item,
+  .ant-pagination-prev .ant-pagination-item-link,
+  .ant-pagination-next .ant-pagination-item-link,
+  .ant-tabs-nav::before,
+  .ant-card-head,
+  .ant-card-bordered,
+  .ant-modal-header,
+  .ant-modal-footer,
+  .ant-drawer-header,
+  .ant-drawer-footer,
+  .ant-descriptions-bordered .ant-descriptions-item-label,
+  .ant-descriptions-bordered .ant-descriptions-item-content,
+  .ant-list-item,
+  .ant-divider {
+    border-color: var(--border-color) !important;
+  }
+
+  .ant-list-item:hover,
+  .ant-pagination-item:hover,
+  .ant-tabs-tab:hover {
+    background: var(--surface-subtle) !important;
+  }
+
+  .ant-pagination-item-active,
+  .ant-tabs-tab.ant-tabs-tab-active,
+  .ant-tabs-ink-bar {
+    border-color: var(--primary-color) !important;
+  }
+
+  // 暗色模式下的按钮样式（不包含 link 类型）
+  .ant-btn {
+    &:not(.ant-btn-link) {
+      &.ant-btn-primary {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+      }
+      &:not(.ant-btn-primary) {
+        background-color: var(--layout-surface) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+      }
+    }
+  }
+}
+
+// ==================== 输入框 ====================
+
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-search .ant-input {
+  border-radius: var(--border-radius) !important;
+  transition: border-color 0.2s ease;
+}
+
+.ant-input:focus,
+.ant-input-affix-wrapper-focused {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px var(--primary-color-hover) !important;
+}
+
+// ==================== 选择器/下拉框 ====================
+
+.ant-select-selector {
+  border-radius: var(--border-radius) !important;
+}
+
+.ant-select-item-option-active,
+.ant-select-item-option-selected {
+  background: var(--primary-color-weak) !important;
+}
+
+.ant-select-dropdown {
+  overflow: hidden !important;
+}
+
+.ant-select-dropdown-menu,
+.ant-select-dropdown-list {
+  max-height: 300px !important;
+  overflow: auto !important;
+}
+
+// ==================== 标签、徽章 ====================
+
+.ant-tag,
+.ant-badge .ant-scroll-number {
+  border-radius: calc(var(--border-radius) / 1.5) !important;
+}
+
+// ==================== 分页 ====================
+
+.ant-pagination-item-active a {
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+// ==================== 表单 ====================
+
+.ant-form-item-label > label {
+  color: var(--text-color-weak);
+}
+
+// ==================== 模态框 ====================
+
+.ant-modal .ant-btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+// ==================== 工具类 ====================
+
+.theme-primary-color {
+  color: var(--primary-color) !important;
+}
+
+.theme-bg-primary {
+  background-color: var(--primary-color) !important;
+  color: var(--text-on-primary, #fff) !important;
+}

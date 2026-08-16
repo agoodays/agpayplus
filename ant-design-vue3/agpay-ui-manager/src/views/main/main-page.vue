@@ -150,11 +150,16 @@
         <a-skeleton active :loading="skeletonLoading" :paragraph="{ rows: 0 }">
           <div class="quick-start">
             <p>快速开始</p>
-            <ul class="quick-start-ul">
-              <li v-for="menu in quickMenuList" :key="menu.entId">
-                <router-link :to="menu.menuUri">{{ menu.entName }}</router-link>
-              </li>
-            </ul>
+            <template v-if="quickMenuList.length">
+              <ul class="quick-start-ul">
+                <li v-for="menu in quickMenuList" :key="menu.entId">
+                  <router-link :to="menu.menuUri">{{ menu.entName }}</router-link>
+                </li>
+              </ul>
+            </template>
+            <div v-else class="quick-start-empty">
+              暂无快速开始，<a class="empty-link" @click="handleQuickStart">去设置</a>
+            </div>
           </div>
         </a-skeleton>
       </div>
@@ -164,7 +169,7 @@
         <a-skeleton active :loading="skeletonLoading" :paragraph="{ rows: 12 }" />
         <div v-show="!skeletonLoading" class="echart-title">
           <b>支付方式</b>
-          <div class="chart-padding">
+          <div class="date-picker">
             <ag-date-range-picker
               v-model:value="searchData.payTypeQueryDateRange"
               :options="[
@@ -187,7 +192,7 @@
         <a-skeleton active :loading="skeletonLoading" :paragraph="{ rows: 12 }" />
         <div v-show="!skeletonLoading" class="echart-title">
           <b>交易统计</b>
-          <div class="chart-padding">
+          <div class="date-picker">
             <ag-date-range-picker
               v-model:value="searchData.payCountQueryDateRange"
               :options="[
@@ -889,6 +894,10 @@ function handleToSettings() {
   router.push({ path: '/current/userinfo', query: { tab: 'security', sub: 'safeWord' } })
 }
 
+function handleQuickStart() {
+  router.push({ path: '/current/userinfo' })
+}
+
 /**
  * 窗口大小变化时重绘图表
  */
@@ -1063,13 +1072,8 @@ onBeforeUnmount(() => {
   background: rgb(255, 208, 128);
 }
 
-.chart-padding {
-  border-radius: 4px;
-  box-sizing: border-box;
-  max-width: 235px;
-  min-width: 235px;
-  flex-grow: 1;
-  flex-shrink: 1;
+.date-picker {
+  width: 235px;
 }
 
 .quick-start-ul {
@@ -1096,6 +1100,22 @@ onBeforeUnmount(() => {
   }
   li:hover {
     cursor: pointer;
+  }
+}
+
+.quick-start-empty {
+  color: var(--text-color-weak);
+  font-size: 13px;
+  text-align: center;
+  padding: 12px 0;
+
+  .empty-link {
+    color: var(--primary-color);
+    margin-left: 4px;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 </style>

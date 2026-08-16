@@ -108,9 +108,6 @@
 
     <!-- 详情抽屉 -->
     <detail v-model:open="detailOpen" :record-id="currentRecordId" />
-
-    <!-- 高级配置抽屉 -->
-    <mch-config v-model:open="mchConfigOpen" :record-id="mchConfigRecordId" @success="reloadTable" />
   </div>
 </template>
 
@@ -131,7 +128,6 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
-import MchConfig from './mch-config.vue'
 
 const { t } = useI18n()
 
@@ -144,10 +140,6 @@ const router = useRouter()
 
 // 权限检查
 const { hasPermission } = usePermission()
-
-// 高级配置抽屉状态
-const mchConfigOpen = ref(false)
-const mchConfigRecordId = ref(null)
 
 /**
  * 表格列配置
@@ -244,8 +236,10 @@ const appConfigFunc = (recordId) => {
  * @param {Object} recordId - 商户号
  */
 const advancedConfigFunc = (recordId) => {
-  mchConfigRecordId.value = recordId
-  mchConfigOpen.value = true
+  router.push({
+    path: '/mchAdvancedConfig',
+    query: { mchNo: recordId }
+  })
 }
 
 /**

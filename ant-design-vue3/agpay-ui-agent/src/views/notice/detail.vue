@@ -1,0 +1,119 @@
+<template>
+  <ag-drawer
+    v-model:open="localOpen"
+    width="60%"
+    title="公告详情"
+    @close="handleClose"
+  >
+    <div class="article-container">
+      <div class="title">{{ detailData.title }}</div>
+      <div class="author">
+        <span class="auther-text">作者：{{ detailData.publisher }}</span>
+        <span>时间：{{ detailData.publishTime }}</span>
+      </div>
+      <div class="content" v-html="detailData.content"></div>
+    </div>
+  </ag-drawer>
+</template>
+
+<script setup>
+import { noticeApi } from '@/api/business/notice/notice-api'
+import { AgDrawer } from '@/components'
+import { message } from 'ant-design-vue'
+import { reactive, ref, watch } from 'vue'
+
+const props = defineProps({
+  open: { type: Boolean, default: false },
+  recordId: { type: [String, Number], default: '' }
+})
+
+const emit = defineEmits(['update:open'])
+
+const localOpen = ref(false)
+
+const detailData = reactive({
+  title: '',
+  publisher: '',
+  publishTime: '',
+  content: ''
+})
+
+function resetDetailData() {
+  Object.assign(detailData, {
+    title: '',
+    publisher: '',
+    publishTime: '',
+    content: ''
+  })
+}
+
+watch(
+  () => props.open,
+  async (val) => {
+    localOpen.value = val
+    if (val && props.recordId) {
+      await loadDetail()
+    } else if (!val) {
+      resetDetailData()
+    }
+  }
+)
+
+watch(localOpen, (val) => {
+  emit('update:open', val)
+})
+
+const loadDetail = async () => {
+  try {
+    const res = await noticeApi.getById(props.recordId)
+    Object.assign(detailData, res || {})
+  } catch (error) {
+    console.error('加载详情失败:', error)
+    message.error(error?.msg || error?.message || '加载详情失败')
+  }
+}
+
+const handleClose = () => {
+  resetDetailData()
+  localOpen.value = false
+}
+</script>
+
+<style lang="less">
+.article-container {
+  max-width: 100%;
+  width: 800px;
+  margin: 0 auto;
+  padding: 26px 6px 6px;
+
+  .title {
+    height: 50px;
+    line-height: 1.75;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 15px;
+  }
+
+  .subtitle {
+    box-sizing: border-box;
+    width: 400px;
+    font-size: 15px;
+  }
+
+  .author {
+    width: 400px;
+    color: #969696;
+    margin-bottom: 15px;
+  }
+
+  .author .auther-text {
+    margin-right: 20px;
+  }
+
+  .content {
+    margin: 45px auto 0;
+    line-height: 1.5;
+  }
+}
+</style>
