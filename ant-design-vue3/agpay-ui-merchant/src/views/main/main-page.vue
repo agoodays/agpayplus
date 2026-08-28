@@ -199,7 +199,7 @@ import { useUserStore } from '@/store/modules/system/user'
 import { InfoCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
-import Empty from './empty.vue'
+import Empty from '@/views/main/empty.vue'
 
 // ==================== 工具函数 ====================
 
@@ -969,7 +969,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="less" scoped>
-@import './index.less';
+@import '@/views/main/index.less';
 
 .amount-pay-amount {
   font-size: 36px;

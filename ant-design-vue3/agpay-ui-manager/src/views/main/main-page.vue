@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <div class="chart-card">
     <div class="amount">
       <div>
@@ -235,7 +235,7 @@ import { timeFix } from '@/utils/time-util'
 import { InfoCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, shallowRef } from 'vue'
 import { useRouter } from 'vue-router'
-import Empty from '../main/empty.vue'
+import Empty from '@/views/main/empty.vue'
 
 // ==================== 工具函数 ====================
 

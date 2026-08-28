@@ -105,7 +105,7 @@ export const devMenuTree = [
   {
     entId: 'ENT_SYS_USER',
     entName: '子用户管理',
-    menuUri: '/sysUser',
+    menuUri: '/users',
     componentName: 'SysUserPage',
     entType: 'ML',
     menuIcon: 'UserOutlined'
@@ -113,7 +113,7 @@ export const devMenuTree = [
   {
     entId: 'ENT_ARTICLE_NOTICEINFO',
     entName: '公告列表',
-    menuUri: '/notice/table',
+    menuUri: '/notice',
     componentName: 'NoticeInfoPage',
     entType: 'ML',
     menuIcon: 'NotificationOutlined'

@@ -7,9 +7,23 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/api/*": ["../shared/api/*"],
+      "@/components/*": ["../shared/components/*"],
+      "@/composables/*": ["../shared/composables/*"],
+      "@/config/*": ["../shared/config/*"],
+      "@/constants/*": ["../shared/constants/*"],
+      "@/i18n/*": ["../shared/i18n/*"],
+      "@/layouts/*": ["../shared/layouts/*"],
+      "@/lib/*": ["../shared/lib/*"],
+      "@/router/*": ["../shared/router/*"],
+      "@/store/*": ["../shared/store/*"],
+      "@/styles/*": ["../shared/styles/*"],
+      "@/theme/*": ["../shared/theme/*"],
+      "@/utils/*": ["../shared/utils/*"],
+      "@/views/*": ["../shared/views/*"]
     }
   },
-  "include": ["src/**/*.js", "src/**/*.vue"],
+  "include": ["src/**/*.js", "src/**/*.vue", "../shared/**/*.js", "../shared/**/*.vue"],
   "exclude": ["node_modules", "dist"]
 }

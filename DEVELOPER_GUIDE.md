@@ -520,7 +520,7 @@ public abstract class ServiceBase
 #### 6.2.1 HTTP 请求函数
 
 **对象**: `req` (AgAxios 单例)  
-**文件**: [ant-design-vue3/agpay-ui-manager/src/lib/ag-axios.js](ant-design-vue3/agpay-ui-manager/src/lib/ag-axios.js)
+**文件**: [ant-design-vue3/shared/lib/ag-axios.js](ant-design-vue3/shared/lib/ag-axios.js)
 
 **方法**:
 
@@ -535,7 +535,7 @@ public abstract class ServiceBase
 
 #### 6.2.2 组合式函数
 
-**文件**: [ant-design-vue3/agpay-ui-manager/src/composables/useCommon.js](ant-design-vue3/agpay-ui-manager/src/composables/useCommon.js)
+**文件**: [ant-design-vue3/shared/composables/useCommon.js](ant-design-vue3/shared/composables/useCommon.js)
 
 **导出函数**:
 
@@ -582,7 +582,7 @@ export default {
 
 #### 6.2.3 工具函数
 
-**文件**: `ant-design-vue3/agpay-ui-manager/src/utils/`
+**文件**: `ant-design-vue3/shared/utils/`
 
 | 文件 | 功能 |
 |------|------|

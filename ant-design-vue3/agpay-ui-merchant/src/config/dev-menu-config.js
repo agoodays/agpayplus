@@ -101,7 +101,7 @@ export const devMenuTree = [
   {
     entId: 'ENT_SYS_USER',
     entName: '子用户管理',
-    menuUri: '/sysUser',
+    menuUri: '/users',
     componentName: 'SysUserPage',
     entType: 'ML',
     menuIcon: 'UserOutlined'

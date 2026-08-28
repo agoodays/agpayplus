@@ -1,6 +1,6 @@
 <template>
   <div>
-    <a-card :bordered="false">      
+    <a-card :bordered="false">
       <a-tabs v-model:active-key="groupKey" :animated="false">
         <a-tab-pane key="1" tab="安全管理">
           <div v-if="groupKey === '1'">

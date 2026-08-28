@@ -1,4 +1,4 @@
-# AgPayPlus Agent Guide
+﻿# AgPayPlus Agent Guide
 
 本文件用于帮助 AI 编码智能体在本仓库快速、稳定地执行开发任务。
 
@@ -126,7 +126,7 @@ src/
 ### 4.4 API 层
 
 ```js
-// 通用 RESTful（src/lib/ag-axios.js）
+// 通用 RESTful（shared/lib/ag-axios.js）
 import { req } from '@/lib/ag-axios'
 req.list(url, params)      // GET 分页列表
 req.getById(url, id)       // GET 单条
@@ -139,7 +139,7 @@ req.export(url, bizType, params)
 import { reqLoad } from '@/lib/ag-axios'
 reqLoad.list(url, params)  // GET 分页列表（带 Loading）
 
-// 域级 API（src/api/system/* 或 src/api/business/*）
+// 域级 API（shared/api/system/* 或 shared/api/business/*）
 import { loginApi } from '@/api/system/login-api'
 import { basicApi } from '@/api/system/basic-api'
 import { mchApi } from '@/api/business/mch/mch-api'
@@ -155,14 +155,14 @@ import { mchApi } from '@/api/business/mch/mch-api'
 
 ### 4.6 主题 / 样式规范
 
-- 运行时 CSS 变量定义在 `src/theme/index.less`（`--primary-color`, `--layout-bg` 等）
-- Ant Design 覆盖在 `src/theme/antd-overrides.less`
+- 运行时 CSS 变量定义在 `shared/theme/index.less`（`--primary-color`, `--layout-bg` 等）
+- Ant Design 覆盖在 `shared/theme/antd-overrides.less`
 - 暗色主题通过 `data-theme="dark"` + CSS 变量切换，由 `appStore.syncRootThemeState()` 控制
 - 布局高度：`html/body overflow: hidden` → `ag-layout-content overflow: auto` 为唯一滚动层，`user-layout` 自带内部滚动
 
 ### 4.7 localStorage key 管理
 
-所有 key 集中在 `src/constants/local-storage-key-const.js`，前缀 `agpay_mgr_`，避免跨项目污染：
+所有 key 集中在 `shared/constants/local-storage-key-const.js`，前缀 `agpay_mgr_`，避免跨项目污染：
 
 ```
 USER_TOKEN / USER_INFO / USER_POINTS / APP_CONFIG

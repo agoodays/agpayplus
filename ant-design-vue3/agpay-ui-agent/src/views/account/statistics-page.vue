@@ -30,11 +30,13 @@
               :options="agentSelectOptions"
               class="header-filter-select"
             />
-            <ag-date-range-picker
-              v-model:value="queryDateRange"
-              :options="DATE_RANGE_OPTIONS"
-              @update:value="handleRangeChange"
-            />
+            <div class="date-picker">
+              <ag-date-range-picker
+                v-model:value="queryDateRange"
+                :options="DATE_RANGE_OPTIONS"
+                @update:value="handleRangeChange"
+              />
+            </div>
           </div>
         </div>
       </template>
@@ -271,6 +273,7 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 24px 30px;
+  padding: 16px;
 }
 
 .stat-card {
@@ -309,6 +312,10 @@ onMounted(() => {
 
 .header-filter-select {
   width: 160px;
+}
+
+.date-picker {
+  width: 235px;
 }
 
 // ========== 代理商信息卡片 ==========

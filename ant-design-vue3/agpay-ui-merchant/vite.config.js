@@ -1,9 +1,10 @@
-import { defineConfig, loadEnv } from 'vite'
+﻿import { defineConfig, loadEnv } from 'vite'
 import { resolve } from 'path'
 import vue from '@vitejs/plugin-vue'
 import viteCompression from 'vite-plugin-compression'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { VitePWA } from 'vite-plugin-pwa'
+import { createSharedAlias } from '../shared/config/resolve-shared-alias'
 
 const pathResolve = (dir) => {
   return resolve(__dirname, '.', dir)
@@ -15,15 +16,20 @@ export default defineConfig(({ mode }) => {
   
   return {
     resolve: {
+      symlinks: false,
       alias: [
-        // 绝对路径重命名：@/xxxx => src/xxxx
-        {
-          find: '@',
-          replacement: pathResolve('src')
-        }
-      ]
+        createSharedAlias({ projectRoot: __dirname }),
+        // 绝对路径重命名：@/xxxx => src/xxxx（兜底）
+        { find: '@', replacement: pathResolve('src') }
+      ],
+      modules: [resolve(__dirname, 'node_modules'), 'node_modules'],
+      dedupe: ['vue', 'vue-router', 'pinia', 'ant-design-vue', '@ant-design/icons-vue', 'axios', 'dayjs']
+    },
+    define: {
+      __APP_ID__: JSON.stringify('merchant')
     },
     server: {
+      fs: { allow: [__dirname, resolve(__dirname, '..', 'shared')] },
       port: 8818,
       host: '0.0.0.0',
       open: true
