@@ -108,6 +108,13 @@ export function useTableData({ props, state, emit, t }) {
       return
     }
 
+    // 清理选中状态，防止数据切换后残留旧选中行
+    if (state.selectedRowKeys && state.selectedRowKeys.length > 0) {
+      state.selectedRowKeys = []
+      state.selectedRows = []
+      emit('selection-change', { selectedRowKeys: [], selectedRows: [] })
+    }
+
     const pagination = paginationConfig.value
     const sortParams = state.sorter?.field
       ? {

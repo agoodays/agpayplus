@@ -19,7 +19,7 @@ function devInfo(...args) {
  *
  * 使用方式：
  * ```javascript
- * import themeService from '@/utils/themeService'
+ * import themeService from '@/utils/theme-service'
  *
  * // 在应用启动时加载并应用主题
  * await themeService.loadAndApplyTheme()

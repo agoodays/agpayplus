@@ -11,7 +11,7 @@
         @reset="searchFunc"
       >
         <template #base="{ colSpan }">
-          <a-col v-bind="colSpan">
+          <a-col v-bind="colSpan" v-if="!roleSearchHidden.has('sysType')">
             <a-form-item label="">
               <ag-select
                 v-model="searchData.sysType"
@@ -22,7 +22,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col v-bind="colSpan">
+          <a-col v-bind="colSpan" v-if="!roleSearchHidden.has('belongInfoId')">
             <a-form-item label="">
               <ag-input v-model="searchData.belongInfoId" label="所属代理商/商户" placeholder="请输入所属代理商/商户" />
             </a-form-item>
@@ -109,8 +109,13 @@ import { getSysTypeOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { getProjectConfig } from '@/config/project-config'
 import AddOrEdit from './add-or-edit.vue'
 
+const projectConfig = getProjectConfig(__APP_ID__)
+const roleCfg = projectConfig.views.sysRolePage
+const roleSearchHidden = new Set(roleCfg.hiddenSearchFields || [])
+const roleColumnHidden = new Set(roleCfg.hiddenColumns || [])
 const { t } = useI18n()
 const sysTypeOptions = computed(() => getSysTypeOptions(t))
 
@@ -151,13 +156,14 @@ const getSysTypeText = (sysType) => {
 /**
  * 表格列配置
  */
-const tableColumns = [
+const ALL_TABLE_COLUMNS = [
   { key: 'roleId', title: '角色ID', width: 130, fixed: 'left', sorter: true, customRender: 'roleIdSlot' },
   { key: 'roleName', dataIndex: 'roleName', title: '角色名称', width: 160, sorter: true },
   { key: 'sysType', title: '所属系统', width: 120, customRender: 'sysTypeSlot' },
   { key: 'belongInfoId', dataIndex: 'belongInfoId', title: '所属代理商/商户', width: 140 },
   { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
+const tableColumns = roleColumnHidden.size ? ALL_TABLE_COLUMNS.filter(c => !roleColumnHidden.has(c.key)) : ALL_TABLE_COLUMNS
 
 /**
  * 使用 CRUD 表格页面组合式函数

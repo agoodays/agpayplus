@@ -13,16 +13,16 @@
         <a-descriptions-item label="商户类型">
           {{ detailData.mchType === 1 ? '普通商户' : detailData.mchType === 2 ? '特约商户' : '未知' }}
         </a-descriptions-item>
-        <a-descriptions-item label="商户号">
+        <a-descriptions-item v-if="!trfDHid.has('mchNo')" label="商户号">
           <a-typography-text copyable>{{ detailData.mchNo }}</a-typography-text>
         </a-descriptions-item>
-        <a-descriptions-item label="商户名称">
+        <a-descriptions-item v-if="!trfDHid.has('mchName')" label="商户名称">
           {{ detailData.mchName }}
         </a-descriptions-item>
         <a-descriptions-item label="应用APPID">
           {{ detailData.appId }}
         </a-descriptions-item>
-        <a-descriptions-item label="服务商号">
+        <a-descriptions-item v-if="!trfDHid.has('isvNo')" label="服务商号">
           <a-typography-text v-if="detailData.isvNo" copyable>{{ detailData.isvNo }}</a-typography-text>
           <span v-else>-</span>
         </a-descriptions-item>
@@ -164,6 +164,7 @@ const props = defineProps({
  * @event update:open - 通知父组件抽屉状态变化
  */
 const emit = defineEmits(['update:open'])
+const trfDHid = new Set(getProjectConfig(__APP_ID__).views.transferDetailDrawer.hiddenFields || [])
 
 /**
  * 响应式状态定义

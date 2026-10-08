@@ -13,7 +13,7 @@
         <a-descriptions-item label="商户类型">
           {{ detailData.mchType === 1 ? '普通商户' : detailData.mchType === 2 ? '特约商户' : '未知' }}
         </a-descriptions-item>
-        <a-descriptions-item label="服务商号">
+        <a-descriptions-item v-if="!refDHid.has('isvNo')" label="服务商号">
           <a-typography-text v-if="detailData.isvNo" copyable>{{ detailData.isvNo }}</a-typography-text>
           <span v-else>-</span>
         </a-descriptions-item>
@@ -22,11 +22,11 @@
             <a-typography-text copyable>{{ detailData.refundOrderId }}</a-typography-text>
           </a-tag>
         </a-descriptions-item>
-        <a-descriptions-item label="代理商号">
+        <a-descriptions-item v-if="!refDHid.has('agentNo')" label="代理商号">
           <a-typography-text v-if="detailData.agentNo" copyable>{{ detailData.agentNo }}</a-typography-text>
           <span v-else>-</span>
         </a-descriptions-item>
-        <a-descriptions-item label="商户号">
+        <a-descriptions-item v-if="!refDHid.has('mchNo')" label="商户号">
           <a-typography-text copyable>{{ detailData.mchNo }}</a-typography-text>
         </a-descriptions-item>
         <a-descriptions-item label="支付订单号">
@@ -174,6 +174,7 @@ const props = defineProps({
  * @event update:open - 通知父组件抽屉状态变化
  */
 const emit = defineEmits(['update:open'])
+const refDHid = new Set(getProjectConfig(__APP_ID__).views.refundDetailDrawer.hiddenFields || [])
 
 /**
  * 响应式状态定义

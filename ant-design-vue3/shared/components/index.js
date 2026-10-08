@@ -36,6 +36,9 @@ export { default as AgLoading } from './ag-loading/index.js'
 export { default as GlobalLoad } from './global-load/index.vue'
 export { default as AgErrorBoundary } from './ag-error-boundary/index.vue'
 
+// 业务组件
+export { default as ChannelUserModal } from './channel-user/channel-user-modal.vue'
+
 // 工具提示：所有组件已完成 Vue 3 迁移
 // - 使用 Composition API
 // - 支持 v-model

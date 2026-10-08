@@ -103,11 +103,12 @@
 </template>
 
 <script setup>
+import { useMenuLogic, resolveRouteTitle as resolveRouteTitleWithT } from '@/composables/useMenuLogic'
+import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { appDefaultConfig } from '@/config/app-config'
 import { useAppStore } from '@/store/modules/system/app'
 import { useAppConfigStore } from '@/store/modules/system/app-config'
 import { useUserStore } from '@/store/modules/system/user'
-import * as antIcons from '@ant-design/icons-vue'
 import {
   BgColorsOutlined,
   DownOutlined,
@@ -120,45 +121,12 @@ import {
   UserOutlined
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
-import { computed, getCurrentInstance, h, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
+import { infoBox } from '@/utils/info-box'
 
-function getIconComponent(iconName) {
-  if (!iconName) return null
-  // 将短横线分隔的名称转换为驼峰命名
-  const camelCaseName = iconName.replace(/-([a-z])/g, (g) => g[1].toUpperCase())
-  // 首字母大写
-  let PascalCaseName = camelCaseName.charAt(0).toUpperCase() + camelCaseName.slice(1)
-  // 检查是否已经包含 Outlined 后缀
-  if (!PascalCaseName.endsWith('Outlined')) {
-    PascalCaseName += 'Outlined'
-  }
-  return antIcons[PascalCaseName]
-}
-
-function resolveMenuTitle(menu) {
-  const i18nKey = menu.menuI18nKey || menu.i18nKey
-  const fallbackTitle = menu.entName || menu.name || ''
-  if (!i18nKey) {
-    return fallbackTitle
-  }
-
-  const translated = t(i18nKey)
-  return translated === i18nKey ? fallbackTitle : translated
-}
-
-function resolveRouteTitle(routeItem) {
-  const i18nKey = routeItem?.meta?.i18nKey
-  const fallbackTitle = routeItem?.meta?.title || routeItem?.name || ''
-  if (!i18nKey) {
-    return fallbackTitle
-  }
-
-  const translated = t(i18nKey)
-  return translated === i18nKey ? fallbackTitle : translated
-}
-
+// ==================== 基础依赖 ====================
 const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
@@ -167,237 +135,65 @@ const appConfigStore = useAppConfigStore()
 const { t } = useI18n()
 const { proxy } = getCurrentInstance()
 
-const selectedKeys = ref([])
-const openKeys = ref([])
-const cachedOpenKeys = ref([])
-const collapsed = ref(false)
-const collapsedByResponsive = ref(false)
 const currentYear = dayjs().year()
-const responsiveBreakpoint = 1200
-const visibleEntType = 'ML'
-let resizeRafId = 0
-
-// 侧边菜单宽度
 const sideMenuWidth = computed(() => appDefaultConfig.sideMenuWidth)
-
-// 配置标志
 const breadCrumbFlag = computed(() => appConfigStore.breadCrumbFlag)
 const footerFlag = computed(() => appConfigStore.footerFlag)
 
-const menuData = computed(() => {
-  return userStore.allMenuRouteTree || []
+// ==================== 响应式布局（窗口监听 + 折叠） ====================
+const { collapsed } = useResponsiveLayout(1200)
+
+// ==================== 菜单逻辑（过滤 / 转换 / 选中同步 / 展开持久化） ====================
+const {
+  menuItems,
+  selectedKeys,
+  openKeys,
+  menuClick,
+  openChange,
+  syncMenuFromRoute
+} = useMenuLogic({
+  route,
+  userStore,
+  t,
+  collapsed
 })
-const visibleMenuTree = computed(() => {
-  return filterVisibleMenus(menuData.value)
-})
+
 const menuTheme = computed(() => (appStore.themeConfig?.darkMode ? 'dark' : 'light'))
-const menuItems = computed(() => {
-  return transformMenuToItems(visibleMenuTree.value)
-})
 const isDarkMode = computed(() => Boolean(appStore.themeConfig?.darkMode))
 const breadcrumbs = computed(() => route.matched.filter((item) => item.meta && item.meta.title))
 const backTopTarget = () => document.querySelector('.ag-layout-content')
 
-watch(
-  () => route.path,
-  (newPath) => {
-    updateMenuKeys(newPath)
-  }
-)
+// 面包屑标题解析
+const resolveRouteTitle = (item) => resolveRouteTitleWithT(item, t)
 
-watch(
-  () => collapsed.value,
-  (isCollapsed) => {
-    if (isCollapsed) {
-      cachedOpenKeys.value = [...openKeys.value]
-      openKeys.value = []
-      return
-    }
+// 菜单事件（a-menu @click/@open-change 传入的对象直接转发到 composable）
+const handleMenuClick = ({ key }) => menuClick({ key }, router)
+const handleOpenChange = (keys) => openChange(keys)
 
-    if (cachedOpenKeys.value.length > 0) {
-      openKeys.value = [...cachedOpenKeys.value]
-    }
-  }
-)
+// 首次挂载同步一次当前路由选中状态
+syncMenuFromRoute(route.path)
 
-onMounted(() => {
-  handleWindowResize()
-  window.addEventListener('resize', onWindowResize)
-  updateMenuKeys(route.path)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', onWindowResize)
-  if (resizeRafId) {
-    cancelAnimationFrame(resizeRafId)
-    resizeRafId = 0
-  }
-})
-
-function onWindowResize() {
-  if (resizeRafId) {
-    cancelAnimationFrame(resizeRafId)
-  }
-  resizeRafId = requestAnimationFrame(() => {
-    handleWindowResize()
-    resizeRafId = 0
-  })
-}
-
-function handleWindowResize() {
-  const shouldCollapse = window.innerWidth < responsiveBreakpoint
-
-  if (shouldCollapse && !collapsed.value) {
-    collapsed.value = true
-    collapsedByResponsive.value = true
-    return
-  }
-
-  if (!shouldCollapse && collapsedByResponsive.value) {
-    collapsed.value = false
-    collapsedByResponsive.value = false
-  }
-}
-
-function updateMenuKeys(path) {
-  const currentMenu = findMenuByPath(visibleMenuTree.value, path)
-  if (currentMenu) {
-    selectedKeys.value = [String(currentMenu.entId)]
-    const parentKeys = findParentKeys(visibleMenuTree.value, currentMenu.entId)
-    openKeys.value = parentKeys.map((key) => String(key))
-  }
-}
-
-function findMenuByPath(menus, path) {
-  for (const menu of menus) {
-    if (menu.menuUri === path) {
-      return menu
-    }
-    if (menu.children) {
-      const found = findMenuByPath(menu.children, path)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-/**
- * 过滤菜单树：
- * 1) 当前节点 entType=ML 时保留
- * 2) 非 ML 但存在可见子节点时保留父级壳子
- */
-function filterVisibleMenus(menus = []) {
-  return menus
-    .map((menu) => {
-      const children = menu.children && menu.children.length > 0 ? filterVisibleMenus(menu.children) : undefined
-      const shouldKeep = menu.entType === visibleEntType || (children && children.length > 0)
-
-      if (!shouldKeep) {
-        return null
-      }
-
-      return {
-        ...menu,
-        children
-      }
-    })
-    .filter(Boolean)
-}
-
-/**
- * 转换为 Ant Design Vue Menu items
- */
-function transformMenuToItems(menus = []) {
-  return menus.map((menu) => {
-    const children = menu.children && menu.children.length > 0 ? transformMenuToItems(menu.children) : undefined
-
-    const iconComponent = getIconComponent(menu.menuIcon || menu.icon)
-
-    return {
-      key: String(menu.entId),
-      label: resolveMenuTitle(menu),
-      icon: iconComponent ? h(iconComponent) : undefined,
-      children
-    }
-  })
-}
-
-// 查找父级菜单的 key
-function findParentKeys(menus, targetKey, parentKeys = []) {
-  for (const menu of menus) {
-    if (menu.children) {
-      const hasTarget = menu.children.some((child) => child.entId === targetKey)
-      if (hasTarget) {
-        return [...parentKeys, menu.entId]
-      }
-      const found = findParentKeys(menu.children, targetKey, [...parentKeys, menu.entId])
-      if (found.length > 0) return found
-    }
-  }
-  return []
-}
-
-// 菜单点击事件
-const handleMenuClick = ({ key }) => {
-  const menu = findMenuById(visibleMenuTree.value, key)
-  if (menu && menu.menuUri) {
-    router.push(menu.menuUri)
-  }
-}
-
-const handleOpenChange = (keys) => {
-  openKeys.value = keys
-  if (!collapsed.value) {
-    cachedOpenKeys.value = [...keys]
-  }
-}
-
-// 根据ID查找菜单
-function findMenuById(menus, id) {
-  for (const menu of menus) {
-    if (String(menu.entId) === String(id)) {
-      return menu
-    }
-    if (menu.children) {
-      const found = findMenuById(menu.children, id)
-      if (found) return found
-    }
-  }
-  return null
-}
-
-// 刷新页面
+// ==================== 头部操作 ====================
 const handleReload = () => {
   window.location.reload()
 }
-
-// 个人中心
 const handleUserCenter = () => {
-  router.push({ path: '/current/userinfo' }) // router.push({ name: 'ENT_C_USERINFO' })
+  router.push({ name: 'ENT_C_USERINFO' })
 }
-
-// 账户设置
 const handleSetting = () => {
-  router.push({ path: '/current/userinfo', query: { tab: 'security', sub: 'password' } })
+  router.push({ name: 'ENT_C_USERINFO', query: { tab: 'security', sub: 'password' } })
 }
-
-// 语言切换
 const handleLanguageChange = (language) => {
   appConfigStore.setLanguage(language)
 }
-
-const handleDarkModeChange = (checked) => {
-  appStore.setDarkMode(checked)
-}
-
 const toggleDarkMode = () => {
   appStore.setDarkMode(!isDarkMode.value)
 }
-
-// 退出登录
 const handleLogout = () => {
   const username = userStore.realname || userStore.loginUsername
-  proxy.$infoBox.confirmPrimary(
+  // 优先使用全局注入的 $infoBox，降级为直接导入的 infoBox（避免依赖 getCurrentInstance）
+  const ib = proxy?.$infoBox ?? infoBox
+  ib.confirmPrimary(
     t('layout.confirmLogoutTitle'),
     t('layout.confirmLogoutContent', { name: username }),
     async () => {

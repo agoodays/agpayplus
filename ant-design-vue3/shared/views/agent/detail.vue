@@ -9,12 +9,12 @@
     <a-spin :spinning="loading">
       <!-- 基本信息 -->
       <a-descriptions :column="2">
-        <a-descriptions-item label="代理商号">{{ detailData.agentNo }}</a-descriptions-item>
+        <a-descriptions-item v-if="!agDHid.has('agentNo')" label="代理商号">{{ detailData.agentNo }}</a-descriptions-item>
         <a-descriptions-item label="代理商名称">{{ detailData.agentName }}</a-descriptions-item>
         <a-descriptions-item label="登录名">{{ detailData.loginUsername }}</a-descriptions-item>
         <a-descriptions-item label="代理商简称">{{ detailData.agentShortName }}</a-descriptions-item>
         <a-descriptions-item label="上级代理商号">{{ detailData.pid }}</a-descriptions-item>
-        <a-descriptions-item label="服务商号">{{ detailData.isvNo }}</a-descriptions-item>
+        <a-descriptions-item v-if="!agDHid.has('isvNo')" label="服务商号">{{ detailData.isvNo }}</a-descriptions-item>
         <a-descriptions-item label="服务商名称">{{ detailData.isvName }}</a-descriptions-item>
         <a-descriptions-item label="联系人姓名">{{ detailData.contactName }}</a-descriptions-item>
         <a-descriptions-item label="联系人手机号">{{ detailData.contactTel }}</a-descriptions-item>
@@ -170,6 +170,7 @@ const props = defineProps({
 
 /** 事件定义 */
 const emit = defineEmits(['update:open'])
+const agDHid = new Set(getProjectConfig(__APP_ID__).views.agentDetail.hiddenFields || [])
 
 /** 加载状态 */
 const loading = ref(false)

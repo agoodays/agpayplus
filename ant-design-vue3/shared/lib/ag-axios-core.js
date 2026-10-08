@@ -177,16 +177,16 @@ class AgAxios {
           return Promise.resolve(response.data)
         }
 
-        // JSON 响应处理
+        // JSON 响应处理：code 为 undefined/null/0 视为成功，其他为业务错误
         const resData = response.data
-        if (resData.code && resData.code !== 0) {
-          if (response.config.showErrorMsg) {
-            message.error(resData.msg)
-          }
-          return Promise.reject(resData)
-        } else {
+        const isSuccess = resData.code === undefined || resData.code === null || resData.code === 0
+        if (isSuccess) {
           return Promise.resolve(resData.data)
         }
+        if (response.config.showErrorMsg) {
+          message.error(resData.msg)
+        }
+        return Promise.reject(resData)
       },
       (error) => {
         this.destroy(error.config?.url)
@@ -205,9 +205,12 @@ class AgAxios {
           return Promise.reject({ cancelled: true, message: '请求已取消' })
         }
 
-        // 请求重试
+        // 请求重试：仅对幂等请求（GET/HEAD/OPTIONS）且仅在网络错误时重试，避免非幂等请求重复提交
         const config = error.config
-        if (config && config.retry > 0) {
+        const method = config?.method?.toLowerCase()
+        const isIdempotent = method === 'get' || method === 'head' || method === 'options'
+        const isNetworkError = !error.response // 仅无 response（网络错误/超时）才重试，4xx/5xx 不重试
+        if (config && isIdempotent && isNetworkError && config.retry > 0) {
           config.retry--
           const delay = config.retryDelay || 1000
           return new Promise((resolve) => {
@@ -223,17 +226,16 @@ class AgAxios {
           errorInfo = error.response?.data || error.message
         }
 
-        // 401 会话超时
+        // 401 会话超时（Modal.warning 仅显示 OK 按钮，无需 onCancel/cancelText）
         if (error.response?.status === 401 && import.meta.env.VITE_BYPASS_LOGIN !== 'true') {
           const toLoginTimeout = setTimeout(logout, 3000)
           Modal.warning({
             title: '会话超时，请重新登录',
             content: '3s后将自动退出...',
             okText: '重新登录',
-            cancelText: '关闭对话',
-            onOk: logout,
-            onCancel() {
+            onOk: () => {
               clearTimeout(toLoginTimeout)
+              logout()
             }
           })
         } else {
@@ -265,12 +267,7 @@ class AgAxios {
       mergedOptions.headers[ACCESS_TOKEN_NAME] = `Bearer ${token}`
     }
 
-    return this.instance(mergedOptions).catch((error) => {
-      if (error.cached) {
-        return Promise.resolve(error.data)
-      }
-      throw error
-    })
+    return this.instance(mergedOptions)
   }
 
   /**

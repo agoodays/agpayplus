@@ -341,9 +341,8 @@ router.beforeEach(async (to, from, next) => {
 
   // ========== 生产模式处理 ==========
 
-  // 未登录 → 跳转登录页
+  // 未登录 → 跳转登录页（logout 仅清前端状态，token 为空时无需重复调用）
   if (!token) {
-    userStore.logout()
     if (to.path === PAGE_PATH_LOGIN) {
       next()
     } else {

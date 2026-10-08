@@ -14,7 +14,7 @@
         </a-col>
         <a-col v-bind="colSpan">
           <a-form-item label="">
-            <ag-input v-model="searchData.isvNo" label="服务商编号" placeholder="请输入服务商编号" />
+            <ag-input v-if="!sivSearchHidden.has('isvNo')" v-model="searchData.isvNo" label="服务商编号" placeholder="请输入服务商编号" />
           </a-form-item>
         </a-col>
         <a-col v-bind="colSpan">
@@ -223,13 +223,19 @@ import {
 } from '@ant-design/icons-vue'
 import { reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { getProjectConfig } from '@/config/project-config'
+
+// 差异化配置
+const sivCfg = getProjectConfig(__APP_ID__).views.statisticIsvCountPage
+const sivSearchHidden = new Set(sivCfg.hiddenSearchFields || [])
+const sivColHidden = new Set(sivCfg.hiddenColumns || [])
 
 const icons = { InfoCircleOutlined }
 
 // 权限检查
 const { hasPermission } = usePermission()
 
-const tableColumns = ref([
+const ALL_TABLE_COLUMNS = [
   { key: 'isvName', dataIndex: 'isvName', title: '服务商名称', width: 160, fixed: 'left', ellipsis: true },
   { key: 'isvNo', dataIndex: 'isvNo', title: '服务商编号', width: 140 },
   { key: 'payAmount', title: '交易金额', width: 110, ellipsis: true, customRender: 'payAmountSlot', titleSlot: 'payAmountTitle' },
@@ -241,7 +247,10 @@ const tableColumns = ref([
   { key: 'count', title: '交易/总笔数', width: 120, customRender: 'countSlot' },
   { key: 'round', title: '成功率', width: 110, customRender: 'roundSlot', titleSlot: 'roundTitle' },
   { key: 'op', title: '操作', width: 180, fixed: 'right', align: 'center', customRender: 'opSlot' }
-])
+]
+const tableColumns = ref(
+  sivColHidden.size ? ALL_TABLE_COLUMNS.filter(c => !sivColHidden.has(c.key)) : ALL_TABLE_COLUMNS
+)
 
 const route = useRoute()
 const router = useRouter()

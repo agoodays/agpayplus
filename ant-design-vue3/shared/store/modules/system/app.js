@@ -112,6 +112,18 @@ export const useAppStore = defineStore('app', {
     },
 
     /**
+     * 获取当前项目对应的站点子配置（根据 __APP_ID__ 映射到 siteInfo 的 mgr/agent/mch）
+     * @returns {{sysPrimaryColor?:string, logoUrl?:string, sysTitle?:string, loginBgUrl?:string, loginCardPosition?:string, showLoginRecord?:boolean} | null}
+     */
+    resolveCurrentSiteSysConfig() {
+      if (!this.siteInfo) return null
+      const appId = typeof __APP_ID__ !== 'undefined' ? __APP_ID__ : 'manager'
+      const keyMap = { manager: 'mgr', agent: 'agent', merchant: 'mch' }
+      const sysKey = keyMap[appId] || 'mgr'
+      return this.siteInfo[sysKey] || null
+    },
+
+    /**
      * 应用管理端主题配置（mgr）
      */
     applyMgrThemeConfig(mgrConfig) {
@@ -225,9 +237,13 @@ export const useAppStore = defineStore('app', {
       if (!data) return
       let themeChanged = false
 
-      // 应用管理端主题配置
-      if (data.siteInfo?.mgr) {
-        themeChanged = this.applyMgrThemeConfig(data.siteInfo.mgr) || themeChanged
+      // 应用当前系统的主题配置（根据 __APP_ID__ 选择 mgr/agent/mch 子配置）
+      const appId = typeof __APP_ID__ !== 'undefined' ? __APP_ID__ : 'manager'
+      const keyMap = { manager: 'mgr', agent: 'agent', merchant: 'mch' }
+      const sysKey = keyMap[appId] || 'mgr'
+      const sysConfig = data.siteInfo?.[sysKey]
+      if (sysConfig) {
+        themeChanged = this.applyMgrThemeConfig(sysConfig) || themeChanged
       }
 
       // 应用其他主题配置

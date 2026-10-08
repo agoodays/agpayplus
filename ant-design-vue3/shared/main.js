@@ -50,11 +50,19 @@ function setupGlobalErrorHandling(app) {
 
   // 2. 未捕获的 Promise 错误
   window.addEventListener('unhandledrejection', (event) => {
-    console.error('🚨 未捕获的 Promise 错误:', event.reason)
+    // 跳过已被 ag-axios 处理的业务错误（含 code/msg 字段），避免重复弹出错误提示
+    const reason = event.reason
+    const isHandledApiError = reason && (reason.code !== undefined || reason.msg !== undefined || reason.cancelled === true)
+    if (isHandledApiError) {
+      event.preventDefault()
+      return
+    }
+
+    console.error('🚨 未捕获的 Promise 错误:', reason)
 
     // 显示错误提示
-    if (event.reason && event.reason.message) {
-      message.error(`请求失败: ${event.reason.message}`)
+    if (reason && reason.message) {
+      message.error(`请求失败: ${reason.message}`)
     } else {
       message.error('请求失败，请稍后重试')
     }

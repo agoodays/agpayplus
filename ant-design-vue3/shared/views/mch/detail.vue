@@ -7,7 +7,7 @@
   >
     <a-spin :spinning="loading">
       <a-descriptions :column="2" bordered size="small">
-        <a-descriptions-item label="商户号">
+        <a-descriptions-item v-if="!mchDHid.has('mchNo')" label="商户号">
           {{ detailData.mchNo }}
         </a-descriptions-item>
 
@@ -115,6 +115,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:open'])
+const mchDHid = new Set(getProjectConfig(__APP_ID__).views.mchDetail.hiddenFields || [])
 
 // State
 const loading = ref(false)
