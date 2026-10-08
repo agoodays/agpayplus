@@ -153,7 +153,11 @@
         </a-col>
         <a-col :span="12">
           <a-form-item label="卡片背景色" name="bgColor">
-            <color-picker v-model="saveObject.bgColor" locale="zh-CN" />
+            <color-picker
+              class="ag-color-picker"
+              v-model:pureColor="saveObject.bgColor"
+              v-bind="{ isWidget:false, format:'hex', shape:'square', lang:'ZH-cn' }"
+            />
           </a-form-item>
         </a-col>
       </a-row>
@@ -171,7 +175,7 @@ import { AgDrawer, AgUpload } from '@/components'
 import { getOpenStatusOptions, getStateOptions, getSupportStatusOptions } from '@/constants/common-const'
 import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

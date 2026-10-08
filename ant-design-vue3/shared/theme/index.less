@@ -179,26 +179,6 @@
   --w-e-modal-button-border-color: var(--dark-border-color);
 }
 
-/* ==================== 颜色选择器 (.m-colorPicker) 主题适配 ==================== */
-
-/* 亮色模式：映射到全局主变量 */
-.m-colorPicker {
-  --vcp-panel-bg: var(--base-bg-color);
-  --vcp-panel-border: 1px solid var(--border-color);
-  --vcp-panel-shadow: 0 8px 24px var(--shadow-color);
-  --vcp-text-color: var(--text-color);
-  --vcp-focus-color: var(--primary-color);
-}
-
-/* 暗黑模式：映射到全局暗黑变量 */
-:root[data-theme='dark'] .m-colorPicker {
-  --vcp-panel-bg: var(--dark-layout-surface);
-  --vcp-panel-border: 1px solid var(--dark-border-color);
-  --vcp-panel-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); /* 暗黑模式下阴影加深 */
-  --vcp-text-color: var(--dark-text-color);
-  --vcp-focus-color: var(--primary-color);
-}
-
 // ==================== 基础样式 ====================
 
 * {

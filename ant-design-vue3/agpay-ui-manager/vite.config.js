@@ -23,7 +23,12 @@ export default defineConfig(({ mode }) => {
         { find: '@', replacement: pathResolve('src') }
       ],
       modules: [resolve(__dirname, 'node_modules'), 'node_modules'],
-      dedupe: ['vue', 'vue-router', 'pinia', 'ant-design-vue', '@ant-design/icons-vue', 'axios', 'dayjs']
+      dedupe: [
+        'vue', 'vue-router', 'pinia', 'pinia-plugin-persistedstate',
+        'ant-design-vue', '@ant-design/icons-vue', '@wangeditor/editor', '@wangeditor/editor-for-vue', '@amap/amap-jsapi-loader',
+        'axios', 'crypto-js', 'dayjs', 'js-base64', 'lodash', 'nprogress', 'vue-i18n', 'colorpickers',
+        'reconnectingwebsocket', 'viewerjs'
+      ]
     },
     define: {
       __APP_ID__: JSON.stringify('manager')

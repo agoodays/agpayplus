@@ -93,10 +93,11 @@
             <a-row>
               <a-col :span="24">
                 <color-picker
+                  class="ag-color-picker"
                   v-if="saveObject.configInfo.bgColor === 'custom'"
-                  v-model="saveObject.configInfo.customBgColor"
-                  locale="zh-CN"
-                  @change="onChange"
+                  v-model:pureColor="saveObject.configInfo.customBgColor"
+                  v-bind="{ isWidget:false, format:'hex', shape:'square', lang:'ZH-cn' }"
+                  @pureColorChange="onChange"
                 />
               </a-col>
             </a-row>
@@ -163,7 +164,7 @@ import { upload } from '@/lib/ag-axios'
 import { viewerApi } from '@/utils/viewer-api'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { ref, watch } from 'vue'
+import { defineEmits, defineProps, ref, watch } from 'vue'
 
 /**
  * 图标组件映射

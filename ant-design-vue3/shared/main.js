@@ -2,20 +2,19 @@ import { i18n, setAppLocale } from '@/i18n'
 import { router } from '@/router'
 import { store } from '@/store'
 import { getInitializedLanguage, useAppConfigStore } from '@/store/modules/system/app-config'
-import { useUserStore } from '@/store/modules/system/user'
+import '@/theme/index.less'
+import { infoBox } from '@/utils/info-box'
 import themeService from '@/utils/theme-service'
 import * as antIcons from '@ant-design/icons-vue'
 import Antd, { message } from 'ant-design-vue'
 import 'ant-design-vue/dist/reset.css'
+import ColorPickers from 'colorpickers'
+import 'colorpickers/style.css'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import { createApp } from 'vue'
 import App from './App.vue'
 import Initializer from './bootstrap'
-import '@/theme/index.less'
-import { infoBox } from '@/utils/info-box'
-import vcolorpicker from 'vcolorpicker'
-import 'vcolorpicker/style.css'
 
 // ==================== 全局配置 ====================
 
@@ -127,7 +126,7 @@ async function initializeApp() {
   // 使用插件
   app.use(i18n)
   app.use(Antd)
-  app.use(vcolorpicker)
+  app.use(ColorPickers)
 
   // 初始化多语言（i18n + dayjs）
   const appConfigStore = useAppConfigStore(store)

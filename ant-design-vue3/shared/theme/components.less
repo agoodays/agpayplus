@@ -852,58 +852,15 @@
 
 // ==================== 颜色选择器样式 ====================
 
-.m-colorPicker {
-  --vcp-panel-radius: var(--border-radius);
-  --vcp-panel-shadow: 0 8px 24px var(--shadow-color);
-  --vcp-panel-padding: 10px;
-  --vcp-transition: 0.3s ease;
-  --vcp-z-index: 10000;
+.vc-color-wrap {
   height: 66px !important;
   width: 100% !important;
-  margin-top: 8px !important;
   border: 1px solid var(--border-color) !important;
   border-radius: var(--border-radius) !important;
-  text-align: left;
-  font-size: 14px;
-  display: inline-block;
-  position: relative;
 }
 
-.m-colorPicker .colorBtn {
-  width: calc(100% - 16px) !important;
-  height: 48px !important;
-  margin: 8px !important;
-  border-radius: var(--border-radius) !important;
-  cursor: pointer;
-}
-
-.m-colorPicker .box.open {
-  z-index: 10000 !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  pointer-events: auto !important;
-  border-radius: var(--border-radius) !important;
-}
-
-.m-colorPicker .box h3.moreColors {
-  cursor: pointer;
-}
-
-.m-colorPicker .hd .colorView {
-  border-radius: var(--border-radius) !important;
-}
-
-.m-colorPicker .hd .defaultColor {
-  border-radius: var(--border-radius) !important;
-}
-
-.m-colorPicker .tColor li {
-  border-radius: var(--vcp-swatch-size) !important;
-}
-
-.m-colorPicker .bColor li li {    
-  border-radius: var(--vcp-swatch-size) !important;
-  margin: 2px 0px !important;
+.vc-colorpicker.white {
+  background-color: var(--base-bg-color) !important;
 }
 
 // ==================== 色弱模式 ====================
