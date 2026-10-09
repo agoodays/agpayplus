@@ -1,8 +1,8 @@
 export default {
   app: {
-    title: "AgPay商户平台"
+    title: 'AgPay商户平台'
   },
   auth: {
-    loginTitle: "商户登录"
+    loginTitle: '商户登录'
   }
 }

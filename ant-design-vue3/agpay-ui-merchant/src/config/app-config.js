@@ -17,11 +17,26 @@ export const asyncRouteDefine = {
   MchAppPage: { defaultPath: '/apps', component: () => import('@/views/mch-app/mch-app-page.vue') },
   MchStorePage: { defaultPath: '/store', component: () => import('@/views/mch-store/mch-store-page.vue') },
   PayOrderPage: { defaultPath: '/payOrder', component: () => import('@/views/order/pay/pay-order-page.vue') },
-  RefundOrderPage: { defaultPath: '/refundOrder', component: () => import('@/views/order/refund/refund-order-page.vue') },
-  TransferOrderPage: { defaultPath: '/transferOrder', component: () => import('@/views/order/transfer/transfer-order-page.vue') },
-  DivisionReceiverGroupPage: { defaultPath: '/divisionReceiverGroup', component: () => import('@/views/division/group/division-receiver-group-page.vue') },
-  DivisionReceiverPage: { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/division-receiver-page.vue') },
-  DivisionRecordPage: { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/division-record-page.vue') },
+  RefundOrderPage: {
+    defaultPath: '/refundOrder',
+    component: () => import('@/views/order/refund/refund-order-page.vue')
+  },
+  TransferOrderPage: {
+    defaultPath: '/transferOrder',
+    component: () => import('@/views/order/transfer/transfer-order-page.vue')
+  },
+  DivisionReceiverGroupPage: {
+    defaultPath: '/divisionReceiverGroup',
+    component: () => import('@/views/division/group/division-receiver-group-page.vue')
+  },
+  DivisionReceiverPage: {
+    defaultPath: '/divisionReceiver',
+    component: () => import('@/views/division/receiver/division-receiver-page.vue')
+  },
+  DivisionRecordPage: {
+    defaultPath: '/divisionRecord',
+    component: () => import('@/views/division/record/division-record-page.vue')
+  },
   MchConfigPage: { defaultPath: '/mchConfig', component: () => import('@/views/mch-config/mch-config-page.vue') },
   NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/sys/notice/notice-info-page.vue') }, // 公告管理
   MchTransferPage: { defaultPath: '/transfer', component: () => import('@/views/transfer/mch-transfer-page.vue') },

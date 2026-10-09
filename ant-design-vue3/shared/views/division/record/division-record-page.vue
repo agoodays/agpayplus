@@ -175,7 +175,7 @@ import { useI18n } from 'vue-i18n'
 import Detail from './detail.vue'
 
 const { t } = useI18n()
-const dvRecCfg = getProjectConfig(__APP_ID__).views.divisionRecordPage
+const dvRecCfg = getProjectConfig().views.divisionRecordPage
 const dvRecColHidden = new Set(dvRecCfg.hiddenColumns || [])
 const dvRecSearchHidden = new Set(dvRecCfg.hiddenSearchFields || [])
 const divisionStateOptions = computed(() => getDivisionStateOptions(t))

@@ -2,14 +2,7 @@
   <a-alert v-if="loginErrorInfo" class="login-error-message" :message="loginErrorInfo" type="error" show-icon />
   <div class="main">
     <div class="desc">{{ t('auth.loginTitle') }}</div>
-    <a-form
-      ref="loginForm"
-      class="user-layout-login"
-      :model="loginObject"
-      :rules="rules"
-      @finish="onFinish"
-      @finish-failed="onFinishFailed"
-    >
+    <a-form ref="loginForm" class="user-layout-login" :model="loginObject" :rules="rules" @finish="onFinish">
       <a-form-item name="username">
         <ag-input v-model="loginObject.username" size="large" type="text" :label="t('auth.loginNameOrPhone')" />
       </a-form-item>
@@ -18,12 +11,7 @@
       </a-form-item>
       <div class="vercode-container">
         <a-form-item name="vercode">
-          <ag-input
-            v-model="loginObject.vercode"
-            size="large"
-            type="text"
-            :label="t('auth.captcha')"
-          />
+          <ag-input v-model="loginObject.vercode" size="large" type="text" :label="t('auth.captcha')" />
         </a-form-item>
         <div class="code-img">
           <img v-show="vercodeImgSrc" :src="vercodeImgSrc" @click="refVercode()" />
@@ -181,8 +169,6 @@ const loginSuccess = (res) => {
   // 清除错误信息
   loginErrorInfo.value = ''
 }
-
-const onFinishFailed = (_errorInfo) => {}
 
 // 生命周期钩子
 onMounted(() => {

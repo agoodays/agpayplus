@@ -5,10 +5,7 @@
         <div class="amount-top">
           <a-skeleton active :loading="skeletonLoading" :paragraph="{ rows: 6 }">
             <div class="amount-date">
-              <div
-                :class="{ 'amount-date-active': payDayPeriod === 'today' }"
-                @click="switchPayDayPeriod('today')"
-              >
+              <div :class="{ 'amount-date-active': payDayPeriod === 'today' }" @click="switchPayDayPeriod('today')">
                 今日交易
               </div>
               <div
@@ -55,7 +52,7 @@
               </a-select>
             </div>
           </a-skeleton>
-          <div class="pay-amount" ref="payAmountRef"></div>
+          <div ref="payAmountRef" class="pay-amount"></div>
           <empty v-show="!hasPayAmountData" />
         </div>
       </div>
@@ -226,8 +223,7 @@ function isDarkMode() {
 function getChartThemeColors() {
   const dark = isDarkMode()
   const style = getComputedStyle(document.documentElement)
-  const getVar = (name, fallback) =>
-    style.getPropertyValue(name).trim() || fallback
+  const getVar = (name, fallback) => style.getPropertyValue(name).trim() || fallback
 
   return {
     textColor: getVar('--text-color', dark ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.85)'),
@@ -910,13 +906,7 @@ async function initPage() {
   await tryInitAllCharts()
 
   // 并行加载所有数据（互不影响）
-  await Promise.allSettled([
-    fetchPayDayCount(),
-    fetchPayTrend(),
-    fetchPayType(),
-    fetchPayCount(),
-    fetchNotice()
-  ])
+  await Promise.allSettled([fetchPayDayCount(), fetchPayTrend(), fetchPayType(), fetchPayCount(), fetchNotice()])
 
   // 所有数据加载完成后关闭骨架屏
   skeletonLoading.value = false
@@ -945,10 +935,7 @@ onMounted(async () => {
   // 监听主题变化，动态更新图表配色
   themeObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
-      if (
-        mutation.type === 'attributes' &&
-        mutation.attributeName === 'data-theme'
-      ) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
         updateAllChartThemes()
       }
     }

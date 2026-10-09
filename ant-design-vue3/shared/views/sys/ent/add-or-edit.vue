@@ -85,10 +85,7 @@ import { getFlagOptions, getSysTypeOptions, getUserTypeOptions } from '@/constan
 import { message } from 'ant-design-vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getProjectConfig } from '@/config/project-config'
-
 const { t } = useI18n()
-const seFormHid = new Set(getProjectConfig(__APP_ID__).views.sysEntAddOrEdit.hiddenFormFields || [])
 
 // 获取翻译后的下拉选项
 const sysTypeOptions = computed(() => getSysTypeOptions(t))

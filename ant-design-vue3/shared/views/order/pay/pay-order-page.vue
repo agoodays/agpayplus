@@ -46,7 +46,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col v-if="payOrderCfg.showPayInterfaceFilter" v-bind="colSpan">
+          <a-col v-if="!paySearchHidden.has('ifCode')" v-bind="colSpan">
             <a-form-item label="">
               <ag-select v-model="searchData.ifCode" label="支付接口" placeholder="请选择接口" allow-clear show-search>
                 <a-select-option v-for="c in channelList" :key="c.ifCode" :value="c.ifCode">
@@ -390,8 +390,9 @@ import { useI18n } from 'vue-i18n'
 import DetailDrawer from './detail-drawer.vue'
 import RefundModal from './refund-modal.vue'
 
-const projectConfig = getProjectConfig(__APP_ID__)
+const projectConfig = getProjectConfig()
 const payOrderCfg = projectConfig.views.payOrderPage
+const paySearchHidden = new Set(payOrderCfg.hiddenSearchFields || [])
 const userStore = useUserStore()
 
 // 国际化
@@ -503,9 +504,8 @@ function handleRefundSuccess() {
  * 退款按钮可见性判断
  */
 const refundBtnVisible = (record) => {
-  const { refundVisibleWhen } = payOrderCfg
-  if (!refundVisibleWhen) return true
-  try { return new Function('record', `return ${refundVisibleWhen}`)(record) } catch { return true }
+  return payOrderCfg.refundButtonVisibility === 'always'
+    || (record.state === 2 && record.refundState !== 2)
 }
 
 /**
@@ -552,7 +552,7 @@ const copyOrderNo = async (orderNo) => {
 }
 
 onMounted(async () => {
-  if (!payOrderCfg.showPayInterfaceFilter) return
+  if (paySearchHidden.has('ifCode')) return
   try {
     const res = __APP_ID__ === 'agent'
       ? await payConfigApi.queryPayConfigIfCodes({ infoId: userStore.belongInfoId, configMode: 'agentSelf' })

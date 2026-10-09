@@ -89,7 +89,7 @@ import { PlusOutlined } from '@ant-design/icons-vue'
 import AddOrEdit from './add-or-edit.vue'
 
 /** 差异化配置 */
-const dvGrpCfg = getProjectConfig(__APP_ID__).views.divisionReceiverGroupPage
+const dvGrpCfg = getProjectConfig().views.divisionReceiverGroupPage
 const dvGrpColHidden = new Set(dvGrpCfg.hiddenColumns || [])
 const dvGrpSearchHidden = new Set(dvGrpCfg.hiddenSearchFields || [])
 

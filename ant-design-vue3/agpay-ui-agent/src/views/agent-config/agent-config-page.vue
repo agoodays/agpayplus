@@ -6,19 +6,37 @@
           <div v-if="groupKey === '1'">
             <a-row :gutter="16">
               <a-col :md="16" :lg="16">
-                <a-form ref="pwdFormRef" :model="updateObject" :label-col="{ span: 9 }" :wrapper-col="{ span: 10 }" :rules="rulesPass">
-                  <a-form-item label="原支付密码" prop="originalPwd" v-if="hasSipwValidate">
-                    <a-input-password :maxlength="6" v-model:value="updateObject.originalPwd" placeholder="请输入原支付密码" />
+                <a-form
+                  ref="pwdFormRef"
+                  :model="updateObject"
+                  :label-col="{ span: 9 }"
+                  :wrapper-col="{ span: 10 }"
+                  :rules="rulesPass"
+                >
+                  <a-form-item v-if="hasSipwValidate" label="原支付密码" prop="originalPwd">
+                    <a-input-password
+                      v-model:value="updateObject.originalPwd"
+                      :maxlength="6"
+                      placeholder="请输入原支付密码"
+                    />
                   </a-form-item>
                   <a-form-item label="新支付密码" prop="newPwd">
-                    <a-input-password :maxlength="6" v-model:value="updateObject.newPwd" placeholder="请输入新支付密码" />
+                    <a-input-password
+                      v-model:value="updateObject.newPwd"
+                      :maxlength="6"
+                      placeholder="请输入新支付密码"
+                    />
                   </a-form-item>
                   <a-form-item label="确认新支付密码" prop="confirmPwd">
-                    <a-input-password :maxlength="6" v-model:value="updateObject.confirmPwd" placeholder="确认新支付密码" />
+                    <a-input-password
+                      v-model:value="updateObject.confirmPwd"
+                      :maxlength="6"
+                      placeholder="确认新支付密码"
+                    />
                   </a-form-item>
                 </a-form>
                 <a-form-item style="display: flex; justify-content: center">
-                  <a-button type="primary" @click="setSipw" :loading="btnLoading">确认更改</a-button>
+                  <a-button type="primary" :loading="btnLoading" @click="setSipw">确认更改</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -77,25 +95,28 @@ const setHasSipwValidate = async () => {
 }
 
 const setSipw = () => {
-  pwdFormRef.value?.validate().then(() => {
-    infoBox.confirmPrimary('确认更新支付密码吗？', '', async () => {
-      btnLoading.value = true
-      try {
-        const originalPwd = Base64.encode(updateObject.originalPwd)
-        const confirmPwd = Base64.encode(updateObject.confirmPwd)
-        await agentConfigApi.updateConfig('agentSipw', { originalPwd, confirmPwd })
-        infoBox.modalWarning('提示', '更新成功！')
-        updateObject.originalPwd = ''
-        updateObject.newPwd = ''
-        updateObject.confirmPwd = ''
-        await setHasSipwValidate()
-      } catch (err) {
-        console.error(err)
-      } finally {
-        btnLoading.value = false
-      }
+  pwdFormRef.value
+    ?.validate()
+    .then(() => {
+      infoBox.confirmPrimary('确认更新支付密码吗？', '', async () => {
+        btnLoading.value = true
+        try {
+          const originalPwd = Base64.encode(updateObject.originalPwd)
+          const confirmPwd = Base64.encode(updateObject.confirmPwd)
+          await agentConfigApi.updateConfig('agentSipw', { originalPwd, confirmPwd })
+          infoBox.modalWarning('提示', '更新成功！')
+          updateObject.originalPwd = ''
+          updateObject.newPwd = ''
+          updateObject.confirmPwd = ''
+          await setHasSipwValidate()
+        } catch (err) {
+          console.error(err)
+        } finally {
+          btnLoading.value = false
+        }
+      })
     })
-  }).catch(() => {})
+    .catch(() => {})
 }
 
 onMounted(() => {
@@ -103,5 +124,4 @@ onMounted(() => {
 })
 </script>
 
-<style lang="less" scoped>
-</style>
+<style lang="less" scoped></style>

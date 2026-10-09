@@ -207,7 +207,7 @@ const sysTypeOptions = computed(() => getSysTypeOptions(t))
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
-const suCfg = getProjectConfig(__APP_ID__).views.sysUserPage
+const suCfg = getProjectConfig().views.sysUserPage
 const suColHidden = new Set(suCfg.hiddenColumns || [])
 const suSearchHidden = new Set(suCfg.hiddenSearchFields || [])
 

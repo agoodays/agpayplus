@@ -11,6 +11,7 @@
 | [DOCUMENTATION_INDEX.md](./DOCUMENTATION_INDEX.md) | **文档索引** - 完整文档列表与统计 | ⭐⭐⭐⭐⭐ |
 | [CUSTOM_COMPONENTS_USAGE_GUIDE.md](./CUSTOM_COMPONENTS_USAGE_GUIDE.md) | **自定义组件使用指南** - 统一使用规范与场景示例 | ⭐⭐⭐⭐⭐ |
 | [FRONTEND_NAMING_CONVENTIONS.md](./FRONTEND_NAMING_CONVENTIONS.md) | **前端开发与命名规范** - 文件、符号、分层与提交检查清单 | ⭐⭐⭐⭐⭐ |
+| [VUE3_SHARED_ARCHITECTURE_PLAN.md](./VUE3_SHARED_ARCHITECTURE_PLAN.md) | **Vue3 共享架构优化计划** - Vite 配置、项目差异配置与 Agent 接续记录 | ⭐⭐⭐⭐ |
 
 ### 🎨 组件文档
 

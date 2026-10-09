@@ -20,15 +20,21 @@ export const asyncRouteDefine = {
   // 商户管理
   MchPage: { defaultPath: '/mch', component: () => import('@/views/mch/mch-page.vue') },
   MchAppPage: { defaultPath: '/apps', component: () => import('@/views/mch-app/mch-app-page.vue') },
-  MchStorePage: { defaultPath: '/store', component: () => import('@/views/mch-store/mch-store-page.vue') },  
+  MchStorePage: { defaultPath: '/store', component: () => import('@/views/mch-store/mch-store-page.vue') },
   // 代理商管理
   AgentPage: { defaultPath: '/agent', component: () => import('@/views/agent/agent-page.vue') },
   // 订单管理
   PayOrderPage: { defaultPath: '/payOrder', component: () => import('@/views/order/pay/pay-order-page.vue') },
-  RefundOrderPage: { defaultPath: '/refundOrder', component: () => import('@/views/order/refund/refund-order-page.vue') },
+  RefundOrderPage: {
+    defaultPath: '/refundOrder',
+    component: () => import('@/views/order/refund/refund-order-page.vue')
+  },
   // 系统管理
   SysUserPage: { defaultPath: '/users', component: () => import('@/views/sys/user/sys-user-page.vue') },
   SysUserTeamPage: { defaultPath: '/sysUserTeam', component: () => import('@/views/sys/team/team-page.vue') },
   RolePage: { defaultPath: '/role', component: () => import('@/views/sys/role/role-page.vue') },
-  AgentConfigPage: { defaultPath: '/agentConfig', component: () => import('@/views/agent-config/agent-config-page.vue') },
+  AgentConfigPage: {
+    defaultPath: '/agentConfig',
+    component: () => import('@/views/agent-config/agent-config-page.vue')
+  }
 }

@@ -17,9 +17,30 @@ export const devMenuTree = [
     entType: 'MO',
     menuIcon: 'BankOutlined',
     children: [
-      { entId: 'ENT_MCH_INFO', entName: '商户基本信息', menuUri: '/mchInfo', componentName: 'MchInfoPage', entType: 'ML', menuIcon: 'IdcardOutlined' },
-      { entId: 'ENT_MCH_APP', entName: '商户应用', menuUri: '/apps', componentName: 'MchAppPage', entType: 'ML', menuIcon: 'AppstoreOutlined' },
-      { entId: 'ENT_MCH_STORE', entName: '商户门店', menuUri: '/store', componentName: 'MchStorePage', entType: 'ML', menuIcon: 'ShopOutlined' }
+      {
+        entId: 'ENT_MCH_INFO',
+        entName: '商户基本信息',
+        menuUri: '/mchInfo',
+        componentName: 'MchInfoPage',
+        entType: 'ML',
+        menuIcon: 'IdcardOutlined'
+      },
+      {
+        entId: 'ENT_MCH_APP',
+        entName: '商户应用',
+        menuUri: '/apps',
+        componentName: 'MchAppPage',
+        entType: 'ML',
+        menuIcon: 'AppstoreOutlined'
+      },
+      {
+        entId: 'ENT_MCH_STORE',
+        entName: '商户门店',
+        menuUri: '/store',
+        componentName: 'MchStorePage',
+        entType: 'ML',
+        menuIcon: 'ShopOutlined'
+      }
     ]
   },
   {
@@ -29,10 +50,38 @@ export const devMenuTree = [
     entType: 'MO',
     menuIcon: 'FileTextOutlined',
     children: [
-      { entId: 'ENT_PAY_ORDER', entName: '支付订单', menuUri: '/payOrder', componentName: 'PayOrderPage', entType: 'ML', menuIcon: 'DollarOutlined' },
-      { entId: 'ENT_REFUND_ORDER', entName: '退款订单', menuUri: '/refundOrder', componentName: 'RefundOrderPage', entType: 'ML', menuIcon: 'RollbackOutlined' },
-      { entId: 'ENT_TRANSFER_ORDER', entName: '转账订单', menuUri: '/transferOrder', componentName: 'TransferOrderPage', entType: 'ML', menuIcon: 'SwapOutlined' },
-      { entId: 'ENT_NOTIFY', entName: '商户通知', menuUri: '/notify', componentName: 'MchNotifyPage', entType: 'ML', menuIcon: 'BellOutlined' }
+      {
+        entId: 'ENT_PAY_ORDER',
+        entName: '支付订单',
+        menuUri: '/payOrder',
+        componentName: 'PayOrderPage',
+        entType: 'ML',
+        menuIcon: 'DollarOutlined'
+      },
+      {
+        entId: 'ENT_REFUND_ORDER',
+        entName: '退款订单',
+        menuUri: '/refundOrder',
+        componentName: 'RefundOrderPage',
+        entType: 'ML',
+        menuIcon: 'RollbackOutlined'
+      },
+      {
+        entId: 'ENT_TRANSFER_ORDER',
+        entName: '转账订单',
+        menuUri: '/transferOrder',
+        componentName: 'TransferOrderPage',
+        entType: 'ML',
+        menuIcon: 'SwapOutlined'
+      },
+      {
+        entId: 'ENT_NOTIFY',
+        entName: '商户通知',
+        menuUri: '/notify',
+        componentName: 'MchNotifyPage',
+        entType: 'ML',
+        menuIcon: 'BellOutlined'
+      }
     ]
   },
   {
@@ -42,9 +91,30 @@ export const devMenuTree = [
     entType: 'MO',
     menuIcon: 'ShareAltOutlined',
     children: [
-      { entId: 'ENT_DIV_GROUP', entName: '分账账号组', menuUri: '/divisionReceiverGroup', componentName: 'DivisionReceiverGroupPage', entType: 'ML', menuIcon: 'TeamOutlined' },
-      { entId: 'ENT_DIV_RECEIVER', entName: '分账账号', menuUri: '/divisionReceiver', componentName: 'DivisionReceiverPage', entType: 'ML', menuIcon: 'UserOutlined' },
-      { entId: 'ENT_DIV_RECORD', entName: '分账记录', menuUri: '/divisionRecord', componentName: 'DivisionRecordPage', entType: 'ML', menuIcon: 'OrderedListOutlined' }
+      {
+        entId: 'ENT_DIV_GROUP',
+        entName: '分账账号组',
+        menuUri: '/divisionReceiverGroup',
+        componentName: 'DivisionReceiverGroupPage',
+        entType: 'ML',
+        menuIcon: 'TeamOutlined'
+      },
+      {
+        entId: 'ENT_DIV_RECEIVER',
+        entName: '分账账号',
+        menuUri: '/divisionReceiver',
+        componentName: 'DivisionReceiverPage',
+        entType: 'ML',
+        menuIcon: 'UserOutlined'
+      },
+      {
+        entId: 'ENT_DIV_RECORD',
+        entName: '分账记录',
+        menuUri: '/divisionRecord',
+        componentName: 'DivisionRecordPage',
+        entType: 'ML',
+        menuIcon: 'OrderedListOutlined'
+      }
     ]
   },
   {
@@ -54,8 +124,22 @@ export const devMenuTree = [
     entType: 'MO',
     menuIcon: 'BarChartOutlined',
     children: [
-      { entId: 'ENT_STAT_TX', entName: '交易报表', menuUri: '/statistic/transaction', componentName: 'TransactionPage', entType: 'ML', menuIcon: 'LineChartOutlined' },
-      { entId: 'ENT_STAT_MCH', entName: '商户统计', menuUri: '/statistic/mch', componentName: 'MchCountPage', entType: 'ML', menuIcon: 'PieChartOutlined' }
+      {
+        entId: 'ENT_STAT_TX',
+        entName: '交易报表',
+        menuUri: '/statistic/transaction',
+        componentName: 'TransactionPage',
+        entType: 'ML',
+        menuIcon: 'LineChartOutlined'
+      },
+      {
+        entId: 'ENT_STAT_MCH',
+        entName: '商户统计',
+        menuUri: '/statistic/mch',
+        componentName: 'MchCountPage',
+        entType: 'ML',
+        menuIcon: 'PieChartOutlined'
+      }
     ]
   },
   {

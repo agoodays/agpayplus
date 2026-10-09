@@ -10,7 +10,7 @@
        <a-descriptions-item label="门店编号" :span="2"><b>{{ detailData.storeId }}</b></a-descriptions-item>
        <a-descriptions-item label="门店名称" :span="2">{{ detailData.storeName }}</a-descriptions-item>
        <a-descriptions-item v-if="!mStoDHid.has('mchNo')" label="商户号">{{ detailData.mchNo }}</a-descriptions-item>
-       <a-descriptions-item label="商户名称">{{ detailData.mchName }}</a-descriptions-item>
+        <a-descriptions-item v-if="!mStoDHid.has('mchName')" label="商户名称">{{ detailData.mchName }}</a-descriptions-item>
        <a-descriptions-item label="代理商号" v-if="!hiddenFields.has('agentNo')">{{ detailData.agentNo || '-' }}</a-descriptions-item>
        <a-descriptions-item label="服务商号" v-if="!hiddenFields.has('isvNo')">{{ detailData.isvNo || '-' }}</a-descriptions-item>
        <a-descriptions-item label="联系人电话" :span="2">{{ detailData.contactPhone || '-' }}</a-descriptions-item>
@@ -56,7 +56,7 @@ import { getProjectConfig } from '@/config/project-config'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 
-const projectConfig = getProjectConfig(__APP_ID__)
+const projectConfig = getProjectConfig()
 const hiddenFields = new Set(projectConfig.views.mchStoreDetail.hiddenFields)
 
 // Props & Emits
@@ -72,7 +72,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:open'])
-const mStoDHid = new Set(getProjectConfig(__APP_ID__).views.mchStoreDetail.hiddenFields || [])
+const mStoDHid = new Set(getProjectConfig().views.mchStoreDetail.hiddenFields || [])
 
 // State
 const loading = ref(false)

@@ -2,16 +2,16 @@
   <a-modal
     v-model:open="visible"
     title="条码支付"
-    @cancel="handleChose"
     :mask-closable="false"
     :footer="null"
     :width="350"
+    @cancel="handleChose"
   >
     <div>
       <p>请输入用户条形码:</p>
       <div style="display: flex; flex-direction: row; margin-bottom: 14px">
-        <a-input v-model:value="barCodeValue" ref="barCodeInput" @pressEnter="handleOk" />
-        <a-button @click="handleOk" type="primary" style="margin-left: 10px" :loading="loading">确认支付</a-button>
+        <a-input ref="barCodeInput" v-model:value="barCodeValue" @press-enter="handleOk" />
+        <a-button type="primary" style="margin-left: 10px" :loading="loading" @click="handleOk">确认支付</a-button>
       </div>
       <p>或者使用(扫码枪/扫码盒)扫码:</p>
       <div style="text-align: center">

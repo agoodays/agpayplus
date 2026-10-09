@@ -91,7 +91,7 @@ const sysTypeOptions = computed(() => getSysTypeOptions(t))
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
-const stmCfg = getProjectConfig(__APP_ID__).views.sysTeamPage
+const stmCfg = getProjectConfig().views.sysTeamPage
 const stmColHidden = new Set(stmCfg.hiddenColumns || [])
 const stmSearchHidden = new Set(stmCfg.hiddenSearchFields || [])
 

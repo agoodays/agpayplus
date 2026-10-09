@@ -64,7 +64,7 @@ import { message } from 'ant-design-vue'
 import { ref, watch } from 'vue'
 
 // 差异化配置
-const qbCfg = getProjectConfig(__APP_ID__).views.qrCodeBind
+const qbCfg = getProjectConfig().views.qrCodeBind
 const qbFormHid = new Set(qbCfg.hiddenFormFields || [])
 
 /**

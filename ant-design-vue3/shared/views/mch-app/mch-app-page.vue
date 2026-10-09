@@ -13,7 +13,8 @@
        @reset="searchFunc"
      >
        <template #base="{ colSpan }">
-         <a-col v-bind="colSpan" v-if="!maSearchHidden.has('mchNo')">           <a-form-item label="">
+         <a-col v-if="!mchAppSearchHidden.has('mchNo')" v-bind="colSpan">
+           <a-form-item label="">
              <ag-select-infinite
                v-model="searchData.mchNo"
                label="商户号"
@@ -178,6 +179,9 @@ const { t } = useI18n()
 
 // 获取翻译后的下拉选项
 const stateOptions = computed(() => getStateOptions(t))
+const appPageConfig = getProjectConfig().views.mchAppPage
+const mchAppColHidden = new Set(appPageConfig.hiddenColumns || [])
+const mchAppSearchHidden = new Set(appPageConfig.hiddenSearchFields || [])
 
 const route = useRoute()
 
@@ -239,7 +243,7 @@ const ALL_TABLE_COLUMNS = [
  { key: 'createdAt', dataIndex: 'createdAt', title: '创建日期', width: 180 },
  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
-const tableColumns = maColHidden.size ? ALL_TABLE_COLUMNS.filter(c => !maColHidden.has(c.key)) : ALL_TABLE_COLUMNS
+const tableColumns = ALL_TABLE_COLUMNS.filter((column) => !mchAppColHidden.has(column.key))
 
 /**
 * 请求表格数据函数

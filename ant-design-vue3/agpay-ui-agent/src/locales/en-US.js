@@ -1,8 +1,8 @@
 export default {
   app: {
-    title: "AgPay Agent Platform"
+    title: 'AgPay Agent Platform'
   },
   auth: {
-    loginTitle: "Agent Login"
+    loginTitle: 'Agent Login'
   }
 }

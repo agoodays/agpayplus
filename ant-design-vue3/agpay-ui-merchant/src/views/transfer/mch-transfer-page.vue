@@ -3,13 +3,11 @@
     <a-form>
       <div style="display: flex; flex-direction: row">
         <a-form-item>
-          <a-select v-model:value="reqData.appId" @change="changeAppId" style="width: 300px">
+          <a-select v-model:value="reqData.appId" style="width: 300px" @change="changeAppId">
             <a-select-option value="">请选择应用APPID</a-select-option>
-            <a-select-option
-              v-for="item in mchAppList"
-              :key="item.appId"
-              :value="item.appId"
-            >{{ item.appName }} [{{ item.appId }}]</a-select-option>
+            <a-select-option v-for="item in mchAppList" :key="item.appId" :value="item.appId"
+              >{{ item.appName }} [{{ item.appId }}]</a-select-option
+            >
           </a-select>
         </a-form-item>
       </div>
@@ -24,7 +22,7 @@
           <div
             v-for="item in ifCodeList"
             :key="item.ifCode"
-            :class="{ 'paydemo-type': true, colorChange: true, 'this': reqData.ifCode === item.ifCode }"
+            :class="{ 'paydemo-type': true, colorChange: true, this: reqData.ifCode === item.ifCode }"
             @click="changeCurrentIfCode(item.ifCode)"
           >
             <span class="colorChange">{{ item.ifName }}</span>
@@ -49,27 +47,19 @@
         <div class="paydemo-form-item">
           <label>订单编号：</label>
           <span id="payMchOrderNo">{{ reqData.mchOrderNo }}</span>
-          <span @click="randomOrderNo" class="paydemo-btn" style="padding: 0 3px">刷新订单号</span>
+          <span class="paydemo-btn" style="padding: 0 3px" @click="randomOrderNo">刷新订单号</span>
         </div>
         <div class="paydemo-form-item">
           <span>转账金额(元)：</span>
-          <a-input-number
-            :max="100000"
-            :min="0.01"
-            :precision="2"
-            v-model:value="reqData.amount"
-          />
+          <a-input-number v-model:value="reqData.amount" :max="100000" :min="0.01" :precision="2" />
         </div>
 
         <div class="paydemo-form-item">
           <span>收款账号：</span>
           <a-input v-model:value="reqData.accountNo" style="width: 200px; margin-right: 10px" />
-          <a-button
-            v-show="reqData.entryType === 'WX_CASH'"
-            size="small"
-            danger
-            @click="showChannelUserQR"
-          >自动获取openID</a-button>
+          <a-button v-show="reqData.entryType === 'WX_CASH'" size="small" danger @click="showChannelUserQR"
+            >自动获取openID</a-button
+          >
         </div>
         <div style="margin-left: 10px; color: red">提示：【微信官方】需要填入对应应用收款方的openID</div>
         <div style="margin-left: 10px; color: red">【支付宝官方】需要填入支付宝登录账号</div>
@@ -86,16 +76,12 @@
         </div>
 
         <div style="margin-top: 20px; text-align: left">
-          <a-button
-            type="primary"
-            size="large"
-            @click="immediatelyTransfer"
-          >立即转账</a-button>
+          <a-button type="primary" size="large" @click="immediatelyTransfer">立即转账</a-button>
         </div>
       </div>
     </div>
 
-    <ChannelUserModal ref="channelUserModalRef" @changeChannelUserId="changeChannelUserIdFunc" />
+    <ChannelUserModal ref="channelUserModalRef" @change-channel-user-id="changeChannelUserIdFunc" />
   </a-card>
 </template>
 

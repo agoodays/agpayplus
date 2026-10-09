@@ -120,13 +120,14 @@ import { accountBillApi } from '@/api/business/account-bill/account-bill-api'
 import { AgDateRangePicker, AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getProjectConfig } from '@/config/project-config'
 import { getAccountTypeOptions, getBizTypeInfo, getBizTypeOptions, getProfitInfoTypeOptions } from '@/constants/common-const'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Detail from './detail.vue'
 
 const { t } = useI18n()
-const abCfg = getProjectConfig(__APP_ID__).views.statisticTransactionPage
+const abCfg = getProjectConfig().views.statisticTransactionPage
 const abColHidden = new Set(abCfg.hiddenColumns || [])
 const abSearchHidden = new Set(abCfg.hiddenSearchFields || [])
 const profitInfoTypeOptions = getProfitInfoTypeOptions(t)

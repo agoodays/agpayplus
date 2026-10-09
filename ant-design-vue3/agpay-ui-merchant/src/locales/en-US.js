@@ -1,8 +1,8 @@
 export default {
   app: {
-    title: "AgPay Merchant Platform"
+    title: 'AgPay Merchant Platform'
   },
   auth: {
-    loginTitle: "Merchant Login"
+    loginTitle: 'Merchant Login'
   }
 }

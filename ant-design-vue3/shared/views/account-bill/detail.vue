@@ -62,6 +62,7 @@
 
 import { accountBillApi } from '@/api/business/account-bill/account-bill-api'
 import { AgDrawer } from '@/components'
+import { getProjectConfig } from '@/config/project-config'
 import { reactive, ref, watch } from 'vue'
 
 const props = defineProps({
@@ -76,7 +77,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:open'])
-const abDHid = new Set(getProjectConfig(__APP_ID__).views.accountBillDetail.hiddenFields || [])
+const abDHid = new Set(getProjectConfig().views.accountBillDetail.hiddenFields || [])
 
 /**
 * 本地打开状态

@@ -236,7 +236,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { getProjectConfig } from '@/config/project-config'
 
 // 差异化配置
-const sagCfg = getProjectConfig(__APP_ID__).views.statisticAgentCountPage
+const sagCfg = getProjectConfig().views.statisticAgentCountPage
 const sagSearchHidden = new Set(sagCfg.hiddenSearchFields || [])
 const sagColHidden = new Set(sagCfg.hiddenColumns || [])
 

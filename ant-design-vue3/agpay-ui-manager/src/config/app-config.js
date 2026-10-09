@@ -4,7 +4,7 @@
  * 公共配置（appDefaultConfig / defaultThemeConfig / defaultLayoutConfig）
  * 已迁移至 shared/config/common-config.js 统一维护。
  */
-export { appDefaultConfig, defaultThemeConfig, defaultLayoutConfig } from '../../../shared/config/common-config.js'
+export { appDefaultConfig, defaultLayoutConfig, defaultThemeConfig } from '../../../shared/config/common-config.js'
 
 /**
  * 与后端开发人员的路由名称及配置项
@@ -19,31 +19,63 @@ export const asyncRouteDefine = {
   MchApplyPage: { defaultPath: '/mchApply', component: () => import('@/views/mch-apply/mch-apply-page.vue') }, // 商户进件列表
   MchAppPage: { defaultPath: '/apps', component: () => import('@/views/mch-app/mch-app-page.vue') }, // 商户应用列表
   MchStorePage: { defaultPath: '/store', component: () => import('@/views/mch-store/mch-store-page.vue') }, // 商户门店列表
-  MchAdvancedConfigPage: { defaultPath: '/mchAdvancedConfig', component: () => import('@/views/mch/mch-advanced-config.vue') }, // 商户高级配置（独立页）
   // 代理商管理
   AgentPage: { defaultPath: '/agent', component: () => import('@/views/agent/agent-page.vue') }, // 代理商列表
   // 服务商管理
   IsvPage: { defaultPath: '/isv', component: () => import('@/views/isv/isv-page.vue') }, // 服务商列表
   // 佣金管理
-  PlatformProfitPage: { defaultPath: '/platformProfits', component: () => import('@/views/statistic/agent/agent-count-page.vue') }, // 平台佣金统计
-  AccountBillPage: { defaultPath: '/accountBill', component: () => import('@/views/account-bill/account-bill-page.vue') }, // 钱包流水
+  PlatformProfitPage: {
+    defaultPath: '/platformProfits',
+    component: () => import('@/views/statistic/agent/agent-count-page.vue')
+  }, // 平台佣金统计
+  AccountBillPage: {
+    defaultPath: '/accountBill',
+    component: () => import('@/views/account-bill/account-bill-page.vue')
+  }, // 钱包流水
   // 订单管理
   PayOrderPage: { defaultPath: '/payOrder', component: () => import('@/views/order/pay/pay-order-page.vue') }, // 支付订单列表
-  RefundOrderPage: { defaultPath: '/refundOrder', component: () => import('@/views/order/refund/refund-order-page.vue') }, // 退款订单列表
-  TransferOrderPage: { defaultPath: '/transferOrder', component: () => import('@/views/order/transfer/transfer-order-page.vue') }, // 转账订单
+  RefundOrderPage: {
+    defaultPath: '/refundOrder',
+    component: () => import('@/views/order/refund/refund-order-page.vue')
+  }, // 退款订单列表
+  TransferOrderPage: {
+    defaultPath: '/transferOrder',
+    component: () => import('@/views/order/transfer/transfer-order-page.vue')
+  }, // 转账订单
   MchNotifyPage: { defaultPath: '/notify', component: () => import('@/views/order/notify/mch-notify-page.vue') }, // 商户通知列表
   // 数据统计
-  TransactionPage: { defaultPath: '/statistic/transaction', component: () => import('@/views/statistic/transaction/transaction-page.vue') }, // 交易报表
+  TransactionPage: {
+    defaultPath: '/statistic/transaction',
+    component: () => import('@/views/statistic/transaction/transaction-page.vue')
+  }, // 交易报表
   MchCountPage: { defaultPath: '/statistic/mch', component: () => import('@/views/statistic/mch/mch-count-page.vue') }, // 商户统计
-  AgentCountPage: { defaultPath: '/statistic/agent', component: () => import('@/views/statistic/agent/agent-count-page.vue') }, // 代理商统计
+  AgentCountPage: {
+    defaultPath: '/statistic/agent',
+    component: () => import('@/views/statistic/agent/agent-count-page.vue')
+  }, // 代理商统计
   IsvCountPage: { defaultPath: '/statistic/isv', component: () => import('@/views/statistic/isv/isv-count-page.vue') }, // 服务商统计
-  ChannelCountPage: { defaultPath: '/statistic/channel', component: () => import('@/views/statistic/channel/channel-count-page.vue') }, // 通道统计
+  ChannelCountPage: {
+    defaultPath: '/statistic/channel',
+    component: () => import('@/views/statistic/channel/channel-count-page.vue')
+  }, // 通道统计
   // 分账管理
-  DivisionReceiverGroupPage: { defaultPath: '/divisionReceiverGroup', component: () => import('@/views/division/group/division-receiver-group-page.vue') }, // 分账账号组管理
-  DivisionReceiverPage: { defaultPath: '/divisionReceiver', component: () => import('@/views/division/receiver/division-receiver-page.vue') }, // 分账账号管理
-  DivisionRecordPage: { defaultPath: '/divisionRecord', component: () => import('@/views/division/record/division-record-page.vue') }, // 分账记录
+  DivisionReceiverGroupPage: {
+    defaultPath: '/divisionReceiverGroup',
+    component: () => import('@/views/division/group/division-receiver-group-page.vue')
+  }, // 分账账号组管理
+  DivisionReceiverPage: {
+    defaultPath: '/divisionReceiver',
+    component: () => import('@/views/division/receiver/division-receiver-page.vue')
+  }, // 分账账号管理
+  DivisionRecordPage: {
+    defaultPath: '/divisionRecord',
+    component: () => import('@/views/division/record/division-record-page.vue')
+  }, // 分账记录
   // 支付配置
-  IfDefinePage: { defaultPath: '/ifdefines', component: () => import('@/views/pay-config/pay-if-define/if-define-page.vue') },
+  IfDefinePage: {
+    defaultPath: '/ifdefines',
+    component: () => import('@/views/pay-config/pay-if-define/if-define-page.vue')
+  },
   PayWayPage: { defaultPath: '/payways', component: () => import('@/views/pay-config/pay-way/pay-way-page.vue') },
   // 设备配置
   QrCodePage: { defaultPath: '/qrc', component: () => import('@/views/qr-code/qr-code-page.vue') },
@@ -55,5 +87,5 @@ export const asyncRouteDefine = {
   SysUserTeamPage: { defaultPath: '/teams', component: () => import('@/views/sys/team/team-page.vue') },
   SysConfigPage: { defaultPath: '/config', component: () => import('@/views/sys/config/sys-config.vue') }, // 系统配置
   SysLogPage: { defaultPath: '/log', component: () => import('@/views/sys/log/sys-log.vue') },
-  NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/sys/notice/notice-info-page.vue') }, // 公告管理
+  NoticeInfoPage: { defaultPath: '/notices', component: () => import('@/views/sys/notice/notice-info-page.vue') } // 公告管理
 }

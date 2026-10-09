@@ -9,8 +9,8 @@
       <div class="agent-info-rows">
         <div
           v-for="field in AGENT_INFO_FIELDS"
-          :key="field.key"
           v-show="!field.visible || field.visible(agentInfo)"
+          :key="field.key"
           class="agent-info-row"
         >
           <span class="agent-info-label">{{ field.label }}</span>
@@ -25,11 +25,7 @@
         <div class="header-row">
           <span>订单/商户统计</span>
           <div class="header-actions">
-            <a-select
-              v-model:value="selectedAgentNo"
-              :options="agentSelectOptions"
-              class="header-filter-select"
-            />
+            <a-select v-model:value="selectedAgentNo" :options="agentSelectOptions" class="header-filter-select" />
             <div class="date-picker">
               <ag-date-range-picker
                 v-model:value="queryDateRange"
@@ -247,13 +243,16 @@ function handleRangeChange(value) {
 }
 
 function copyAgentInfo() {
-  const lines = AGENT_INFO_FIELDS
-    .filter((f) => !f.visible || f.visible(agentInfo.value))
-    .map((f) => `${f.label}: ${f.render(agentInfo.value)}`)
+  const lines = AGENT_INFO_FIELDS.filter((f) => !f.visible || f.visible(agentInfo.value)).map(
+    (f) => `${f.label}: ${f.render(agentInfo.value)}`
+  )
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(lines.join('\n')).then(() => {
-      message.success('复制成功')
-    }).catch(() => {})
+    navigator.clipboard
+      .writeText(lines.join('\n'))
+      .then(() => {
+        message.success('复制成功')
+      })
+      .catch(() => {})
   }
 }
 

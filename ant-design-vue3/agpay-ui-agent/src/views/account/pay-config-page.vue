@@ -1,11 +1,7 @@
 <template>
   <div>
     <a-card :bordered="false">
-      <AgPayConfigPanel
-        :perm-code="'ENT_AGENT_SELF_PAY_CONFIG_ADD'"
-        config-mode="agentSelf"
-        :info-id="infoId"
-      />
+      <AgPayConfigPanel :perm-code="'ENT_AGENT_SELF_PAY_CONFIG_ADD'" config-mode="agentSelf" :info-id="infoId" />
     </a-card>
   </div>
 </template>

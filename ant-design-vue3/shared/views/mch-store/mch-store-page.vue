@@ -132,7 +132,8 @@ import Detail from './detail.vue'
 const route = useRoute()
 
 /** 项目配置（__APP_ID__ 由各项目 vite.config.js define 注入） */
-const projectConfig = getProjectConfig(__APP_ID__)
+const projectConfig = getProjectConfig()
+const msSearchHidden = new Set(projectConfig.views.mchStorePage.hiddenSearchFields || [])
 
 /** 权限校验 */
 const { hasPermission } = usePermission()

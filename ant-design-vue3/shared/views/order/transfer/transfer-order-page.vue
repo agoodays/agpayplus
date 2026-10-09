@@ -220,7 +220,7 @@ import DetailDrawer from './detail-drawer.vue'
 // 权限检查
 const { hasPermission } = usePermission()
 
-const projectConfig = getProjectConfig(__APP_ID__)
+const projectConfig = getProjectConfig()
 const trCfg = projectConfig.views.transferOrderPage
 const trColHidden = new Set(trCfg.hiddenColumns || [])
 const trSearchHidden = new Set(trCfg.hiddenSearchFields || [])

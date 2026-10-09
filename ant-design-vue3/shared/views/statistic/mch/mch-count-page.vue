@@ -244,7 +244,7 @@ import { getProjectConfig } from '@/config/project-config'
 import Detail from './detail.vue'
 
 // 差异化配置
-const statMchCfg = getProjectConfig(__APP_ID__).views.statisticMchPage
+const statMchCfg = getProjectConfig().views.statisticMchPage
 const statMchSearchHidden = new Set(statMchCfg.hiddenSearchFields || [])
 const statMchColHidden = new Set(statMchCfg.hiddenColumns || [])
 

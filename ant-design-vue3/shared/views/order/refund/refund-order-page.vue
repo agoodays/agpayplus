@@ -62,7 +62,7 @@
              <ag-input v-model="searchData.isvNo" label="服务商号" placeholder="请输入服务商号" allow-clear />
            </a-form-item>
          </a-col>
-         <a-col v-bind="colSpan">
+         <a-col v-bind="colSpan" v-if="!refundSearchHidden.has('ifCode')">
            <a-form-item label="">
              <ag-select
                v-model="searchData.state"
@@ -304,11 +304,10 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import RefundDetailDrawer from './refund-detail-drawer.vue'
 
-const projectConfig = getProjectConfig(__APP_ID__)
+const projectConfig = getProjectConfig()
 const refundCfg = projectConfig.views.refundOrderPage
 const refundColHidden = new Set(refundCfg.hiddenColumns || [])
 const refundSearchHidden = new Set(refundCfg.hiddenSearchFields || [])
-const payOrderCfg = refundCfg
 const userStore = useUserStore()
 
 // i18n
@@ -450,7 +449,7 @@ async function handleSearchMch(keyword) {
 * 请求支付接口定义数据
 */
 async function initIfDefineList() {
- if (!payOrderCfg.showPayInterfaceFilter) return
+ if (refundSearchHidden.has('ifCode')) return
  try {
    const res = __APP_ID__ === 'agent'
      ? await payConfigApi.queryPayConfigIfCodes({ infoId: userStore.belongInfoId, configMode: 'agentSelf' })

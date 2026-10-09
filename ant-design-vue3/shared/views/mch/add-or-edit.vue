@@ -240,7 +240,7 @@ import { useI18n } from 'vue-i18n'
 import { getProjectConfig } from '@/config/project-config'
 
 const { t } = useI18n()
-const maFormHid = new Set(getProjectConfig(__APP_ID__).views.mchAddOrEdit.hiddenFormFields || [])
+const maFormHid = new Set(getProjectConfig().views.mchAddOrEdit.hiddenFormFields || [])
 
 const flagOptions = computed(() => getFlagOptions(t))
 const stateOptions = computed(() => getStateOptions(t))

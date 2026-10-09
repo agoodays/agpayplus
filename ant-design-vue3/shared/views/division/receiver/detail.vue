@@ -53,6 +53,7 @@
 */
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
 import { AgDrawer } from '@/components'
+import { getProjectConfig } from '@/config/project-config'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 
@@ -70,7 +71,7 @@ const props = defineProps({
 
 /** 事件定义 */
 const emit = defineEmits(['update:open'])
-const dvRcvHid = new Set(getProjectConfig(__APP_ID__).views.divisionReceiverDetail.hiddenFields || [])
+const dvRcvHid = new Set(getProjectConfig().views.divisionReceiverDetail.hiddenFields || [])
 
 /** 加载状态 */
 const loading = ref(false)

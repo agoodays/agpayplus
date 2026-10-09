@@ -100,10 +100,6 @@ import SetEntMatchRule from './set-ent-match-rule.vue'
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
-const entCfg = getProjectConfig(__APP_ID__).views.sysEntPage
-const entColHidden = new Set(entCfg.hiddenColumns || [])
-const entSearchHidden = new Set(entCfg.hiddenSearchFields || [])
-
 /** i18n */
 const { t } = useI18n()
 
@@ -147,7 +143,7 @@ const ALL_TABLE_COLUMNS = [
  { key: 'updatedAt', dataIndex: 'updatedAt', title: '修改时间', width: 200 },
  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
-const tableColumns = entColHidden.size ? ALL_TABLE_COLUMNS.filter(c => !entColHidden.has(c.key)) : ALL_TABLE_COLUMNS
+const tableColumns = ALL_TABLE_COLUMNS
 
 /**
 * 请求表格数据函数

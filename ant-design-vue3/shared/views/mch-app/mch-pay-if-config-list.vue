@@ -140,7 +140,7 @@ const { t } = useI18n()
 const icons = { ArrowLeftOutlined, ArrowRightOutlined, CloseOutlined, ReloadOutlined, RightOutlined, SearchOutlined }
 
 const { hasPermission } = usePermission()
-const picCfg = getProjectConfig(__APP_ID__).views.payIfConfigListPage
+const picCfg = getProjectConfig().views.payIfConfigListPage
 const picColHidden = new Set(picCfg.hiddenColumns || [])
 const picSearchHidden = new Set(picCfg.hiddenSearchFields || [])
 

@@ -1,11 +1,11 @@
 <template>
   <div class="mch-config-page">
-    <a-tabs v-model:active-key="groupKey" @change="selectTabs" :animated="false">
+    <a-tabs v-model:active-key="groupKey" :animated="false" @change="selectTabs">
       <a-tab-pane key="orderConfig" tab="系统配置">
         <div v-if="groupKey === 'orderConfig'">
           <a-form :model="configData" layout="horizontal">
             <a-row>
-              <a-col :span="8" :offset="1" :key="config" v-for="(item, config) in configData">
+              <a-col v-for="(item, config) in configData" :key="config" :span="8" :offset="1">
                 <a-form-item :label="item.configName">
                   <a-radio-group v-model:value="item.configVal">
                     <a-radio value="1">启用</a-radio>
@@ -17,7 +17,7 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display: flex; justify-content: center">
-                  <a-button type="primary" @click="confirm('系统配置')" :loading="btnLoading">确认更新</a-button>
+                  <a-button type="primary" :loading="btnLoading" @click="confirm('系统配置')">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -54,7 +54,7 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display: flex; justify-content: center">
-                  <a-button type="primary" @click="setMchLevel" :loading="btnLoading">确认更新</a-button>
+                  <a-button type="primary" :loading="btnLoading" @click="setMchLevel">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -66,10 +66,14 @@
         <div v-if="groupKey === 'payOrderNotifyConfig'">
           <a-form :model="configData" layout="vertical">
             <a-row>
-              <a-col :span="22" :offset="1" :key="config" v-for="(item, config) in configData">
+              <a-col v-for="(item, config) in configData" :key="config" :span="22" :offset="1">
                 <div v-if="item.configKey !== 'payOrderNotifyExtParams'">
-                  <a-form-item :label="item.configName" v-if="item.type === 'text' || item.type === 'textarea'">
-                    <a-input :type="item.type === 'text' ? 'text' : 'textarea'" v-model:value="item.configVal" autocomplete="off" />
+                  <a-form-item v-if="item.type === 'text' || item.type === 'textarea'" :label="item.configName">
+                    <a-input
+                      v-model:value="item.configVal"
+                      :type="item.type === 'text' ? 'text' : 'textarea'"
+                      autocomplete="off"
+                    />
                     <div v-if="item.configKey === 'mchRefundNotifyUrl'" class="agpay-tip-text">
                       <span>智能POS收款、退款等场景下，需要配置商户回调地址，接口下单以下单传参为准</span>
                     </div>
@@ -77,12 +81,21 @@
                   <a-form-item v-if="item.type === 'radio'">
                     <template #label>
                       <span :title="item.configName" style="margin-right: 4px">{{ item.configName }}</span>
-                      <a-popover placement="top" v-if="item.configKey === 'mchNotifyPostType'">
+                      <a-popover v-if="item.configKey === 'mchNotifyPostType'" placement="top">
                         <template #content>
                           <p>设置后该商户接收支付网关所有的通知（支付、退款等回调）将全部以此方式发送。</p>
-                          <p>POST(Body形式)：method: POST; Content-Type: application/x-www-form-urlencoded; 回调参数（例如a=1&b=2）放置在Body发送。</p>
-                          <p>POST(QueryString形式)：method: POST; Content-Type: application/x-www-form-urlencoded; 回调参数（例如a=1&b=2）放置在QueryString发送。</p>
-                          <p>POST(JSON形式)：method: POST; Content-Type: application/json; 回调参数（例如{a: 1, b: 2}）放置在Body发送。</p>
+                          <p>
+                            POST(Body形式)：method: POST; Content-Type: application/x-www-form-urlencoded;
+                            回调参数（例如a=1&b=2）放置在Body发送。
+                          </p>
+                          <p>
+                            POST(QueryString形式)：method: POST; Content-Type: application/x-www-form-urlencoded;
+                            回调参数（例如a=1&b=2）放置在QueryString发送。
+                          </p>
+                          <p>
+                            POST(JSON形式)：method: POST; Content-Type: application/json; 回调参数（例如{a: 1, b:
+                            2}）放置在Body发送。
+                          </p>
                         </template>
                         <template #title>
                           <span>回调方式</span>
@@ -112,7 +125,12 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display: flex; justify-content: center">
-                  <a-button type="primary" @click="confirm('回调参数', '更新完成后请尽快检查回调接收地址，避免验签失败造成业务损失！')" :loading="btnLoading">确认更新</a-button>
+                  <a-button
+                    type="primary"
+                    :loading="btnLoading"
+                    @click="confirm('回调参数', '更新完成后请尽快检查回调接收地址，避免验签失败造成业务损失！')"
+                    >确认更新</a-button
+                  >
                 </a-form-item>
               </a-col>
             </a-row>
@@ -124,13 +142,15 @@
         <div v-if="groupKey === 'divisionManage'">
           <a-form :model="divisionConfig" layout="horizontal">
             <a-row>
-              <a-col :span="22" :offset="1" v-if="divisionConfig.mchDivisionEntFlag">
+              <a-col v-if="divisionConfig.mchDivisionEntFlag" :span="22" :offset="1">
                 <a-form-item style="margin-bottom: 0">
                   <template #label>
                     <span title="全局自动分账" style="margin-right: 4px">全局自动分账</span>
                     <a-popover placement="top">
                       <template #content>
-                        <p>开启：将根据[全局自动分账规则]进行自动分账处理（屏蔽下单API的分账参数，订单标识都是自动分账模式）</p>
+                        <p>
+                          开启：将根据[全局自动分账规则]进行自动分账处理（屏蔽下单API的分账参数，订单标识都是自动分账模式）
+                        </p>
                         <p>关闭：以API传参为准</p>
                       </template>
                       <template #title>
@@ -148,7 +168,11 @@
                   <a-divider orientation="left">全局自动分账规则</a-divider>
                   <div style="display: flex; align-items: center">
                     <span style="margin-right: 8px">当订单金额大于等于</span>
-                    <a-input-number :min="0" :formatter="value => `${value} 元`" v-model:value="divisionConfig.autoDivisionRules.amountLimit" />
+                    <a-input-number
+                      v-model:value="divisionConfig.autoDivisionRules.amountLimit"
+                      :min="0"
+                      :formatter="(value) => `${value} 元`"
+                    />
                     <span style="margin-left: 8px">时自动分账</span>
                   </div>
                 </a-form-item>
@@ -176,7 +200,13 @@
             <a-row>
               <a-col :span="19">
                 <a-form-item style="display: flex; justify-content: center">
-                  <a-button v-if="divisionConfig.mchDivisionEntFlag" type="primary" @click="confirm('分账设置')" :loading="btnLoading">确认更新</a-button>
+                  <a-button
+                    v-if="divisionConfig.mchDivisionEntFlag"
+                    type="primary"
+                    :loading="btnLoading"
+                    @click="confirm('分账设置')"
+                    >确认更新</a-button
+                  >
                 </a-form-item>
               </a-col>
             </a-row>
@@ -188,19 +218,33 @@
         <div v-if="groupKey === 'setSipw'">
           <a-row :gutter="16">
             <a-col :md="16" :lg="16">
-              <a-form ref="pwdFormRef" :model="updateObject" :label-col="{ span: 9 }" :wrapper-col="{ span: 10 }" :rules="rulesPass">
-                <a-form-item label="原支付密码" prop="originalPwd" v-if="hasSipwValidate">
-                  <a-input-password :maxlength="6" v-model:value="updateObject.originalPwd" placeholder="请输入原支付密码" />
+              <a-form
+                ref="pwdFormRef"
+                :model="updateObject"
+                :label-col="{ span: 9 }"
+                :wrapper-col="{ span: 10 }"
+                :rules="rulesPass"
+              >
+                <a-form-item v-if="hasSipwValidate" label="原支付密码" prop="originalPwd">
+                  <a-input-password
+                    v-model:value="updateObject.originalPwd"
+                    :maxlength="6"
+                    placeholder="请输入原支付密码"
+                  />
                 </a-form-item>
                 <a-form-item label="新支付密码" prop="newPwd">
-                  <a-input-password :maxlength="6" v-model:value="updateObject.newPwd" placeholder="请输入新支付密码" />
+                  <a-input-password v-model:value="updateObject.newPwd" :maxlength="6" placeholder="请输入新支付密码" />
                 </a-form-item>
                 <a-form-item label="确认新支付密码" prop="confirmPwd">
-                  <a-input-password :maxlength="6" v-model:value="updateObject.confirmPwd" placeholder="确认新支付密码" />
+                  <a-input-password
+                    v-model:value="updateObject.confirmPwd"
+                    :maxlength="6"
+                    placeholder="确认新支付密码"
+                  />
                 </a-form-item>
               </a-form>
               <a-form-item style="display: flex; justify-content: center">
-                <a-button type="primary" @click="setMchSipw" :loading="btnLoading">确认更改</a-button>
+                <a-button type="primary" :loading="btnLoading" @click="setMchSipw">确认更改</a-button>
               </a-form-item>
             </a-col>
           </a-row>
@@ -211,13 +255,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
-import { message } from 'ant-design-vue'
-import { InfoCircleOutlined } from '@ant-design/icons-vue'
-import { Base64 } from 'js-base64'
 import { mchConfigApi } from '@/api/business/mch-config/mch-config-api'
 import { req } from '@/lib/ag-axios'
 import { infoBox } from '@/utils/info-box'
+import { InfoCircleOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { Base64 } from 'js-base64'
+import { computed, onMounted, reactive, ref } from 'vue'
 
 const btnLoading = ref(false)
 const groupKey = ref('orderConfig')
@@ -306,13 +350,13 @@ const divisionConfig = ref({
 const rowSelection = computed(() => ({
   onChange: (selectedRowKeys, selectedRows) => {
     payOrderNotifyExtParams.value = []
-    selectedRows.forEach(record => {
+    selectedRows.forEach((record) => {
       if (!record.disabled) {
         payOrderNotifyExtParams.value.push(record.key)
       }
     })
   },
-  getCheckboxProps: record => ({
+  getCheckboxProps: (record) => ({
     props: {
       disabled: record.disabled,
       defaultChecked: record.disabled || payOrderNotifyExtParams.value.includes(record.key)
@@ -326,13 +370,13 @@ const detail = async () => {
     const res = await mchConfigApi.getConfig(groupKey.value)
     configData.value = res || []
     if (groupKey.value === 'payOrderNotifyConfig') {
-      const extParamsItem = res?.find(item => item.configKey === 'payOrderNotifyExtParams')
+      const extParamsItem = res?.find((item) => item.configKey === 'payOrderNotifyExtParams')
       if (extParamsItem) {
         payOrderNotifyExtParams.value = JSON.parse(extParamsItem.configVal)
       }
     }
     if (groupKey.value === 'divisionManage') {
-      const divisionItem = res?.find(item => item.configKey === 'divisionConfig')
+      const divisionItem = res?.find((item) => item.configKey === 'divisionConfig')
       if (divisionItem) {
         divisionConfig.value = JSON.parse(divisionItem.configVal)
       }
@@ -391,11 +435,12 @@ const confirm = async (title, content = '') => {
 
 const setMchLevel = () => {
   btnLoading.value = true
-  mchConfigApi.updateConfig('mchLevel', { mchLevel: mchLevel.value })
+  mchConfigApi
+    .updateConfig('mchLevel', { mchLevel: mchLevel.value })
     .then(() => {
       infoBox.modalWarning('提示', '更新成功，重新登录后将切换功能模式！')
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err)
     })
     .finally(() => {
@@ -413,25 +458,28 @@ const setHasSipwValidate = async () => {
 }
 
 const setMchSipw = () => {
-  pwdFormRef.value?.validate().then(() => {
-    infoBox.confirmPrimary('确认更新支付密码吗？', '', async () => {
-      btnLoading.value = true
-      try {
-        const originalPwd = Base64.encode(updateObject.originalPwd)
-        const confirmPwd = Base64.encode(updateObject.confirmPwd)
-        await mchConfigApi.updateConfig('mchSipw', { originalPwd, confirmPwd })
-        infoBox.modalWarning('提示', '更新成功！')
-        updateObject.originalPwd = ''
-        updateObject.newPwd = ''
-        updateObject.confirmPwd = ''
-        await setHasSipwValidate()
-      } catch (err) {
-        console.error(err)
-      } finally {
-        btnLoading.value = false
-      }
+  pwdFormRef.value
+    ?.validate()
+    .then(() => {
+      infoBox.confirmPrimary('确认更新支付密码吗？', '', async () => {
+        btnLoading.value = true
+        try {
+          const originalPwd = Base64.encode(updateObject.originalPwd)
+          const confirmPwd = Base64.encode(updateObject.confirmPwd)
+          await mchConfigApi.updateConfig('mchSipw', { originalPwd, confirmPwd })
+          infoBox.modalWarning('提示', '更新成功！')
+          updateObject.originalPwd = ''
+          updateObject.newPwd = ''
+          updateObject.confirmPwd = ''
+          await setHasSipwValidate()
+        } catch (err) {
+          console.error(err)
+        } finally {
+          btnLoading.value = false
+        }
+      })
     })
-  }).catch(() => {})
+    .catch(() => {})
 }
 
 onMounted(() => {
@@ -444,18 +492,5 @@ onMounted(() => {
   background: var(--base-bg-color);
   border-radius: 10px;
   padding: 16px;
-}
-
-.agpay-tip-text {
-  font-size: 12px;
-  border-radius: 5px;
-  background: #ffeed8;
-  color: #c57000;
-  padding: 5px 10px;
-  display: inline-block;
-  max-width: 100%;
-  position: relative;
-  margin-top: 15px;
-  line-height: 1.5715;
 }
 </style>

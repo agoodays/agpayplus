@@ -5,10 +5,7 @@
         <div class="amount-top">
           <a-skeleton active :loading="skeletonLoading" :paragraph="{ rows: 6 }">
             <div class="amount-date">
-              <div
-                :class="{ 'amount-date-active': payDayPeriod === 'today' }"
-                @click="switchPayDayPeriod('today')"
-              >
+              <div :class="{ 'amount-date-active': payDayPeriod === 'today' }" @click="switchPayDayPeriod('today')">
                 今日交易
               </div>
               <div
@@ -55,7 +52,7 @@
               </a-select>
             </div>
           </a-skeleton>
-          <div class="pay-amount" ref="payAmountRef"></div>
+          <div ref="payAmountRef" class="pay-amount"></div>
           <empty v-show="!hasPayAmountData" />
         </div>
       </div>
@@ -98,12 +95,7 @@
               <div
                 class="contrast-bar especially-bar"
                 :style="{
-                  width:
-                    (chartData.totalMch !== 0
-                      ? chartData.isvSubMchCount / chartData.totalMch
-                      : 0) *
-                      100 +
-                    '%'
+                  width: (chartData.totalMch !== 0 ? chartData.isvSubMchCount / chartData.totalMch : 0) * 100 + '%'
                 }"
                 @mouseover="tips.isvSubMchTipVisible = true"
                 @mouseout="tips.isvSubMchTipVisible = false"
@@ -263,8 +255,7 @@ function isDarkMode() {
 function getChartThemeColors() {
   const dark = isDarkMode()
   const style = getComputedStyle(document.documentElement)
-  const getVar = (name, fallback) =>
-    style.getPropertyValue(name).trim() || fallback
+  const getVar = (name, fallback) => style.getPropertyValue(name).trim() || fallback
 
   return {
     textColor: getVar('--text-color', dark ? 'rgba(255,255,255,0.88)' : 'rgba(0,0,0,0.85)'),
@@ -996,10 +987,7 @@ onMounted(async () => {
   // 监听主题变化，动态更新图表配色
   themeObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
-      if (
-        mutation.type === 'attributes' &&
-        mutation.attributeName === 'data-theme'
-      ) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
         updateAllChartThemes()
       }
     }
@@ -1064,7 +1052,7 @@ onBeforeUnmount(() => {
 }
 
 .especially-bar {
-  background:  rgb(255, 128, 102);
+  background: rgb(255, 128, 102);
 }
 
 .ordinary-bar {

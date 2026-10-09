@@ -112,7 +112,7 @@ import { useI18n } from 'vue-i18n'
 import { getProjectConfig } from '@/config/project-config'
 import AddOrEdit from './add-or-edit.vue'
 
-const projectConfig = getProjectConfig(__APP_ID__)
+const projectConfig = getProjectConfig()
 const roleCfg = projectConfig.views.sysRolePage
 const roleSearchHidden = new Set(roleCfg.hiddenSearchFields || [])
 const roleColumnHidden = new Set(roleCfg.hiddenColumns || [])

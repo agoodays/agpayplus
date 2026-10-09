@@ -18,7 +18,7 @@
          </a-form-item>
        </a-col>
 
-       <a-col :span="10">
+      <a-col v-if="!maFormHid.has('mchNo')" :span="10">
          <a-form-item label="商户号" name="mchNo">
            <a-select
              v-model:value="saveObject.mchNo"
@@ -132,7 +132,7 @@ import { useI18n } from 'vue-i18n'
 import { getProjectConfig } from '@/config/project-config'
 
 const { t } = useI18n()
-const maFormHid = new Set(getProjectConfig(__APP_ID__).views.mchAppAddOrEdit.hiddenFormFields || [])
+const maFormHid = new Set(getProjectConfig().views.mchAppAddOrEdit.hiddenFormFields || [])
 
 // 获取翻译后的下拉选项
 const stateOptions = computed(() => getStateOptions(t))
@@ -185,7 +185,7 @@ const appSecretPlaceholder = computed(() => {
 
 // 表单验证规则
 const rules = computed(() => ({
- mchNo: [{ required: true, message: '请选择商户', trigger: 'change' }],
+ mchNo: maFormHid.has('mchNo') ? [] : [{ required: true, message: '请选择商户', trigger: 'change' }],
  appName: [{ required: true, message: '请输入应用名称', trigger: 'blur' }],
  appSignType: [{ required: true, message: '请选择签名方式', trigger: 'change', type: 'array' }],
  appSecret: [

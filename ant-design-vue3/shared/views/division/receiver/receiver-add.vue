@@ -288,7 +288,7 @@ import AddOrEdit from '../group/add-or-edit.vue'
 const { hasPermission } = usePermission()
 
 // 差异化配置
-const drCfg = getProjectConfig(__APP_ID__).views.divisionReceiverAdd
+const drCfg = getProjectConfig().views.divisionReceiverAdd
 const drFormHid = new Set(drCfg.hiddenFormFields || [])
 
 /** Props 定义 */

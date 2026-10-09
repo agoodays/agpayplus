@@ -303,23 +303,27 @@ const handleUpdatePassword = async () => {
   try {
     await passwordFormRef.value.validate()
 
-    infoBox.confirmPrimary(t('current.confirmUpdatePasswordTitle'), t('current.updatePasswordNeedRelogin'), async () => {
-      passwordLoading.value = true
-      try {
-        await currentApi.modifyPwd({
-          originalPwd: Base64.encode(passwordForm.originalPwd),
-          confirmPwd: Base64.encode(passwordForm.confirmPwd)
-        })
+    infoBox.confirmPrimary(
+      t('current.confirmUpdatePasswordTitle'),
+      t('current.updatePasswordNeedRelogin'),
+      async () => {
+        passwordLoading.value = true
+        try {
+          await currentApi.modifyPwd({
+            originalPwd: Base64.encode(passwordForm.originalPwd),
+            confirmPwd: Base64.encode(passwordForm.confirmPwd)
+          })
 
-        message.success(t('current.editSuccessRelogin'))
-        await userStore.logout()
-        router.push({ name: 'login' })
-      } catch (error) {
-        message.error(error.msg || t('common.editFailed'))
-      } finally {
-        passwordLoading.value = false
+          message.success(t('current.editSuccessRelogin'))
+          await userStore.logout()
+          router.push({ name: 'login' })
+        } catch (error) {
+          message.error(error.msg || t('common.editFailed'))
+        } finally {
+          passwordLoading.value = false
+        }
       }
-    })
+    )
   } catch (_error) {
     // 表单验证失败
   }

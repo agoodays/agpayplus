@@ -160,7 +160,7 @@ import ReceiverAdd from './receiver-add.vue'
 import ReceiverEdit from './receiver-edit.vue'
 
 /** 差异化配置 */
-const dvRcvCfg = getProjectConfig(__APP_ID__).views.divisionReceiverPage
+const dvRcvCfg = getProjectConfig().views.divisionReceiverPage
 const dvRcvColHidden = new Set(dvRcvCfg.hiddenColumns || [])
 const dvRcvSearchHidden = new Set(dvRcvCfg.hiddenSearchFields || [])
 

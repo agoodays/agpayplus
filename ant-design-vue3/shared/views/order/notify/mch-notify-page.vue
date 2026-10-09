@@ -149,7 +149,7 @@ const { t } = useI18n()
 const { hasPermission } = usePermission()
 
 /** 差异化配置 */
-const mnCfg = getProjectConfig(__APP_ID__).views.mchNotifyPage
+const mnCfg = getProjectConfig().views.mchNotifyPage
 const mnColHidden = new Set(mnCfg.hiddenColumns || [])
 const mnSearchHidden = new Set(mnCfg.hiddenSearchFields || [])
 

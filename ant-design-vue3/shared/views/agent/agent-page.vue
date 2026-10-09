@@ -151,7 +151,7 @@ const stateOptions = computed(() => getStateOptions(t))
 
 /** 权限校验 */
 const { hasPermission } = usePermission()
-const agCfg = getProjectConfig(__APP_ID__).views.agentPage
+const agCfg = getProjectConfig().views.agentPage
 const agColHidden = new Set(agCfg.hiddenColumns || [])
 const agSearchHidden = new Set(agCfg.hiddenSearchFields || [])
 

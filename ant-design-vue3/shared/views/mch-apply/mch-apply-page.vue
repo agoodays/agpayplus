@@ -178,8 +178,8 @@ import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
 import SelectChannel from './select-channel.vue'
 
-const projectConfig = getProjectConfig(__APP_ID__)
-const mapCfg = getProjectConfig(__APP_ID__).views.mchApplyPage
+const projectConfig = getProjectConfig()
+const mapCfg = getProjectConfig().views.mchApplyPage
 const mapColHidden = new Set(mapCfg.hiddenColumns || [])
 // 注:当前页面模板搜索区无项目维度显隐需求,不再声明 mapSearchHidden 空 Set(避免 B-2 未使用告警)
 const userStore = useUserStore()

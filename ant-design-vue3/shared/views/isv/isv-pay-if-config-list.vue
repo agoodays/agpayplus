@@ -60,7 +60,7 @@ const { t } = useI18n()
 const icons = { LoadingOutlined, RightOutlined }
 
 const { hasPermission } = usePermission()
-const picCfg = getProjectConfig(__APP_ID__).views.payIfConfigListPage
+const picCfg = getProjectConfig().views.payIfConfigListPage
 const picColHidden = new Set(picCfg.hiddenColumns || [])
 const picSearchHidden = new Set(picCfg.hiddenSearchFields || [])
 

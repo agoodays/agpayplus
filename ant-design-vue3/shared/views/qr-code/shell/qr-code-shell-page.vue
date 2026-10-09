@@ -140,7 +140,6 @@
 import { qrcShellApi } from '@/api/business/qr-code/qrc-shell-api'
 import { AgCard, AgInput, AgSearch, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
-import { getProjectConfig } from '@/config/project-config'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
 import { viewerApi } from '@/utils/viewer-api'
 import { AppstoreOutlined, BarsOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons-vue'
@@ -150,9 +149,6 @@ import AddOrEdit from './add-or-edit.vue'
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
-const qshCfg = getProjectConfig(__APP_ID__).views.qrCodeShellPage
-const qshColHidden = new Set(qshCfg.hiddenColumns || [])
-const qshSearchHidden = new Set(qshCfg.hiddenSearchFields || [])
 
 /**
 * CRUD 表格页面状态
@@ -188,7 +184,7 @@ const ALL_TABLE_COLUMNS = [
  { key: 'shellAlias', dataIndex: 'shellAlias', title: '模板别名' },
  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
-const tableColumns = qshColHidden.size ? ALL_TABLE_COLUMNS.filter(c => !qshColHidden.has(c.key)) : ALL_TABLE_COLUMNS
+const tableColumns = ALL_TABLE_COLUMNS
 
 /** AgCard 组件配置参数 */
 const cardConfig = {

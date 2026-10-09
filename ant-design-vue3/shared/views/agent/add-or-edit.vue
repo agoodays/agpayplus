@@ -410,7 +410,7 @@ import { useI18n } from 'vue-i18n'
 import { getProjectConfig } from '@/config/project-config'
 
 const { t } = useI18n()
-const agFormHid = new Set(getProjectConfig(__APP_ID__).views.agentAddOrEdit.hiddenFormFields || [])
+const agFormHid = new Set(getProjectConfig().views.agentAddOrEdit.hiddenFormFields || [])
 
 // 获取翻译后的下拉选项
 const stateOptions = computed(() => getStateOptions(t))

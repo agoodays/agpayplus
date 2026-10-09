@@ -75,6 +75,7 @@
 <script setup>
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDrawer } from '@/components'
+import { getProjectConfig } from '@/config/project-config'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 
@@ -100,7 +101,7 @@ const props = defineProps({
 */
 const emit = defineEmits(['update:open'])
 // 注:ntyHid 为重复 Set 声明(模板只使用 ntfDHid),已清理避免 B-2 未使用告警
-const ntfDHid = new Set(getProjectConfig(__APP_ID__).views.notifyDetailDrawer.hiddenFields || [])
+const ntfDHid = new Set(getProjectConfig().views.notifyDetailDrawer.hiddenFields || [])
 
 /**
 * 响应式状态定义

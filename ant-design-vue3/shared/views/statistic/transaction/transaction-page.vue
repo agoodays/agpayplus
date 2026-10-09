@@ -280,7 +280,7 @@ import { getQueryDateTypeOptions } from '@/constants/common-const'
 const icons = { InfoCircleOutlined, SyncOutlined }
 
 const { t } = useI18n()
-const statTransCfg = getProjectConfig(__APP_ID__).views.statisticTransactionPage
+const statTransCfg = getProjectConfig().views.statisticTransactionPage
 const statTransColHidden = new Set(statTransCfg.hiddenColumns || [])
 const statTransSearchHidden = new Set(statTransCfg.hiddenSearchFields || [])
 const queryDateTypeOptions = computed(() => getQueryDateTypeOptions(t))

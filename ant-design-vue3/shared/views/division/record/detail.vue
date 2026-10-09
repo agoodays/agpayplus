@@ -63,6 +63,7 @@
 */
 import { divisionRecordApi } from '@/api/business/division/division-record-api'
 import { AgDrawer } from '@/components'
+import { getProjectConfig } from '@/config/project-config'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 
@@ -80,7 +81,7 @@ const props = defineProps({
 
 /** 事件定义 */
 const emit = defineEmits(['update:open'])
-const dvRecHid = new Set(getProjectConfig(__APP_ID__).views.orderDetailDrawer.hiddenFields || [])
+const dvRecHid = new Set(getProjectConfig().views.orderDetailDrawer.hiddenFields || [])
 
 /** 加载状态 */
 const loading = ref(false)

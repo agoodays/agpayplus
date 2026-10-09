@@ -124,6 +124,7 @@
 <script setup>
 import { mchApplyApi } from '@/api/business/mch-apply/mch-apply-api'
 import { AgDrawer } from '@/components'
+import { getProjectConfig } from '@/config/project-config'
 import { InputNumber, message, Modal } from 'ant-design-vue'
 import { computed, h, reactive, ref, watch } from 'vue'
 
@@ -155,7 +156,7 @@ const STATE_COLOR = {
 
 const props = defineProps({})
 const emit = defineEmits(['update:open', 'refresh', 'auditSuccess', 'verified'])
-const mapDHid = new Set(getProjectConfig(__APP_ID__).views.mchApplyDetail.hiddenFields || [])
+const mapDHid = new Set(getProjectConfig().views.mchApplyDetail.hiddenFields || [])
 
 const localOpen = ref(false)
 const loading = ref(false)

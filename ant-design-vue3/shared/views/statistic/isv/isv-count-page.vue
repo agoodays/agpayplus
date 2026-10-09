@@ -226,7 +226,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { getProjectConfig } from '@/config/project-config'
 
 // 差异化配置
-const sivCfg = getProjectConfig(__APP_ID__).views.statisticIsvCountPage
+const sivCfg = getProjectConfig().views.statisticIsvCountPage
 const sivSearchHidden = new Set(sivCfg.hiddenSearchFields || [])
 const sivColHidden = new Set(sivCfg.hiddenColumns || [])
 

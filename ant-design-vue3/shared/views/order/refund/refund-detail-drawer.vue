@@ -150,6 +150,7 @@
 <script setup>
 import { orderApi } from '@/api/business/order/order-api'
 import { AgDrawer } from '@/components'
+import { getProjectConfig } from '@/config/project-config'
 import { message } from 'ant-design-vue'
 import { reactive, ref, watch } from 'vue'
 
@@ -174,7 +175,7 @@ const props = defineProps({
  * @event update:open - 通知父组件抽屉状态变化
  */
 const emit = defineEmits(['update:open'])
-const refDHid = new Set(getProjectConfig(__APP_ID__).views.refundDetailDrawer.hiddenFields || [])
+const refDHid = new Set(getProjectConfig().views.refundDetailDrawer.hiddenFields || [])
 
 /**
  * 响应式状态定义

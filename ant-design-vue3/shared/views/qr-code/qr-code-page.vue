@@ -138,7 +138,7 @@ const icons = { ExclamationCircleOutlined, QrcodeOutlined }
 
 /** 权限检查 */
 const { hasPermission } = usePermission()
-const qrCfg = getProjectConfig(__APP_ID__).views.qrCodePage
+const qrCfg = getProjectConfig().views.qrCodePage
 const qrColHidden = new Set(qrCfg.hiddenColumns || [])
 const qrSearchHidden = new Set(qrCfg.hiddenSearchFields || [])
 

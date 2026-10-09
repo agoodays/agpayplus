@@ -50,7 +50,7 @@ import { ref, watch } from 'vue'
 import { getProjectConfig } from '@/config/project-config'
 
 // 差异化配置：是否显示代理商注册区（MCH 项目默认隐藏）
-const showAgentMerchantIntro = getProjectConfig(__APP_ID__).views.sysUserInviteCode?.showAgentMerchantIntro ?? true
+const showAgentMerchantIntro = getProjectConfig().views.sysUserInviteCode?.showAgentMerchantIntro ?? true
 
 /**
 * 组件属性定义

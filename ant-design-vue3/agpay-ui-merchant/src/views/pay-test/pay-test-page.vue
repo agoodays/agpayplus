@@ -5,7 +5,7 @@
         <a-col :md="24" :lg="24">
           <a-space :size="16" wrap>
             <a-form-item label="应用" style="margin-bottom: 0">
-              <a-select v-model:value="appId" @change="changeAppId" style="width: 300px" placeholder="选择应用">
+              <a-select v-model:value="appId" style="width: 300px" placeholder="选择应用" @change="changeAppId">
                 <a-select-option v-for="item in mchAppList" :key="item.appId" :value="item.appId">
                   {{ item.appName }} [{{ item.appId }}]
                 </a-select-option>
@@ -26,52 +26,112 @@
       <a-divider v-else-if="noConfigText">您尚未配置任何支付方式</a-divider>
       <a-divider v-else />
 
-      <div style="width: 100%" class="paydemo" v-if="payTestShow">
+      <div v-if="payTestShow" style="width: 100%" class="paydemo">
         <div class="paydemo-type-content">
-          <div class="paydemo-type-name article-title" v-show="showTitle('WX')">微信支付</div>
+          <div v-show="showTitle('WX')" class="paydemo-type-name article-title">微信支付</div>
           <div class="paydemo-type-body">
-            <div class="paydemo-type" v-show="appPaywayList.includes('WX_NATIVE')" @click="changeCurrentWayCode('WX_NATIVE', 'codeImgUrl')" :class="{ this: currentWayCode === 'WX_NATIVE' }">
+            <div
+              v-show="appPaywayList.includes('WX_NATIVE')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'WX_NATIVE' }"
+              @click="changeCurrentWayCode('WX_NATIVE', 'codeImgUrl')"
+            >
               <img :src="payImg('wx_native')" class="paydemo-type-img" /><span>微信二维码</span>
             </div>
-            <div class="paydemo-type" v-show="appPaywayList.includes('WX_BAR')" @click="changeCurrentWayCode('WX_BAR', '')" :class="{ this: currentWayCode === 'WX_BAR' }">
+            <div
+              v-show="appPaywayList.includes('WX_BAR')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'WX_BAR' }"
+              @click="changeCurrentWayCode('WX_BAR', '')"
+            >
               <img :src="payImg('wx_bar')" class="paydemo-type-img" /><span>微信条码</span>
             </div>
-            <div class="paydemo-type" v-show="appPaywayList.includes('WX_JSAPI')" @click="changeCurrentWayCode('WX_JSAPI', 'codeImgUrl')" :class="{ this: currentWayCode === 'WX_JSAPI' }">
+            <div
+              v-show="appPaywayList.includes('WX_JSAPI')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'WX_JSAPI' }"
+              @click="changeCurrentWayCode('WX_JSAPI', 'codeImgUrl')"
+            >
               <img :src="payImg('wx_jsapi')" class="paydemo-type-img" /><span>公众号/小程序</span>
             </div>
-            <div class="paydemo-type-h5" v-show="appPaywayList.includes('WX_H5')" @click="changeCurrentWayCode('WX_H5', 'payurl')" :class="{ this: currentWayCode === 'WX_H5' }">
+            <div
+              v-show="appPaywayList.includes('WX_H5')"
+              class="paydemo-type-h5"
+              :class="{ this: currentWayCode === 'WX_H5' }"
+              @click="changeCurrentWayCode('WX_H5', 'payurl')"
+            >
               <img :src="payImg('wx_h5')" class="paydemo-type-img" /><span>微信H5</span>
             </div>
           </div>
 
-          <div class="paydemo-type-name article-title" v-show="showTitle('ALI')">支付宝支付</div>
+          <div v-show="showTitle('ALI')" class="paydemo-type-name article-title">支付宝支付</div>
           <div class="paydemo-type-body">
-            <div class="paydemo-type" v-show="appPaywayList.includes('ALI_QR')" @click="changeCurrentWayCode('ALI_QR', 'codeImgUrl')" :class="{ this: currentWayCode === 'ALI_QR' }">
+            <div
+              v-show="appPaywayList.includes('ALI_QR')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'ALI_QR' }"
+              @click="changeCurrentWayCode('ALI_QR', 'codeImgUrl')"
+            >
               <img :src="payImg('ali_qr')" class="paydemo-type-img" /><span>支付宝二维码</span>
             </div>
-            <div class="paydemo-type" v-show="appPaywayList.includes('ALI_BAR')" @click="changeCurrentWayCode('ALI_BAR', '')" :class="{ this: currentWayCode === 'ALI_BAR' }">
+            <div
+              v-show="appPaywayList.includes('ALI_BAR')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'ALI_BAR' }"
+              @click="changeCurrentWayCode('ALI_BAR', '')"
+            >
               <img :src="payImg('ali_bar')" class="paydemo-type-img" /><span>支付宝条码</span>
             </div>
-            <div class="paydemo-type" v-show="appPaywayList.includes('ALI_JSAPI')" @click="changeCurrentWayCode('ALI_JSAPI', 'codeImgUrl')" :class="{ this: currentWayCode === 'ALI_JSAPI' }">
+            <div
+              v-show="appPaywayList.includes('ALI_JSAPI')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'ALI_JSAPI' }"
+              @click="changeCurrentWayCode('ALI_JSAPI', 'codeImgUrl')"
+            >
               <img :src="payImg('ali_jsapi')" class="paydemo-type-img" /><span>支付宝生活号</span>
             </div>
-            <div class="paydemo-type" v-show="appPaywayList.includes('ALI_PC')" @click="changeCurrentWayCode('ALI_PC', 'payurl')" :class="{ this: currentWayCode === 'ALI_PC' }">
+            <div
+              v-show="appPaywayList.includes('ALI_PC')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'ALI_PC' }"
+              @click="changeCurrentWayCode('ALI_PC', 'payurl')"
+            >
               <img :src="payImg('ali_pc')" class="paydemo-type-img" /><span>支付宝PC网站</span>
             </div>
-            <div class="paydemo-type-h5" v-show="appPaywayList.includes('ALI_WAP')" @click="changeCurrentWayCode('ALI_WAP', 'payurl')" :class="{ this: currentWayCode === 'ALI_WAP' }">
+            <div
+              v-show="appPaywayList.includes('ALI_WAP')"
+              class="paydemo-type-h5"
+              :class="{ this: currentWayCode === 'ALI_WAP' }"
+              @click="changeCurrentWayCode('ALI_WAP', 'payurl')"
+            >
               <img :src="payImg('ali_wap')" class="paydemo-type-img" /><span>支付宝WAP</span>
             </div>
           </div>
 
-          <div class="paydemo-type-name article-title" v-show="showQtTitle()">其它支付</div>
+          <div v-show="showQtTitle()" class="paydemo-type-name article-title">其它支付</div>
           <div class="paydemo-type-body">
-            <div class="paydemo-type" v-show="appPaywayList.includes('WX_JSAPI') || appPaywayList.includes('ALI_JSAPI')" @click="changeCurrentWayCode('QR_CASHIER', 'codeImgUrl')" :class="{ this: currentWayCode === 'QR_CASHIER' }">
+            <div
+              v-show="appPaywayList.includes('WX_JSAPI') || appPaywayList.includes('ALI_JSAPI')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'QR_CASHIER' }"
+              @click="changeCurrentWayCode('QR_CASHIER', 'codeImgUrl')"
+            >
               <img :src="payImg('qr_cashier')" class="paydemo-type-img" /><span>聚合主扫</span>
             </div>
-            <div class="paydemo-type" v-show="appPaywayList.includes('WX_BAR') || appPaywayList.includes('ALI_BAR')" @click="changeCurrentWayCode('AUTO_BAR', 'codeImgUrl')" :class="{ this: currentWayCode === 'AUTO_BAR' }">
+            <div
+              v-show="appPaywayList.includes('WX_BAR') || appPaywayList.includes('ALI_BAR')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'AUTO_BAR' }"
+              @click="changeCurrentWayCode('AUTO_BAR', 'codeImgUrl')"
+            >
               <img :src="payImg('auto_bar')" class="paydemo-type-img" /><span>聚合被扫</span>
             </div>
-            <div class="paydemo-type" v-show="appPaywayList.includes('PP_PC')" @click="changeCurrentWayCode('PP_PC', 'payurl')" :class="{ this: currentWayCode === 'PP_PC' }">
+            <div
+              v-show="appPaywayList.includes('PP_PC')"
+              class="paydemo-type"
+              :class="{ this: currentWayCode === 'PP_PC' }"
+              @click="changeCurrentWayCode('PP_PC', 'payurl')"
+            >
               <img :src="payImg('pp_pc')" class="paydemo-type-img" /><span>PayPal支付</span>
             </div>
           </div>
@@ -85,7 +145,7 @@
             <div class="paydemo-form-item">
               <label>订单编号：</label>
               <span>{{ mchOrderNo }}</span>
-              <span @click="randomOrderNo" class="paydemo-btn" style="padding: 0 3px">刷新订单号</span>
+              <span class="paydemo-btn" style="padding: 0 3px" @click="randomOrderNo">刷新订单号</span>
             </div>
             <div class="paydemo-form-item">
               <label>订单标题：</label>
@@ -116,9 +176,9 @@
                 <a-input-number
                   v-show="amountInput"
                   ref="amountInputFocus"
+                  v-model:value="customAmount"
                   :max="100000"
                   :min="0.01"
-                  v-model:value="customAmount"
                   :precision="2"
                   :step="0.01"
                   style="margin-left: 6px"
@@ -127,21 +187,21 @@
             </div>
 
             <div style="margin-top: 20px; text-align: left">
-              <a-button type="primary" @click="immediatelyPay" style="padding: 5px 20px">立即支付</a-button>
+              <a-button type="primary" style="padding: 5px 20px" @click="immediatelyPay">立即支付</a-button>
             </div>
           </div>
         </div>
       </div>
     </a-card>
 
-    <pay-test-modal ref="payTestModal" @closeBarCode="$refs.payTestBarCodeRef?.processCatch?.()" />
-    <pay-test-bar-code ref="payTestBarCodeRef" @barCodeValue="barCodeChange" @CodeAgainChange="testCodeChange" />
+    <PayTestModal ref="payTestModal" @close-bar-code="$refs.payTestBarCodeRef?.processCatch?.()" />
+    <pay-test-bar-code ref="payTestBarCodeRef" @bar-code-value="barCodeChange" @code-again-change="testCodeChange" />
   </div>
 </template>
 
 <script setup>
 import { message } from 'ant-design-vue'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
@@ -261,7 +321,10 @@ const immediatelyPay = async () => {
 
   try {
     const res = await payTestApi.createOrder({
-      wayCode: (currentWayCode.value === 'WX_JSAPI' || currentWayCode.value === 'ALI_JSAPI') ? 'QR_CASHIER' : currentWayCode.value,
+      wayCode:
+        currentWayCode.value === 'WX_JSAPI' || currentWayCode.value === 'ALI_JSAPI'
+          ? 'QR_CASHIER'
+          : currentWayCode.value,
       amount,
       appId: appId.value,
       storeId: storeId.value,

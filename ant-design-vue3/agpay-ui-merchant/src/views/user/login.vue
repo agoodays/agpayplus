@@ -4,9 +4,13 @@
     <div class="tab-box">
       <div class="desc">{{ t('auth.loginTitle') }}</div>
       <div class="tab">
-        <a v-if="loginMethod !== LOGIN_METHOD_ENUM.PASSWORD" @click="switchMethod(LOGIN_METHOD_ENUM.PASSWORD)">密码登录</a>
+        <a v-if="loginMethod !== LOGIN_METHOD_ENUM.PASSWORD" @click="switchMethod(LOGIN_METHOD_ENUM.PASSWORD)"
+          >密码登录</a
+        >
         <span v-if="loginMethod !== LOGIN_METHOD_ENUM.MESSAGE">|</span>
-        <a v-if="loginMethod !== LOGIN_METHOD_ENUM.MESSAGE" @click="switchMethod(LOGIN_METHOD_ENUM.MESSAGE)">短信登录</a>
+        <a v-if="loginMethod !== LOGIN_METHOD_ENUM.MESSAGE" @click="switchMethod(LOGIN_METHOD_ENUM.MESSAGE)"
+          >短信登录</a
+        >
         <span v-if="loginMethod !== LOGIN_METHOD_ENUM.QRCODE">|</span>
         <a v-if="loginMethod !== LOGIN_METHOD_ENUM.QRCODE" @click="switchMethod(LOGIN_METHOD_ENUM.QRCODE)">扫码登录</a>
       </div>
@@ -18,13 +22,15 @@
           <a-qrcode v-if="qrcodeText" :value="qrcodeText" :size="200" />
           <a-empty v-else description="加载中..." />
         </div>
-        <div class="qr-tips" v-if="qrcodeStatus && qrcodeStatus !== 'waiting'">
+        <div v-if="qrcodeStatus && qrcodeStatus !== 'waiting'" class="qr-tips">
           <template v-if="qrcodeStatus === 'scanned'">扫码成功，请确认登录</template>
           <template v-else-if="qrcodeStatus === 'expired'">二维码已过期</template>
           <template v-else-if="qrcodeStatus === 'confirmed'">登录成功</template>
           <template v-else-if="qrcodeStatus === 'canceled'">用户已取消登录</template>
         </div>
-        <a-button v-if="qrcodeStatus === 'expired' || qrcodeStatus === 'canceled'" size="small" @click="refreshQrcode">刷新二维码</a-button>
+        <a-button v-if="qrcodeStatus === 'expired' || qrcodeStatus === 'canceled'" size="small" @click="refreshQrcode"
+          >刷新二维码</a-button
+        >
       </div>
       <div class="qr-footer">请使用商户通APP扫码登录</div>
     </div>
@@ -36,7 +42,6 @@
       :model="loginObject"
       :rules="rules"
       @finish="onFinish"
-      @finish-failed="onFinishFailed"
     >
       <a-form-item v-if="loginMethod === LOGIN_METHOD_ENUM.PASSWORD" name="username">
         <ag-input v-model="loginObject.username" size="large" type="text" :label="t('auth.loginNameOrPhone')" />
@@ -60,15 +65,21 @@
 
       <div v-if="loginMethod === LOGIN_METHOD_ENUM.MESSAGE" class="sms-code-row">
         <a-form-item name="smsCode">
-          <ag-input v-model="loginObject.smsCode" size="large" type="text" label="短信验证码" placeholder="请输入短信验证码" />
+          <ag-input
+            v-model="loginObject.smsCode"
+            size="large"
+            type="text"
+            label="短信验证码"
+            placeholder="请输入短信验证码"
+          />
         </a-form-item>
         <a-button
           type="primary"
           size="large"
           :disabled="smsCountdown > 0"
           :loading="smsSending"
+          style="height: 40px; margin-left: 10px"
           @click="sendSmsCode"
-          style="height: 40px; margin-left: 10px;"
         >
           {{ smsCountdown > 0 ? `${smsCountdown}秒后重新发送` : '发送短信验证码' }}
         </a-button>
@@ -79,7 +90,9 @@
         <a class="forget-password" href="/forget">{{ t('auth.forgotPassword') }}</a>
       </a-form-item>
       <a-form-item class="submit">
-        <a-button size="large" type="primary" html-type="submit" class="login-button" :loading="loading">{{ t('auth.login') }}</a-button>
+        <a-button size="large" type="primary" html-type="submit" class="login-button" :loading="loading">{{
+          t('auth.login')
+        }}</a-button>
       </a-form-item>
 
       <div class="form-footer-links">
@@ -241,7 +254,7 @@ const getQrcodeStatus = async () => {
   }
 }
 
-const onFinish = async (values) => {
+const onFinish = async () => {
   loading.value = true
   loginErrorInfo.value = ''
 
@@ -251,7 +264,12 @@ const onFinish = async (values) => {
       username: loginMethod.value === LOGIN_METHOD_ENUM.PASSWORD ? loginObject.username : undefined,
       password: loginMethod.value === LOGIN_METHOD_ENUM.PASSWORD ? loginObject.password : undefined,
       mobile: loginMethod.value === LOGIN_METHOD_ENUM.MESSAGE ? loginObject.mobile : undefined,
-      vercode: loginMethod.value === LOGIN_METHOD_ENUM.PASSWORD ? loginObject.vercode : (loginMethod.value === LOGIN_METHOD_ENUM.MESSAGE ? loginObject.smsCode : undefined),
+      vercode:
+        loginMethod.value === LOGIN_METHOD_ENUM.PASSWORD
+          ? loginObject.vercode
+          : loginMethod.value === LOGIN_METHOD_ENUM.MESSAGE
+            ? loginObject.smsCode
+            : undefined,
       vercodeToken: loginObject.vercodeToken
     }
 
@@ -282,8 +300,6 @@ const loginSuccess = (res) => {
   }, 1000)
   loginErrorInfo.value = ''
 }
-
-const onFinishFailed = (_errorInfo) => {}
 
 onMounted(() => {
   refVercode()
@@ -367,7 +383,9 @@ onUnmounted(() => {
     color: var(--text-color-secondary);
     cursor: pointer;
     padding: 0 5px;
-    &:hover { color: var(--ant-primary-color); }
+    &:hover {
+      color: var(--ant-primary-color);
+    }
   }
   span {
     color: var(--border-color);
@@ -409,11 +427,20 @@ onUnmounted(() => {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  .ant-form-item { flex: 1; margin-bottom: 24px; }
+  .ant-form-item {
+    flex: 1;
+    margin-bottom: 24px;
+  }
 }
 .form-footer-links {
   text-align: center;
   margin-top: 16px;
-  a { color: var(--text-color-secondary); font-size: 14px; &:hover { color: var(--ant-primary-color); } }
+  a {
+    color: var(--text-color-secondary);
+    font-size: 14px;
+    &:hover {
+      color: var(--ant-primary-color);
+    }
+  }
 }
 </style>

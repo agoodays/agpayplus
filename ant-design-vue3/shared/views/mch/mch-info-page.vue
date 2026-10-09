@@ -72,7 +72,7 @@ import { message } from 'ant-design-vue'
 import { getProjectConfig } from '@/config/project-config'
 import { mainApi } from '@/api/business/main/main-api'
 import { infoBox } from '@/utils/info-box'
-const miHid = new Set(getProjectConfig(__APP_ID__).views.mchInfoPage.hiddenFields || [])
+const miHid = new Set(getProjectConfig().views.mchInfoPage.hiddenFields || [])
 
 const mchInfo = ref({})
 const infoFormRef = ref(null)

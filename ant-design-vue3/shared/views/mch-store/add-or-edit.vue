@@ -11,7 +11,7 @@
  >
    <a-form ref="infoForm" :model="saveObject" :rules="rules" layout="vertical">
      <!-- 商户号（仅新增时显示） -->
-     <a-row v-if="isAdd" :gutter="16">
+      <a-row v-if="isAdd && !msFormHid.has('mchNo')" :gutter="16">
        <a-col :span="24">
          <a-form-item label="商户号" name="mchNo">
              <!-- <ag-select
@@ -180,7 +180,7 @@ import { getProjectConfig } from '@/config/project-config'
 const icons = { LoadingOutlined, UploadOutlined }
 
 const { t } = useI18n()
-const msFormHid = new Set(getProjectConfig(__APP_ID__).views.mchStoreAddOrEdit.hiddenFormFields || [])
+const msFormHid = new Set(getProjectConfig().views.mchStoreAddOrEdit.hiddenFormFields || [])
 
 /** Props 定义 */
 const props = defineProps({
@@ -255,7 +255,7 @@ const saveObject = reactive({
 
 /** 表单验证规则 */
 const rules = {
- mchNo: [{ required: true, message: '请选择商户', trigger: 'change' }],
+ mchNo: msFormHid.has('mchNo') ? [] : [{ required: true, message: '请选择商户', trigger: 'change' }],
  storeName: [{ required: true, message: '请输入门店名称', trigger: 'blur' }],
  contactPhone: [{ required: true, pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
  storeLogo: [{ required: true, message: '请上传门店LOGO', trigger: 'change' }],

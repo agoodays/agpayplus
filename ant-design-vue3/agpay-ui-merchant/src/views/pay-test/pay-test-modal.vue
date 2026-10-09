@@ -1,11 +1,5 @@
 <template>
-  <a-modal
-    v-model:open="visible"
-    title="等待支付"
-    :mask-closable="false"
-    :footer="null"
-    :width="300"
-  >
+  <a-modal v-model:open="visible" title="等待支付" :mask-closable="false" :footer="null" :width="300">
     <div style="width: 100%; margin-bottom: 20px; text-align: center">
       <img
         v-if="apiRes.payDataType === 'codeImgUrl' && apiRes.payData"
@@ -15,7 +9,11 @@
         height="252"
       />
       <template v-else-if="apiRes.payDataType === 'payurl'">
-        <span>等待用户支付 <hr /> 如浏览器未正确跳转请点击：</span>
+        <span
+          >等待用户支付
+          <hr />
+          如浏览器未正确跳转请点击：</span
+        >
         <a :href="apiRes.payData" target="_blank">支付地址</a>
         <a-button size="small" style="margin-left: 8px" @click="onCopy(apiRes.payData)">复制链接</a-button>
       </template>
@@ -86,10 +84,7 @@ const showModal = (wayCode, res) => {
       emit('closeBarCode')
       Modal.error({
         title: '支付失败',
-        content: [
-          h('div', `错误码：${res.errCode}`),
-          h('div', `错误信息：${res.errMsg}`)
-        ]
+        content: [h('div', `错误码：${res.errCode}`), h('div', `错误信息：${res.errMsg}`)]
       })
     }
     return
@@ -103,9 +98,7 @@ const showModal = (wayCode, res) => {
 
   emit('closeBarCode')
 
-  payOrderWebSocket = new ReconnectingWebSocket(
-    `${getWsPrefix()}/api/anon/ws/payOrder/${res.payOrderId}/${Date.now()}`
-  )
+  payOrderWebSocket = new ReconnectingWebSocket(`${getWsPrefix()}/api/anon/ws/payOrder/${res.payOrderId}/${Date.now()}`)
   payOrderWebSocket.onopen = () => {}
   payOrderWebSocket.onmessage = (msgObject) => {
     const msg = JSON.parse(msgObject.data)
@@ -117,10 +110,7 @@ const showModal = (wayCode, res) => {
       handleClose()
       Modal.error({
         title: '支付失败',
-        content: [
-          h('div', `错误码：${msg.errCode}`),
-          h('div', `错误信息：${msg.errMsg}`)
-        ]
+        content: [h('div', `错误码：${msg.errCode}`), h('div', `错误信息：${msg.errMsg}`)]
       })
     }
   }

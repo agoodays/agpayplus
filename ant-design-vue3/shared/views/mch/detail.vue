@@ -11,7 +11,7 @@
           {{ detailData.mchNo }}
         </a-descriptions-item>
 
-        <a-descriptions-item label="商户名称">
+        <a-descriptions-item v-if="!mchDHid.has('mchName')" label="商户名称">
           {{ detailData.mchName }}
         </a-descriptions-item>
 
@@ -33,19 +33,19 @@
           {{ detailData.mchLevel }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value" label="服务商号">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('isvNo')" label="服务商号">
           {{ detailData.isvNo }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value" label="服务商名称">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('isvName')" label="服务商名称">
           {{ detailData.isvName }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value" label="代理商号">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('agentNo')" label="代理商号">
           {{ detailData.agentNo }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value" label="代理商名称">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('agentName')" label="代理商名称">
           {{ detailData.agentName }}
         </a-descriptions-item>
 
@@ -90,6 +90,7 @@
  */
 import { mchApi } from '@/api/business/mch/mch-api'
 import { AgDrawer } from '@/components'
+import { getProjectConfig } from '@/config/project-config'
 import {
   MCH_TYPE_ENUM,
   getMchTypeInfo,
@@ -115,7 +116,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:open'])
-const mchDHid = new Set(getProjectConfig(__APP_ID__).views.mchDetail.hiddenFields || [])
+const mchDHid = new Set(getProjectConfig().views.mchDetail.hiddenFields || [])
 
 // State
 const loading = ref(false)

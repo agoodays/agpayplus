@@ -111,7 +111,6 @@
 
    <!-- 高级配置抽屉 -->
    <mch-config
-     v-if="projectConfig.views.mchPage.advancedConfigMode === 'drawer'"
      v-model:open="mchConfigOpen"
      :record-id="mchConfigRecordId"
      @success="reloadTable"
@@ -129,18 +128,17 @@ import { mchApi } from '@/api/business/mch/mch-api'
 import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/components'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
+import { getProjectConfig } from '@/config/project-config'
 import { getMchTypeInfo, getMchTypeOptions, getStateInfo, getStateOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
-import { computed, defineAsyncComponent, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { getProjectConfig } from '@/config/project-config'
 import AddOrEdit from './add-or-edit.vue'
 import Detail from './detail.vue'
+import MchConfig from './mch-config.vue'
 
-const MchConfig = defineAsyncComponent(() => import('./mch-config.vue'))
-const projectConfig = getProjectConfig(__APP_ID__)
-const mchCfg = getProjectConfig(__APP_ID__).views.mchPage
+const mchCfg = getProjectConfig().views.mchPage
 const mchColHidden = new Set(mchCfg.hiddenColumns || [])
 const mchSearchHidden = new Set(mchCfg.hiddenSearchFields || [])
 
@@ -256,13 +254,8 @@ const appConfigFunc = (recordId) => {
 * @param {Object} recordId - 商户号
 */
 const advancedConfigFunc = (recordId) => {
- const cfg = projectConfig.views.mchPage
- if (cfg.advancedConfigMode === 'route') {
-   router.push({ path: cfg.advancedConfigRoutePath, query: { mchNo: recordId } })
- } else {
    mchConfigRecordId.value = recordId
    mchConfigOpen.value = true
- }
 }
 
 /**

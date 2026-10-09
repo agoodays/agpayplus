@@ -201,7 +201,7 @@ import { AgDrawer } from '@/components'
 import { getOpenStatusOptions, getStateOptions } from '@/constants/common-const'
 import { InfoCircleOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
