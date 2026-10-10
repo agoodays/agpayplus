@@ -4,6 +4,9 @@
     width="60%"
     title="商户高级配置"
     :mask-closable="false"
+    :show-confirm="true"
+    :confirm-loading="loading"
+    @confirm="handleConfirm"
     @close="handleClose"
   >
     <a-tabs v-model:active-key="groupKey" @change="selectTabs" :animated="false">
@@ -14,13 +17,6 @@
               <a-col :span="8" :offset="1" :key="config" v-for="(item, config) in configData">
                 <a-form-item :label="item.configName">
                   <a-radio-group v-model:value="item.configVal" :options="stateOptions" />
-                </a-form-item>
-              </a-col>
-            </a-row>
-            <a-row>
-              <a-col :span="19">
-                <a-form-item style="display: flex; justify-content: center">
-                  <a-button type="primary" @click="confirm('系统配置')" :loading="btnLoading">确认更新</a-button>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -72,13 +68,6 @@
                     :pagination="false"
                   />
                 </div>
-              </a-col>
-            </a-row>
-            <a-row>
-              <a-col :span="19">
-                <a-form-item style="display: flex; justify-content: center">
-                  <a-button type="primary" @click="confirm('回调参数', '更新完成后请尽快检查回调接收地址，避免验签失败造成业务损失！')" :loading="btnLoading">确认更新</a-button>
-                </a-form-item>
               </a-col>
             </a-row>
           </a-form>
@@ -150,13 +139,6 @@
                 </a-form-item>
               </a-col>
             </a-row>
-            <a-row>
-              <a-col :span="19">
-                <a-form-item style="display: flex; justify-content: center">
-                  <a-button type="primary" @click="confirm('分账设置')" :loading="btnLoading">确认更新</a-button>
-                </a-form-item>
-              </a-col>
-            </a-row>
           </a-form>
         </div>
       </a-tab-pane>
@@ -177,17 +159,16 @@
                 </div>
               </a-col>
             </a-row>
-            <a-row>
-              <a-col :span="24">
-                <a-form-item style="display: flex; justify-content: center">
-                  <a-button type="primary" @click="confirm('商户的接口权限')" :loading="btnLoading">确认更新</a-button>
-                </a-form-item>
-              </a-col>
-            </a-row>
           </a-form>
         </div>
       </a-tab-pane>
     </a-tabs>
+
+    <!-- <div class="config-footer">
+      <a-button type="primary" :loading="loading" @click="handleConfirm">
+        确认更新
+      </a-button>
+    </div> -->
   </ag-drawer>
 </template>
 
@@ -199,6 +180,7 @@
 import { mchApi } from '@/api/business/mch/mch-api'
 import { AgDrawer } from '@/components'
 import { getOpenStatusOptions, getStateOptions } from '@/constants/common-const'
+import { infoBox } from '@/utils/info-box'
 import { InfoCircleOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { computed, defineEmits, defineProps, ref, watch } from 'vue'
@@ -224,7 +206,7 @@ const props = defineProps({
 const emit = defineEmits(['update:open', 'success'])
 
 const localOpen = ref(false)
-const btnLoading = ref(false)
+const loading = ref(false)
 const groupKey = ref('orderConfig')
 const configData = ref([])
 const isShowMchApiEnt = ref(false)
@@ -364,10 +346,19 @@ const selectTabs = async (key) => {
   await detail()
 }
 
-const confirm = async (title, content) => {
+const groupConfig = {
+  orderConfig: { title: '系统配置' },
+  payOrderNotifyConfig: {
+    title: '回调参数',
+    tips: '更新完成后请尽快检查回调接收地址，避免验签失败造成业务损失！'
+  },
+  divisionManage: { title: '分账设置' },
+  mchApiEnt: { title: '商户的接口权限' }
+}
+
+const buildSubmitPayload = () => {
   const jsonObject = {}
-  for (const i in configData.value) {
-    const item = configData.value[i]
+  for (const item of configData.value) {
     switch (item.configKey) {
       case 'payOrderNotifyExtParams':
         jsonObject[item.configKey] = JSON.stringify(payOrderNotifyExtParams.value)
@@ -383,17 +374,26 @@ const confirm = async (title, content) => {
         break
     }
   }
-  btnLoading.value = true
-  try {
-    await mchApi.updateMchConfigs(groupKey.value, jsonObject)
-    message.success('更新成功')
-    emit('success')
-    handleClose()
-  } catch (error) {
-    console.error('更新失败:', error)
-  } finally {
-    btnLoading.value = false
-  }
+  return jsonObject
+}
+
+const handleConfirm = () => {
+  const { title = '配置', tips } = groupConfig[groupKey.value] || {}
+
+  infoBox.confirmPrimary(`确认修改${title}吗？`, tips, async () => {
+    loading.value = true
+    try {
+      const jsonObject = buildSubmitPayload()
+      await mchApi.updateMchConfigs(groupKey.value, jsonObject)
+      message.success('更新成功')
+      emit('success')
+      handleClose()
+    } catch (error) {
+      console.error('更新失败:', error)
+    } finally {
+      loading.value = false
+    }
+  })
 }
 
 const handleClose = () => {
@@ -412,3 +412,13 @@ watch(() => props.open, (newVal) => {
   }
 })
 </script>
+
+<style scoped lang="less">
+/* .config-footer {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+} */
+</style>

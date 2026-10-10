@@ -208,7 +208,6 @@
        </a-col>
      </a-row>
    </a-form>
-
  </ag-drawer>
 </template>
 
@@ -220,24 +219,24 @@
 import { mchApi } from '@/api/business/mch/mch-api'
 import { basicApi } from '@/api/system/basic-api'
 import { AgDrawer, AgInput, AgTextarea } from '@/components'
+import { getProjectConfig } from '@/config/project-config'
 import {
- FLAG_ENUM,
- MCH_LEVEL_ENUM,
- MCH_TYPE_ENUM,
- REFUND_MODE_ENUM,
- STATE_ENUM,
- getFlagOptions,
- getMchLevelOptions,
- getMchTypeOptions,
- getRefundModeOptions,
- getStateOptions
+  FLAG_ENUM,
+  MCH_LEVEL_ENUM,
+  MCH_TYPE_ENUM,
+  REFUND_MODE_ENUM,
+  STATE_ENUM,
+  getFlagOptions,
+  getMchLevelOptions,
+  getMchTypeOptions,
+  getRefundModeOptions,
+  getStateOptions
 } from '@/constants/common-const'
 import { QuestionCircleOutlined, SyncOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import { Base64 } from 'js-base64'
-import { computed, nextTick, reactive, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { getProjectConfig } from '@/config/project-config'
 
 const { t } = useI18n()
 const maFormHid = new Set(getProjectConfig().views.mchAddOrEdit.hiddenFormFields || [])

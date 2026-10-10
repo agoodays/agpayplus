@@ -315,6 +315,16 @@ Push-Location ant-design-vue3/agpay-ui-merchant; npm run build; Pop-Location
 | 2026-10-09 | 保留本地优先 alias，不迁移 workspace | 545 个共享 `@/` 导入、Merchant 本地页面覆盖和同名入口表明该解析语义仍在使用；全量改写成本高且无独立发布需求 | 3 |
 | 2026-10-09 | jsconfig 具名 alias 使用应用 `src` 优先、shared 兜底 | 与 Vite `createSharedAlias` 解析顺序一致，避免编辑器把 `@/config/project-config` 指向旧 shared selector | 2、3 |
 
+### 测试账号
+> 注意：验证码可以随便输入，后端Debug模式不验证验证码
+
+http://localhost:8817/
+agpayadmin/agpay123
+http://localhost:8816/
+xiangyu/agpay666
+http://localhost:8818/
+aifeier/agpay666
+
 ### 每次工作会话更新模板
 
 复制以下模板并追加到本节顶部，保留历史记录：
