@@ -14,4 +14,10 @@
     <Folder Include="HealthChecks\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- 共享配置：物理文件存放于 src/ 下（4 个 API 共用一份），链接到输出目录供配置系统加载。
+         由 AgPayApiHostExtensions.AddAgPayApiHost 以最低优先级插入配置源，环境变量仍可覆盖。 -->
+    <Content Include="..\appsettings.Shared.json" Link="appsettings.Shared.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\appsettings.Shared.Development.json" Link="appsettings.Shared.Development.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

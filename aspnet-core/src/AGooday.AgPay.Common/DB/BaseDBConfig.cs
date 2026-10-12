@@ -80,7 +80,7 @@ namespace AGooday.AgPay.Common.DB
                 DbType = DataBaseType.MySql;
                 var defaultConnectionString = DifDBConnOfSecurity(defaultConnectionFile, defaultConnection);
 
-                return string.IsNullOrWhiteSpace(defaultConnectionString) ? "server=localhost;port=3306;uid=root;pwd=mysql*;database=agpayplusdb_dev" : defaultConnectionString;
+                return string.IsNullOrWhiteSpace(defaultConnectionString) ? "server=localhost;port=3306;uid=root;pwd=Mysql@Local2024;database=agpayplusdb_dev" : defaultConnectionString;
             }
         }
         private static string DifDBConnOfSecurity(params string[] conn)
