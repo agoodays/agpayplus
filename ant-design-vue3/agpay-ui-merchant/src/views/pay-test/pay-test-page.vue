@@ -200,14 +200,14 @@
 </template>
 
 <script setup>
-import { message } from 'ant-design-vue'
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 import { mchAppApi } from '@/api/business/mch-app/mch-app-api'
 import { mchStoreApi } from '@/api/business/mch-store/mch-store-api'
 import { payTestApi } from '@/api/business/pay-test/pay-test-api'
-import PayTestModal from './pay-test-modal.vue'
-import PayTestBarCode from './pay-test-bar-code.vue'
+import PayTestBarCode from '@/components/pay-test/pay-test-bar-code.vue'
+import PayTestModal from '@/components/pay-test/pay-test-modal.vue'
+import { message } from 'ant-design-vue'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 import './payTest.css'
 
 const appId = ref('')

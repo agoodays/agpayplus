@@ -47,6 +47,7 @@
             </div>
           </div>
           <div class="ag-layout-header-right">
+            <component :is="QuickCashierAction" v-if="QuickCashierAction" />
             <div class="ag-layout-header-dark-mode" :title="isDarkMode ? t('layout.switchLightMode') : t('layout.switchDarkMode')" @click="toggleDarkMode">
               <bg-colors-outlined />
             </div>
@@ -103,12 +104,14 @@
 </template>
 
 <script setup>
-import { useMenuLogic, resolveRouteTitle as resolveRouteTitleWithT } from '@/composables/useMenuLogic'
+import { resolveRouteTitle as resolveRouteTitleWithT, useMenuLogic } from '@/composables/useMenuLogic'
 import { useResponsiveLayout } from '@/composables/useResponsiveLayout'
 import { appDefaultConfig } from '@/config/app-config'
+import { getProjectConfig } from '@/config/project-config'
 import { useAppStore } from '@/store/modules/system/app'
 import { useAppConfigStore } from '@/store/modules/system/app-config'
 import { useUserStore } from '@/store/modules/system/user'
+import { infoBox } from '@/utils/info-box'
 import {
   BgColorsOutlined,
   DownOutlined,
@@ -121,10 +124,9 @@ import {
   UserOutlined
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
-import { computed, getCurrentInstance } from 'vue'
+import { computed, defineAsyncComponent, getCurrentInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
-import { infoBox } from '@/utils/info-box'
 
 // ==================== 基础依赖 ====================
 const route = useRoute()
@@ -134,6 +136,8 @@ const appStore = useAppStore()
 const appConfigStore = useAppConfigStore()
 const { t } = useI18n()
 const { proxy } = getCurrentInstance()
+const quickCashierLoader = getProjectConfig().layout?.headerActions?.quickCashier
+const QuickCashierAction = quickCashierLoader ? defineAsyncComponent(quickCashierLoader) : null
 
 const currentYear = dayjs().year()
 const sideMenuWidth = computed(() => appDefaultConfig.sideMenuWidth)

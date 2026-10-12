@@ -2,6 +2,11 @@ import { createProjectConfig } from '../../../shared/config/project-config-core'
 
 // 只声明 Merchant 相对 shared 默认配置的差异，其余配置继承默认值。
 const projectConfig = createProjectConfig({
+  layout: {
+    headerActions: {
+      quickCashier: () => import('@/components/quick-cashier/quick-cashier.vue')
+    }
+  },
   views: {
     // ---- 角色管理列表 ----
     // Merchant 用户只属于当前商户，无需按系统类型或主体归属筛选。

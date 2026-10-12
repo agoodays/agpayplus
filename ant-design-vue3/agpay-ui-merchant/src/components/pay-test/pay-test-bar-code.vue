@@ -22,8 +22,8 @@
 </template>
 
 <script setup>
-import { nextTick, ref } from 'vue'
 import scanImg from '@/assets/payTestImg/scan.svg'
+import { defineEmits, defineExpose, nextTick, ref } from 'vue'
 
 const emit = defineEmits(['barCodeValue', 'CodeAgainChange'])
 
@@ -57,5 +57,10 @@ const processCatch = () => {
   loading.value = false
 }
 
-defineExpose({ showModal, getVisible, processCatch })
+const closeModal = () => {
+  visible.value = false
+  loading.value = false
+}
+
+defineExpose({ showModal, getVisible, processCatch, closeModal })
 </script>
