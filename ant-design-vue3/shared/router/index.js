@@ -22,6 +22,7 @@ const modules = import.meta.glob('../views/**/*.vue')
 
 // 无需登录验证的路由白名单
 const ALLOW_LIST = ['login', 'forget', 'register', 'registerResult']
+const registrationEnabled = typeof __APP_ID__ !== 'undefined' && ['agent', 'merchant'].includes(__APP_ID__)
 
 // 开发模式演示权限点（两处初始化共用，避免重复维护）
 const DEV_ENT_IDS = [
@@ -163,7 +164,10 @@ const routes = [
     component: UserLayout,
     children: [
       { path: 'login', name: '登录', component: () => import('@/views/user/login.vue') },
-      { path: 'forget', name: '注册', component: () => import('@/views/user/forget.vue') }
+      { path: 'forget', name: '注册', component: () => import('@/views/user/forget.vue') },
+      ...(registrationEnabled
+        ? [{ path: 'register', name: 'register', component: () => import('@/views/user/register.vue') }]
+        : [])
     ]
   },
   {

@@ -2,8 +2,8 @@
  *  登录
  *
  */
-import { request, getRequest } from '@/lib/ag-axios'
 import { LOGIN_METHOD_ENUM } from '@/constants/system/login-const'
+import { getRequest, request } from '@/lib/ag-axios'
 import { Base64 } from '@/lib/encrypt'
 
 export const loginApi = {
@@ -85,6 +85,32 @@ export const loginApi = {
       true
     )
   },
+  /**
+   * 注册代理商或商户
+   */
+  register: ({ accountType, entityName, code, confirmPwd, phone, inviteCode }) => {
+    const isAgent = accountType === 'agent'
+    return request(
+      {
+        url: isAgent ? '/api/anon/register/agentRegister' : '/api/anon/register/mchRegister',
+        method: 'post',
+        data: {
+          ...(isAgent ? { agentName: entityName } : { mchName: entityName }),
+          code: Base64.encode(code),
+          confirmPwd: Base64.encode(confirmPwd),
+          phone: Base64.encode(phone),
+          inviteCode
+        }
+      },
+      true,
+      true,
+      true
+    )
+  },
+  /**
+   * 获取注册协议
+   */
+  treaty: () => request({ url: '/api/anon/treaty', method: 'get' }, true, true, true),
   /**
    * 发送短信验证码
    * @param data

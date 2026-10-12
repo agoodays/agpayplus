@@ -2,7 +2,7 @@
   <ag-drawer
     v-model:open="localOpen"
     width="50%"
-    :title="isAdd ? '新增支付接口' : '修改支付接口'"
+    :title="t(isAdd ? 'payConfig.ifDefine.addTitle' : 'payConfig.ifDefine.editTitle')"
     :mask-closable="false"
     :show-confirm="true"
     :confirm-loading="loading"
@@ -17,89 +17,89 @@
     >
       <a-row :gutter="16">
         <a-col :span="24">
-          <p class="ag-drawer-title">基本配置</p>
+          <p class="ag-drawer-title">{{ t('payConfig.ifDefine.basicConfig') }}</p>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="接口代码" name="ifCode">
-            <a-input v-model:value="saveObject.ifCode" placeholder="请输入" :disabled="!isAdd" />
+          <a-form-item :label="t('payConfig.ifDefine.ifCode')" name="ifCode">
+            <a-input v-model:value="saveObject.ifCode" :placeholder="t('payConfig.ifDefine.pleaseInput')" :disabled="!isAdd" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="接口名称" name="ifName">
-            <a-input v-model:value="saveObject.ifName" placeholder="请输入" />
+          <a-form-item :label="t('payConfig.ifDefine.ifName')" name="ifName">
+            <a-input v-model:value="saveObject.ifName" :placeholder="t('payConfig.ifDefine.pleaseInput')" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否支持普通商户模式" name="isMchMode">
+          <a-form-item :label="t('payConfig.ifDefine.supportMerchantMode')" name="isMchMode">
             <a-radio-group v-model:value="saveObject.isMchMode" :options="supportStatusOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否支持服务商子商户模式" name="isIsvMode">
+          <a-form-item :label="t('payConfig.ifDefine.supportIsvSubMerchantMode')" name="isIsvMode">
             <a-radio-group v-model:value="saveObject.isIsvMode" :options="supportStatusOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="24">
-          <a-form-item label="支付参数配置页面类型" name="configPageType">
+          <a-form-item :label="t('payConfig.ifDefine.configPageType')" name="configPageType">
             <a-radio-group v-model:value="saveObject.configPageType">
-              <a-radio :value="1">根据接口配置定义描述渲染页面</a-radio>
-              <a-radio :value="2">自定义页面</a-radio>
+              <a-radio :value="1">{{ t('payConfig.ifDefine.renderFromDefinition') }}</a-radio>
+              <a-radio :value="2">{{ t('payConfig.ifDefine.customPage') }}</a-radio>
             </a-radio-group>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否支持进件" name="isSupportApplyment">
+          <a-form-item :label="t('payConfig.ifDefine.supportApplyment')" name="isSupportApplyment">
             <a-radio-group v-model:value="saveObject.isSupportApplyment" :options="supportStatusOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否开启进件" name="isOpenApplyment">
+          <a-form-item :label="t('payConfig.ifDefine.openApplyment')" name="isOpenApplyment">
             <a-radio-group v-model:value="saveObject.isOpenApplyment" :disabled="!saveObject.isSupportApplyment" :options="openStatusOptions"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否支持对账" name="isSupportCheckBill">
+          <a-form-item :label="t('payConfig.ifDefine.supportReconciliation')" name="isSupportCheckBill">
             <a-radio-group v-model:value="saveObject.isSupportCheckBill" :options="supportStatusOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否开启对账" name="isOpenCheckBill">
+          <a-form-item :label="t('payConfig.ifDefine.openReconciliation')" name="isOpenCheckBill">
             <a-radio-group v-model:value="saveObject.isOpenCheckBill" :disabled="!saveObject.isSupportCheckBill" :options="openStatusOptions"/>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否支持提现" name="isSupportCashout">
+          <a-form-item :label="t('payConfig.ifDefine.supportCashout')" name="isSupportCashout">
             <a-radio-group v-model:value="saveObject.isSupportCashout" :options="supportStatusOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="是否开启提现" name="isOpenCashout">
+          <a-form-item :label="t('payConfig.ifDefine.openCashout')" name="isOpenCashout">
             <a-radio-group v-model:value="saveObject.isOpenCashout" :disabled="!saveObject.isSupportCashout" :options="openStatusOptions"/>
           </a-form-item>
         </a-col>
         <a-col :span="24" v-if="saveObject.isIsvMode == 1 && saveObject.configPageType === 1">
-          <a-form-item label="服务商接口配置定义描述" name="isvParams">
-            <a-textarea v-model:value="saveObject.isvParams" placeholder="请输入" :rows="4" />
+          <a-form-item :label="t('payConfig.ifDefine.isvParams')" name="isvParams">
+            <a-textarea v-model:value="saveObject.isvParams" :placeholder="t('payConfig.ifDefine.pleaseInput')" :rows="4" />
           </a-form-item>
         </a-col>
         <a-col :span="24" v-if="saveObject.isIsvMode == 1 && saveObject.configPageType === 1">
-          <a-form-item label="特约商户接口配置定义描述" name="isvsubMchParams">
-            <a-textarea v-model:value="saveObject.isvsubMchParams" placeholder="请输入" :rows="4" />
+          <a-form-item :label="t('payConfig.ifDefine.isvSubMerchantParams')" name="isvsubMchParams">
+            <a-textarea v-model:value="saveObject.isvsubMchParams" :placeholder="t('payConfig.ifDefine.pleaseInput')" :rows="4" />
           </a-form-item>
         </a-col>
         <a-col :span="24" v-if="saveObject.isMchMode == 1 && saveObject.configPageType === 1">
-          <a-form-item label="普通商户接口配置定义描述" name="normalMchParams">
-            <a-textarea v-model:value="saveObject.normalMchParams" placeholder="请输入" :rows="4" />
+          <a-form-item :label="t('payConfig.ifDefine.normalMerchantParams')" name="normalMchParams">
+            <a-textarea v-model:value="saveObject.normalMchParams" :placeholder="t('payConfig.ifDefine.pleaseInput')" :rows="4" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="状态" name="state">
+          <a-form-item :label="t('payConfig.ifDefine.state')" name="state">
             <a-radio-group v-model:value="saveObject.state" :options="stateOptions" />
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="备注" name="remark">
-            <a-input v-model:value="saveObject.remark" placeholder="请输入" />
+          <a-form-item :label="t('payConfig.ifDefine.remark')" name="remark">
+            <a-input v-model:value="saveObject.remark" :placeholder="t('payConfig.ifDefine.pleaseInput')" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -108,12 +108,12 @@
           <a-divider orientation="left" />
         </a-col>
         <a-col :span="24">
-          <p class="ag-drawer-title">支付方式</p>
+          <p class="ag-drawer-title">{{ t('payConfig.ifDefine.paymentMethods') }}</p>
         </a-col>
       </a-row>
       <a-row :gutter="16">
         <a-col :span="24">
-          <a-form-item label="支持的支付方式" name="checkedList">
+          <a-form-item :label="t('payConfig.ifDefine.supportedPaymentMethods')" name="checkedList">
             <a-checkbox-group v-model:value="checkedList">
               <div v-for="(group, index) in groupedWays" :key="index" class="pay-way-group">
                 <div class="pay-way-group-title">{{ group.name }}</div>
@@ -132,12 +132,12 @@
           <a-divider orientation="left" />
         </a-col>
         <a-col :span="24">
-          <p class="ag-drawer-title">页面展示</p>
+          <p class="ag-drawer-title">{{ t('payConfig.ifDefine.pageDisplay') }}</p>
         </a-col>
       </a-row>
       <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-item label="卡片icon" name="icon">
+          <a-form-item :label="t('payConfig.ifDefine.cardIcon')" name="icon">
             <ag-upload
               :action="action"
               accept=".jpg, .jpeg, .png"
@@ -146,13 +146,13 @@
               @upload-success="uploadSuccess"
             >
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> {{ t('components.upload') }} </a-button>
               </template>
             </ag-upload>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="卡片背景色" name="bgColor">
+          <a-form-item :label="t('payConfig.ifDefine.cardBackgroundColor')" name="bgColor">
             <color-picker
               class="ag-color-picker"
               v-model:pureColor="saveObject.bgColor"
@@ -175,7 +175,7 @@ import { AgDrawer, AgUpload } from '@/components'
 import { getOpenStatusOptions, getStateOptions, getSupportStatusOptions } from '@/constants/common-const'
 import { CheckOutlined, CloseOutlined, LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
-import { computed, defineEmits, defineProps, onMounted, reactive, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -275,14 +275,14 @@ const checkedList = ref([])
 /**
  * 表单验证规则
  */
-const rules = reactive({
-  ifCode: [{ required: true, message: '请输入接口代码', trigger: 'blur' }],
-  ifName: [{ required: true, message: '请输入接口名称', trigger: 'blur' }],
+const rules = computed(() => ({
+  ifCode: [{ required: true, message: t('payConfig.ifDefine.ifCodeRequired'), trigger: 'blur' }],
+  ifName: [{ required: true, message: t('payConfig.ifDefine.ifNameRequired'), trigger: 'blur' }],
   normalMchParams: [{
     required: true, 
     validator: (rule, value) => {
       if (saveObject.value.isMchMode === 1 && saveObject.value.configPageType === 1 && !value) {
-        return Promise.reject(new Error('请输入普通商户接口配置定义描述'))
+        return Promise.reject(new Error(t('payConfig.ifDefine.normalMerchantParamsRequired')))
       }
       return Promise.resolve()
     },
@@ -292,7 +292,7 @@ const rules = reactive({
     required: true, 
     validator: (rule, value) => {
       if (saveObject.value.isIsvMode === 1 && saveObject.value.configPageType === 1 && !value) {
-        return Promise.reject(new Error('请输入服务商接口配置定义描述'))
+        return Promise.reject(new Error(t('payConfig.ifDefine.isvParamsRequired')))
       }
       return Promise.resolve()
     },
@@ -302,7 +302,7 @@ const rules = reactive({
     required: true, 
     validator: (rule, value) => {
       if (saveObject.value.isIsvMode === 1 && saveObject.value.configPageType === 1 && !value) {
-        return Promise.reject(new Error('请输入特约商户接口配置定义描述'))
+        return Promise.reject(new Error(t('payConfig.ifDefine.isvSubMerchantParamsRequired')))
       }
       return Promise.resolve()
     },
@@ -312,13 +312,13 @@ const rules = reactive({
     required: true,
     validator: (rule, value) => {
       if (checkedList.value.length <= 0) {
-        return Promise.reject(new Error('请选择支付方式'))
+        return Promise.reject(new Error(t('payConfig.ifDefine.paymentMethodRequired')))
       }
       return Promise.resolve()
     },
     trigger: 'blur'
   }]
-})
+}))
 
 /**
  * 加载表单数据
@@ -371,10 +371,10 @@ const handleConfirm = async () => {
 
     if (isAdd.value) {
       await payConfigApi.addIfDefine(saveObject.value)
-      message.success('新增成功')
+      message.success(t('common.addSuccess'))
     } else {
       await payConfigApi.updateIfDefineById(props.ifCode, saveObject.value)
-      message.success('修改成功')
+      message.success(t('common.editSuccess'))
     }
 
     localOpen.value = false
@@ -405,17 +405,17 @@ const groupBy = (list, key) => {
 const getGroupName = (wayType) => {
   switch (wayType) {
     case 'WECHAT':
-      return '微信'
+      return t('common.wayType.wechat')
     case 'ALIPAY':
-      return '支付宝'
+      return t('common.wayType.alipay')
     case 'YSFPAY':
-      return '云闪付'
+      return t('common.wayType.ysfpay')
     case 'UNIONPAY':
-      return '银联'
+      return t('common.wayType.unionpay')
     case 'DCEPPAY':
-      return '数字人民币'
+      return t('common.wayType.dceppay')
     default:
-      return '其他'
+      return t('common.wayType.other')
   }
 }
 
