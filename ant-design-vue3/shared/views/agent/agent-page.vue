@@ -136,8 +136,8 @@ import { AgInput, AgSearch, AgSelect, AgTable, AgTableActions } from '@/componen
 import AgPayConfig from '@/components/ag-pay-config'
 import { usePermission } from '@/composables/useCommon'
 import { useCrudTablePage } from '@/composables/useCrudTablePage'
-import { getStateInfo, getStateOptions } from '@/constants/common-const'
 import { getProjectConfig } from '@/config/project-config'
+import { getStateInfo, getStateOptions } from '@/constants/common-const'
 import { PlusOutlined } from '@ant-design/icons-vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -160,51 +160,51 @@ const payConfigOpen = ref(false)
 
 /** 表格列配置 */
 const ALL_TABLE_COLUMNS = [
- { key: 'agentName', title: '代理商名称', width: 160, fixed: 'left', ellipsis: true, customRender: 'agentNameSlot' },
- { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
- { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
- { key: 'level', dataIndex: 'level', title: '等级', width: 70 },
- { key: 'pid', dataIndex: 'pid', title: '上级代理', width: 140 },
- { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
- { key: 'auditProfitAmount', dataIndex: 'auditProfitAmount', title: '已结算', width: 100 },
- { key: 'balanceAmount', dataIndex: 'balanceAmount', title: '钱包余额', width: 100 },
- { key: 'unAmount', dataIndex: 'unAmount', title: '待结算金额', width: 110 },
- { key: 'state', title: '状态', width: 100, customRender: 'stateSlot' },
- { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
- { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'agentName', title: '代理商名称', width: 160, fixed: 'left', ellipsis: true, customRender: 'agentNameSlot' },
+  { key: 'agentNo', dataIndex: 'agentNo', title: '代理商号', width: 140 },
+  { key: 'contactTel', dataIndex: 'contactTel', title: '手机号', width: 140 },
+  { key: 'level', dataIndex: 'level', title: '等级', width: 70 },
+  { key: 'pid', dataIndex: 'pid', title: '上级代理', width: 140 },
+  { key: 'isvNo', dataIndex: 'isvNo', title: '服务商号', width: 140 },
+  { key: 'auditProfitAmount', dataIndex: 'auditProfitAmount', title: '已结算', width: 100 },
+  { key: 'balanceAmount', dataIndex: 'balanceAmount', title: '钱包余额', width: 100 },
+  { key: 'unAmount', dataIndex: 'unAmount', title: '待结算金额', width: 110 },
+  { key: 'state', title: '状态', width: 100, customRender: 'stateSlot' },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '创建时间', width: 200 },
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 const tableColumns = agColHidden.size ? ALL_TABLE_COLUMNS.filter(c => !agColHidden.has(c.key)) : ALL_TABLE_COLUMNS
 
 /** 使用 CRUD 表格页面组合式函数 */
 const {
- tableRef,
- searchData,
- defaultSearchData,
- searchFunc,
- searchLoading,
- modalOpen,
- detailOpen,
- currentRecordId,
- reloadTable,
- openCreate,
- openEdit,
- openDetail,
- closeModal,
- confirmDelete
+  tableRef,
+  searchData,
+  defaultSearchData,
+  searchFunc,
+  searchLoading,
+  modalOpen,
+  detailOpen,
+  currentRecordId,
+  reloadTable,
+  openCreate,
+  openEdit,
+  openDetail,
+  closeModal,
+  confirmDelete
 } = useCrudTablePage({
- searchDefaults: {
-   agentNo: '',
-   pid: '',
-   isvNo: '',
-   agentName: '',
-   loginUsername: '',
-   contactTel: '',
-   state: undefined
- },
- deleteAction: (recordId) => agentApi.delById(recordId),
- deleteConfirmTitle: '确定删除吗',
- deleteConfirmContent: '此操作将删除该代理商及其所有关联用户信息',
- deleteSuccessMessage: '删除成功'
+  searchDefaults: {
+      agentNo: '',
+      pid: '',
+      isvNo: '',
+      agentName: '',
+      loginUsername: '',
+      contactTel: '',
+      state: undefined
+  },
+  deleteAction: (recordId) => agentApi.delById(recordId),
+  deleteConfirmTitle: '确定删除吗',
+  deleteConfirmContent: '此操作将删除该代理商及其所有关联用户信息',
+  deleteSuccessMessage: '删除成功'
 })
 
 /**
@@ -213,7 +213,7 @@ const {
 * @returns {Promise} - 查询结果
 */
 const loadDataFunc = async (params) => {
- return await agentApi.queryPage(params)
+  return await agentApi.queryPage(params)
 }
 
 /** 新增代理商 */
@@ -227,8 +227,8 @@ const detailFunc = (recordId) => openDetail(recordId)
 
 /** 打开支付配置 */
 const payConfigFunc = (recordId) => {
- currentRecordId.value = recordId
- payConfigOpen.value = true
+  currentRecordId.value = recordId
+  payConfigOpen.value = true
 }
 
 /** 删除代理商 */
@@ -236,8 +236,8 @@ const delFunc = (recordId) => confirmDelete(recordId)
 
 /** 处理新增/编辑成功 */
 const handleModalSuccess = () => {
- closeModal()
- reloadTable()
+  closeModal()
+  reloadTable()
 }
 </script>
 

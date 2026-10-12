@@ -161,15 +161,15 @@ const {
 * 表格列配置
 */
 const ALL_TABLE_COLUMNS = [
- { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
- { key: 'bizType', title: '业务类型', width: 160, customRender: 'bizTypeSlot' },
- { key: 'infoName', title: '角色名称', width: 260, customRender: 'infoNameSlot' },
- { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 180, customRender: 'beforeBalanceSlot' },
- { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 180, customRender: 'changeAmountSlot' },
- { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: 'afterBalanceSlot' },
- { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联业务订单号', width: 200 },
- { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
- { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
+  { key: 'id', dataIndex: 'id', title: '流水号', width: 120, fixed: 'left' },
+  { key: 'bizType', title: '业务类型', width: 160, customRender: 'bizTypeSlot' },
+  { key: 'infoName', title: '角色名称', width: 260, customRender: 'infoNameSlot' },
+  { key: 'beforeBalance', dataIndex: 'beforeBalance', title: '变动前账户余额', width: 180, customRender: 'beforeBalanceSlot' },
+  { key: 'changeAmount', dataIndex: 'changeAmount', title: '变动金额', width: 180, customRender: 'changeAmountSlot' },
+  { key: 'afterBalance', dataIndex: 'afterBalance', title: '变动后账户余额', width: 180, customRender: 'afterBalanceSlot' },
+  { key: 'relaBizOrderId', dataIndex: 'relaBizOrderId', title: '关联业务订单号', width: 200 },
+  { key: 'createdAt', dataIndex: 'createdAt', title: '时间', width: 200 },
+  { key: 'op', title: '操作', width: 100, fixed: 'right', align: 'center', customRender: 'opSlot' }
 ]
 const tableColumns = abColHidden.size ? ALL_TABLE_COLUMNS.filter(c => !abColHidden.has(c.key)) : ALL_TABLE_COLUMNS
 

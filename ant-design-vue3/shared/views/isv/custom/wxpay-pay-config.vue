@@ -1,14 +1,7 @@
 <template>
-  <ag-drawer
-    v-model:open="localOpen"
-    width="40%"
-    title="填写参数"
-    :mask-closable="false"
-    :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')"
-    :confirm-loading="loading"
-    @confirm="handleConfirm"
-    @close="handleClose"
-  >
+  <ag-drawer v-model:open="localOpen" width="40%" title="填写参数" :mask-closable="false"
+    :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')" :confirm-loading="loading" @confirm="handleConfirm"
+    @close="handleClose">
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
         <a-col :span="12">
@@ -78,48 +71,36 @@
         </a-col>
         <a-col span="24">
           <a-form-item label="API证书(apiclient_cert.p12)" name="cert">
-            <ag-upload
-              :action="action"
-              accept=".p12"
-              bind-name="cert"
-              :urls="[ifParams.cert]"
-              list-type="picture"
-              @upload-success="uploadSuccess"
-            >
+            <ag-upload :action="action" accept=".p12" bind-name="cert" :urls="[ifParams.cert]" list-type="picture"
+              @upload-success="uploadSuccess">
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+                <a-button class="ag-upload-btn">
+                  <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
+                </a-button>
               </template>
             </ag-upload>
           </a-form-item>
         </a-col>
         <a-col span="24">
           <a-form-item label="证书文件(apiclient_cert.pem)" name="apiClientCert">
-            <ag-upload
-              :action="action"
-              accept=".pem"
-              bind-name="apiClientCert"
-              :urls="[ifParams.apiClientCert]"
-              list-type="picture"
-              @upload-success="uploadSuccess"
-            >
+            <ag-upload :action="action" accept=".pem" bind-name="apiClientCert" :urls="[ifParams.apiClientCert]"
+              list-type="picture" @upload-success="uploadSuccess">
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+                <a-button class="ag-upload-btn">
+                  <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
+                </a-button>
               </template>
             </ag-upload>
           </a-form-item>
         </a-col>
         <a-col span="24">
           <a-form-item label="私钥文件(apiclient_key.pem)" name="apiClientKey">
-            <ag-upload
-              :action="action"
-              accept=".pem"
-              bind-name="apiClientKey"
-              :urls="[ifParams.apiClientKey]"
-              list-type="picture"
-              @upload-success="uploadSuccess"
-            >
+            <ag-upload :action="action" accept=".pem" bind-name="apiClientKey" :urls="[ifParams.apiClientKey]"
+              list-type="picture" @upload-success="uploadSuccess">
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+                <a-button class="ag-upload-btn">
+                  <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
+                </a-button>
               </template>
             </ag-upload>
           </a-form-item>
@@ -140,7 +121,7 @@ import { usePermission } from '@/composables/useCommon'
 import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { computed, ref } from 'vue'
+import { computed, defineEmits, defineProps, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

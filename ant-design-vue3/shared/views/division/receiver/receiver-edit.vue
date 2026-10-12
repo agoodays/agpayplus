@@ -1,21 +1,7 @@
 <template>
-  <ag-drawer
-    v-model:open="localOpen"
-    width="30%"
-    title="修改分账用户信息"
-    :mask-closable="false"
-    :show-confirm="true"
-    :confirm-loading="confirmLoading"
-    @confirm="handleConfirm"
-    @close="handleClose"
-  >
-    <a-form
-      ref="infoForm"
-      :model="saveObject"
-      :label-col="{ span: 6 }"
-      :wrapper-col="{ span: 15 }"
-      :rules="rules"
-    >
+  <ag-drawer v-model:open="localOpen" width="30%" title="修改分账用户信息" :mask-closable="false" :show-confirm="true"
+    :confirm-loading="confirmLoading" @confirm="handleConfirm" @close="handleClose">
+    <a-form ref="infoForm" :model="saveObject" :label-col="{ span: 6 }" :wrapper-col="{ span: 15 }" :rules="rules">
       <a-form-item label="账号别名：" name="receiverAlias">
         <a-input v-model:value="saveObject.receiverAlias" />
       </a-form-item>
@@ -49,7 +35,7 @@
 import { divisionReceiverApi } from '@/api/business/division/division-receiver-api'
 import { AgDrawer } from '@/components'
 import { message } from 'ant-design-vue'
-import { ref, watch } from 'vue'
+import { defineEmits, defineProps, ref, watch } from 'vue'
 
 /** Props 定义 */
 const props = defineProps({
@@ -105,11 +91,11 @@ const initForm = async () => {
     divisionReceiverApi.getById(props.recordId),
     divisionReceiverApi.listReceiverGroup({ pageSize: -1 })
   ])
-  
+
   const current = res || {}
   current.divisionProfit = (current.divisionProfit * 100).toFixed(2)
   saveObject.value = current
-  
+
   allReceiverGroup.value = groupRes.records || []
 }
 

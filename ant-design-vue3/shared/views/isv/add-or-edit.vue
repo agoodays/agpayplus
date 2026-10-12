@@ -1,14 +1,6 @@
 ﻿<template>
-  <ag-drawer
-    v-model:open="localOpen"
-    width="40%"
-    :title="isAdd ? '新增服务商' : '修改服务商'"
-    :mask-closable="false"
-    :show-confirm="true"
-    :confirm-loading="loading"
-    @confirm="handleConfirm"
-    @close="handleClose"
-  >
+  <ag-drawer v-model:open="localOpen" width="40%" :title="isAdd ? '新增服务商' : '修改服务商'" :mask-closable="false"
+    :show-confirm="true" :confirm-loading="loading" @confirm="handleConfirm" @close="handleClose">
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
         <a-col :span="10">
@@ -62,7 +54,7 @@ import { isvApi } from '@/api/business/isv/isv-api'
 import { AgDrawer } from '@/components'
 import { getStateOptions } from '@/constants/common-const'
 import { message } from 'ant-design-vue'
-import { computed, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

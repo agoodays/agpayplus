@@ -1,14 +1,6 @@
 <template>
-  <ag-drawer
-    v-model:open="localOpen"
-    width="40%"
-    title="支付参数配置"
-    :mask-closable="false"
-    :show-confirm="true"
-    :confirm-loading="loading"
-    @confirm="handleConfirm"
-    @close="handleClose"
-  >
+  <ag-drawer v-model:open="localOpen" width="40%" title="支付参数配置" :mask-closable="false" :show-confirm="true"
+    :confirm-loading="loading" @confirm="handleConfirm" @close="handleClose">
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
         <a-col :span="12">
@@ -34,17 +26,9 @@
     <a-form ref="isvParamForm" :model="ifParams" layout="vertical" :rules="ifParamsRules">
       <a-row :gutter="16">
         <a-col v-for="(item, key) in isvParams" :key="key" :span="item.type === 'text' ? 12 : 24">
-          <a-form-item
-            v-if="item.type === 'text' || item.type === 'textarea'"
-            :label="item.desc"
-            :name="item.name"
-          >
-            <a-input
-              v-if="item.star === '1'"
-              v-model:value="ifParams[item.name]"
-              :placeholder="ifParams[item.name + '_ph']"
-              :type="item.type"
-            />
+          <a-form-item v-if="item.type === 'text' || item.type === 'textarea'" :label="item.desc" :name="item.name">
+            <a-input v-if="item.star === '1'" v-model:value="ifParams[item.name]"
+              :placeholder="ifParams[item.name + '_ph']" :type="item.type" />
             <a-input v-else v-model:value="ifParams[item.name]" placeholder="请输入" :type="item.type" />
           </a-form-item>
           <a-form-item v-else-if="item.type === 'radio'" :label="item.desc" :name="item.name">
@@ -55,15 +39,12 @@
             </a-radio-group>
           </a-form-item>
           <a-form-item v-else-if="item.type === 'file'" :label="item.desc" :name="item.name">
-            <ag-upload
-              :action="action"
-              :bind-name="item.name"
-              :urls="[ifParams[item.name]]"
-              list-type="picture"
-              @upload-success="uploadSuccess"
-            >
+            <ag-upload :action="action" :bind-name="item.name" :urls="[ifParams[item.name]]" list-type="picture"
+              @upload-success="uploadSuccess">
               <template #uploadSlot="{ loading }">
-                <a-button class="ag-upload-btn"> <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传 </a-button>
+                <a-button class="ag-upload-btn">
+                  <component :is="loading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
+                </a-button>
               </template>
             </ag-upload>
           </a-form-item>
@@ -83,7 +64,7 @@ import { AgDrawer, AgUpload } from '@/components'
 import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { computed, ref } from 'vue'
+import { computed, defineEmits, defineProps, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

@@ -1,16 +1,12 @@
 <template>
-  <ag-drawer
-    v-model:open="localOpen"
-    title="代理商详情"
-    width="40%"
-    :show-footer="false"
-    @close="handleClose"
-  >
+  <ag-drawer v-model:open="localOpen" title="代理商详情" width="40%" :show-footer="false" @close="handleClose">
     <a-spin :spinning="loading">
       <!-- 基本信息 -->
       <a-descriptions :column="2">
         <a-descriptions-item v-if="!agDHid.has('agentNo')" label="代理商号">{{ detailData.agentNo }}</a-descriptions-item>
-        <a-descriptions-item v-if="!agDHid.has('agentName')" label="代理商名称">{{ detailData.agentName }}</a-descriptions-item>
+        <a-descriptions-item v-if="!agDHid.has('agentName')" label="代理商名称">
+          {{ detailData.agentName }}
+        </a-descriptions-item>
         <a-descriptions-item label="登录名">{{ detailData.loginUsername }}</a-descriptions-item>
         <a-descriptions-item label="代理商简称">{{ detailData.agentShortName }}</a-descriptions-item>
         <a-descriptions-item label="上级代理商号">{{ detailData.pid }}</a-descriptions-item>
@@ -54,14 +50,17 @@
       <a-descriptions :column="2" :bordered="false">
         <a-descriptions-item label="代理商类型">{{ getAgentTypeInfo(detailData.agentType, t).text }}</a-descriptions-item>
         <a-descriptions-item label="收款账户类型">{{ detailData.settAccountTypeName }}</a-descriptions-item>
-        <a-descriptions-item label="对公账户名称" v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
+        <a-descriptions-item label="对公账户名称"
+          v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
           {{ detailData.settAccountName }}
         </a-descriptions-item>
         <a-descriptions-item :label="detailData.settAccountNoLabel">{{ detailData.settAccountNo }}</a-descriptions-item>
-        <a-descriptions-item label="开户银行名称" v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
+        <a-descriptions-item label="开户银行名称"
+          v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
           {{ detailData.settAccountBank }}
         </a-descriptions-item>
-        <a-descriptions-item label="开户行支行名称" v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
+        <a-descriptions-item label="开户行支行名称"
+          v-if="detailData.settAccountType === SETT_ACCOUNT_TYPE_ENUM.BANK_PUBLIC.value">
           {{ detailData.settAccountSubBank }}
         </a-descriptions-item>
       </a-descriptions>
@@ -73,62 +72,44 @@
       <a-row :gutter="16">
         <a-col v-if="detailData.agentType === 2" :span="10">
           <a-form-item label="营业执照照片" name="licenseImg">
-            <ag-upload
-              :urls="detailData.licenseImg ? [detailData.licenseImg] : []"
+            <ag-upload :urls="detailData.licenseImg ? [detailData.licenseImg] : []"
               :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-              list-type="picture"
-              :read-only="true"
-            />
+              list-type="picture" :read-only="true" />
           </a-form-item>
         </a-col>
         <a-col v-if="detailData.agentType === 2 && detailData.settAccountType === 'BANK_PUBLIC'" :span="10">
           <a-form-item label="开户许可证照片" name="permitImg">
-            <ag-upload
-              :urls="detailData.permitImg ? [detailData.permitImg] : []"
+            <ag-upload :urls="detailData.permitImg ? [detailData.permitImg] : []"
               :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-              list-type="picture"
-              :read-only="true"
-            />
+              list-type="picture" :read-only="true" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item :label="'[' + imgLabel + ']身份证人像面照片'" name="idcard1Img">
-            <ag-upload
-              :urls="detailData.idcard1Img ? [detailData.idcard1Img] : []"
+            <ag-upload :urls="detailData.idcard1Img ? [detailData.idcard1Img] : []"
               :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-              list-type="picture"
-              :read-only="true"
-            />
+              list-type="picture" :read-only="true" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item :label="'[' + imgLabel + ']身份证国徽面照片'" name="idcard2Img">
-            <ag-upload
-              :urls="detailData.idcard2Img ? [detailData.idcard2Img] : []"
+            <ag-upload :urls="detailData.idcard2Img ? [detailData.idcard2Img] : []"
               :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-              list-type="picture"
-              :read-only="true"
-            />
+              list-type="picture" :read-only="true" />
           </a-form-item>
         </a-col>
         <a-col :span="10">
           <a-form-item label="[联系人]手持身份证照片" name="idcardInHandImg">
-            <ag-upload
-              :urls="detailData.idcardInHandImg ? [detailData.idcardInHandImg] : []"
+            <ag-upload :urls="detailData.idcardInHandImg ? [detailData.idcardInHandImg] : []"
               :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-              list-type="picture"
-              :read-only="true"
-            />
+              list-type="picture" :read-only="true" />
           </a-form-item>
         </a-col>
         <a-col v-if="detailData.settAccountType === 'BANK_PRIVATE'" :span="10">
           <a-form-item :label="'[' + imgLabel + ']银行卡照片'" name="bankCardImg">
-            <ag-upload
-              :urls="detailData.bankCardImg ? [detailData.bankCardImg] : []"
+            <ag-upload :urls="detailData.bankCardImg ? [detailData.bankCardImg] : []"
               :show-upload-list="{ showPreviewIcon: false, showRemoveIcon: false, showDownloadIcon: false }"
-              list-type="picture"
-              :read-only="true"
-            />
+              list-type="picture" :read-only="true" />
           </a-form-item>
         </a-col>
       </a-row>
@@ -152,7 +133,7 @@ import {
   getStateInfo
 } from '@/constants/common-const'
 import { message } from 'ant-design-vue'
-import { reactive, ref, watch } from 'vue'
+import { defineEmits, defineProps, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

@@ -6,13 +6,8 @@
         <a-tab-pane key="basic" tab="基本信息">
           <a-row :gutter="24">
             <a-col :md="16" :lg="16">
-              <a-form
-                ref="basicFormRef"
-                :model="basicForm"
-                :label-col="{ span: 6 }"
-                :wrapper-col="{ span: 14 }"
-                :rules="basicRules"
-              >
+              <a-form ref="basicFormRef" :model="basicForm" :label-col="{ span: 6 }" :wrapper-col="{ span: 14 }"
+                :rules="basicRules">
                 <a-form-item label="用户登录名">
                   <a-input v-model:value="basicForm.loginUsername" disabled />
                 </a-form-item>
@@ -46,19 +41,10 @@
                 <div class="avatar-preview">
                   <img :src="basicForm.avatarUrl || defaultAvatar" alt="头像" @click="handlePreviewAvatar" />
                 </div>
-                <ag-upload
-                  name="file"
-                  :action="uploadAction"
-                  :accept="'.jpg,.jpeg,.png'"
-                  :multiple="false"
-                  :show-upload-list="false"
-                  :urls="basicForm.avatarUrl ? [basicForm.avatarUrl] : []"
-                  :num="1"
-                  :replace-mode="true"
-                  :before-upload="beforeAvatarUpload"
-                  @upload-success="handleAvatarUploadSuccess"
-                  @error="handleAvatarUploadError"
-                >
+                <ag-upload name="file" :action="uploadAction" :accept="'.jpg,.jpeg,.png'" :multiple="false"
+                  :show-upload-list="false" :urls="basicForm.avatarUrl ? [basicForm.avatarUrl] : []" :num="1"
+                  :replace-mode="true" :before-upload="beforeAvatarUpload" @upload-success="handleAvatarUploadSuccess"
+                  @error="handleAvatarUploadError">
                   <template #uploadSlot="{ loading }">
                     <a-button :loading="loading">
                       <upload-outlined />
@@ -78,35 +64,21 @@
             <a-tab-pane key="password" tab="修改密码">
               <a-row :gutter="24">
                 <a-col :md="16" :lg="16">
-                  <a-form
-                    ref="passwordFormRef"
-                    :model="passwordForm"
-                    :label-col="{ span: 6 }"
-                    :wrapper-col="{ span: 14 }"
-                    :rules="passwordRules"
-                  >
+                  <a-form ref="passwordFormRef" :model="passwordForm" :label-col="{ span: 6 }"
+                    :wrapper-col="{ span: 14 }" :rules="passwordRules">
                     <a-form-item label="原密码" name="originalPwd">
-                      <a-input-password
-                        v-model:value="passwordForm.originalPwd"
-                        placeholder="请输入原密码"
-                        autocomplete="new-password"
-                      />
+                      <a-input-password v-model:value="passwordForm.originalPwd" placeholder="请输入原密码"
+                        autocomplete="new-password" />
                     </a-form-item>
 
                     <a-form-item label="新密码" name="newPwd">
-                      <a-input-password
-                        v-model:value="passwordForm.newPwd"
-                        placeholder="请输入新密码"
-                        autocomplete="new-password"
-                      />
+                      <a-input-password v-model:value="passwordForm.newPwd" placeholder="请输入新密码"
+                        autocomplete="new-password" />
                     </a-form-item>
 
                     <a-form-item label="确认新密码" name="confirmPwd">
-                      <a-input-password
-                        v-model:value="passwordForm.confirmPwd"
-                        placeholder="请再次输入新密码"
-                        autocomplete="new-password"
-                      />
+                      <a-input-password v-model:value="passwordForm.confirmPwd" placeholder="请再次输入新密码"
+                        autocomplete="new-password" />
                     </a-form-item>
 
                     <a-form-item :wrapper-col="{ offset: 6, span: 14 }">

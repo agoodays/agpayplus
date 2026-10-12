@@ -1,22 +1,10 @@
 <template>
-  <a-modal
-    title="修改头像"
-    v-model:open="localOpen"
-    :mask-closable="false"
-    :confirm-loading="confirmLoading"
-    :width="800"
-    :footer="null"
-    @cancel="handleClose"
-  >
+  <a-modal title="修改头像" v-model:open="localOpen" :mask-closable="false" :confirm-loading="confirmLoading" :width="800"
+    :footer="null" @cancel="handleClose">
     <a-row>
       <a-col :xs="24" :md="12" style="height: '350px'">
         <div class="avatar-upload-area">
-          <ag-upload
-            name="file"
-            :before-upload="beforeUpload"
-            :show-upload-list="false"
-            :action="upload.icon"
-          >
+          <ag-upload name="file" :before-upload="beforeUpload" :show-upload-list="false" :action="upload.icon">
             <div class="upload-placeholder" v-if="!options.img">
               <component :is="icons.PlusOutlined" style="font-size: 48px; color: #ccc" />
               <p>点击上传图片</p>
@@ -35,7 +23,9 @@
     <a-row>
       <a-col :lg="2" :md="2">
         <a-button @click="triggerUpload">
-          <template #icon><UploadOutlined /></template>
+          <template #icon>
+            <UploadOutlined />
+          </template>
           选择图片
         </a-button>
       </a-col>
@@ -51,11 +41,11 @@
  * 修改头像模态框组件
  * 功能：上传和裁剪用户头像
  */
-import { ref, reactive, watch } from 'vue'
-import { message } from 'ant-design-vue'
-import { PlusOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { upload } from '@/lib/ag-axios'
 import { AgUpload } from '@/components'
+import { upload } from '@/lib/ag-axios'
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import { message } from 'ant-design-vue'
+import { defineEmits, defineProps, reactive, ref, watch } from 'vue'
 
 const icons = { PlusOutlined, UploadOutlined }
 

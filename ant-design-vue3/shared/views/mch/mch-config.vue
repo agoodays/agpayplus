@@ -1,14 +1,6 @@
 <template>
-  <ag-drawer
-    v-model:open="localOpen"
-    width="60%"
-    title="商户高级配置"
-    :mask-closable="false"
-    :show-confirm="true"
-    :confirm-loading="loading"
-    @confirm="handleConfirm"
-    @close="handleClose"
-  >
+  <ag-drawer v-model:open="localOpen" width="60%" title="商户高级配置" :mask-closable="false" :show-confirm="true"
+    :confirm-loading="loading" @confirm="handleConfirm" @close="handleClose">
     <a-tabs v-model:active-key="groupKey" @change="selectTabs" :animated="false">
       <a-tab-pane key="orderConfig" tab="系统配置">
         <div v-if="groupKey === 'orderConfig'">
@@ -30,7 +22,8 @@
               <a-col :span="22" :offset="1" :key="config" v-for="(item, config) in configData">
                 <div v-if="item.configKey !== 'payOrderNotifyExtParams'">
                   <a-form-item :label="item.configName" v-if="item.type === 'text' || item.type === 'textarea'">
-                    <a-input :type="item.type === 'text' ? 'text' : 'textarea'" v-model:value="item.configVal" autocomplete="off" />
+                    <a-input :type="item.type === 'text' ? 'text' : 'textarea'" v-model:value="item.configVal"
+                      autocomplete="off" />
                     <div v-if="item.configKey === 'mchRefundNotifyUrl'" class="agpay-tip-text">
                       <span>智能POS收款、退款等场景下，需要配置商户回调地址，接口下单以下单传参为准</span>
                     </div>
@@ -41,14 +34,19 @@
                       <a-popover placement="top" v-if="item.configKey === 'mchNotifyPostType'">
                         <template #content>
                           <p>设置后该商户接收支付网关所有的通知（支付、退款等回调）将全部以此方式发送。</p>
-                          <p>POST(Body形式)： method: POST; Content-Type: application/x-www-form-urlencoded; 回调参数（ 例如a=1&b=2 ）放置在Body 发送。</p>
-                          <p>POST(QueryString形式)： method: POST; Content-Type: application/x-www-form-urlencoded; 回调参数（ 例如a=1&b=2 ）放置在QueryString 发送。</p>
-                          <p>POST(JSON形式)： method: POST; Content-Type: application/json; 回调参数（ 例如{a: 1, b: 2} ）放置在Body 发送。</p>
+                          <p>POST(Body形式)： method: POST; Content-Type: application/x-www-form-urlencoded; 回调参数（
+                            例如a=1&b=2 ）放置在Body 发送。</p>
+                          <p>POST(QueryString形式)： method: POST; Content-Type: application/x-www-form-urlencoded; 回调参数（
+                            例如a=1&b=2 ）放置在QueryString 发送。</p>
+                          <p>POST(JSON形式)： method: POST; Content-Type: application/json; 回调参数（ 例如{a: 1, b: 2} ）放置在Body
+                            发送。</p>
                         </template>
                         <template #title>
                           <span>回调方式</span>
                         </template>
-                        <span><InfoCircleOutlined /></span>
+                        <span>
+                          <InfoCircleOutlined />
+                        </span>
                       </a-popover>
                     </template>
                     <a-radio-group v-model:value="item.configVal">
@@ -59,14 +57,8 @@
                   </a-form-item>
                 </div>
                 <div v-else>
-                  <a-table
-                    size="small"
-                    :title="() => '回调参数配置'"
-                    :row-selection="rowSelection"
-                    :columns="orderNotifyParamsColumns"
-                    :data-source="orderNotifyParamsData"
-                    :pagination="false"
-                  />
+                  <a-table size="small" :title="() => '回调参数配置'" :row-selection="rowSelection"
+                    :columns="orderNotifyParamsColumns" :data-source="orderNotifyParamsData" :pagination="false" />
                 </div>
               </a-col>
             </a-row>
@@ -89,16 +81,19 @@
                       <template #title>
                         <span>全局自动分账</span>
                       </template>
-                      <span><InfoCircleOutlined /></span>
+                      <span>
+                        <InfoCircleOutlined />
+                      </span>
                     </a-popover>
                   </template>
-                  <a-radio-group v-model:value="divisionConfig.overrideAutoFlag" :options="openStatusOptions"/>
+                  <a-radio-group v-model:value="divisionConfig.overrideAutoFlag" :options="openStatusOptions" />
                 </a-form-item>
                 <a-form-item v-if="divisionConfig.overrideAutoFlag === 1" class="division" label="金额限制">
                   <a-divider orientation="left">全局自动分账规则</a-divider>
                   <div style="display: flex; align-items: center;">
                     <span style="margin-right: 8px">当订单金额大于等于</span>
-                    <a-input-number :min="0" :formatter="value => `${value} 元`" v-model:value="divisionConfig.autoDivisionRules.amountLimit" />
+                    <a-input-number :min="0" :formatter="value => `${value} 元`"
+                      v-model:value="divisionConfig.autoDivisionRules.amountLimit" />
                     <span style="margin-left: 8px">时自动分账</span>
                   </div>
                 </a-form-item>
@@ -129,7 +124,9 @@
                       <template #title>
                         <span>商户管理功能限制</span>
                       </template>
-                      <span><InfoCircleOutlined /></span>
+                      <span>
+                        <InfoCircleOutlined />
+                      </span>
                     </a-popover>
                   </template>
                   <a-radio-group v-model:value="divisionConfig.mchDivisionEntFlag">
@@ -148,14 +145,8 @@
             <a-row>
               <a-col :span="24">
                 <div v-if="isShowMchApiEnt">
-                  <a-table
-                    size="small"
-                    :title="() => '商户可自调用接口'"
-                    :row-selection="mchApiEntRowSelection"
-                    :columns="mchApiEntColumns"
-                    :data-source="mchApiEntData"
-                    :pagination="false"
-                  />
+                  <a-table size="small" :title="() => '商户可自调用接口'" :row-selection="mchApiEntRowSelection"
+                    :columns="mchApiEntColumns" :data-source="mchApiEntData" :pagination="false" />
                 </div>
               </a-col>
             </a-row>

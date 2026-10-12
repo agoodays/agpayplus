@@ -1,10 +1,5 @@
 <template>
-  <ag-drawer
-    v-model:open="localOpen"
-    width="40%"
-    title="商户详情"
-    @close="handleClose"
-  >
+  <ag-drawer v-model:open="localOpen" width="40%" title="商户详情" @close="handleClose">
     <a-spin :spinning="loading">
       <a-descriptions :column="2" bordered size="small">
         <a-descriptions-item v-if="!mchDHid.has('mchNo')" label="商户号">
@@ -33,19 +28,23 @@
           {{ detailData.mchLevel }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('isvNo')" label="服务商号">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('isvNo')"
+          label="服务商号">
           {{ detailData.isvNo }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('isvName')" label="服务商名称">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('isvName')"
+          label="服务商名称">
           {{ detailData.isvName }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('agentNo')" label="代理商号">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('agentNo')"
+          label="代理商号">
           {{ detailData.agentNo }}
         </a-descriptions-item>
 
-        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('agentName')" label="代理商名称">
+        <a-descriptions-item v-if="detailData.type === MCH_TYPE_ENUM.SPECIAL.value && !mchDHid.has('agentName')"
+          label="代理商名称">
           {{ detailData.agentName }}
         </a-descriptions-item>
 
@@ -98,7 +97,7 @@ import {
   getStateInfo
 } from '@/constants/common-const'
 import { message } from 'ant-design-vue'
-import { reactive, ref, watch } from 'vue'
+import { defineEmits, defineProps, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

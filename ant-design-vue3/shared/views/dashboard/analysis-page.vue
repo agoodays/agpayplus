@@ -13,13 +13,8 @@
     <a-row :gutter="[16, 16]" style="margin-top: 16px">
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card :loading="loading">
-          <a-statistic
-            :title="t('main.todayAmount')"
-            :value="statistics.todayAmount"
-            :precision="2"
-            :suffix="t('main.yuan')"
-            :value-style="{ color: 'var(--success-color)' }"
-          >
+          <a-statistic :title="t('main.todayAmount')" :value="statistics.todayAmount" :precision="2"
+            :suffix="t('main.yuan')" :value-style="{ color: 'var(--success-color)' }">
             <template #prefix>
               <transaction-outlined />
             </template>

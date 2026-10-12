@@ -1,14 +1,7 @@
 <template>
-  <ag-drawer
-    v-model:open="localOpen"
-    width="40%"
-    title="填写参数"
-    :mask-closable="false"
-    :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')"
-    :confirm-loading="loading"
-    @confirm="handleConfirm"
-    @close="handleClose"
-  >
+  <ag-drawer v-model:open="localOpen" width="40%" title="填写参数" :mask-closable="false"
+    :show-confirm="hasPermission('ENT_MCH_PAY_CONFIG_ADD')" :confirm-loading="loading" @confirm="handleConfirm"
+    @close="handleClose">
     <a-form ref="infoForm" :model="saveObject" layout="vertical" :rules="rules">
       <a-row :gutter="16">
         <a-col :span="12">
@@ -45,12 +38,14 @@
         </a-col>
         <a-col span="24">
           <a-form-item label="应用私钥" name="privateKey">
-            <a-input v-model:value="ifParams.privateKey" :placeholder="ifParams.privateKey_ph || '请输入'" type="textarea" />
+            <a-input v-model:value="ifParams.privateKey" :placeholder="ifParams.privateKey_ph || '请输入'"
+              type="textarea" />
           </a-form-item>
         </a-col>
         <a-col span="24">
           <a-form-item label="支付宝公钥" name="alipayPublicKey">
-            <a-input v-model:value="ifParams.alipayPublicKey" :placeholder="ifParams.alipayPublicKey_ph || '请输入'" type="textarea" />
+            <a-input v-model:value="ifParams.alipayPublicKey" :placeholder="ifParams.alipayPublicKey_ph || '请输入'"
+              type="textarea" />
           </a-form-item>
         </a-col>
         <a-col span="12">
@@ -71,14 +66,8 @@
         </a-col>
         <a-col span="24">
           <a-form-item label="应用公钥证书（.crt格式）" name="appPublicCert">
-            <ag-upload
-              :action="action"
-              accept=".crt"
-              bind-name="appPublicCert"
-              :urls="[ifParams.appPublicCert]"
-              list-type="picture"
-              @upload-success="uploadSuccess"
-            >
+            <ag-upload :action="action" accept=".crt" bind-name="appPublicCert" :urls="[ifParams.appPublicCert]"
+              list-type="picture" @upload-success="uploadSuccess">
               <template #uploadSlot="{ loading: uploadLoading }">
                 <a-button class="ag-upload-btn">
                   <component :is="uploadLoading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
@@ -89,14 +78,8 @@
         </a-col>
         <a-col span="24">
           <a-form-item label="支付宝公钥证书（.crt格式）" name="alipayPublicCert">
-            <ag-upload
-              :action="action"
-              accept=".crt"
-              bind-name="alipayPublicCert"
-              :urls="[ifParams.alipayPublicCert]"
-              list-type="picture"
-              @upload-success="uploadSuccess"
-            >
+            <ag-upload :action="action" accept=".crt" bind-name="alipayPublicCert" :urls="[ifParams.alipayPublicCert]"
+              list-type="picture" @upload-success="uploadSuccess">
               <template #uploadSlot="{ loading: uploadLoading }">
                 <a-button class="ag-upload-btn">
                   <component :is="uploadLoading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
@@ -107,14 +90,8 @@
         </a-col>
         <a-col span="24">
           <a-form-item label="支付宝根证书（.crt格式）" name="alipayRootCert">
-            <ag-upload
-              :action="action"
-              accept=".crt"
-              bind-name="alipayRootCert"
-              :urls="[ifParams.alipayRootCert]"
-              list-type="picture"
-              @upload-success="uploadSuccess"
-            >
+            <ag-upload :action="action" accept=".crt" bind-name="alipayRootCert" :urls="[ifParams.alipayRootCert]"
+              list-type="picture" @upload-success="uploadSuccess">
               <template #uploadSlot="{ loading: uploadLoading }">
                 <a-button class="ag-upload-btn">
                   <component :is="uploadLoading ? icons.LoadingOutlined : icons.UploadOutlined" /> 上传
@@ -144,7 +121,7 @@ import { usePayConfigDrawer } from '@/composables/usePayConfigDrawer'
 import { getStateOptions } from '@/constants/common-const'
 import { upload } from '@/lib/ag-axios'
 import { LoadingOutlined, UploadOutlined } from '@ant-design/icons-vue'
-import { computed, ref } from 'vue'
+import { computed, defineEmits, defineProps, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
